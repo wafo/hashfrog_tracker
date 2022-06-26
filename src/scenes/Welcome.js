@@ -1,6 +1,17 @@
-import { Fragment } from "react";
+import { useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import Footer from "../components/Footer";
+import welcome from "./welcome.md";
 
 const Welcome = () => {
+  const [markdown, setMarkdown] = useState(null);
+
+  useEffect(() => {
+    fetch(welcome)
+      .then((response) => response.text())
+      .then((text) => setMarkdown(text));
+  }, []);
+
   const launchTracker = () => {
     const url = "http://localhost:3000/tracker";
     window.open(
@@ -11,11 +22,15 @@ const Welcome = () => {
   };
 
   return (
-    <Fragment>
+    <div style={{ color: "#fff" }}>
       <button type="button" onClick={launchTracker}>
         Launch tracker
       </button>
-    </Fragment>
+      <ReactMarkdown>{markdown}</ReactMarkdown>
+      <div style={{ margin: "2rem 0" }}>
+        <Footer />
+      </div>
+    </div>
   );
 };
 

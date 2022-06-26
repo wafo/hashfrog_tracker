@@ -9,7 +9,7 @@ const Footer = (props) => {
   return (
     <Fragment>
       <p style={{ fontSize: "0.75rem", opacity }}>
-        {name} v{version} {showGitHub && <span>- Source code on GitHub</span>}
+        {name} v{version} {showGitHub && <span>- Source code on <a href="https://github.com/wafo/hashfrog_tracker">GitHub</a></span>}
       </p>
     </Fragment>
   );
