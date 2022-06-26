@@ -3,6 +3,8 @@ import ReactMarkdown from "react-markdown";
 import Footer from "../components/Footer";
 import welcome from "./welcome.md";
 
+const baseURL = process.env.PUBLIC_URL;
+
 const Welcome = () => {
   const [markdown, setMarkdown] = useState(null);
 
@@ -13,7 +15,7 @@ const Welcome = () => {
   }, []);
 
   const launchTracker = () => {
-    const url = "http://localhost:3000/tracker";
+    const url = `${baseURL}/tracker`;
     window.open(
       url,
       "HashFrog Tracker",
