@@ -2,7 +2,7 @@
 
 This is a tracker for the [Ocarina of Time Randomizer](https://ootrandomizer.com/). It's available at [https://hashfrog.wafo.dev](https://hashfrog.wafo.dev).
 
-## Explanation
+## About
 The motivation behind this project is to have a simple customizable tracker that will help keep track of all the checks in the game.
 
 ### TODO
