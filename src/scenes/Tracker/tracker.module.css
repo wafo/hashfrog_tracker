@@ -1,0 +1,39 @@
+.tracker {
+  max-width: 315px;
+  overflow: hidden;
+}
+
+.items {
+  display: flex;
+  align-items: flex-start;
+}
+
+.songs {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.medallions {
+  margin: 1rem 0;
+}
+
+.songs {
+  margin: 1rem 0;
+}
+
+.sometimes {
+  display: flex;
+  justify-content: space-between;
+  margin: 1rem 0;
+}
+
+.always {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.locations {
+  margin: 1rem 0;
+}

@@ -1,0 +1,637 @@
+[
+  {
+    "id": "a081121b16f84366bf16e16ca90cd23f",
+    "type": "simple",
+    "name": "Example",
+    "label": "",
+    "labelStartingIndex": 0,
+    "size": [25, 25],
+    "icons": ["hash_frog_32x32.png"],
+    "countConfig": [0, 1],
+    "receiver": false,
+    "selectedStartingIndex": 0
+  },
+  {
+    "id": "0c44ac338d7249b39271d0b25425b7d9",
+    "type": "simple",
+    "name": "sticks",
+    "size": [25, 25],
+    "icons": ["sticks_bw_32x32.png", "sticks_32x32.png"]
+  },
+  {
+    "id": "ca8ed02a22504625a59432b5bd36e1f7",
+    "type": "simple",
+    "name": "nuts",
+    "size": [25, 25],
+    "icons": ["nuts_bw_32x32.png", "nuts_32x32.png"]
+  },
+  {
+    "id": "41abf8d927884593b6652d03f7d7b4e0",
+    "type": "simple",
+    "name": "bombs",
+    "size": [25, 25],
+    "icons": ["bombs_bw_32x32.png", "bombs_32x32.png"]
+  },
+  {
+    "id": "e2259c4e07c84603b9d8ec735763bb0a",
+    "type": "simple",
+    "name": "bow",
+    "size": [25, 25],
+    "icons": ["bow_bw_32x32.png", "bow_32x32.png"]
+  },
+  {
+    "id": "4d690df905ec450aa13b558224147d5a",
+    "type": "simple",
+    "name": "fl_arrows",
+    "size": [25, 25],
+    "icons": [
+      "fire_light_arrows_bw_32x32.png",
+      "fire_arrows_32x32.png",
+      "light_arrows_32x32.png",
+      "fire_light_arrows_32x32.png"
+    ]
+  },
+  {
+    "id": "9d59f8728d764624821b248ac84d64cb",
+    "type": "simple",
+    "name": "slingshot",
+    "size": [25, 25],
+    "icons": ["slingshot_bw_32x32.png", "slingshot_32x32.png"]
+  },
+  {
+    "id": "429279d84b614c529e1b979dbe2db283",
+    "type": "simple",
+    "name": "hammer",
+    "size": [25, 25],
+    "icons": ["hammer_bw_32x32.png", "hammer_32x32.png"]
+  },
+  {
+    "id": "da02ed703faf48559179614e389c2dd1",
+    "type": "simple",
+    "name": "bombchus",
+    "size": [25, 25],
+    "icons": ["bomb_chu_bw_32x32.png", "bomb_chu_32x32.png"]
+  },
+  {
+    "id": "eb57bc60abc34ea7b67f857b0f30fcc3",
+    "type": "simple",
+    "name": "hookshot",
+    "size": [25, 25],
+    "icons": [
+      "hookshot_bw_32x32.png",
+      "hookshot_32x32.png",
+      "longshot_32x32.png"
+    ]
+  },
+  {
+    "id": "a81e243dac784154b83746c644c74dd8",
+    "type": "simple",
+    "name": "dins-farore",
+    "size": [25, 25],
+    "icons": [
+      "dins_farores_bw_32x32.png",
+      "dins_fire_32x32.png",
+      "farores_wind_32x32.png",
+      "dins_farores_32x32.png"
+    ]
+  },
+  {
+    "id": "4935246af9e34230b82a4b639d62a75c",
+    "type": "simple",
+    "name": "dins",
+    "size": [25, 25],
+    "icons": ["dins_fire_bw_32x32.png", "dins_fire_32x32.png"]
+  },
+  {
+    "id": "1b220c9255fe427e90f2da5bdfcd965a",
+    "type": "simple",
+    "name": "farores",
+    "size": [25, 25],
+    "icons": ["farores_wind_bw_32x32.png", "farores_wind_32x32.png"]
+  },
+  {
+    "id": "0f2e5a599a6645ae89ec3bd1b787a7b3",
+    "type": "simple",
+    "name": "boomerang",
+    "size": [25, 25],
+    "icons": ["boomerang_bw_32x32.png", "boomerang_32x32.png"]
+  },
+  {
+    "id": "c783209d6be348dc821829e46095348f",
+    "type": "simple",
+    "name": "lens",
+    "size": [25, 25],
+    "icons": ["lens_bw_32x32.png", "lens_32x32.png"]
+  },
+  {
+    "id": "e9adcab606b346379717e97f7c59ceff",
+    "type": "simple",
+    "name": "beans",
+    "size": [25, 25],
+    "icons": ["beans_bw_32x32.png", "beans_32x32.png"]
+  },
+  {
+    "id": "9274be1cc1934da1927c96ca9a369c1a",
+    "type": "simple",
+    "name": "magic",
+    "size": [25, 25],
+    "icons": ["magic_bw_32x32.png", "magic_32x32.png", "magic_double_32x32.png"]
+  },
+  {
+    "id": "9274be1cc1934da1927c96ca9a369c1a",
+    "type": "simple",
+    "name": "strength",
+    "size": [25, 25],
+    "icons": [
+      "strength_bw_32x32.png",
+      "strength_32x32.png",
+      "strength2_32x32.png",
+      "strength3_32x32.png"
+    ]
+  },
+  {
+    "id": "b797e237d5754d4785b436ba44128740",
+    "type": "simple",
+    "name": "rutos_letter",
+    "size": [25, 25],
+    "icons": [
+      "bottle_rutos_letter_bw_32x32.png",
+      "bottle_rutos_letter_32x32.png"
+    ]
+  },
+  {
+    "id": "b5550cfbf9fc4e36b70524fe2d253aee",
+    "type": "counter",
+    "name": "bottle_counter",
+    "size": [25, 25],
+    "countConfig": [0, 4],
+    "icons": ["bottle_empty_32x32.png"]
+  },
+  {
+    "id": "973baa09459d468da633e9510bbdaa1f",
+    "type": "simple",
+    "name": "scale",
+    "size": [25, 25],
+    "icons": ["scale_bw_32x32.png", "scale_32x32.png", "scale_golden_32x32.png"]
+  },
+  {
+    "id": "8d96134f27634b7f9f21f7b8cb1b1e91",
+    "type": "simple",
+    "name": "wallet",
+    "size": [25, 25],
+    "icons": ["wallet_bw_32x32.png", "wallet2_32x32.png", "wallet3_32x32.png"]
+  },
+  {
+    "id": "6e86caa5dbe549e1b3b87e3eb179c508",
+    "type": "simple",
+    "name": "trade_1",
+    "size": [25, 25],
+    "icons": [
+      "zeldas_letter_32x32.png",
+      "keaton_mask_32x32.png",
+      "skull_mask_32x32.png",
+      "sold_out_32x32.png"
+    ]
+  },
+  {
+    "id": "3bd2660084e04e13b0de10fd84b9dd22",
+    "type": "simple",
+    "name": "trade_2",
+    "size": [25, 25],
+    "icons": [
+      "prescription_bw_32x32.png",
+      "prescription_32x32.png",
+      "hash_frog_32x32.png",
+      "eye_drops_32x32.png",
+      "claim_check_32x32.png"
+    ]
+  },
+  {
+    "id": "ac1b262de0684222beb0eb23cf671a7e",
+    "type": "simple",
+    "name": "kokiri_sword",
+    "size": [25, 25],
+    "icons": ["kokiri_sword_bw_32x32.png", "kokiri_sword_32x32.png"]
+  },
+  {
+    "id": "4cf982a84e834ca7a8f5a68c0af0a7e7",
+    "type": "simple",
+    "name": "master_sword",
+    "size": [25, 25],
+    "icons": ["master_sword_bw_32x32.png", "master_sword_32x32.png"],
+    "selectedStartingIndex": 1
+  },
+  {
+    "id": "250b5e9af3364df492d6831624119319",
+    "type": "simple",
+    "name": "biggoron_sword",
+    "size": [25, 25],
+    "icons": ["biggoron_sword_bw_32x32.png", "biggoron_sword_32x32.png"]
+  },
+  {
+    "id": "133778d9e7344127ae4a3532e5ddcb45",
+    "type": "simple",
+    "name": "deku_shield",
+    "size": [25, 25],
+    "icons": ["deku_shield_bw_32x32.png", "deku_shield_32x32.png"]
+  },
+  {
+    "id": "cb4e8d979d6c4b71a8ee081580ef4b43",
+    "type": "simple",
+    "name": "hylian_shield",
+    "size": [25, 25],
+    "icons": ["hylian_shield_bw_32x32.png", "hylian_shield_32x32.png"]
+  },
+  {
+    "id": "b91377bea50741b09a65c88490039bde",
+    "type": "simple",
+    "name": "mirror_shield",
+    "size": [25, 25],
+    "icons": ["mirror_shield_bw_32x32.png", "mirror_shield_32x32.png"]
+  },
+  {
+    "id": "e103b9bf216f4f279101389e9f1b586e",
+    "type": "simple",
+    "name": "adult_shield",
+    "size": [25, 25],
+    "icons": [
+      "mirror_shield_bw_32x32.png",
+      "hylian_shield_32x32.png",
+      "mirror_shield_32x32.png"
+    ]
+  },
+  {
+    "id": "cd797979d81349299fcb49327528793d",
+    "type": "simple",
+    "name": "tunic_goron",
+    "size": [25, 25],
+    "icons": ["tunic_goron_bw_32x32.png", "tunic_goron_32x32.png"]
+  },
+  {
+    "id": "fc301b61b1fe4454ab50a62190285792",
+    "type": "simple",
+    "name": "tunic_zora",
+    "size": [25, 25],
+    "icons": ["tunic_zora_bw_32x32.png", "tunic_zora_32x32.png"]
+  },
+  {
+    "id": "ae65a70f31c047eea8b5b4dea7f3cf2b",
+    "type": "simple",
+    "name": "tunics",
+    "size": [25, 25],
+    "icons": [
+      "tunics_bw_32x32.png",
+      "tunic_goron_32x32.png",
+      "tunic_zora_32x32.png",
+      "tunics_32x32.png"
+    ]
+  },
+  {
+    "id": "1cb911ed9d5042f69c7a19fe2bb36538",
+    "type": "simple",
+    "name": "boots_iron",
+    "size": [25, 25],
+    "icons": ["boots_iron_bw_32x32.png", "boots_iron_32x32.png"]
+  },
+  {
+    "id": "f803a437eaa44905b73da81023c34a3c",
+    "type": "simple",
+    "name": "boots_hover",
+    "size": [25, 25],
+    "icons": ["boots_hover_bw_32x32.png", "boots_hover_32x32.png"]
+  },
+  {
+    "id": "c447628606044cfa82854fe9482affce",
+    "type": "simple",
+    "name": "boots",
+    "size": [25, 25],
+    "icons": [
+      "boots_iron_hover_bw_32x32.png",
+      "boots_iron_32x32.png",
+      "boots_hover_32x32.png",
+      "boots_iron_hover_32x32.png"
+    ]
+  },
+  {
+    "id": "cb672b13eb854a38a8615a5a64ea1a30",
+    "type": "simple",
+    "name": "gerudo_card",
+    "size": [25, 25],
+    "icons": ["gerudo_card_bw_32x32.png", "gerudo_card_32x32.png"]
+  },
+  {
+    "id": "1ba1379bab19454aa48f7203b3deda9a",
+    "type": "simple",
+    "name": "bottle",
+    "size": [25, 25],
+    "icons": ["bottle_empty_bw_32x32.png", "bottle_empty_32x32.png"]
+  },
+  {
+    "id": "42c86e70f58f4cf2bed60bc57f7db77d",
+    "type": "label",
+    "name": "stone_kokiri",
+    "label": ["JAB", "DOD", "DEK", "N/A", "FOR", "FIR", "WAT", "SHA", "SPI"],
+    "labelStartingIndex": 3,
+    "size": [25, 25],
+    "icons": ["stone_kokiri_bw_32x32.png", "stone_kokiri_32x32.png"]
+  },
+  {
+    "id": "7976e88940704645ba08ffa2ff233ac3",
+    "type": "label",
+    "name": "stone_goron",
+    "label": ["JAB", "DOD", "DEK", "N/A", "FOR", "FIR", "WAT", "SHA", "SPI"],
+    "labelStartingIndex": 3,
+    "size": [25, 25],
+    "icons": ["stone_goron_bw_32x32.png", "stone_goron_32x32.png"]
+  },
+  {
+    "id": "c20602aa38604c16a6e2d2065d501667",
+    "type": "label",
+    "name": "stone_zora",
+    "label": ["JAB", "DOD", "DEK", "N/A", "FOR", "FIR", "WAT", "SHA", "SPI"],
+    "labelStartingIndex": 3,
+    "size": [25, 25],
+    "icons": ["stone_zora_bw_32x32.png", "stone_zora_32x32.png"]
+  },
+  {
+    "id": "c20602aa38604c16a6e2d2065d501667",
+    "type": "label",
+    "name": "stone_zora",
+    "label": ["JAB", "DOD", "DEK", "N/A", "FOR", "FIR", "WAT", "SHA", "SPI"],
+    "labelStartingIndex": 3,
+    "size": [25, 25],
+    "icons": ["stone_zora_bw_32x32.png", "stone_zora_32x32.png"]
+  },
+  {
+    "id": "635c03029678417a94b3f368eca91397",
+    "type": "label",
+    "name": "medallion_green",
+    "label": ["JAB", "DOD", "DEK", "N/A", "FOR", "FIR", "WAT", "SHA", "SPI"],
+    "labelStartingIndex": 3,
+    "size": [25, 25],
+    "icons": ["medallion_green_bw_32x32.png", "medallion_green_32x32.png"]
+  },
+  {
+    "id": "c1dbcf08a6054df3911ac50933294327",
+    "type": "label",
+    "name": "medallion_red",
+    "label": ["JAB", "DOD", "DEK", "N/A", "FOR", "FIR", "WAT", "SHA", "SPI"],
+    "labelStartingIndex": 3,
+    "size": [25, 25],
+    "icons": ["medallion_red_bw_32x32.png", "medallion_red_32x32.png"]
+  },
+  {
+    "id": "30b5d2740159487bbdbd630157d93014",
+    "type": "label",
+    "name": "medallion_blue",
+    "label": ["JAB", "DOD", "DEK", "N/A", "FOR", "FIR", "WAT", "SHA", "SPI"],
+    "labelStartingIndex": 3,
+    "size": [25, 25],
+    "icons": ["medallion_blue_bw_32x32.png", "medallion_blue_32x32.png"]
+  },
+  {
+    "id": "739e10a1da284fc588962d5dbd938292",
+    "type": "label",
+    "name": "medallion_purple",
+    "label": ["JAB", "DOD", "DEK", "N/A", "FOR", "FIR", "WAT", "SHA", "SPI"],
+    "labelStartingIndex": 3,
+    "size": [25, 25],
+    "icons": ["medallion_purple_bw_32x32.png", "medallion_purple_32x32.png"]
+  },
+  {
+    "id": "f7a0d8c2a83541baa83a97e803528b09",
+    "type": "label",
+    "name": "medallion_orange",
+    "label": ["JAB", "DOD", "DEK", "N/A", "FOR", "FIR", "WAT", "SHA", "SPI"],
+    "labelStartingIndex": 3,
+    "size": [25, 25],
+    "icons": ["medallion_orange_bw_32x32.png", "medallion_orange_32x32.png"]
+  },
+  {
+    "id": "131c660d700943f7af019f09d7bb61b9",
+    "type": "label",
+    "name": "medallion_yellow",
+    "label": ["JAB", "DOD", "DEK", "N/A", "FOR", "FIR", "WAT", "SHA", "SPI"],
+    "labelStartingIndex": 3,
+    "size": [25, 25],
+    "icons": ["medallion_yellow_bw_32x32.png", "medallion_yellow_32x32.png"]
+  },
+  {
+    "id": "6616d206722c46d79e686dc5c00704ea",
+    "type": "nested",
+    "name": "song_minuet",
+    "size": [25, 25],
+    "icons": ["song_minuet_bw_32x32.png", "song_minuet_32x32.png"]
+  },
+  {
+    "id": "dbcf56141dbb4973809baa8656dabab9",
+    "type": "nested",
+    "name": "song_bolero",
+    "size": [25, 25],
+    "icons": ["song_bolero_bw_32x32.png", "song_bolero_32x32.png"]
+  },
+  {
+    "id": "8c157474e4ed4e4d9cbf6f62aeb36356",
+    "type": "nested",
+    "name": "song_serenade",
+    "size": [25, 25],
+    "icons": ["song_serenade_bw_32x32.png", "song_serenade_32x32.png"]
+  },
+  {
+    "id": "a63004582a91482fb5e253c2db36c987",
+    "type": "nested",
+    "name": "song_nocturne",
+    "size": [25, 25],
+    "icons": ["song_nocturne_bw_32x32.png", "song_nocturne_32x32.png"]
+  },
+  {
+    "id": "1e57ad7bb7a84961a46b21590794b722",
+    "type": "nested",
+    "name": "song_requiem",
+    "size": [25, 25],
+    "icons": ["song_requiem_bw_32x32.png", "song_requiem_32x32.png"]
+  },
+  {
+    "id": "b27f35d5a64d4165a5f091781ddf6c14",
+    "type": "nested",
+    "name": "song_prelude",
+    "size": [25, 25],
+    "icons": ["song_prelude_bw_32x32.png", "song_prelude_32x32.png"]
+  },
+  {
+    "id": "d8631b41c18a47b6a5f232b194bfaf3f",
+    "type": "nested",
+    "name": "song_lullaby",
+    "size": [25, 25],
+    "icons": ["song_lullaby_bw_32x32.png", "song_lullaby_32x32.png"]
+  },
+  {
+    "id": "9c61c54fa3fd41f98302f82c744ac019",
+    "type": "nested",
+    "name": "song_epona",
+    "size": [25, 25],
+    "icons": ["song_epona_bw_32x32.png", "song_epona_32x32.png"]
+  },
+  {
+    "id": "5826f5735b3f4a54a02530413287822c",
+    "type": "nested",
+    "name": "song_saria",
+    "size": [25, 25],
+    "icons": ["song_saria_bw_32x32.png", "song_saria_32x32.png"]
+  },
+  {
+    "id": "4f5625f979824ba0a8005a139c9df716",
+    "type": "nested",
+    "name": "song_suns",
+    "size": [25, 25],
+    "icons": ["song_suns_bw_32x32.png", "song_suns_32x32.png"]
+  },
+  {
+    "id": "a4e440022028431a9af08f305af240ee",
+    "type": "nested",
+    "name": "song_time",
+    "size": [25, 25],
+    "icons": ["song_time_bw_32x32.png", "song_time_32x32.png"]
+  },
+  {
+    "id": "a6afa47c930546008f56b03ac364254b",
+    "type": "nested",
+    "name": "song_storms",
+    "size": [25, 25],
+    "icons": ["song_storms_bw_32x32.png", "song_storms_32x32.png"]
+  },
+  {
+    "id": "34fb4c398a1e43ed99a40a6351ceed8b",
+    "type": "counter",
+    "name": "keys_forest",
+    "size": [20, 20],
+    "icons": ["key_forest_32x32.png"],
+    "countConfig": [0, 5]
+  },
+  {
+    "id": "e84c0569d7e546349565994885ca17c1",
+    "type": "counter",
+    "name": "keys_fire",
+    "size": [20, 20],
+    "icons": ["key_fire_32x32.png"],
+    "countConfig": [0, 8]
+  },
+  {
+    "id": "113c8c69a8d3410288eecc3efdcba9ac",
+    "type": "counter",
+    "name": "keys_water",
+    "size": [20, 20],
+    "icons": ["key_water_32x32.png"],
+    "countConfig": [0, 6]
+  },
+  {
+    "id": "f960cb2e268b47378c1fbd280a36b7ae",
+    "type": "counter",
+    "name": "keys_shadow",
+    "size": [20, 20],
+    "icons": ["key_shadow_32x32.png"],
+    "countConfig": [0, 5]
+  },
+  {
+    "id": "b1682f98da9547ec91364bec23522dbd",
+    "type": "counter",
+    "name": "keys_spirit",
+    "size": [20, 20],
+    "icons": ["key_spirit_32x32.png"],
+    "countConfig": [0, 5]
+  },
+  {
+    "id": "b974af3f77fd4f6da41aca226176ed35",
+    "type": "counter",
+    "name": "keys_botw",
+    "size": [20, 20],
+    "icons": ["key_32x32.png"],
+    "countConfig": [0, 3]
+  },
+  {
+    "id": "d8cf98dc40d245bfb81f8c5ab339319e",
+    "type": "counter",
+    "name": "keys_gtg",
+    "size": [20, 20],
+    "icons": ["key_32x32.png"],
+    "countConfig": [0, 9]
+  },
+  {
+    "id": "4c1b24c3e3954038b14f4daa3656e0b5",
+    "type": "simple",
+    "name": "sometimes",
+    "size": [20, 20],
+    "icons": [
+      "hash_frog_bw_32x32.png",
+      "sold_out_32x32.png",
+      "light_arrows_32x32.png",
+      "bottle_big_poe_32x32.png"
+    ],
+    "countConfig": [0, 9],
+    "receiver": true
+  },
+  {
+    "id": "7ac5c97bf662472599f66f70d4b83b16",
+    "type": "simple",
+    "name": "gs_10",
+    "size": [25, 25],
+    "icons": ["gs_10_32x32.png"]
+  },
+  {
+    "id": "ce0c6a199afe4cbb8cd330645c14b32f",
+    "type": "simple",
+    "name": "gs_20",
+    "size": [25, 25],
+    "icons": ["gs_20_32x32.png"]
+  },
+  {
+    "id": "4677c7d847b04867911ef8b93901cbe1",
+    "type": "simple",
+    "name": "gs_30",
+    "size": [25, 25],
+    "icons": ["gs_30_32x32.png"]
+  },
+  {
+    "id": "4cacb44f1ad74ee2a414e69d65c57d6e",
+    "type": "simple",
+    "name": "gs_40",
+    "size": [25, 25],
+    "icons": ["gs_40_32x32.png"]
+  },
+  {
+    "id": "7ab920520d0f4efa91732f5ea1fcd68c",
+    "type": "simple",
+    "name": "gs_50",
+    "size": [25, 25],
+    "icons": ["gs_50_32x32.png"]
+  },
+  {
+    "id": "a4a963b8f018474388eaf188518d577d",
+    "type": "simple",
+    "name": "skull_mask",
+    "size": [25, 25],
+    "icons": ["skull_mask_32x32.png"]
+  },
+  {
+    "id": "fb0d152f1cc44e9cbfa9c3417af239f2",
+    "type": "simple",
+    "name": "biggoron",
+    "size": [25, 25],
+    "icons": ["biggoron_32x32.png"]
+  },
+  {
+    "id": "857a865df3474ff4a9b1742d70f8b7e3",
+    "type": "simple",
+    "name": "frogs",
+    "size": [25, 25],
+    "icons": ["frogs_32x32.png"]
+  },
+  {
+    "id": "d055616ee0314701a6d1471c0a5595ff",
+    "type": "counter",
+    "name": "gold_skulls",
+    "size": [25, 25],
+    "icons": ["gs_counter_32x32.png"],
+    "countConfig": [0, 50]
+  }
+]
