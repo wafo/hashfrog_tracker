@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import Footer from "../../components/Footer";
 import Item from "../../components/Item";
 import ItemsTable from "../../components/ItemsTable";
@@ -12,6 +12,10 @@ import styles from "./tracker.module.css";
 // Or maybe a context stored in local storage
 
 const Tracker = () => {
+  useEffect(() => {
+    document.title = "HashFrog - Tracker";
+  }, []);
+
   const section_1 = useMemo(() => {
     const section_items = [
       "sticks",
