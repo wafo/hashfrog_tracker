@@ -44,6 +44,22 @@
     "items": [null, "8633e18f860e4eccb821800eeec01c29"]
   },
   {
+    "id": "4ffa3034c2d34e488a8c4e100c437204",
+    "type": "simple",
+    "name": "fire_arrows",
+    "size": [25, 25],
+    "icons": ["fire_arrows_bw_32x32.png", "fire_arrows_32x32.png"],
+    "items": [null, "7c3026558a6b49df97733d13ecc815c7"]
+  },
+  {
+    "id": "b2369b26bb154a1c95e1b50e943facd6",
+    "type": "simple",
+    "name": "light_arrows",
+    "size": [25, 25],
+    "icons": ["light_arrows_bw_32x32.png", "light_arrows_32x32.png"],
+    "items": [null, "ff67e2e04ce04aa8add77658ee932802"]
+  },
+  {
     "id": "4d690df905ec450aa13b558224147d5a",
     "type": "simple",
     "name": "fl_arrows",
