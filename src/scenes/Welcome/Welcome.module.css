@@ -1,0 +1,16 @@
+.container {
+  max-width: 1320px;
+  display: flex;
+  margin: auto;
+}
+
+.left {
+}
+
+.right {
+  margin-top: 1.5em;
+}
+
+.configuration {
+  margin: 0.5rem 0;
+}

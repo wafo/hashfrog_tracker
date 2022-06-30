@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import { TrackerProvider } from "./context/trackerContext";
-import Welcome from "./scenes/Welcome";
+import Welcome from "./scenes/Welcome/Welcome";
 import Tracker from "./scenes/Tracker/Tracker";
 import TrackerChecks from "./scenes/TrackerChecks";
 
