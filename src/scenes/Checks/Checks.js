@@ -94,7 +94,7 @@ const Checks = () => {
   );
 };
 
-const Buttons = ({ type, setType }) => {
+const Buttons = ({ setType }) => {
   return (
     <div className={styles.buttons}>
       <button type="button" className="" onClick={() => setType("overworld")}>

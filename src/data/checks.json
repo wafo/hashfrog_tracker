@@ -68,7 +68,7 @@
     "type": "overworld",
     "location_id": "c92293c7b9de4a8bac40266e76d2930f",
     "available": true,
-    "checked": false,
+    "checked": true,
     "condition": null
   },
   {
@@ -119,6 +119,16 @@
     "location_id": "c92293c7b9de4a8bac40266e76d2930f",
     "available": true,
     "checked": false,
+    "condition": null
+  },
+  {
+    "id": "0961d833fa0a4e68b275fcbd834fee64",
+    "name": "mask_of_truth",
+    "label": "Deku Theater - Mask of Truth",
+    "type": "overworld",
+    "location_id": "c92293c7b9de4a8bac40266e76d2930f",
+    "available": true,
+    "checked": true,
     "condition": null
   },
   {
@@ -193,7 +203,7 @@
     "location_id": "27fae6f9cd2245d5b776c079e7f31d8a",
     "available": false,
     "checked": false,
-    "condition": "function validate(o){return!!(o.bombs||o.hammer)}"
+    "condition": "function validate(o){return!!((o.bombs||o.hammer)&&(o.gold_scale&&o.iron_boots))}"
   },
   {
     "id": "138fb2a7715d42e7be0e38e5d537721e",
@@ -308,6 +318,16 @@
     "available": false,
     "checked": false,
     "condition": "function validate(o){return!!(o.bombs)}"
+  },
+  {
+    "id": "f8747a2fb6e14708a3e7237aa1efdfb9",
+    "name": "big_poe",
+    "label": "Big Poe",
+    "type": "overworld",
+    "location_id": "e93eb5a49155416bbc4f0bf159a57e4c",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.epona&&o.bow&&o.bottle)}"
   },
 
 
@@ -507,7 +527,7 @@
     "location_id": "6a402e3983dd44f88c186a359c095975",
     "available": false,
     "checked": false,
-    "condition": "function validate(o){return!!(o.dmc_entrance&&o.hover_boots||o.bolero&&o.beans)}"
+    "condition": "function validate(o){return!!((o.dmc_entrance&&o.hover_boots)||(o.bolero&&o.beans))}"
   },
   {
     "id": "9cc96f76694f4734a34ad9329b926815",
@@ -675,13 +695,13 @@
   },
   {
     "id": "56c7fe970b89431aa4af3650bb74ac69",
-    "name": "gvy_box",
+    "name": "gv_box",
     "label": "Box",
     "type": "overworld",
     "location_id": "90406a5afd1141cc859ec084de544fc4",
     "available": false,
     "checked": false,
-    "condition": "function validate(o){return!!(o.beans||o.longshot||o.boomerang)}"
+    "condition": "function validate(o){return!!(o.beans||o.longshot)}"
   },
   {
     "id": "287ad0fee09e4697b9bd92cb55416478",
@@ -701,7 +721,7 @@
     "location_id": "90406a5afd1141cc859ec084de544fc4",
     "available": false,
     "checked": false,
-    "condition": "function validate(o){return!!(o.zelda&&(o.sticks||(o.magic&&(o.dins||(o.bow&&o.fire_arrows)))))}"
+    "condition": "function validate(o){return!!(o.zelda&&o.fire_source)}"
   },
   
 
@@ -743,7 +763,7 @@
     "location_id": "dcf040c5849d45019f525da2ef89261b",
     "available": false,
     "checked": false,
-    "condition": "function validate(o){return!!(o.gold_scale||(o.iron_boots&&o.hookshot))}"
+    "condition": "function validate(o){return!!(o.gold_scale)}"
   },
   {
     "id": "701af6db500f44e992905ec932b681a7",
@@ -837,7 +857,7 @@
     "location_id": "681b54e4746c44c28f77d1f61493b296",
     "available": false,
     "checked": false,
-    "condition": "function validate(o){return!!(o.domain_child_access)}"
+    "condition": "function validate(o){return!!(o.domain_child_access&&o.sticks)}"
   },
   {
     "id": "bc404f4b51ba4a91a734c384bd06bd7a",
@@ -847,7 +867,7 @@
     "location_id": "681b54e4746c44c28f77d1f61493b296",
     "available": false,
     "checked": false,
-    "condition": "function validate(o){return!!((o.zelda||o.hover_boots)&&o.bottle)}"
+    "condition": "function validate(o){return!!(o.domain_adult_access&&o.bottle&&(o.wallet_2||(o.domain_child_access&&o.rutos_letter)))}"
   },
 
 
@@ -923,7 +943,7 @@
     "location_id": "d64781983d754066b4c575503002d9b2",
     "available": false,
     "checked": false,
-    "condition": "function validate(o){return!!(o.fortress_access&&o.gerudo_card&&(o.hover_boots||(o.hookshot&&o.scarecrow)))}"
+    "condition": "function validate(o){return!!(o.fortress_access&&o.gerudo_card&&(o.hover_boots||(o.hookshot&&o.scarecrow)||o.longshot))}"
   },
   {
     "id": "7181638b8d7d47ca90d91bec54837049",
@@ -955,7 +975,7 @@
     "location_id": "49151c1606cf42469d9f97c1d86e3d44",
     "available": false,
     "checked": false,
-    "condition": "function validate(o){return!!(o.wasteland_access&&o.magic&&(o.dins||(o.bow&&o.fire_arrows)))}"
+    "condition": "function validate(o){return!!(o.wasteland_access&&o.fire_source)}"
   },
   {
     "id": "f2f36eb6051a4ba08a298bc9eaeec594",
@@ -987,7 +1007,7 @@
     "location_id": "47071597282b43ab93a287e753c2d256",
     "available": false,
     "checked": false,
-    "condition": "function validate(o){return!!(o.wasteland_access)}"
+    "condition": "function validate(o){return!!(o.colossus_access)}"
   },
   {
     "id": "a3a4000a8eca4f81b9e3442d0e0785b0",
@@ -997,7 +1017,7 @@
     "location_id": "47071597282b43ab93a287e753c2d256",
     "available": false,
     "checked": false,
-    "condition": "function validate(o){return!!(o.wasteland_access&&o.bombs&&o.zelda)}"
+    "condition": "function validate(o){return!!(o.colossus_access&&o.bombs&&o.zelda)}"
   },
 
 

@@ -49,12 +49,15 @@ const defaultItems = {
   medallion_orange: false,
   // Extra
   scarecrow: true,
+  fire_source: true,
   dmc_entrance: false,
   domain_child_access: false,
+  domain_adult_access: false,
   fountain_child_access: false,
   fountain_adult_access: false,
   fortress_access: false,
   wasteland_access: false,
+  colossus_access: false,
 };
 
 const TrackerContext = createContext();
@@ -141,20 +144,29 @@ function parseItems(items_list) {
   if (items.bombs || items.scale) {
     items.beans = true;
   }
-  if (items.zelda || items.scale || items.bombs) {
+  if (items.zelda || items.scale) {
     items.domain_child_access = true;
+  }
+  if (items.zelda || items.hover_boots) {
+    items.domain_adult_access = true;
   }
   if (items.domain_child_access && items.rutos_letter) {
     items.fountain_child_access = true;
   }
-  if (items.zelda || items.hover_boots) {
+  if (items.domain_child_access && items.rutos_letter && items.domain_adult_access) {
     items.fountain_adult_access = true;
   }
-  if (items.epona || items.longshot || items.requiem) {
+  if (items.epona || items.longshot) {
     items.fortress_access = true;
   }
-  if (items.requiem || (items.fortress_access && items.gerudo_card)) {
+  if (items.fortress_access && (items.hover_boots || items.longshot)) {
     items.wasteland_access = true;
+  }
+  if ((items.wasteland_access && items.magic && items.lens) || items.requiem) {
+    items.colossus_access = true;
+  }
+  if (items.magic && (items.dins || (items.bow && items.fire_arrows))) {
+    items.fire_source = true;
   }
 
   return items;
