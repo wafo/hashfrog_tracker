@@ -22,24 +22,25 @@ const Tracker = () => {
       "nuts",
       "bombs",
       "bow",
-      "fl_arrows",
+      "fire_arrows",
+      "dins",
       "rutos_letter",
-      "bottle_counter",
       "slingshot",
       "hammer",
       "bombchus",
       "hookshot",
-      "dins",
-      "trade_1",
-      "trade_2",
+      "light_arrows",
+      "farores",
+      "bottle_counter",
       "boomerang",
       "lens",
       "beans",
       "magic",
-      "farores",
-      "wallet",
+      "trade_1",
+      "trade_2",
       "gerudo_card",
-    ];
+      "wallet",
+    ]; // 
     return section_items.map((name) =>
       elements.find((item) => item.name === name)
     );
@@ -185,11 +186,36 @@ const Tracker = () => {
         </div>
       </div>
       <div className={styles.locations}>
-        <LocationHint backgroundColor="#4a8ab6" color="#fff" margin="2px 0" width={310} />
-        <LocationHint backgroundColor="#4a8ab6" color="#fff" margin="2px 0" width={310} />
-        <LocationHint backgroundColor="#4a8ab6" color="#fff" margin="2px 0" width={310} />
-        <LocationHint backgroundColor="#4a8ab6" color="#fff" margin="2px 0" width={310} />
-        <LocationHint backgroundColor="#4a8ab6" color="#fff" margin="2px 0" width={310} />
+        <LocationHint
+          backgroundColor="#4a8ab6"
+          color="#fff"
+          margin="2px 0"
+          width={310}
+        />
+        <LocationHint
+          backgroundColor="#4a8ab6"
+          color="#fff"
+          margin="2px 0"
+          width={310}
+        />
+        <LocationHint
+          backgroundColor="#4a8ab6"
+          color="#fff"
+          margin="2px 0"
+          width={310}
+        />
+        <LocationHint
+          backgroundColor="#4a8ab6"
+          color="#fff"
+          margin="2px 0"
+          width={310}
+        />
+        <LocationHint
+          backgroundColor="#4a8ab6"
+          color="#fff"
+          margin="2px 0"
+          width={310}
+        />
         <div style={{ margin: "1rem" }} />
         <LocationHint
           backgroundColor="#c6445c"

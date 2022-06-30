@@ -49,6 +49,16 @@
     "checked": false,
     "condition": null
   },
+  {
+    "id": "67afc8b376bf4cefbcc3628b859217df",
+    "name": "grotto_storms",
+    "label": "Grotto - Storms",
+    "type": "overworld",
+    "location_id": "62734d0ee39c4f90afaca7b836b8a801",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.storms)}"
+  },
 
 
   {
