@@ -1,0 +1,33 @@
+.info {
+}
+
+.locations {
+  display: grid;
+  grid-template-columns: 25% 25% 25% 25%;
+}
+
+.locations_item {
+  padding: 2px;
+}
+
+.locations_item button {
+  width: 100%;
+  aspect-ratio: 2/1;
+}
+
+.checks {
+  padding: 0;
+  list-style: none;
+}
+
+.check button {
+  background-color: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+}
+
+.check button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

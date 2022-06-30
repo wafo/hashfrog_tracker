@@ -1,10 +1,10 @@
 import { useEffect, useMemo } from "react";
 import Footer from "../../components/Footer";
-import Item from "../../components/Item";
-import ItemsTable from "../../components/ItemsTable";
+import Element from "../../components/Element";
+import ElementsTable from "../../components/ElementsTable";
 import LocationHint from "../../components/LocationHint";
 import SometimesHint from "../../components/SometimesHint";
-import items from "../../data/items.json";
+import elements from "../../data/elements.json";
 import labels from "../../data/labels.json";
 import styles from "./tracker.module.css";
 
@@ -41,7 +41,7 @@ const Tracker = () => {
       "gerudo_card",
     ];
     return section_items.map((name) =>
-      items.find((item) => item.name === name)
+      elements.find((item) => item.name === name)
     );
   }, []);
 
@@ -61,7 +61,7 @@ const Tracker = () => {
       "scale",
     ];
     return section_items.map((name) =>
-      items.find((item) => item.name === name)
+      elements.find((item) => item.name === name)
     );
   }, []);
 
@@ -78,7 +78,7 @@ const Tracker = () => {
       "medallion_orange",
     ];
     return section_items.map((name) => {
-      const item = items.find((item) => item.name === name);
+      const item = elements.find((item) => item.name === name);
       // TODO: Para dejarlo como recordatorio que estaría bien los labels vinieran de otra parte ((?))
       item.label = labels.dungeons;
       item.labelStartingIndex = 3;
@@ -102,7 +102,7 @@ const Tracker = () => {
       "song_prelude",
     ];
     return section_items.map((name) =>
-      items.find((item) => item.name === name)
+      elements.find((item) => item.name === name)
     );
   }, []);
 
@@ -117,12 +117,12 @@ const Tracker = () => {
       "keys_gtg",
     ];
     return section_items.map((name) =>
-      items.find((item) => item.name === name)
+      elements.find((item) => item.name === name)
     );
   }, []);
 
   const sometimesIcons = useMemo(() => {
-    return items.find((item) => item.name === "sometimes").icons;
+    return elements.find((item) => item.name === "sometimes").icons;
   }, []);
 
   const alwaysHints = useMemo(() => {
@@ -141,28 +141,28 @@ const Tracker = () => {
       "sometimes",
     ];
     return section_items.map((name) => {
-      const item = items.find((item) => item.name === name);
+      const item = elements.find((item) => item.name === name);
       item.size = [20, 20];
       return item;
     });
   }, []);
 
   const gold_skulls = useMemo(() => {
-    return items.find((item) => item.name === "gold_skulls");
+    return elements.find((item) => item.name === "gold_skulls");
   }, []);
 
   return (
     <div className={styles.tracker}>
       <div className={styles.items}>
-        <ItemsTable items={section_2} columns={3} padding={2} />
-        <ItemsTable items={section_1} columns={7} padding={2} />
+        <ElementsTable elements={section_2} columns={3} padding={2} />
+        <ElementsTable elements={section_1} columns={7} padding={2} />
       </div>
       <div className={styles.medallions}>
-        <ItemsTable items={dungeons} columns={9} padding={4} />
+        <ElementsTable elements={dungeons} columns={9} padding={4} />
       </div>
       <div className={styles.songs}>
-        <ItemsTable items={songs} columns={6} padding={2} />
-        <ItemsTable items={keys} columns={4} padding={1} />
+        <ElementsTable elements={songs} columns={6} padding={2} />
+        <ElementsTable elements={keys} columns={4} padding={1} />
       </div>
       <div className={styles.sometimes}>
         <div>
@@ -173,8 +173,8 @@ const Tracker = () => {
           <SometimesHint icons={sometimesIcons} />
         </div>
         <div className={styles.always}>
-          <ItemsTable items={alwaysHints} columns={4} padding={2} />
-          <Item
+          <ElementsTable elements={alwaysHints} columns={4} padding={2} />
+          <Element
             type={gold_skulls.type}
             name={gold_skulls.name}
             label={gold_skulls.label}

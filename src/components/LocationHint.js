@@ -1,7 +1,7 @@
 import { Fragment, useMemo, useState } from "react";
 import CustomReactSelect from "./CustomReactSelect";
 import labelsJSON from "../data/labels.json";
-import Item from "./Item";
+import Element from "./Element";
 
 const LocationHint = (props) => {
   const {
@@ -50,7 +50,7 @@ const LocationHint = (props) => {
   return (
     <div style={{ width, display: "flex", margin }}>
       {showBoss && hasValue && (
-        <Item
+        <Element
           id={`locations_boss_${id}`}
           name={`locations_boss_${name}`}
           type="simple"
@@ -69,7 +69,7 @@ const LocationHint = (props) => {
       />
       {showItems && hasValue && (
         <Fragment>
-          <Item
+          <Element
             id={`locations_item1_${id}`}
             name={`locations_item1_${name}`}
             type="simple"
@@ -78,7 +78,7 @@ const LocationHint = (props) => {
             customStyle={{ marginLeft: "0.25rem" }}
             receiver
           />
-          <Item
+          <Element
             id={`locations_item1_${id}`}
             name={`locations_item1_${name}`}
             type="simple"
@@ -87,7 +87,7 @@ const LocationHint = (props) => {
             customStyle={{ marginLeft: "0.25rem" }}
             receiver
           />
-          <Item
+          <Element
             id={`locations_item1_${id}`}
             name={`locations_item1_${name}`}
             type="simple"
@@ -96,7 +96,7 @@ const LocationHint = (props) => {
             customStyle={{ marginLeft: "0.25rem" }}
             receiver
           />
-          <Item
+          <Element
             id={`locations_item1_${id}`}
             name={`locations_item1_${name}`}
             type="simple"

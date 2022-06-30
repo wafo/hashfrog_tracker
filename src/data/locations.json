@@ -1,0 +1,156 @@
+[
+  {
+    "id": "62734d0ee39c4f90afaca7b836b8a801",
+    "name": "kokiri_forest",
+    "label": "Kokiri Forest",
+    "short_label": "KOK",
+    "type": "overworld"
+  },
+  {
+    "id": "c92293c7b9de4a8bac40266e76d2930f",
+    "name": "lost_woods",
+    "label": "Lost Woods",
+    "short_label": "LW",
+    "type": "overworld"
+  },
+  {
+    "id": "6d1a37fb20d94218849bf6b85bcce1ee",
+    "name": "sacred_forest_meadow",
+    "label": "Sacred Forest Meadow",
+    "short_label": "SFM",
+    "type": "overworld"
+  },
+  {
+    "id": "27fae6f9cd2245d5b776c079e7f31d8a",
+    "name": "hyrule_field",
+    "label": "Hyrule Field",
+    "short_label": "HF",
+    "type": "overworld"
+  },
+  {
+    "id": "65c17c34902d467a8739f240707ae8b0",
+    "name": "lonlon_ranch",
+    "label": "Lonlon Ranch",
+    "short_label": "LR",
+    "type": "overworld"
+  },
+  {
+    "id": "e93eb5a49155416bbc4f0bf159a57e4c",
+    "name": "market",
+    "label": "Market",
+    "short_label": "MKT",
+    "type": "overworld"
+  },
+  {
+    "id": "2d285794ee724c9781d358a2efe60c35",
+    "name": "hyrule_castle",
+    "label": "Hyrule Castle",
+    "short_label": "HC",
+    "type": "overworld"
+  },
+  {
+    "id": "000213e3a1614456be18823c94f102f5",
+    "name": "outside_ganons_castle",
+    "label": "Outside Ganons Castle",
+    "short_label": "OGC",
+    "type": "overworld"
+  },
+  {
+    "id": "c4120146f6b54a78b68084370f3f9273",
+    "name": "kakariko",
+    "label": "Kakariko",
+    "short_label": "KAK",
+    "type": "overworld"
+  },
+  {
+    "id": "ee0b7d2a96c64dbfa4f341f260727ac8",
+    "name": "death_mountain_trail",
+    "label": "Death Mountain Trail",
+    "short_label": "DMT",
+    "type": "overworld"
+  },
+  {
+    "id": "6a402e3983dd44f88c186a359c095975",
+    "name": "death_mountain_crater",
+    "label": "Death Mountain Crater",
+    "short_label": "DMC",
+    "type": "overworld"
+  },
+  {
+    "id": "1f4996c01fd84a02bc574f0fada32dbd",
+    "name": "goron_city",
+    "label": "Goron City",
+    "short_label": "GC",
+    "type": "overworld"
+  },
+  {
+    "id": "90406a5afd1141cc859ec084de544fc4",
+    "name": "graveyard",
+    "label": "Graveyard",
+    "short_label": "GVY",
+    "type": "overworld"
+  },
+  {
+    "id": "dcf040c5849d45019f525da2ef89261b",
+    "name": "lake_hylia",
+    "label": "Lake Hylia",
+    "short_label": "LH",
+    "type": "overworld"
+  },
+  {
+    "id": "4fc25f3c07184e65b0ec075fdd02673c",
+    "name": "zoras_river",
+    "label": "Zoras River",
+    "short_label": "ZR",
+    "type": "overworld"
+  },
+  {
+    "id": "681b54e4746c44c28f77d1f61493b296",
+    "name": "zoras_domain",
+    "label": "Zoras Domain",
+    "short_label": "ZD",
+    "type": "overworld"
+  },
+  {
+    "id": "cd7fcec078e94196a4da34c4cd1862c7",
+    "name": "zoras_fountain",
+    "label": "Zoras Fountain",
+    "short_label": "ZF",
+    "type": "overworld"
+  },
+  {
+    "id": "4b95c22b1f224aea967541179c9bdd72",
+    "name": "gerudo_valley",
+    "label": "Gerudo Valley",
+    "short_label": "GV",
+    "type": "overworld"
+  },
+  {
+    "id": "d64781983d754066b4c575503002d9b2",
+    "name": "gerudo_fortress",
+    "label": "Gerudo Fortress",
+    "short_label": "GF",
+    "type": "overworld"
+  },
+  {
+    "id": "49151c1606cf42469d9f97c1d86e3d44",
+    "name": "wasteland",
+    "label": "Wasteland",
+    "short_label": "WD",
+    "type": "overworld"
+  },
+  {
+    "id": "47071597282b43ab93a287e753c2d256",
+    "name": "desert_colossus",
+    "label": "Desert Colossus",
+    "short_label": "COL",
+    "type": "overworld"
+  },
+  {
+    "id": "b465ba7239604c84a3233c12655726e7",
+    "name": "temple_of_time",
+    "label": "Temple of Time",
+    "short_label": "TOT",
+    "type": "overworld"
+  }
+]

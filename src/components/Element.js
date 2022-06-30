@@ -1,8 +1,9 @@
 import { Fragment, useCallback, useMemo, useState } from "react";
+import { useItem } from "../context/trackerContext";
 
 const baseURL = process.env.PUBLIC_URL;
 
-const styles2 = {
+const styles = {
   container: {
     position: "relative",
     cursor: "pointer",
@@ -42,7 +43,7 @@ const nestedStyles = {
   bottom: "-5px",
 };
 
-const Item = (props) => {
+const Element = (props) => {
   const {
     name = "Item",
     label = "",
@@ -54,7 +55,10 @@ const Item = (props) => {
     countConfig = [0, 5], // min, max
     receiver = false, // if draggin overrides item
     selectedStartingIndex = 0, // on which of the icons we start
+    items = [],
   } = props;
+
+  const itemContext = useItem();
 
   const [selected, setSelected] = useState(selectedStartingIndex);
   const [counter, setCounter] = useState(0);
@@ -67,28 +71,34 @@ const Item = (props) => {
   const clickHandler = useCallback(
     (event) => {
       event.preventDefault();
-      switch (event.nativeEvent.type) {
-        case "click":
-          if (type === "simple" || type === "nested" || type === "label") {
-            setSelected((prev) => (prev < icons.length - 1 ? ++prev : prev));
-            setDraggedIcon(null);
-          } else if (type === "counter") {
-            setCounter((prev) => (prev === countConfig[1] ? prev : ++prev));
-          }
-          break;
-        case "contextmenu":
-          if (type === "simple" || type === "nested" || type === "label") {
-            setSelected((prev) => (prev > 0 ? --prev : prev));
-            setDraggedIcon(null);
-          } else if (type === "counter") {
-            setCounter((prev) => (prev === countConfig[0] ? prev : --prev));
-          }
-          break;
-        default:
-          break;
+
+      const isCounter = !["simple", "nested", "label"].includes(type);
+      let updated = isCounter ? counter : selected;
+
+      if (event.nativeEvent.type === "click") {
+        if (!isCounter)
+          updated = updated < icons.length - 1 ? ++updated : updated;
+        if (isCounter)
+          updated = updated === countConfig[1] ? updated : ++updated;
+      } else if (event.nativeEvent.type === "contextmenu") {
+        if (!isCounter) updated = updated > 0 ? --updated : updated;
+        if (isCounter) updated === countConfig[0] ? updated : --updated;
+      }
+
+      // Canceling draggedIcon
+      if (!isCounter) {
+        setDraggedIcon(null);
+        setSelected(updated);
+      } else {
+        setCounter(updated);
+      }
+
+      // For context
+      if (!isCounter) {
+        itemContext.markItem(items, items[updated]);
       }
     },
-    [icons, type, countConfig]
+    [icons, type, countConfig, selected, items, itemContext, counter]
   );
 
   const dragHandler = useCallback(
@@ -120,7 +130,7 @@ const Item = (props) => {
         style={{
           width: size[0],
           height: size[1],
-          ...styles2.container,
+          ...styles.container,
           ...customStyle,
         }}
         onClick={clickHandler}
@@ -131,13 +141,13 @@ const Item = (props) => {
         onDrop={dropHandler}
         draggable
       >
-        <img src={draggedIcon || icon} alt={name} style={styles2.img} />
+        <img src={draggedIcon || icon} alt={name} style={styles.img} />
         {type === "counter" && <CounterLabel counter={counter} />}
         {type === "label" && (
-          <ItemLabel label={label} labelStartingIndex={labelStartingIndex} />
+          <ElementLabel label={label} labelStartingIndex={labelStartingIndex} />
         )}
         {type === "nested" && (
-          <Item
+          <Element
             name={`${name}_nested`}
             type="simple"
             icons={["unknown_16x16.png"]}
@@ -151,7 +161,7 @@ const Item = (props) => {
   );
 };
 
-const ItemLabel = ({ label, labelStartingIndex }) => {
+const ElementLabel = ({ label, labelStartingIndex }) => {
   const [index, setIndex] = useState(labelStartingIndex);
 
   const display = useMemo(() => {
@@ -176,10 +186,10 @@ const ItemLabel = ({ label, labelStartingIndex }) => {
 
   if (!label) return null;
   if (typeof label === "string") {
-    return <label style={styles2.label}>{label}</label>;
+    return <label style={styles.label}>{label}</label>;
   } else if (Array.isArray(label)) {
     return (
-      <label style={styles2.label} onWheel={handleOnWheel}>
+      <label style={styles.label} onWheel={handleOnWheel}>
         {display}
       </label>
     );
@@ -187,7 +197,7 @@ const ItemLabel = ({ label, labelStartingIndex }) => {
 };
 
 const CounterLabel = ({ counter }) => {
-  return <label style={styles2.counter}>{counter}</label>;
+  return <label style={styles.counter}>{counter}</label>;
 };
 
-export default Item;
+export default Element;
