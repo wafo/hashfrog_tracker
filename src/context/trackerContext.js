@@ -7,7 +7,7 @@ const defaultItems = {
   zelda: false,
   epona: false,
   sarias: false,
-  sungsong: false,
+  sunsong: false,
   storms: false,
   minuet: false,
   bolero: false,
@@ -66,7 +66,8 @@ function parseItems(items_list) {
     if (item === "2801c2b994864757a2363fbb053076db") items.zelda = true;
     if (item === "96ebae804a3143438c2cfbc7680c464f") items.epona = true;
     if (item === "4fd7fcb8249744d9ba7f0d951df061bf") items.sarias = true;
-    if (item === "4cc5a64c593c4e6b8b0ecc8d3dae3230") items.sungsong = true;
+    if (item === "4cc5a64c593c4e6b8b0ecc8d3dae3230") items.sunsong = true;
+    if (item === "60671fe069e54ae38e763652bd7d9d97") items.time = true;
     if (item === "c2b35441c0604a9dbd0d63c9cd6755d9") items.storms = true;
     if (item === "ce1f2799ff1a433ba0bb40fee47e49a1") items.minuet = true;
     if (item === "e4769601bde54324a97704d29ca7f9b3") items.bolero = true;

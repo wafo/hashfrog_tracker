@@ -666,12 +666,12 @@
   {
     "id": "791b9a459f4d490bbe85b249b087c733",
     "name": "tomb_redead",
-    "label": "Tomb - Redead/Sungsong",
+    "label": "Tomb - Redead/Sunsong",
     "type": "overworld",
     "location_id": "90406a5afd1141cc859ec084de544fc4",
     "available": false,
     "checked": false,
-    "condition": "function validate(o){return!!(o.sungsong)}"
+    "condition": "function validate(o){return!!(o.sunsong)}"
   },
   {
     "id": "56c7fe970b89431aa4af3650bb74ac69",
@@ -743,7 +743,7 @@
     "location_id": "dcf040c5849d45019f525da2ef89261b",
     "available": false,
     "checked": false,
-    "condition": "function validate(o){return!!(o.gold_scale||o.iron_boots)}"
+    "condition": "function validate(o){return!!(o.gold_scale||(o.iron_boots&&o.hookshot))}"
   },
   {
     "id": "701af6db500f44e992905ec932b681a7",
@@ -763,7 +763,7 @@
     "location_id": "dcf040c5849d45019f525da2ef89261b",
     "available": false,
     "checked": false,
-    "condition": "function validate(o){return!!(o.bow)}"
+    "condition": "function validate(o){return!!(o.bow&&((o.longshot&&o.scarecrow)||o.medallion_blue))}"
   },
 
 
@@ -796,6 +796,26 @@
     "available": true,
     "checked": false,
     "condition": null
+  },
+  {
+    "id": "96823736aaaa45e7ad7651b0bfc4cefb",
+    "name": "frogs_1",
+    "label": "Frogs in the Storms",
+    "type": "overworld",
+    "location_id": "4fc25f3c07184e65b0ec075fdd02673c",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.storms)}"
+  },
+  {
+    "id": "e62ce76534eb478d9a3490aaaa2208e0",
+    "name": "frogs_2",
+    "label": "Frogs 2",
+    "type": "overworld",
+    "location_id": "4fc25f3c07184e65b0ec075fdd02673c",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.zelda&&o.epona&&o.sarias&&o.sunsong&&o.time&&o.storms)}"
   },
 
 
