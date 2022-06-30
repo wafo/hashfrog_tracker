@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import labelsJSON from "../data/labels.json";
 import CustomReactSelect from "./CustomReactSelect";
-import Item from "./Item";
+import Element from "./Element";
 
 const SometimesHint = (props) => {
   const {
@@ -28,7 +28,7 @@ const SometimesHint = (props) => {
         name={`sometimes_input_${name}`}
         options={memoizedOptions}
       />
-      <Item
+      <Element
         id={`sometimes_item_${id}`}
         name={`sometimes_item_${name}`}
         type="simple"
