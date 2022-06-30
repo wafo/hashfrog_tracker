@@ -134,9 +134,9 @@
   },
   {
     "id": "49151c1606cf42469d9f97c1d86e3d44",
-    "name": "wasteland",
-    "label": "Wasteland",
-    "short_label": "WD",
+    "name": "haunted_wasteland",
+    "label": "Haunted Wasteland",
+    "short_label": "HW",
     "type": "overworld"
   },
   {
