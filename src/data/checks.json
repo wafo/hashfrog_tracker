@@ -1,0 +1,1044 @@
+[
+  {
+    "id": "cd334b70cb864234a025879735f5e61c",
+    "name": "midos_1",
+    "label": "Mido's #1",
+    "type": "overworld",
+    "location_id": "62734d0ee39c4f90afaca7b836b8a801",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+  {
+    "id": "c85c1812aae744d098bff0b7c8369176",
+    "name": "midos_2",
+    "label": "Mido's #2",
+    "type": "overworld",
+    "location_id": "62734d0ee39c4f90afaca7b836b8a801",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+  {
+    "id": "6864895d67a940f085d1b46923ba63cd",
+    "name": "midos_3",
+    "label": "Mido's #3",
+    "type": "overworld",
+    "location_id": "62734d0ee39c4f90afaca7b836b8a801",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+  {
+    "id": "f73dd89a11b6457d8fdb1baef3e63a19",
+    "name": "midos_4",
+    "label": "Mido's #4",
+    "type": "overworld",
+    "location_id": "62734d0ee39c4f90afaca7b836b8a801",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+  {
+    "id": "9f6586adac8c49ecaa9446bc1b1c149c",
+    "name": "kokiri_sword",
+    "label": "Kokiri Sword",
+    "type": "overworld",
+    "location_id": "62734d0ee39c4f90afaca7b836b8a801",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+  {
+    "id": "67afc8b376bf4cefbcc3628b859217df",
+    "name": "grotto_storms",
+    "label": "Grotto - Storms",
+    "type": "overworld",
+    "location_id": "62734d0ee39c4f90afaca7b836b8a801",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.storms)}"
+  },
+
+
+  {
+    "id": "2943d77020984d65b1e3e810624884ab",
+    "name": "fairy_ocarina",
+    "label": "Fairy Ocarina",
+    "type": "overworld",
+    "location_id": "c92293c7b9de4a8bac40266e76d2930f",
+    "available": true,
+    "checked": true,
+    "condition": null
+  },
+  {
+    "id": "addc029d8c0349fabf89a13c8b66cefb",
+    "name": "bridge_scrub",
+    "label": "Bridge Scrub",
+    "type": "overworld",
+    "location_id": "c92293c7b9de4a8bac40266e76d2930f",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+  {
+    "id": "bb4687136f564a09b595eda71b66d830",
+    "name": "skull_kid",
+    "label": "Skull Kid",
+    "type": "overworld",
+    "location_id": "c92293c7b9de4a8bac40266e76d2930f",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.sarias)}"
+  },
+  {
+    "id": "b9e58ab9736b4019bba304ac6a79ca02",
+    "name": "ocarina_minigame",
+    "label": "Ocarina Minigame",
+    "type": "overworld",
+    "location_id": "c92293c7b9de4a8bac40266e76d2930f",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+  {
+    "id": "91442c277edd4be48d55b8e2aa541a02",
+    "name": "target_in_the_woods",
+    "label": "Target in the Woods",
+    "type": "overworld",
+    "location_id": "c92293c7b9de4a8bac40266e76d2930f",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.slingshot)}"
+  },
+  {
+    "id": "f641ef79033648c9b5a8fb918a3e5a14",
+    "name": "skull_mask",
+    "label": "Deku Theater - Skull Mask",
+    "type": "overworld",
+    "location_id": "c92293c7b9de4a8bac40266e76d2930f",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+  {
+    "id": "0961d833fa0a4e68b275fcbd834fee64",
+    "name": "mask_of_truth",
+    "label": "Deku Theater - Mask of Truth",
+    "type": "overworld",
+    "location_id": "c92293c7b9de4a8bac40266e76d2930f",
+    "available": true,
+    "checked": true,
+    "condition": null
+  },
+  {
+    "id": "b5a052af4da341bbb52b55edbc31d4d5",
+    "name": "grotto_near_goron_city",
+    "label": "Grotto - Near Goron City",
+    "type": "overworld",
+    "location_id": "c92293c7b9de4a8bac40266e76d2930f",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.bombs||o.hammer)}"
+  },
+  {
+    "id": "9b8685b8dcd24128be8dc815a664ee6c",
+    "name": "grotto_scrubs",
+    "label": "Grotto - Scrubs",
+    "type": "overworld",
+    "location_id": "c92293c7b9de4a8bac40266e76d2930f",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.bombs||o.hammer)}"
+  },
+
+
+  {
+    "id": "7f4ef07a921c47a8966ec94d86cbc6ba",
+    "name": "grotto_wolfs",
+    "label": "Grotto - Wolfs",
+    "type": "overworld",
+    "location_id": "6d1a37fb20d94218849bf6b85bcce1ee",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.bombs||o.hammer)}"
+  },
+  {
+    "id": "17f54c8e5fad4061991d48f1a46d2b63",
+    "name": "song_sarias",
+    "label": "Song - Sarias",
+    "type": "overworld",
+    "location_id": "6d1a37fb20d94218849bf6b85bcce1ee",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+  {
+    "id": "bc03074033fd4289942c6d291084aeb0",
+    "name": "song_minuet",
+    "label": "Song - Minuet",
+    "type": "overworld",
+    "location_id": "6d1a37fb20d94218849bf6b85bcce1ee",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.sarias||o.minuet)}"
+  },
+
+
+  {
+    "id": "8765d7fa1ffd42298711f72dcd108406",
+    "name": "grotto_near_market",
+    "label": "Grotto - Near Market",
+    "type": "overworld",
+    "location_id": "27fae6f9cd2245d5b776c079e7f31d8a",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.bombs||o.hammer)}"
+  },
+  {
+    "id": "cbf687ad761c4eb0a3b3b949baa9857b",
+    "name": "grotto_tektite",
+    "label": "Grotto - Tektite",
+    "type": "overworld",
+    "location_id": "27fae6f9cd2245d5b776c079e7f31d8a",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!((o.bombs||o.hammer)&&(o.gold_scale&&o.iron_boots))}"
+  },
+  {
+    "id": "138fb2a7715d42e7be0e38e5d537721e",
+    "name": "grotto_remote",
+    "label": "Grotto - Remote",
+    "type": "overworld",
+    "location_id": "27fae6f9cd2245d5b776c079e7f31d8a",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.bombs||o.hammer)}"
+  },
+  {
+    "id": "eb22b7b35b6d47c190d4b1a9a9b79060",
+    "name": "grotto_scrub",
+    "label": "Grotto - Scrub",
+    "type": "overworld",
+    "location_id": "27fae6f9cd2245d5b776c079e7f31d8a",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.bombs||o.hammer)}"
+  },
+  {
+    "id": "02ba41b344e04f3296847f867be2058b",
+    "name": "grotto_open",
+    "label": "Grotto - Open",
+    "type": "overworld",
+    "location_id": "27fae6f9cd2245d5b776c079e7f31d8a",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+
+
+  {
+    "id": "f27e00ede3ca404d8cce09d7c8789efa",
+    "name": "talon",
+    "label": "Talon Chickens",
+    "type": "overworld",
+    "location_id": "65c17c34902d467a8739f240707ae8b0",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+  {
+    "id": "9765f452546a49c19e0ce1ff74cc6523",
+    "name": "ranch_back",
+    "label": "Back of Ranch",
+    "type": "overworld",
+    "location_id": "65c17c34902d467a8739f240707ae8b0",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+  {
+    "id": "2535d092a6ca4a0d9b1f973151ca17b6",
+    "name": "song_epona",
+    "label": "Song - Epona",
+    "type": "overworld",
+    "location_id": "65c17c34902d467a8739f240707ae8b0",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+
+
+  {
+    "id": "c749509c816148ccae75441c7122e3c2",
+    "name": "minigame_slingshot",
+    "label": "Minigame - Slingshot",
+    "type": "overworld",
+    "location_id": "e93eb5a49155416bbc4f0bf159a57e4c",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+  {
+    "id": "378784469d594670b750f1ac3deebb7c",
+    "name": "richard",
+    "label": "Richard",
+    "type": "overworld",
+    "location_id": "e93eb5a49155416bbc4f0bf159a57e4c",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+  {
+    "id": "5e0b39ef5e8f4c51ada4af4ecea7d802",
+    "name": "minigame_lens",
+    "label": "Minigame - Lens",
+    "type": "overworld",
+    "location_id": "e93eb5a49155416bbc4f0bf159a57e4c",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.lens&&o.magic)}"
+  },
+  {
+    "id": "41966e10730d4b33805e5132bb532870",
+    "name": "minigame_bombchu_1",
+    "label": "Minigame - Bombchu Bowling #1",
+    "type": "overworld",
+    "location_id": "e93eb5a49155416bbc4f0bf159a57e4c",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.bombs)}"
+  },
+  {
+    "id": "40783f10f2c04affa8470aeed2e6999c",
+    "name": "minigame_bombchu_2",
+    "label": "Minigame - Bombchu Bowling #2",
+    "type": "overworld",
+    "location_id": "e93eb5a49155416bbc4f0bf159a57e4c",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.bombs)}"
+  },
+  {
+    "id": "f8747a2fb6e14708a3e7237aa1efdfb9",
+    "name": "big_poe",
+    "label": "Big Poe",
+    "type": "overworld",
+    "location_id": "e93eb5a49155416bbc4f0bf159a57e4c",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.epona&&o.bow&&o.bottle)}"
+  },
+
+
+  {
+    "id": "2a8a6fc64fe24aaca1069691ca285bef",
+    "name": "great_fairy_castle",
+    "label": "Great Fairy - Castle",
+    "type": "overworld",
+    "location_id": "2d285794ee724c9781d358a2efe60c35",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.zelda&&o.bombs)}"
+  },
+  {
+    "id": "e30f30a4104147ecac0876dc80317719",
+    "name": "song_zelda",
+    "label": "Song - Zelda",
+    "type": "overworld",
+    "location_id": "2d285794ee724c9781d358a2efe60c35",
+    "available": true,
+    "checked": true,
+    "condition": null
+  },
+
+
+  {
+    "id": "5cfb5aa9f852498ea010d69c687f9f9d",
+    "name": "great_fairy_ganon",
+    "label": "Great Fairy - Outside Ganons",
+    "type": "overworld",
+    "location_id": "000213e3a1614456be18823c94f102f5",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.zelda&&o.strength_3)}"
+  },
+
+
+  {
+    "id": "15c914bd367c44cbb15ac449c2565c8c",
+    "name": "roof_man",
+    "label": "Man on the roof",
+    "type": "overworld",
+    "location_id": "c4120146f6b54a78b68084370f3f9273",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+  {
+    "id": "6b42f503ecf64e228d33e2bed9fcc7ac",
+    "name": "grotto_rear",
+    "label": "Grotto - Rear",
+    "type": "overworld",
+    "location_id": "c4120146f6b54a78b68084370f3f9273",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+  {
+    "id": "b1ef3f5256f444ef97dabb5b9a5b020b",
+    "name": "windmill",
+    "label": "Windmill",
+    "type": "overworld",
+    "location_id": "c4120146f6b54a78b68084370f3f9273",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+  {
+    "id": "b07b6be2bd16458e97614a42d1713f50",
+    "name": "anju",
+    "label": "Anju",
+    "type": "overworld",
+    "location_id": "c4120146f6b54a78b68084370f3f9273",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+  {
+    "id": "a9464fd06d274c078c93d0f68260612d",
+    "name": "impas_cow",
+    "label": "Impas Cow",
+    "type": "overworld",
+    "location_id": "c4120146f6b54a78b68084370f3f9273",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+  {
+    "id": "43cb4ff7f2a54465bf92677e2f522c67",
+    "name": "cuccos",
+    "label": "Cuccos",
+    "type": "overworld",
+    "location_id": "c4120146f6b54a78b68084370f3f9273",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+  {
+    "id": "06b54bfebd3641df909491faa4691800",
+    "name": "archery",
+    "label": "Archery",
+    "type": "overworld",
+    "location_id": "c4120146f6b54a78b68084370f3f9273",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.bow)}"
+  },
+  {
+    "id": "15889377dca24bfd8477dd8f0be00f03",
+    "name": "grotto_redead",
+    "label": "Grotto - Redead",
+    "type": "overworld",
+    "location_id": "c4120146f6b54a78b68084370f3f9273",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.bombs||o.hammer)}"
+  },
+  {
+    "id": "070949714c5f4d18bf4e30950932f919",
+    "name": "song_nocturne",
+    "label": "Song - Nocturne",
+    "type": "overworld",
+    "location_id": "c4120146f6b54a78b68084370f3f9273",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.medallion_green&&o.medallion_red&&o.medallion_blue)}"
+  },
+
+
+  {
+    "id": "76614adec440492c8777fd5223d1e110",
+    "name": "dc_entrance",
+    "label": "Top of DC Entrance",
+    "type": "overworld",
+    "location_id": "ee0b7d2a96c64dbfa4f341f260727ac8",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+  {
+    "id": "604b8bcb5d204362aa5e350001e3e905",
+    "name": "dmt_wall",
+    "label": "DMT Wall",
+    "type": "overworld",
+    "location_id": "ee0b7d2a96c64dbfa4f341f260727ac8",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.bombs||o.hammer)}"
+  },
+  {
+    "id": "d745c713ef4948d9a1aedf9f772d692b",
+    "name": "grotto_storms",
+    "label": "Grotto - Storms",
+    "type": "overworld",
+    "location_id": "ee0b7d2a96c64dbfa4f341f260727ac8",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.storms)}"
+  },
+  {
+    "id": "024157097c124c7c81c259b7afb6add4",
+    "name": "great_fairy_dmt",
+    "label": "Great Fairy - DMT",
+    "type": "overworld",
+    "location_id": "ee0b7d2a96c64dbfa4f341f260727ac8",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.zelda&&(o.bombs||o.hammer))}"
+  },
+  {
+    "id": "14307bfa5922434381ca3798afda17f5",
+    "name": "claim_check",
+    "label": "Claim Check",
+    "type": "overworld",
+    "location_id": "ee0b7d2a96c64dbfa4f341f260727ac8",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.claim_check)}"
+  },
+
+
+  {
+    "id": "49308e11f84e4c55abed42f368f73b28",
+    "name": "song_bolero",
+    "label": "Song - Bolero",
+    "type": "overworld",
+    "location_id": "6a402e3983dd44f88c186a359c095975",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!((o.dmc_entrance&&(o.hover_boots||o.hookshot))||o.bolero)}"
+  },
+  {
+    "id": "21e593fcfda344f28118a4e6c3a96b38",
+    "name": "dmc_top",
+    "label": "Top of Crater",
+    "type": "overworld",
+    "location_id": "6a402e3983dd44f88c186a359c095975",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!((o.dmc_entrance&&o.hover_boots)||(o.bolero&&o.beans))}"
+  },
+  {
+    "id": "9cc96f76694f4734a34ad9329b926815",
+    "name": "grotto_dmc",
+    "label": "Grotto - DMC",
+    "type": "overworld",
+    "location_id": "6a402e3983dd44f88c186a359c095975",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.bombs||o.hammer)}"
+  },
+  {
+    "id": "c97ff0b99bcf4ab580ec6d05a2eb1c51",
+    "name": "great_fairy_dmc",
+    "label": "Great Fairy - DMC",
+    "type": "overworld",
+    "location_id": "6a402e3983dd44f88c186a359c095975",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.dmc_entrance&&o.hammer&&o.zelda)}"
+  },
+  {
+    "id": "c1acc5ae46c6442eb2fe4e5e899f0b51",
+    "name": "dmc_nook",
+    "label": "Nook",
+    "type": "overworld",
+    "location_id": "6a402e3983dd44f88c186a359c095975",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+
+
+  {
+    "id": "88cb0bf704fb40e084c797a7d2d19311",
+    "name": "gc_maze_1",
+    "label": "Maze #1",
+    "type": "overworld",
+    "location_id": "1f4996c01fd84a02bc574f0fada32dbd",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.bombs||o.hammer||o.strength_2)}"
+  },
+  {
+    "id": "82d83d015a414c54b97a40510ef525b3",
+    "name": "gc_maze_2",
+    "label": "Maze #2",
+    "type": "overworld",
+    "location_id": "1f4996c01fd84a02bc574f0fada32dbd",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.bombs||o.hammer||o.strength_2)}"
+  },
+  {
+    "id": "f0b141bfe3294a75954dd7efd9ac0d37",
+    "name": "gc_hammer",
+    "label": "Maze Hammer",
+    "type": "overworld",
+    "location_id": "1f4996c01fd84a02bc574f0fada32dbd",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.hammer||o.strength_2)}"
+  },
+  {
+    "id": "64105a339b904f3c90c4add2f02d78b3",
+    "name": "darunias",
+    "label": "Darunias Joy",
+    "type": "overworld",
+    "location_id": "1f4996c01fd84a02bc574f0fada32dbd",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.zelda&&o.sarias)}"
+  },
+  {
+    "id": "b086285147b84222b5e41226384c652e",
+    "name": "gc_big_pot",
+    "label": "Big Pot",
+    "type": "overworld",
+    "location_id": "1f4996c01fd84a02bc574f0fada32dbd",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(((o.zelda&&o.sticks)||o.dins)&&o.bombs)}"
+  },
+  {
+    "id": "cd7250820f294b2aadf7b124f624f24e",
+    "name": "gc_big_boy_rolling",
+    "label": "Big Boy Rolling",
+    "type": "overworld",
+    "location_id": "1f4996c01fd84a02bc574f0fada32dbd",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.bombs)}"
+  },
+  {
+    "id": "ff18a4d6c5cd4aaa9c9cda1f2e0ade89",
+    "name": "gc_link",
+    "label": "Goron Link",
+    "type": "overworld",
+    "location_id": "1f4996c01fd84a02bc574f0fada32dbd",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.bow||o.bombs||o.strength_1)}"
+  },
+  {
+    "id": "296e64331ece4519a739b9aa383a7a31",
+    "name": "medigoron",
+    "label": "Medigoron",
+    "type": "overworld",
+    "location_id": "1f4996c01fd84a02bc574f0fada32dbd",
+    "available": false,
+    "checked": true,
+    "condition": "function validate(o){return!!(o.wallet_1&&(o.bombs||o.hammer||o.strength_1))}"
+  },
+
+
+  {
+    "id": "53530ad8df8e459d9be2917422be2a89",
+    "name": "dampe_race_1",
+    "label": "Dampe Race #1",
+    "type": "overworld",
+    "location_id": "90406a5afd1141cc859ec084de544fc4",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+  {
+    "id": "db02d12ac59949368c26e8c81a32f748",
+    "name": "dampe_race_2",
+    "label": "Dampe Race #2",
+    "type": "overworld",
+    "location_id": "90406a5afd1141cc859ec084de544fc4",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+  {
+    "id": "076e501217e54036aa84cb8d8ebf1abd",
+    "name": "dampe_digging",
+    "label": "Dampe Digging",
+    "type": "overworld",
+    "location_id": "90406a5afd1141cc859ec084de544fc4",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+  {
+    "id": "525980e7e63148de8d5856c9aa93ff96",
+    "name": "tomb_shield",
+    "label": "Tomb - Shield",
+    "type": "overworld",
+    "location_id": "90406a5afd1141cc859ec084de544fc4",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+  {
+    "id": "791b9a459f4d490bbe85b249b087c733",
+    "name": "tomb_redead",
+    "label": "Tomb - Redead/Sunsong",
+    "type": "overworld",
+    "location_id": "90406a5afd1141cc859ec084de544fc4",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.sunsong)}"
+  },
+  {
+    "id": "56c7fe970b89431aa4af3650bb74ac69",
+    "name": "gv_box",
+    "label": "Box",
+    "type": "overworld",
+    "location_id": "90406a5afd1141cc859ec084de544fc4",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.beans||o.longshot)}"
+  },
+  {
+    "id": "287ad0fee09e4697b9bd92cb55416478",
+    "name": "song_sunsong",
+    "label": "Song - Sun",
+    "type": "overworld",
+    "location_id": "90406a5afd1141cc859ec084de544fc4",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.zelda)}"
+  },
+  {
+    "id": "075f56ecba124fcabaca883481c67805",
+    "name": "tomb_composers",
+    "label": "Tomb - Composer Torches",
+    "type": "overworld",
+    "location_id": "90406a5afd1141cc859ec084de544fc4",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.zelda&&o.fire_source)}"
+  },
+  
+
+  {
+    "id": "3ec757be86aa4128bc205d79ddcb60a1",
+    "name": "fishing_child",
+    "label": "Child Fishing",
+    "type": "overworld",
+    "location_id": "dcf040c5849d45019f525da2ef89261b",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+  {
+    "id": "14e7752e74db4dd9846e43b89eb263dd",
+    "name": "fishing_adult",
+    "label": "Adult Fishing",
+    "type": "overworld",
+    "location_id": "dcf040c5849d45019f525da2ef89261b",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.beans||(o.hookshot&&o.scarecrow))}"
+  },
+  {
+    "id": "d63917c857d340ed84673c0e23e197e7",
+    "name": "lake_dive",
+    "label": "Lake Dive",
+    "type": "overworld",
+    "location_id": "dcf040c5849d45019f525da2ef89261b",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.scale)}"
+  },
+  {
+    "id": "cdd35d1c3ca44a95ac6b337d67f82486",
+    "name": "lab_dive",
+    "label": "Lab Dive",
+    "type": "overworld",
+    "location_id": "dcf040c5849d45019f525da2ef89261b",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.gold_scale)}"
+  },
+  {
+    "id": "701af6db500f44e992905ec932b681a7",
+    "name": "lab_roof",
+    "label": "Lab Roof",
+    "type": "overworld",
+    "location_id": "dcf040c5849d45019f525da2ef89261b",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.beans||(o.scarecrow&&o.hookshot))}"
+  },
+  {
+    "id": "2f7fd9e057f14ed2bca3258ec8ab4f0d",
+    "name": "shoot_sun",
+    "label": "Shoot the Sun",
+    "type": "overworld",
+    "location_id": "dcf040c5849d45019f525da2ef89261b",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.bow&&((o.longshot&&o.scarecrow)||o.medallion_blue))}"
+  },
+
+
+  {
+    "id": "13fb8851aa16419eac29a785d633bf06",
+    "name": "river_pillar",
+    "label": "Pillar",
+    "type": "overworld",
+    "location_id": "4fc25f3c07184e65b0ec075fdd02673c",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+  {
+    "id": "151efcaeca4a40979732db2307ed887a",
+    "name": "grotto_rivver",
+    "label": "Grotto - River",
+    "type": "overworld",
+    "location_id": "4fc25f3c07184e65b0ec075fdd02673c",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+  {
+    "id": "db3bef42525447eb98f2577799bf12fc",
+    "name": "river_ledge",
+    "label": "Waterfall Ledge",
+    "type": "overworld",
+    "location_id": "4fc25f3c07184e65b0ec075fdd02673c",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+  {
+    "id": "96823736aaaa45e7ad7651b0bfc4cefb",
+    "name": "frogs_1",
+    "label": "Frogs in the Storms",
+    "type": "overworld",
+    "location_id": "4fc25f3c07184e65b0ec075fdd02673c",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.storms)}"
+  },
+  {
+    "id": "e62ce76534eb478d9a3490aaaa2208e0",
+    "name": "frogs_2",
+    "label": "Frogs 2",
+    "type": "overworld",
+    "location_id": "4fc25f3c07184e65b0ec075fdd02673c",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.zelda&&o.epona&&o.sarias&&o.sunsong&&o.time&&o.storms)}"
+  },
+
+
+  {
+    "id": "2a74047e27324ef3b7a81130542ea004",
+    "name": "minigame_domain",
+    "label": "Minigame - Diving",
+    "type": "overworld",
+    "location_id": "681b54e4746c44c28f77d1f61493b296",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.domain_child_access)}"
+  },
+  {
+    "id": "23ecb852ac264b39a91a1eebdc093b5f",
+    "name": "domain_torches",
+    "label": "Domain Torches",
+    "type": "overworld",
+    "location_id": "681b54e4746c44c28f77d1f61493b296",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.domain_child_access&&o.sticks)}"
+  },
+  {
+    "id": "bc404f4b51ba4a91a734c384bd06bd7a",
+    "name": "king_zora",
+    "label": "The King Zora",
+    "type": "overworld",
+    "location_id": "681b54e4746c44c28f77d1f61493b296",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.domain_adult_access&&o.bottle&&(o.wallet_2||(o.domain_child_access&&o.rutos_letter)))}"
+  },
+
+
+  {
+    "id": "430918e8e055419797a79ca86eb05d06",
+    "name": "icy_water",
+    "label": "Icy Water",
+    "type": "overworld",
+    "location_id": "cd7fcec078e94196a4da34c4cd1862c7",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.fountain_adult_access&&o.iron_boots)}"
+  },
+  {
+    "id": "f304fc85b70c4d6e88648641d3cb435e",
+    "name": "icy_standing",
+    "label": "Icy Standing",
+    "type": "overworld",
+    "location_id": "cd7fcec078e94196a4da34c4cd1862c7",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.fountain_adult_access)}"
+  },
+  {
+    "id": "c23a8c6cdc804ef984150e1fa128b9de",
+    "name": "great_fairy_fountain",
+    "label": "Great Fairy - Fountain",
+    "type": "overworld",
+    "location_id": "cd7fcec078e94196a4da34c4cd1862c7",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!((o.fountain_child_access||o.fountain_adult_access)&&o.bombs&&o.zelda)}"
+  },
+
+
+  {
+    "id": "0f5498b9638f49cbbea2649713ba0a67",
+    "name": "valley_box",
+    "label": "Valley Box",
+    "type": "overworld",
+    "location_id": "4b95c22b1f224aea967541179c9bdd72",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+  {
+    "id": "98a286822fb84ea7bf2d33ab31dcc598",
+    "name": "valley_waterfall",
+    "label": "Valley Waterfall",
+    "type": "overworld",
+    "location_id": "4b95c22b1f224aea967541179c9bdd72",
+    "available": true,
+    "checked": false,
+    "condition": null
+  },
+  {
+    "id": "4af4fe52382f4913a657281b2d16c17b",
+    "name": "valley_hammer",
+    "label": "Valley Hammer",
+    "type": "overworld",
+    "location_id": "4b95c22b1f224aea967541179c9bdd72",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.hammer&&(o.epona||o.longshot||o.requiem))}"
+  },
+
+
+  {
+    "id": "3a540195b8ab4f22a43aba27c85bafad",
+    "name": "fortress_top",
+    "label": "Fortress Top",
+    "type": "overworld",
+    "location_id": "d64781983d754066b4c575503002d9b2",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.fortress_access&&o.gerudo_card&&(o.hover_boots||(o.hookshot&&o.scarecrow)||o.longshot))}"
+  },
+  {
+    "id": "7181638b8d7d47ca90d91bec54837049",
+    "name": "hba_1",
+    "label": "Horseback Archery #1",
+    "type": "overworld",
+    "location_id": "d64781983d754066b4c575503002d9b2",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.gerudo_card&&o.epona&&o.bow)}"
+  },
+  {
+    "id": "79695f99e06d4c11888e5f3339e453b3",
+    "name": "hba_2",
+    "label": "Horseback Archery #2",
+    "type": "overworld",
+    "location_id": "d64781983d754066b4c575503002d9b2",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.gerudo_card&&o.epona&&o.bow)}"
+  },
+
+
+  {
+    "id": "86ff0465dba8492db86ee682ce4c0b29",
+    "name": "wasteland_torches",
+    "label": "Wasteland Torches",
+    "type": "overworld",
+    "location_id": "49151c1606cf42469d9f97c1d86e3d44",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.wasteland_access&&o.fire_source)}"
+  },
+  {
+    "id": "f2f36eb6051a4ba08a298bc9eaeec594",
+    "name": "wasteland_carpet",
+    "label": "Carpet Man",
+    "type": "overworld",
+    "location_id": "49151c1606cf42469d9f97c1d86e3d44",
+    "available": false,
+    "checked": true,
+    "condition": "function validate(o){return!!(o.wasteland_access&&o.wallet_1)}"
+  },
+
+
+  {
+    "id": "7e4bd1b1981041e4875f0f7e10a06681",
+    "name": "colossus_arch",
+    "label": "Colossus Arch",
+    "type": "overworld",
+    "location_id": "47071597282b43ab93a287e753c2d256",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.requiem&&o.beans)}"
+  },
+  {
+    "id": "bcee31d4af604f93bdc0cbb614d39f21",
+    "name": "song_requiem",
+    "label": "Song - Requiem",
+    "type": "overworld",
+    "location_id": "47071597282b43ab93a287e753c2d256",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.colossus_access)}"
+  },
+  {
+    "id": "a3a4000a8eca4f81b9e3442d0e0785b0",
+    "name": "great_fairy_colossus",
+    "label": "Great Fairy - Colossus",
+    "type": "overworld",
+    "location_id": "47071597282b43ab93a287e753c2d256",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.colossus_access&&o.bombs&&o.zelda)}"
+  },
+
+
+  {
+    "id": "a8a59331ce29413eb7c161727acee166",
+    "name": "song_prelude",
+    "label": "Song - Prelude",
+    "type": "overworld",
+    "location_id": "b465ba7239604c84a3233c12655726e7",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.medallion_green)}"
+  },
+  {
+    "id": "a0872cbcf0054a11be38b488b1dba6d6",
+    "name": "lacs",
+    "label": "LACS",
+    "type": "overworld",
+    "location_id": "b465ba7239604c84a3233c12655726e7",
+    "available": false,
+    "checked": false,
+    "condition": "function validate(o){return!!(o.medallion_purple&&o.medallion_orange)}"
+  }
+]
