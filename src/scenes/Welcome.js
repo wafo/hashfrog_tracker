@@ -1,38 +1,47 @@
-import { useEffect, useState } from "react";
-import ReactMarkdown from "react-markdown";
-import Footer from "../components/Footer";
-import welcome from "./welcome.md";
-
+import { Fragment, useState } from "react";
+import About from "./About";
 const baseURL = process.env.PUBLIC_URL;
 
 const Welcome = () => {
-  const [markdown, setMarkdown] = useState(null);
-
-  useEffect(() => {
-    fetch(welcome)
-      .then((response) => response.text())
-      .then((text) => setMarkdown(text));
-  }, []);
+  const [checks, setChecks] = useState(false);
 
   const launchTracker = () => {
-    const url = `${baseURL}/tracker`;
-    window.open(
-      url,
-      "HashFrog Tracker",
-      "toolbar=0,location=0,status=0,menubar=0,scrollbars=0,resizable=0,width=331,height=690"
-    );
+    if (checks) {
+      const url = `${baseURL}/tracker/checks`;
+      window.open(
+        url,
+        "HashFrog Tracker",
+        "toolbar=0,location=0,status=0,menubar=0,scrollbars=0,resizable=0,width=600,height=690"
+      );
+    } else {
+      const url = `${baseURL}/tracker`;
+      window.open(
+        url,
+        "HashFrog Tracker",
+        "toolbar=0,location=0,status=0,menubar=0,scrollbars=0,resizable=0,width=331,height=690"
+      );
+    }
   };
 
   return (
-    <div style={{ color: "#fff" }}>
-      <button type="button" onClick={launchTracker}>
-        Launch tracker
-      </button>
-      <ReactMarkdown>{markdown}</ReactMarkdown>
-      <div style={{ margin: "2rem 0" }}>
-        <Footer />
+    <Fragment>
+      <div style={{ color: "#fff" }}>
+        <button type="button" onClick={launchTracker}>
+          Launch tracker
+        </button>
       </div>
-    </div>
+      <div>
+        <input
+          type="checkbox"
+          id="checks"
+          name="checks"
+          value={checks}
+          onChange={() => setChecks((prev) => !prev)}
+        />
+        <label htmlFor="checks"> Use check tracking</label>
+      </div>
+      <About />
+    </Fragment>
   );
 };
 

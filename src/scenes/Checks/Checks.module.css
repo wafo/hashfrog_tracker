@@ -1,4 +1,13 @@
+.checks button {
+  background-color: #333;
+  border-color: #222;
+  border-style: solid;
+  color: #fff;
+}
+
 .info {
+  font-size: 0.75em;
+  margin: 1rem 0;
 }
 
 .locations {
@@ -15,6 +24,22 @@
   aspect-ratio: 2/1;
 }
 
+.location {
+  padding: 2px;
+}
+
+.buttons {
+  padding: 2px;
+}
+
+.buttons button {
+  margin-right: 0.25rem;
+}
+
+.buttons button:last-child {
+  margin-right: 0;
+}
+
 .checks {
   padding: 0;
   list-style: none;
@@ -25,6 +50,7 @@
   border: none;
   color: #fff;
   cursor: pointer;
+  padding: 2px;
 }
 
 .check button:disabled {

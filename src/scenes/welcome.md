@@ -10,10 +10,12 @@ These are in no order and I will work on them as I please.
 
 - Basic customization like font, colors, etc.
 - Layout customization UI and funtionality.
-- Check tracking UI and functionality.
 - Storing layout configurations.
 - Creating custom elements for the tracker.
 - Saving tracking sessions.
+
+### WIP
+- Check tracking UI and functionality.
 
 ### Completed
 - Basic tracker and UI elements.

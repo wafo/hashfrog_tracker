@@ -54,19 +54,10 @@ const defaultItems = {
   fountain_child_access: false,
   fountain_adult_access: false,
   fortress_access: false,
-  wasteland_access: false
+  wasteland_access: false,
 };
 
 const TrackerContext = createContext();
-
-const locationsWithChecks = locationsJSON.reduce((locations, location) => {
-  const checksInLocation = checksJSON.filter(
-    (x) => x.location_id === location.id
-  );
-  location.checks = checksInLocation;
-  locations.push(location);
-  return locations;
-}, []);
 
 function parseItems(items_list) {
   const items = { ...defaultItems };
@@ -126,11 +117,15 @@ function parseItems(items_list) {
       items.strength_3 = true;
     }
     // Medallions
-    if (item === "2c592d344777457f87c1507845864418") items.medallion_green = true;
+    if (item === "2c592d344777457f87c1507845864418")
+      items.medallion_green = true;
     if (item === "880f118d9f80482cb5e3a5091917d965") items.medallion_red = true;
-    if (item === "4e77495743cd44919d4c06061536b445") items.medallion_blue = true;
-    if (item === "099497c5610a43659bd2d31aee5d7250") items.medallion_purple = true;
-    if (item === "9e57725a38d344cfa2f5ebd41c953c71") items.medallion_orange = true;
+    if (item === "4e77495743cd44919d4c06061536b445")
+      items.medallion_blue = true;
+    if (item === "099497c5610a43659bd2d31aee5d7250")
+      items.medallion_purple = true;
+    if (item === "9e57725a38d344cfa2f5ebd41c953c71")
+      items.medallion_orange = true;
   });
 
   // Extra
@@ -165,10 +160,10 @@ function parseItems(items_list) {
 }
 
 const initialState = {
-  checks: checksJSON,
-  locations: locationsWithChecks,
-  items_list: [],
+  checks: [...checksJSON],
+  locations: [...locationsJSON],
   items: { ...defaultItems },
+  items_list: [],
 };
 
 function reducer(state, action) {
@@ -180,44 +175,37 @@ function reducer(state, action) {
       // Manipulating check
       const check = { ...state.checks[checkIndex] };
       check.checked = !check.checked;
-      // Finding location
-      const locationIndex = state.locations.findIndex(
-        (x) => x.id === check.location_id
-      );
-      if (locationIndex === -1) return state;
-      // Finding checks in location
-      const location = { ...state.locations[locationIndex] };
-      const locationCheckIndex = location.checks.findIndex(
-        (x) => x.id === action.payload
-      );
-      if (locationCheckIndex === -1) return state;
-      // Manipulating location
-      location.checks[locationCheckIndex] = check;
       // Manipulating state
       const checks = [...state.checks];
-      checks[checkIndex] = check;
-      const locations = [...state.locations];
-      locations[locationIndex] = location;
+      checks[checkIndex] = { ...check };
 
       return {
         ...state,
         checks,
-        locations,
       };
     }
     case "ITEM_MARK": {
       const { items, item } = action.payload;
-
+      // Preping collecting items
       const items_list = [
         ...state.items_list.filter((x) => !items.includes(x)),
       ];
       if (item) items_list.push(item);
       const parsedItems = parseItems(items_list);
+      // Validating checks based on items collected
+      let checks = [...state.checks];
+      checks = checks.map(check => {
+        if (check.condition) {
+          check.available = new Function("return " + check.condition)()(parsedItems);
+        }
+        return check;
+      });
 
       return {
         ...state,
         items_list,
         items: parsedItems,
+        checks,
       };
     }
     default:

@@ -1,9 +1,8 @@
 import { Route, Routes } from "react-router-dom";
 import { TrackerProvider } from "./context/trackerContext";
-import Checks from "./scenes/Checks/Checks";
-import Combined from "./scenes/Combined";
-import Tracker from "./scenes/Tracker/Tracker";
 import Welcome from "./scenes/Welcome";
+import Tracker from "./scenes/Tracker/Tracker";
+import TrackerChecks from "./scenes/TrackerChecks";
 
 function App() {
   return (
@@ -11,20 +10,19 @@ function App() {
       <Routes>
         {/* <Route path="" element={<Navigate to="/tracker" />} /> */}
         <Route path="" element={<Welcome />} />
-        <Route path="/tracker" element={<Tracker />} />
         <Route
-          path="/combo"
+          path="/tracker"
           element={
             <TrackerProvider>
-              <Combined />
+              <Tracker />
             </TrackerProvider>
           }
         />
         <Route
-          path="/checks"
+          path="/tracker/checks"
           element={
             <TrackerProvider>
-              <Checks />
+              <TrackerChecks />
             </TrackerProvider>
           }
         />

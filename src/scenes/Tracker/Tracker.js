@@ -166,11 +166,11 @@ const Tracker = () => {
       </div>
       <div className={styles.sometimes}>
         <div>
-          <SometimesHint icons={sometimesIcons} />
-          <SometimesHint icons={sometimesIcons} />
-          <SometimesHint icons={sometimesIcons} />
-          <SometimesHint icons={sometimesIcons} />
-          <SometimesHint icons={sometimesIcons} />
+          <SometimesHint width={175} icons={sometimesIcons} />
+          <SometimesHint width={175} icons={sometimesIcons} />
+          <SometimesHint width={175} icons={sometimesIcons} />
+          <SometimesHint width={175} icons={sometimesIcons} />
+          <SometimesHint width={175} icons={sometimesIcons} />
         </div>
         <div className={styles.always}>
           <ElementsTable elements={alwaysHints} columns={4} padding={2} />
@@ -185,17 +185,17 @@ const Tracker = () => {
         </div>
       </div>
       <div className={styles.locations}>
-        <LocationHint backgroundColor="#4a8ab6" color="#fff" margin="2px 0" />
-        <LocationHint backgroundColor="#4a8ab6" color="#fff" margin="2px 0" />
-        <LocationHint backgroundColor="#4a8ab6" color="#fff" margin="2px 0" />
-        <LocationHint backgroundColor="#4a8ab6" color="#fff" margin="2px 0" />
-        <LocationHint backgroundColor="#4a8ab6" color="#fff" margin="2px 0" />
+        <LocationHint backgroundColor="#4a8ab6" color="#fff" margin="2px 0" width={310} />
+        <LocationHint backgroundColor="#4a8ab6" color="#fff" margin="2px 0" width={310} />
+        <LocationHint backgroundColor="#4a8ab6" color="#fff" margin="2px 0" width={310} />
+        <LocationHint backgroundColor="#4a8ab6" color="#fff" margin="2px 0" width={310} />
+        <LocationHint backgroundColor="#4a8ab6" color="#fff" margin="2px 0" width={310} />
         <div style={{ margin: "1rem" }} />
         <LocationHint
           backgroundColor="#c6445c"
           color="#fff"
           margin="2px 0"
-          width={150}
+          width={200}
           showBoss={false}
           showItems={false}
         />
@@ -203,7 +203,7 @@ const Tracker = () => {
           backgroundColor="#c6445c"
           color="#fff"
           margin="2px 0"
-          width={150}
+          width={200}
           showBoss={false}
           showItems={false}
         />
@@ -211,7 +211,7 @@ const Tracker = () => {
           backgroundColor="#c6445c"
           color="#fff"
           margin="2px 0"
-          width={150}
+          width={200}
           showBoss={false}
           showItems={false}
         />

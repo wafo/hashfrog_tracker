@@ -1,13 +1,13 @@
 import Checks from "./Checks/Checks";
 import Tracker from "./Tracker/Tracker";
 
-const Combined = () => {
+const TrackerChecks = () => {
   return (
-    <div style={{ display: "flex" }}>
+    <div style={{ display: "flex", justifyContent: "space-between" }}>
       <Tracker />
       <Checks />
     </div>
   );
 };
 
-export default Combined;
+export default TrackerChecks;

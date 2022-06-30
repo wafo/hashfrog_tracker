@@ -1,9 +1,9 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useCheck, useChecks } from "../../context/trackerContext";
 import styles from "./Checks.module.css";
 
 const Checks = () => {
-  const { checks, locations, items } = useChecks();
+  const { checks, locations } = useChecks();
   const [type, setType] = useState("overworld");
   const [selected, setSelected] = useState(null);
 
@@ -16,7 +16,7 @@ const Checks = () => {
     };
 
     checks.forEach((check) => {
-      if (check.available) counter.available += 1;
+      if (check.available && !check.checked) counter.available += 1;
       if (!check.available) counter.locked += 1;
       if (check.checked) counter.checked += 1;
       if (!check.checked) counter.remaining += 1;
@@ -29,38 +29,67 @@ const Checks = () => {
     setSelected((prev) => (prev === id ? null : id));
   };
 
+  useEffect(() => {
+    setSelected(null);
+  }, [type]);
+
   const locationsByType = useMemo(() => {
-    return locations.filter((x) => x.type === type);
-  }, [locations, type]);
+    const checksByLocation = checks.reduce((acc, check) => {
+      if (!acc[check.location_id]) acc[check.location_id] = [];
+      acc[check.location_id].push({ ...check });
+      return acc;
+    }, {});
+
+    let locationsByType = locations.filter((x) => x.type === type);
+
+    return locationsByType.reduce((acc, loc) => {
+      loc.checks = checksByLocation[loc.id];
+      loc.available = 0;
+      loc.locked = 0;
+
+      loc.checks.forEach((check) => {
+        if (check.available && !check.checked) loc.available += 1;
+        if (!check.available) loc.locked += 1;
+      });
+
+      acc.push({ ...loc });
+      return acc;
+    }, []);
+  }, [checks, locations, type]);
 
   const location = useMemo(() => {
     if (!selected) return null;
-    const location = locations.find((x) => x.id === selected);
-    location.checks = location.checks.map((check) => {
-      if (check.condition) {
-        check.available = new Function("return " + check.condition)()(items);
-      }
-      return check;
-    });
+    const location = locationsByType.find((x) => x.id === selected);
     return location;
-  }, [selected, locations, items]);
+  }, [locationsByType, selected]);
 
   return (
-    <div id="checks" style={{ width: "350px" }}>
+    <div id="checks" style={{ width: "250px" }} className={styles.checks}>
       <Buttons type={type} setType={setType} />
       {location && <Location location={location} setSelected={setSelected} />}
       {!location && (
         <div className={styles.locations}>
-          {locationsByType.map((loc) => (
-            <div key={loc.id} className={styles.locations_item}>
-              <button type="button" onClick={() => handleLocationClick(loc.id)}>
-                <span>{loc.short_label}</span>
-              </button>
-            </div>
-          ))}
+          {locationsByType.map((loc) => {
+            const style = {};
+            if (loc.locked > 0) style.borderLeftColor = "#ffc107";
+            if (loc.available > 0) style.borderLeftColor = "#198754";
+            if (loc.available === 0 && loc.locked === 0) style.opacity = "0.75";
+            return (
+              <div key={loc.id} className={styles.locations_item}>
+                <button
+                  type="button"
+                  onClick={() => handleLocationClick(loc.id)}
+                  onContextMenu={(e) => e.preventDefault()}
+                  style={style}
+                >
+                  <span>{loc.short_label}</span>
+                </button>
+              </div>
+            );
+          })}
         </div>
       )}
-      {/* <Info counter={counter} /> */}
+      <Info counter={counter} />
     </div>
   );
 };
@@ -87,18 +116,27 @@ const Location = ({ location, setSelected }) => {
         Back
       </button>
       <ul className={styles.checks}>
-        {location.checks.map((check) => (
-          <li key={check.id} className={styles.check}>
-            <button
-              type="button"
-              disabled={!check.available}
-              style={check.checked ? { textDecoration: "line-through" } : {}}
-              onClick={() => actions.markCheck(check.id)}
-            >
-              {check.label}
-            </button>
-          </li>
-        ))}
+        {location.checks.map((check) => {
+          const style = {};
+          if (check.checked) style.textDecoration = "line-through";
+          if (!check.available) style.opacity = "0.5";
+
+          return (
+            <li key={check.id} className={styles.check}>
+              <button
+                type="button"
+                style={style}
+                onClick={() => actions.markCheck(check.id)}
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  actions.markCheck(check.id);
+                }}
+              >
+                {check.label}
+              </button>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
@@ -111,7 +149,7 @@ const Info = ({ counter }) => {
         <tbody>
           <tr>
             <td>{counter.checked}</td>
-            <td>Completed</td>
+            <td>Checked</td>
           </tr>
           <tr>
             <td>{counter.available}</td>
