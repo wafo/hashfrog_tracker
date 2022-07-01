@@ -49,7 +49,7 @@ const defaultItems = {
   medallion_orange: false,
   // Extra
   scarecrow: true,
-  fire_source: true,
+  fire_source: false,
   dmc_entrance: false,
   domain_child_access: false,
   domain_adult_access: false,
