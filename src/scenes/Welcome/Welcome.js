@@ -12,14 +12,14 @@ const Welcome = () => {
       window.open(
         url,
         "HashFrog Tracker",
-        "toolbar=0,location=0,status=0,menubar=0,scrollbars=0,resizable=0,width=600,height=690"
+        "toolbar=0,location=0,status=0,menubar=0,scrollbars=0,resizable=0,width=600,height=66",
       );
     } else {
       const url = `${baseURL}/tracker`;
       window.open(
         url,
         "HashFrog Tracker",
-        "toolbar=0,location=0,status=0,menubar=0,scrollbars=0,resizable=0,width=331,height=690"
+        "toolbar=0,location=0,status=0,menubar=0,scrollbars=0,resizable=0,width=326,height=665",
       );
     }
   };
@@ -29,18 +29,14 @@ const Welcome = () => {
       <div className={styles.left}>
         <h1>HashFrog Tracker</h1>
         <p>
-          This is a tracker for the{" "}
-          <a href="https://ootrandomizer.com/">Ocarina of Time Randomizer</a>.
+          This is a tracker for the <a href="https://ootrandomizer.com/">Ocarina of Time Randomizer</a>.
         </p>
         <p>
-          The motivation behind this project is to have a simple customizable
-          tracker that will help keep track of all the checks in the game.
+          The motivation behind this project is to have a simple customizable tracker that will help keep track of all
+          the checks in the game.
         </p>
         <h3>TODO</h3>
-        <p>
-          These are in no order and I make no promises of when I&apos;ll get to
-          them.
-        </p>
+        <p>These are in no order and I make no promises of when I&apos;ll get to them.</p>
         <ul>
           <li>Basic customization like font, colors, etc.</li>
           <li>Layout customization UI and funtionality.</li>
@@ -50,10 +46,8 @@ const Welcome = () => {
         </ul>
         <h3>Changelog</h3>
         <ul>
-          <li>
-            0.3.4 - All check tracking logic changed to standard glitchless
-            logic.
-          </li>
+          <li>0.4.0 - Tracker layout based of JSON file and layout editor UI.</li>
+          <li>0.3.4 - All check tracking logic changed to standard glitchless logic.</li>
         </ul>
         <div style={{ margin: "3rem 0" }} />
         <Footer />
@@ -63,20 +57,11 @@ const Welcome = () => {
           Launch tracker
         </button>
         <div className={styles.configuration}>
-          <input
-            type="checkbox"
-            id="checks"
-            name="checks"
-            value={checks}
-            onChange={() => setChecks((prev) => !prev)}
-          />
+          <input type="checkbox" id="checks" name="checks" value={checks} onChange={() => setChecks(prev => !prev)} />
           <label htmlFor="checks"> Use check tracking. *</label>
         </div>
         <h3>Notes</h3>
-        <p>
-          * Check tracking is based on glitchless logic and common enabled
-          tricks.
-        </p>
+        <p>* Check tracking is based on glitchless logic and common enabled tricks.</p>
         <ul>
           <li>Hidden Grottos without Stone of Agony</li>
           <li>Man on Roof without Hookshot</li>

@@ -1,10 +1,11 @@
 const { useMemo } = require("react");
-import Element from "../components/Element";
-import ElementsTable from "../components/ElementsTable";
-import LocationHint from "../components/LocationHint";
-import SometimesHint from "../components/SometimesHint";
-import { useLayout } from "../context/useLayout";
-import elementsJSON from "../data/elements.json";
+import Element from "../../components/Element";
+import ElementsTable from "../../components/ElementsTable";
+import Footer from "../../components/Footer";
+import LocationHint from "../../components/LocationHint";
+import SometimesHint from "../../components/SometimesHint";
+import { useLayout } from "../../context/useLayout";
+import elementsJSON from "../../data/elements.json";
 
 const styles = {
   layout: {
@@ -82,15 +83,18 @@ const Layout = props => {
   }, [components]);
 
   return (
-    <div
-      style={{
-        ...styles.layout,
-        width: layoutConfig.width,
-        height: layoutConfig.height,
-        backgroundColor: layoutConfig.backgroundColor,
-      }}
-    >
-      {toRender}
+    <div>
+      <div
+        style={{
+          ...styles.layout,
+          width: layoutConfig.width,
+          height: layoutConfig.height,
+          backgroundColor: layoutConfig.backgroundColor,
+        }}
+      >
+        {toRender}
+      </div>
+      <Footer showGitHub={false} opacity={0.5} />
     </div>
   );
 };
