@@ -31,7 +31,7 @@ const Tracker = () => {
       "hookshot",
       "light_arrows",
       "farores",
-      "bottle_counter",
+      "bottle",
       "boomerang",
       "lens",
       "beans",

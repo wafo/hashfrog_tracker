@@ -50,6 +50,7 @@ const defaultItems = {
   // Extra
   scarecrow: true,
   fire_source: false,
+  has_bottle: false,
   dmc_entrance: false,
   domain_child_access: false,
   domain_adult_access: false,
@@ -91,6 +92,7 @@ function parseItems(items_list) {
     if (item === "bc6099ef9091404e9b45aea12d4b6b65") items.boomerang = true;
     if (item === "2ac429aee9b5447e827a16e377fb6ce0") items.lens = true;
     if (item === "2e7752ec3fbc4c03b68c5621f853cad3") items.beans = true;
+    if (item === "55f6bcc569c14f1293eb50fda76c812d") items.bottle = true;
     if (item === "3b07b8868e7a4e438b5c874a1f0ae677") items.claim_check = true;
     if (item === "a391497285c34d56b762ca84b1450d5d") items.rutos_letter = true;
     if (item === "591d582f479140759fd6501caa23c2f9") items.dins = true;
@@ -144,10 +146,10 @@ function parseItems(items_list) {
   if (items.bombs || items.scale) {
     items.beans = true;
   }
-  if (items.zelda || items.scale) {
+  if ((items.zelda && items.bombs) || items.scale) {
     items.domain_child_access = true;
   }
-  if (items.zelda || items.hover_boots) {
+  if (items.zelda) {
     items.domain_adult_access = true;
   }
   if (items.domain_child_access && items.rutos_letter) {
@@ -167,6 +169,9 @@ function parseItems(items_list) {
   }
   if (items.magic && (items.dins || (items.bow && items.fire_arrows))) {
     items.fire_source = true;
+  }
+  if (items.bottle || (items.rutos_letter && (items.zelda || items.scale))) {
+    items.has_bottle = true;
   }
 
   return items;

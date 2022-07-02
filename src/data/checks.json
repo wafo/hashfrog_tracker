@@ -203,7 +203,7 @@
     "location_id": "27fae6f9cd2245d5b776c079e7f31d8a",
     "available": false,
     "checked": false,
-    "condition": "function validate(o){return!!((o.bombs||o.hammer)&&(o.gold_scale&&o.iron_boots))}"
+    "condition": "function validate(o){return!!((o.bombs||o.hammer)&&(o.gold_scale||o.iron_boots))}"
   },
   {
     "id": "138fb2a7715d42e7be0e38e5d537721e",
@@ -327,7 +327,7 @@
     "location_id": "e93eb5a49155416bbc4f0bf159a57e4c",
     "available": false,
     "checked": false,
-    "condition": "function validate(o){return!!(o.epona&&o.bow&&o.bottle)}"
+    "condition": "function validate(o){return!!(o.epona&&o.bow&&o.has_bottle)}"
   },
 
 
@@ -867,7 +867,7 @@
     "location_id": "681b54e4746c44c28f77d1f61493b296",
     "available": false,
     "checked": false,
-    "condition": "function validate(o){return!!(o.domain_adult_access&&o.bottle&&(o.wallet_2||(o.domain_child_access&&o.rutos_letter)))}"
+    "condition": "function validate(o){return!!(o.domain_adult_access&&o.has_bottle&&(o.wallet_2||(o.domain_child_access&&o.rutos_letter)))}"
   },
 
 

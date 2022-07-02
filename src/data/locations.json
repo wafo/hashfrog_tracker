@@ -3,7 +3,7 @@
     "id": "62734d0ee39c4f90afaca7b836b8a801",
     "name": "kokiri_forest",
     "label": "Kokiri Forest",
-    "short_label": "KOK",
+    "short_label": "KF",
     "type": "overworld"
   },
   {
@@ -31,7 +31,7 @@
     "id": "65c17c34902d467a8739f240707ae8b0",
     "name": "lonlon_ranch",
     "label": "Lonlon Ranch",
-    "short_label": "LR",
+    "short_label": "LLR",
     "type": "overworld"
   },
   {
