@@ -17,7 +17,7 @@ const styles = {
   },
 };
 
-const Layout = props => {
+const Layout = () => {
   const {
     state: { layout },
   } = useLayout();
