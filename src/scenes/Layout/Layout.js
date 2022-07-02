@@ -1,4 +1,4 @@
-const { useMemo } = require("react");
+const { useMemo, useEffect } = require("react");
 import Element from "../../components/Element";
 import ElementsTable from "../../components/ElementsTable";
 import Footer from "../../components/Footer";
@@ -18,12 +18,14 @@ const styles = {
 };
 
 const Layout = () => {
+  useEffect(() => {
+    document.title = "HashFrog - Tracker";
+  }, []);
+
   const {
     state: { layout },
   } = useLayout();
   const { layoutConfig, components } = layout;
-
-  console.log(layout);
 
   const toRender = useMemo(() => {
     return components.map(component => {
