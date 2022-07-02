@@ -3,6 +3,8 @@ import { TrackerProvider } from "./context/trackerContext";
 import Welcome from "./scenes/Welcome/Welcome";
 import Tracker from "./scenes/Tracker/Tracker";
 import TrackerChecks from "./scenes/TrackerChecks";
+import Layout from "./scenes/Layout";
+import { LayoutProvider } from "./context/useLayout";
 
 function App() {
   return (
@@ -24,6 +26,16 @@ function App() {
             <TrackerProvider>
               <TrackerChecks />
             </TrackerProvider>
+          }
+        />
+        <Route
+          path="/layout"
+          element={
+            <LayoutProvider>
+              <TrackerProvider>
+                <Layout />
+              </TrackerProvider>
+            </LayoutProvider>
           }
         />
       </Routes>
