@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Footer from "../../components/Footer";
+import LayoutSelector from "../Layout/LayoutSelector";
 import styles from "./Welcome.module.css";
 const baseURL = process.env.PUBLIC_URL;
 
@@ -57,8 +58,14 @@ const Welcome = () => {
           Launch tracker
         </button>
         <div className={styles.configuration}>
-          <input type="checkbox" id="checks" name="checks" value={checks} onChange={() => setChecks(prev => !prev)} />
-          <label htmlFor="checks"> Use check tracking. *</label>
+          <h3>Layout Configuration</h3>
+          <div style={{ marginBottom: "1rem" }}>
+            <input type="checkbox" id="checks" name="checks" value={checks} onChange={() => setChecks(prev => !prev)} />
+            <label htmlFor="checks" style={{ marginLeft: "0.5rem" }}>
+              Use check tracking *
+            </label>
+          </div>
+          <LayoutSelector />
         </div>
         <h3>Notes</h3>
         <p>* Check tracking is based on glitchless logic and common enabled tricks.</p>

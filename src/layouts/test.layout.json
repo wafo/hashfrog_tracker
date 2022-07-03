@@ -1,6 +1,6 @@
 {
   "id": "1d5a40bc94254c548b2cd1ed77e3ea5d",
-  "name": "Standard Default",
+  "name": "Test Layout",
   "layoutConfig": {
     "backgroundColor": "#000",
     "width": 310,
@@ -17,9 +17,9 @@
       "columns": 10,
       "padding": "2px 3px",
       "elements": [
-        "kokiri_sword",
-        "master_sword",
         "biggoron_sword",
+        "master_sword",
+        "kokiri_sword",
         "sticks",
         "nuts",
         "bombs",

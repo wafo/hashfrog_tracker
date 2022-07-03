@@ -22,9 +22,7 @@ const Layout = () => {
     document.title = "HashFrog - Tracker";
   }, []);
 
-  const {
-    state: { layout },
-  } = useLayout();
+  const { state: layout } = useLayout();
   const { layoutConfig, components } = layout;
 
   const toRender = useMemo(() => {
