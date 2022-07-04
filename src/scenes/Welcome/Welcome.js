@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Footer from "../../components/Footer";
-import LayoutSelector from "../Layout/LayoutSelector";
+import LayoutSelector from "../../components/LayoutSelector";
 import styles from "./Welcome.module.css";
 const baseURL = process.env.PUBLIC_URL;
 

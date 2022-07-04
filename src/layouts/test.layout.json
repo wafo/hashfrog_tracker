@@ -1,7 +1,7 @@
 {
   "id": "1d5a40bc94254c548b2cd1ed77e3ea5d",
-  "name": "Test Layout",
   "layoutConfig": {
+    "name": "Test Layout",
     "backgroundColor": "#000",
     "width": 310,
     "height": 615,

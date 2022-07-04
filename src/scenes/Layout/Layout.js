@@ -4,7 +4,7 @@ import ElementsTable from "../../components/ElementsTable";
 import Footer from "../../components/Footer";
 import LocationHint from "../../components/LocationHint";
 import SometimesHint from "../../components/SometimesHint";
-import { useLayout } from "../../context/useLayout";
+import { useLayout } from "../../context/layoutcontext";
 import elementsJSON from "../../data/elements.json";
 
 const styles = {
@@ -17,23 +17,31 @@ const styles = {
   },
 };
 
-const Layout = () => {
+const Layout = props => {
   useEffect(() => {
     document.title = "HashFrog - Tracker";
   }, []);
 
-  const { state: layout } = useLayout();
-  const { layoutConfig, components } = layout;
+  const { state: layoutContext } = useLayout();
+
+  const renderLayout = useMemo(() => {
+    if (props.layout) return props.layout;
+    return layoutContext;
+  }, [props.layout, layoutContext]);
+
+  const layoutConfig = useMemo(() => {
+    return renderLayout.layoutConfig;
+  }, [renderLayout]);
 
   const toRender = useMemo(() => {
-    return components.map(component => {
+    return renderLayout.components.map(component => {
       switch (component.type) {
         case "element": {
           const element = elementsJSON.find(x => x.id === component.elementId);
           const [top, left] = component.position;
           return (
             <div key={component.id} style={{ ...styles.components, top, left }}>
-              <Element {...element} />
+              <Element {...element} size={component.size} />
             </div>
           );
         }
@@ -80,7 +88,7 @@ const Layout = () => {
           return null;
       }
     });
-  }, [components]);
+  }, [renderLayout.components]);
 
   return (
     <div>
@@ -94,7 +102,7 @@ const Layout = () => {
       >
         {toRender}
       </div>
-      <Footer showGitHub={false} opacity={0.5} />
+      {!props.hideFooter && <Footer showGitHub={false} opacity={0.5} />}
     </div>
   );
 };

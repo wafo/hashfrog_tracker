@@ -1,7 +1,7 @@
 {
   "id": "1d5a40bc94254c548b2cd1ed77e3ea5d",
-  "name": "Standard Default",
   "layoutConfig": {
+    "name": "Standard Default",
     "backgroundColor": "#000",
     "width": 310,
     "height": 615,

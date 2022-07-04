@@ -16,6 +16,14 @@ body {
   /* color: #ffff00; */
 }
 
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+}
+
 .form-control {
   display: flex;
   flex-direction: column;
