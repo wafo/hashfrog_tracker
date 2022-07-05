@@ -1,13 +1,9 @@
 import { Fragment, useState } from "react";
 import Layout from "../Layout/Layout";
-import { v4 as uuidv4 } from "uuid";
 import EditorLayoutConfig from "./EditorLayoutConfig";
 import EditorComponentsList from "./EditorComponentsList";
 import styles from "./Editor.module.css";
-
-function generateId() {
-  return uuidv4().replace(/-/g, "");
-}
+import { generateId, readFileAsText } from "../../utils/utils";
 
 const baseLayout = {
   id: "",
@@ -34,6 +30,21 @@ const Editor = () => {
     setLayout({ ...baseLayout, id: generateId() });
   };
 
+  const [layoutKey, setLayoutKey] = useState(Math.random());
+
+  const handleLayoutOpen = async event => {
+    const {
+      target: { files },
+    } = event;
+
+    if (files.length > 0) {
+      const content = await readFileAsText(files[0]);
+      const parsedLayout = JSON.parse(content);
+      setLayout(parsedLayout);
+      setLayoutKey(Math.random())
+    }
+  };
+
   return (
     <div style={{ display: "flex", justifyContent: "flex-start" }}>
       {layout.id && <Layout layout={layout} hideFooter />}
@@ -45,7 +56,7 @@ const Editor = () => {
           </button>
           <div>
             <label htmlFor="open">Open</label>
-            <input type="file" id="open" style={{ display: "none" }} />
+            <input key={layoutKey} type="file" id="open" onChange={handleLayoutOpen} style={{ display: "none" }} />
           </div>
           <button type="button">Export Layout</button>
         </div>

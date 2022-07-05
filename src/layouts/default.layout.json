@@ -51,7 +51,8 @@
         "boots_hover",
         "scale",
         "wallet"
-      ]
+      ],
+      "elementsSize": [25, 25]
     },
     {
       "id": "bd549bd8bdb847b391c94ca3fef05f31",
@@ -69,7 +70,8 @@
         "medallion_blue",
         "medallion_purple",
         "medallion_orange"
-      ]
+      ],
+      "elementsSize": [25, 25]
     },
     {
       "id": "7717af26740543a88a97e44df5f73a9f",
@@ -90,7 +92,8 @@
         "song_nocturne",
         "song_requiem",
         "song_prelude"
-      ]
+      ],
+      "elementsSize": [25, 25]
     },
     {
       "id": "30646a147ed24664aa082e2a27d57e23",
@@ -98,7 +101,8 @@
       "position": [182, 210],
       "columns": 4,
       "padding": "2px",
-      "elements": ["keys_forest", "keys_fire", "keys_water", "keys_shadow", "keys_spirit", "keys_botw", "keys_gtg"]
+      "elements": ["keys_forest", "keys_fire", "keys_water", "keys_shadow", "keys_spirit", "keys_botw", "keys_gtg"],
+      "elementsSize": [20, 20]
     },
     {
       "id": "7cb45cc474cc482fa3d52e8a4bc7f4af",
@@ -161,7 +165,8 @@
       "id": "4925c5916c55499f869a80ad57b9c8b5",
       "type": "element",
       "elementId": "d055616ee0314701a6d1471c0a5595ff",
-      "position": [336, 204]
+      "position": [336, 204],
+      "size": [25, 25]
     },
     {
       "id": "8a3b3543662f4a4bae43462ecab1c3ee",
@@ -169,7 +174,9 @@
       "position": [408, 4],
       "width": 300,
       "color": "#fff",
-      "backgroundColor": "#4a8ab6"
+      "backgroundColor": "#4a8ab6",
+      "showBoss": true,
+      "showItems": true
     },
     {
       "id": "465b60ab778740649f8c5afef1ec6a33",
@@ -177,7 +184,9 @@
       "position": [432, 4],
       "width": 300,
       "color": "#fff",
-      "backgroundColor": "#4a8ab6"
+      "backgroundColor": "#4a8ab6",
+      "showBoss": true,
+      "showItems": true
     },
     {
       "id": "28327abd381f463f8ada58172b26dc33",
@@ -185,7 +194,9 @@
       "position": [456, 4],
       "width": 300,
       "color": "#fff",
-      "backgroundColor": "#4a8ab6"
+      "backgroundColor": "#4a8ab6",
+      "showBoss": true,
+      "showItems": true
     },
     {
       "id": "8f2a1cf6dccb4a88b3abd10dbcc5d8a3",
@@ -193,7 +204,9 @@
       "position": [480, 4],
       "width": 300,
       "color": "#fff",
-      "backgroundColor": "#4a8ab6"
+      "backgroundColor": "#4a8ab6",
+      "showBoss": true,
+      "showItems": true
     },
     {
       "id": "eaa6200b36e04d558c47b4c45b2234c8",
@@ -201,7 +214,9 @@
       "position": [504, 4],
       "width": 300,
       "color": "#fff",
-      "backgroundColor": "#4a8ab6"
+      "backgroundColor": "#4a8ab6",
+      "showBoss": true,
+      "showItems": true
     },
     {
       "id": "a1bee10dd6e44aac81dcd50d52cd5338",

@@ -81,7 +81,7 @@ const Layout = props => {
                 backgroundColor={component.backgroundColor}
                 showBoss={component.showBoss}
                 showItems={component.showItems}
-                itemsIcons={element.icons}
+                {...(element && element.icons && { itemsIcons: element.icons })}
               />
             </div>
           );

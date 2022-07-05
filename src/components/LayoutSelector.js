@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { useLayout } from "../context/layoutcontext";
+import { readFileAsText } from "../utils/utils";
 
 const LayoutSelector = () => {
   const [key, setKey] = useState(Math.random());
@@ -38,15 +39,5 @@ const LayoutSelector = () => {
     </div>
   );
 };
-
-async function readFileAsText(file) {
-  let result = await new Promise(resolve => {
-    let fileReader = new FileReader();
-    fileReader.onload = () => resolve(fileReader.result);
-    fileReader.readAsText(file);
-  });
-
-  return result;
-}
 
 export default LayoutSelector;

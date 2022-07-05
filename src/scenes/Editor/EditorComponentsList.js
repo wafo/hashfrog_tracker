@@ -1,11 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
+import { generateId } from "../../utils/utils";
 import styles from "./Editor.module.css";
 import EditorComponent from "./EditorComponent";
-
-function generateId() {
-  return uuidv4().replace(/-/g, "");
-}
 
 const EditorComponentsList = ({ components, setLayout }) => {
   const [component, setComponent] = useState(null);

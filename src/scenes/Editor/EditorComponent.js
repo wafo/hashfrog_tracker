@@ -1,12 +1,8 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 import elementsJSON from "../../data/elements.json";
 import labelsJSON from "../../data/labels.json";
+import { generateId } from "../../utils/utils";
 import styles from "./Editor.module.css";
-
-function generateId() {
-  return uuidv4().replace(/-/g, "");
-}
 
 const EditorComponent = ({ component, setComponent }) => {
   let { position, type } = component;
@@ -203,7 +199,7 @@ const ElementEditor = ({ component, handleChange }) => {
 };
 
 const TableEditor = ({ component, handleChange }) => {
-  const [elements, setElements] = useState([...component.elements]);
+  const [elements, setElements] = useState([...component.elements.map(x => ({ id: generateId(), value: x }))]);
   const [element, setElement] = useState("a081121b16f84366bf16e16ca90cd23f");
   const [draggedElement, setDraggedElement] = useState(null);
 
