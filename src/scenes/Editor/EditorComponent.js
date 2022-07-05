@@ -1,7 +1,12 @@
-import styles from "./Editor.module.css";
+import { Fragment, useCallback, useEffect, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import elementsJSON from "../../data/elements.json";
 import labelsJSON from "../../data/labels.json";
-import { Fragment, useCallback, useEffect, useState } from "react";
+import styles from "./Editor.module.css";
+
+function generateId() {
+  return uuidv4().replace(/-/g, "");
+}
 
 const EditorComponent = ({ component, setComponent }) => {
   let { position, type } = component;
@@ -211,19 +216,23 @@ const TableEditor = ({ component, handleChange }) => {
     handleChange({
       target: {
         name: "elements",
-        value: elements,
+        value: elements.map(x => x.value),
       },
     });
   }, [elements, handleChange]);
 
-  const addToTable = () => {
-    setElements(prev => [...prev, element]);
+  const addToTable = useCallback(() => {
+    const newElement = {
+      id: generateId(),
+      value: element,
+    };
+    setElements(prev => [...prev, newElement]);
     setElement("a081121b16f84366bf16e16ca90cd23f");
-  };
+  }, [element]);
 
   const removeFromTable = (e, element) => {
     e.preventDefault();
-    setElements(prev => [...prev.filter(x => x !== element)]);
+    setElements(prev => [...prev.filter(x => x.id !== element.id)]);
   };
 
   const onDragStart = (event, element) => {
@@ -240,11 +249,11 @@ const TableEditor = ({ component, handleChange }) => {
     index => {
       const draggedOverElement = elements[index];
       // Ignore if dragged over itself
-      if (draggedOverElement === draggedElement) return;
+      if (draggedOverElement.id === draggedElement.id) return;
       // filter out the currently dragged item
       // add the dragged item after the dragged over item
       setElements(prev => {
-        let elements = [...prev.filter(element => element !== draggedElement)];
+        let elements = [...prev.filter(element => element.id !== draggedElement.id)];
         elements.splice(index, 0, draggedElement);
         return elements;
       });
@@ -308,18 +317,20 @@ const TableEditor = ({ component, handleChange }) => {
           Add
         </button>
       </div>
-      {elements.length > 0 && <p style={{ fontSize: "0.75em", margin: 0, opacity: 0.5 }}>Right click to remove. Drag to re-order.</p>}
+      {elements.length > 0 && (
+        <p style={{ fontSize: "0.75em", margin: 0, opacity: 0.5 }}>Right click to remove. Drag to re-order.</p>
+      )}
       <ol>
         {elements.map((element, index) => (
           <li
-            key={`${index}-${element}`}
+            key={element.id}
             onContextMenu={e => removeFromTable(e, element)}
             onDragStart={e => onDragStart(e, element)}
             onDragEnd={onDragEnd}
             onDragOver={() => onDragOver(index)}
             draggable
           >
-            {element}
+            {element.value}
           </li>
         ))}
       </ol>
