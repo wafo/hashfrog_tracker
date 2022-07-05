@@ -1,14 +1,15 @@
-import { Fragment, useState } from "react";
+import { Fragment, useCallback, useState } from "react";
 import Layout from "../Layout/Layout";
 import EditorLayoutConfig from "./EditorLayoutConfig";
 import EditorComponentsList from "./EditorComponentsList";
 import styles from "./Editor.module.css";
 import { generateId, readFileAsText } from "../../utils/utils";
+import FileSaver from "file-saver";
 
 const baseLayout = {
   id: "",
-  name: "",
   layoutConfig: {
+    name: "",
     backgroundColor: "#222",
     width: 300,
     height: 500,
@@ -41,9 +42,15 @@ const Editor = () => {
       const content = await readFileAsText(files[0]);
       const parsedLayout = JSON.parse(content);
       setLayout(parsedLayout);
-      setLayoutKey(Math.random())
+      setLayoutKey(Math.random());
     }
   };
+
+  const handleLayoutSave = useCallback(() => {
+    //pass data from localStorage API to blob
+    const jsonBlob = new Blob([JSON.stringify(layout)], { type: "text/plain" });
+    FileSaver.saveAs(jsonBlob, `${layout.layoutConfig.name}.json`);
+  }, [layout]);
 
   return (
     <div style={{ display: "flex", justifyContent: "flex-start" }}>
@@ -58,7 +65,9 @@ const Editor = () => {
             <label htmlFor="open">Open</label>
             <input key={layoutKey} type="file" id="open" onChange={handleLayoutOpen} style={{ display: "none" }} />
           </div>
-          <button type="button">Export Layout</button>
+          <button type="button" onClick={handleLayoutSave}>
+            Export Layout
+          </button>
         </div>
         <p className={styles.displayId}>Layout ID: {layout.id}</p>
         {layout.id && (
