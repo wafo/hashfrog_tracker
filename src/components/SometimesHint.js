@@ -15,7 +15,7 @@ const SometimesHint = (props) => {
 
   const memoizedOptions = useMemo(() => {
     if (options) return options;
-    return labelsJSON[labels].map((label) => ({
+    return labelsJSON[labels || "sometimes"].map((label) => ({
       value: label,
       label: label,
     }));

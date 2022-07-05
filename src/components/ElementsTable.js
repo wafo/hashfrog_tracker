@@ -20,8 +20,8 @@ const ElementsTable = props => {
   } = props;
 
   const rows = useMemo(() => {
-    const itemComponents = elements.map(element => (
-      <td key={element.id} style={{ padding }}>
+    const itemComponents = elements.map((element, index) => (
+      <td key={`${index}-${element.id}`} style={{ padding }}>
         <Element {...element} size={elementsSize || element.size} />
       </td>
     ));

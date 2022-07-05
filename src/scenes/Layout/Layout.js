@@ -66,11 +66,12 @@ const Layout = props => {
           const [top, left] = component.position;
           return (
             <div key={component.id} style={{ ...styles.components, top, left }}>
-              <SometimesHint width={component.width} icons={element.icons} />
+              <SometimesHint width={component.width} icons={element.icons} labels={component.labels} />
             </div>
           );
         }
         case "locationhint": {
+          const element = elementsJSON.find(x => x.id === component.elementId);
           const [top, left] = component.position;
           return (
             <div key={component.id} style={{ ...styles.components, top, left }}>
@@ -80,6 +81,7 @@ const Layout = props => {
                 backgroundColor={component.backgroundColor}
                 showBoss={component.showBoss}
                 showItems={component.showItems}
+                itemsIcons={element.icons}
               />
             </div>
           );

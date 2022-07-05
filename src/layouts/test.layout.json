@@ -4,7 +4,7 @@
     "name": "Test Layout",
     "backgroundColor": "#000",
     "width": 310,
-    "height": 615,
+    "height": 663,
     "fontFamily": null,
     "fontSize": null,
     "fontColor": null
@@ -17,9 +17,9 @@
       "columns": 10,
       "padding": "2px 3px",
       "elements": [
-        "biggoron_sword",
-        "master_sword",
         "kokiri_sword",
+        "master_sword",
+        "biggoron_sword",
         "sticks",
         "nuts",
         "bombs",
@@ -227,6 +227,26 @@
       "id": "0d272b0c8044479991a32aa32bcd34ef",
       "type": "locationhint",
       "position": [588, 4],
+      "width": 200,
+      "color": "#fff",
+      "backgroundColor": "#c6445c",
+      "showBoss": false,
+      "showItems": false
+    },
+    {
+      "id": "2c1b7646ed8446a786b4c53bcee0a77b",
+      "type": "locationhint",
+      "position": [612, 4],
+      "width": 200,
+      "color": "#fff",
+      "backgroundColor": "#c6445c",
+      "showBoss": false,
+      "showItems": false
+    },
+    {
+      "id": "da127dd3c4ad484eb6842ddeab93c2f7",
+      "type": "locationhint",
+      "position": [636, 4],
       "width": 200,
       "color": "#fff",
       "backgroundColor": "#c6445c",

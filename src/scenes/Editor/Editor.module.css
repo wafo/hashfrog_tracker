@@ -93,3 +93,12 @@
 .editorComponent select {
   margin-bottom: 0.5rem;
 }
+
+.editorComponent ol {
+  padding: 0 2rem;
+}
+
+.editorComponent ol li {
+  font-size: 0.8em;
+  cursor: pointer;
+}

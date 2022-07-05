@@ -34,7 +34,7 @@ const LayoutSelector = () => {
       <button type="button" style={{ width: "87px" }} onClick={resetLayout}>
         Reset
       </button>
-      <p>Current layout: {layout.name}</p>
+      <p>Current layout: {layout.layoutConfig.name}</p>
     </div>
   );
 };
