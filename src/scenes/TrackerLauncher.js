@@ -48,20 +48,18 @@ const TrackerLauncher = () => {
           <button type="button" className="btn btn-light btn-sm mb-2" onClick={launchTracker}>
             Launch tracker
           </button>
-          <div className="mb-3">
-            <div className="form-check">
-              <input
-                type="checkbox"
-                className="form-check-input"
-                id="checks"
-                name="checks"
-                value={checks}
-                onChange={() => setChecks(prev => !prev)}
-              />
-              <label htmlFor="checks" className="form-check-label">
-                Use check tracking *
-              </label>
-            </div>
+          <div className="form-check mb-3">
+            <input
+              type="checkbox"
+              className="form-check-input"
+              id="checks"
+              name="checks"
+              value={checks}
+              onChange={() => setChecks(prev => !prev)}
+            />
+            <label htmlFor="checks" className="form-check-label">
+              Use check tracking *
+            </label>
           </div>
           <LayoutSelector />
         </div>

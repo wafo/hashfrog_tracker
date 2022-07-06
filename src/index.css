@@ -15,8 +15,31 @@ body {
   /* font-family: "BPmono", sans-serif; */
 }
 
+.card-dark {
+  background-color: #333;
+  color: #eee;
+}
+
+.form-control {
+  border-radius: 2px;
+}
+
+.form-label {
+  margin-bottom: 0.25rem;
+  font-size: 0.75em;
+  font-weight: bold;
+}
+
 .btn {
   border-radius: 2px;
+}
+
+.btn-row {
+  display: flex;
+}
+
+.btn-row > *:not(:last-child) {
+  margin-right: 0.25rem;
 }
 
 /** *************************************** */
@@ -140,4 +163,42 @@ body {
 .check-tracker .info {
   font-size: 0.75em;
   margin: 1rem 0;
+}
+
+/** *************************************** */
+/** Editor */
+/** *************************************** */
+
+.editor {
+  width: 350px;
+  max-height: calc(100vh - 3rem);
+}
+
+.editor .uuid {
+  font-size: 0.7em;
+  opacity: 0.75;
+  margin: 0.25rem 0;
+}
+
+.editor .component-list ul {
+  overflow-y: auto;
+  max-height: 50vh;
+}
+
+.editor .component-list ul button {
+  width: 100%;
+  margin-bottom: 0.25rem;
+  text-align: left;
+}
+
+.editor .table-list {
+  max-height: 200px !important;
+}
+
+.editor .table-list li {
+  cursor: pointer;
+  background-color: #222;
+  border-radius: 2px;
+  padding: 0 0.25rem;
+  margin-bottom: 0.25rem;
 }
