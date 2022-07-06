@@ -14,7 +14,7 @@ const Welcome = () => {
           The motivation behind this project is to have a simple customizable tracker that will help keep track of all
           the checks in the game.
         </p>
-        <h3>TODO</h3>
+        <h3>Features</h3>
         <p>These are in no order and I make no promises of when I&apos;ll get to them.</p>
         <ul>
           <li>Basic customization like font, colors, etc.</li>
