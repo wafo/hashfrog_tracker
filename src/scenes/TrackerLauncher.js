@@ -1,6 +1,6 @@
 import { Fragment, useCallback, useMemo, useState } from "react";
 import LayoutSelector from "../components/LayoutSelector";
-import { useLayout } from "../context/layoutcontext";
+import { useLayout } from "../context/layoutContext";
 
 const baseURL = process.env.PUBLIC_URL;
 

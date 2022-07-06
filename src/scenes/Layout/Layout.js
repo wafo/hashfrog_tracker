@@ -4,7 +4,7 @@ import ElementsTable from "../../components/ElementsTable";
 import Footer from "../../components/Footer";
 import LocationHint from "../../components/LocationHint";
 import SometimesHint from "../../components/SometimesHint";
-import { useLayout } from "../../context/layoutcontext";
+import { useLayout } from "../../context/layoutContext";
 import elementsJSON from "../../data/elements.json";
 
 const styles = {

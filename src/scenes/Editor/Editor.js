@@ -49,11 +49,11 @@ const Editor = () => {
   const handleLayoutSave = useCallback(() => {
     //pass data from localStorage API to blob
     const jsonBlob = new Blob([JSON.stringify(layout)], { type: "text/plain" });
-    FileSaver.saveAs(jsonBlob, `${layout.layoutConfig.name}.json`);
+    FileSaver.saveAs(jsonBlob, `${layout.layoutConfig.name.replace(/ /g, "_")}.json`);
   }, [layout]);
 
   return (
-    <div style={{ display: "flex", justifyContent: "flex-start" }}>
+    <div className="container" style={{ padding: "1rem 0" }}>
       {layout.id && <Layout layout={layout} hideFooter />}
       {!layout.id && <p className={styles.noLayout}>Initialize a layer first.</p>}
       <div className={styles.editor}>
@@ -63,7 +63,14 @@ const Editor = () => {
           </button>
           <div>
             <label htmlFor="open">Open</label>
-            <input key={layoutKey} type="file" id="open" onChange={handleLayoutOpen} style={{ display: "none" }} />
+            <input
+              key={layoutKey}
+              type="file"
+              id="open"
+              onChange={handleLayoutOpen}
+              style={{ display: "none" }}
+              accept=".json"
+            />
           </div>
           <button type="button" onClick={handleLayoutSave}>
             Export Layout

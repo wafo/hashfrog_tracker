@@ -105,7 +105,7 @@ const Buttons = ({ setType }) => {
       <button type="button" className="" onClick={() => setType("overworld")}>
         Overworld
       </button>
-      <button type="button" className="" onClick={() => setType("dungeon")}>
+      <button type="button" className="" onClick={() => setType("dungeon")} disabled>
         Dungeons
       </button>
     </div>
