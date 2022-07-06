@@ -25,7 +25,7 @@ const Welcome = () => {
         </ul>
         <h3>Changelog</h3>
         <ul>
-          <li>0.4.0 - Layout based of JSON file and editor UI.</li>
+          <li>0.4.0 - Layout based of JSON file and editor UI (beta).</li>
           <li>0.3.4 - All check tracking logic changed to standard glitchless logic.</li>
         </ul>
         <div style={{ margin: "3rem 0" }} />
