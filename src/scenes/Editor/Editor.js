@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useState } from "react";
-import Layout from "../Layout/Layout";
+import Layout from "../Layout";
 import EditorLayoutConfig from "./EditorLayoutConfig";
 import EditorComponentsList from "./EditorComponentsList";
 import styles from "./Editor.module.css";

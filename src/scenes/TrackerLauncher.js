@@ -42,28 +42,46 @@ const TrackerLauncher = () => {
 
   return (
     <Fragment>
-      <button type="button" onClick={launchTracker}>
-        Launch tracker
-      </button>
-      <div style={{ margin: "0.5rem 0" }}>
-        <h3>Layout Configuration</h3>
-        <div style={{ marginBottom: "1rem" }}>
-          <input type="checkbox" id="checks" name="checks" value={checks} onChange={() => setChecks(prev => !prev)} />
-          <label htmlFor="checks" style={{ marginLeft: "0.5rem" }}>
-            Use check tracking *
-          </label>
+      <div className="row">
+        <div className="col">
+          <h3>Layout Configuration</h3>
+          <button type="button" className="btn btn-light btn-sm mb-2" onClick={launchTracker}>
+            Launch tracker
+          </button>
+          <div className="mb-3">
+            <div className="form-check">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                id="checks"
+                name="checks"
+                value={checks}
+                onChange={() => setChecks(prev => !prev)}
+              />
+              <label htmlFor="checks" className="form-check-label">
+                Use check tracking *
+              </label>
+            </div>
+          </div>
+          <LayoutSelector />
         </div>
-        <LayoutSelector />
       </div>
-      <h3>Notes</h3>
-      <p>* Check tracking is based on glitchless logic and common enabled tricks.</p>
-      <ul>
-        <li>Hidden Grottos without Stone of Agony</li>
-        <li>Man on Roof without Hookshot</li>
-        <li>Windmill PoH as Adult with Nothing</li>
-        <li>Craters Bean PoH with Hover Boots</li>
-        <li>Ignoring age requirements</li>
-      </ul>
+      <div className="row">
+        <div className="col">
+          <h3>Notes</h3>
+          <p>
+            * Check tracking requires a compatible layout configuration to work properly. It is based on glitchless
+            logic and common enabled tricks.
+          </p>
+          <ul>
+            <li>Hidden Grottos without Stone of Agony</li>
+            <li>Man on Roof without Hookshot</li>
+            <li>Windmill PoH as Adult with Nothing</li>
+            <li>Craters Bean PoH with Hover Boots</li>
+            <li>Ignoring age requirements</li>
+          </ul>
+        </div>
+      </div>
     </Fragment>
   );
 };

@@ -11,43 +11,133 @@
 
 body {
   background-color: #000000;
-  font-family: "BPmono", sans-serif;
   color: #fff;
-  /* color: #ffff00; */
+  /* font-family: "BPmono", sans-serif; */
 }
 
-button {
+.btn {
+  border-radius: 2px;
+}
+
+/** *************************************** */
+/** Layout */
+/** *************************************** */
+
+.layout {
+  font-family: "BPmono", sans-serif;
+}
+
+.layout-content {
+  position: relative;
+}
+
+.layout-component {
+  position: absolute;
+}
+
+/** *************************************** */
+/** Elements */
+/** *************************************** */
+
+.element {
+  position: relative;
   cursor: pointer;
 }
 
-button:disabled {
+.element-nested {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0);
+  bottom: 0px;
+}
+
+.element-icon {
+  width: 100%;
+  height: 100%;
+}
+
+.element-label {
+  position: absolute;
+  bottom: -13px;
+  left: 50%;
+  transform: translate(-50%, 0);
+  text-align: center;
+  font-size: 12px;
+  white-space: nowrap;
+  background-color: #000;
+  width: fit-content;
+  padding: 0px;
+  min-width: 100%;
+  font-weight: 700;
+}
+
+.element-counter {
+  font-size: 14px;
+  font-weight: 400;
+  position: absolute;
+  bottom: -10px;
+  right: 0;
+  cursor: pointer;
+}
+
+/** *************************************** */
+/** Check Tracking */
+/** *************************************** */
+
+.check-tracker {
+  padding: 0.5em;
+  list-style: none;
+  width: 250px;
+}
+
+.check-tracker .buttons {
+  padding: 0 2px;
+}
+
+.check-tracker-locations {
+  display: grid;
+  grid-template-columns: 25% 25% 25% 25%;
+  font-family: "BPmono", sans-serif;
+}
+
+.check-tracker-locations .item {
+  padding: 2px;
+}
+
+.check-tracker-locations .item > button {
+  width: 100%;
+  aspect-ratio: 2/1;
+}
+
+.check-tracker-location {
+  padding: 2px;
+}
+
+.check-tracker .check-list {
+  padding: 0;
+  padding-left: 2px;
+  list-style: none;
+}
+
+.check-tracker .check-list .check {
+  line-height: 1;
+}
+
+.check-tracker .check-list .check button {
+  font-size: 14px;
+  background-color: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 2px 0;
+}
+
+.check-tracker .check-list .check button:disabled {
+  opacity: 0.5;
   cursor: default;
 }
 
-.container {
-  max-width: 1320px;
-  display: flex;
-  margin: auto;
-}
-
-.form-control {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 0.5rem;
-}
-
-.form-control label {
-  font-weight: bold;
-  font-size: 0.8em;
-  margin-bottom: 0.25rem;
-}
-
-.form-control p {
-  font-size: 0.85em;
-}
-
-.btn-link {
-  border: none;
-  background: transparent;
-  color: rgb(0, 0, 238)
+.check-tracker .info {
+  font-size: 0.75em;
+  margin: 1rem 0;
 }
