@@ -15,3 +15,39 @@ body {
   color: #fff;
   /* color: #ffff00; */
 }
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+}
+
+.container {
+  max-width: 1320px;
+  display: flex;
+  margin: auto;
+}
+
+.form-control {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.5rem;
+}
+
+.form-control label {
+  font-weight: bold;
+  font-size: 0.8em;
+  margin-bottom: 0.25rem;
+}
+
+.form-control p {
+  font-size: 0.85em;
+}
+
+.btn-link {
+  border: none;
+  background: transparent;
+  color: rgb(85, 26, 139);
+}

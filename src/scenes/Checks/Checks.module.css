@@ -40,6 +40,10 @@
   margin-right: 0;
 }
 
+.buttons button:disabled {
+  opacity: 0.5;
+}
+
 .checks {
   padding: 0;
   list-style: none;

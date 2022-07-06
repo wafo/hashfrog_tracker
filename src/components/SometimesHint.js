@@ -15,14 +15,14 @@ const SometimesHint = (props) => {
 
   const memoizedOptions = useMemo(() => {
     if (options) return options;
-    return labelsJSON[labels].map((label) => ({
+    return labelsJSON[labels || "sometimes"].map((label) => ({
       value: label,
       label: label,
     }));
   }, [options, labels]);
 
   return (
-    <div style={{ width, display: "flex", margin: "4px 0" }}>
+    <div style={{ width, display: "flex" }}>
       <CustomReactSelect
         id={`sometimes_input_${id}`}
         name={`sometimes_input_${name}`}

@@ -2,11 +2,11 @@
   {
     "id": "a081121b16f84366bf16e16ca90cd23f",
     "type": "simple",
-    "name": "Example",
+    "name": "Default HashFrog",
     "label": "",
     "labelStartingIndex": 0,
     "size": [25, 25],
-    "icons": ["hash_frog_32x32.png"],
+    "icons": ["hash_frog_bw_32x32.png", "hash_frog_32x32.png"],
     "countConfig": [0, 1],
     "receiver": false,
     "selectedStartingIndex": 0
@@ -192,7 +192,7 @@
     ]
   },
   {
-    "id": "9274be1cc1934da1927c96ca9a369c1a",
+    "id": "57f93ba21e0145a0950bff721dabee07",
     "type": "simple",
     "name": "strength",
     "size": [25, 25],
