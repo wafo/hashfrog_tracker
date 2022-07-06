@@ -18,7 +18,7 @@ const Welcome = () => {
         <p>These are in no order and I make no promises of when I&apos;ll get to them.</p>
         <ul>
           <li>Basic customization like font, colors, etc.</li>
-          <li>Layout customization UI and funtionality.</li>
+          <li>UI for layout customization.</li>
           <li>Storing layout configurations.</li>
           <li>Creating custom elements for the tracker.</li>
           <li>Saving tracking sessions.</li>
