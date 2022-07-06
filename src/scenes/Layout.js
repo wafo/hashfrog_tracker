@@ -1,21 +1,13 @@
 const { useMemo, useEffect } = require("react");
-import Element from "../../components/Element";
-import ElementsTable from "../../components/ElementsTable";
-import Footer from "../../components/Footer";
-import LocationHint from "../../components/LocationHint";
-import SometimesHint from "../../components/SometimesHint";
-import { useLayout } from "../../context/layoutContext";
-import elementsJSON from "../../data/elements.json";
-
-const styles = {
-  layout: {
-    backgroundColor: "#333",
-    position: "relative",
-  },
-  components: {
-    position: "absolute",
-  },
-};
+import { useLayout } from "../context/layoutContext";
+// Components
+import Element from "../components/Element";
+import ElementsTable from "../components/ElementsTable";
+import Footer from "../components/Footer";
+import LocationHint from "../components/LocationHint";
+import SometimesHint from "../components/SometimesHint";
+// Data
+import elementsJSON from "../data/elements.json";
 
 const Layout = props => {
   useEffect(() => {
@@ -40,7 +32,7 @@ const Layout = props => {
           const element = elementsJSON.find(x => x.id === component.elementId);
           const [top, left] = component.position;
           return (
-            <div key={component.id} style={{ ...styles.components, top, left }}>
+            <div key={component.id} className="layout-component" style={{ top, left }}>
               <Element {...element} size={component.size} />
             </div>
           );
@@ -51,7 +43,7 @@ const Layout = props => {
           });
           const [top, left] = component.position;
           return (
-            <div key={component.id} style={{ ...styles.components, top, left }}>
+            <div key={component.id} className="layout-component" style={{ top, left }}>
               <ElementsTable
                 elements={elements}
                 elementsSize={component.elementsSize}
@@ -65,7 +57,7 @@ const Layout = props => {
           const element = elementsJSON.find(x => x.id === component.elementId);
           const [top, left] = component.position;
           return (
-            <div key={component.id} style={{ ...styles.components, top, left }}>
+            <div key={component.id} className="layout-component" style={{ top, left }}>
               <SometimesHint width={component.width} icons={element.icons} labels={component.labels} />
             </div>
           );
@@ -74,7 +66,7 @@ const Layout = props => {
           const element = elementsJSON.find(x => x.id === component.elementId);
           const [top, left] = component.position;
           return (
-            <div key={component.id} style={{ ...styles.components, top, left }}>
+            <div key={component.id} className="layout-component" style={{ top, left }}>
               <LocationHint
                 width={component.width}
                 color={component.color}
@@ -93,10 +85,10 @@ const Layout = props => {
   }, [renderLayout.components]);
 
   return (
-    <div>
+    <div className="layout">
       <div
+        className="layout-content"
         style={{
-          ...styles.layout,
           width: layoutConfig.width,
           height: layoutConfig.height,
           backgroundColor: layoutConfig.backgroundColor,

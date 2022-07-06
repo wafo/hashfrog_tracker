@@ -11,43 +11,194 @@
 
 body {
   background-color: #000000;
-  font-family: "BPmono", sans-serif;
   color: #fff;
-  /* color: #ffff00; */
+  /* font-family: "BPmono", sans-serif; */
 }
 
-button {
-  cursor: pointer;
-}
-
-button:disabled {
-  cursor: default;
-}
-
-.container {
-  max-width: 1320px;
-  display: flex;
-  margin: auto;
+.card-dark {
+  background-color: #333;
+  color: #eee;
 }
 
 .form-control {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 0.5rem;
+  border-radius: 2px;
 }
 
-.form-control label {
-  font-weight: bold;
-  font-size: 0.8em;
+.form-label {
   margin-bottom: 0.25rem;
+  font-size: 0.75em;
+  font-weight: bold;
 }
 
-.form-control p {
-  font-size: 0.85em;
+.btn {
+  border-radius: 2px;
 }
 
-.btn-link {
+.btn-row {
+  display: flex;
+}
+
+.btn-row > *:not(:last-child) {
+  margin-right: 0.25rem;
+}
+
+/** *************************************** */
+/** Layout */
+/** *************************************** */
+
+.layout {
+  font-family: "BPmono", sans-serif;
+}
+
+.layout-content {
+  position: relative;
+}
+
+.layout-component {
+  position: absolute;
+}
+
+/** *************************************** */
+/** Elements */
+/** *************************************** */
+
+.element {
+  position: relative;
+  cursor: pointer;
+}
+
+.element-nested {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0);
+  bottom: 0px;
+}
+
+.element-icon {
+  width: 100%;
+  height: 100%;
+}
+
+.element-label {
+  position: absolute;
+  bottom: -13px;
+  left: 50%;
+  transform: translate(-50%, 0);
+  text-align: center;
+  font-size: 12px;
+  white-space: nowrap;
+  background-color: #000;
+  width: fit-content;
+  padding: 0px;
+  min-width: 100%;
+  font-weight: 700;
+}
+
+.element-counter {
+  font-size: 14px;
+  font-weight: 400;
+  position: absolute;
+  bottom: -10px;
+  right: 0;
+  cursor: pointer;
+}
+
+/** *************************************** */
+/** Check Tracking */
+/** *************************************** */
+
+.check-tracker {
+  padding: 0.5em;
+  list-style: none;
+  width: 250px;
+}
+
+.check-tracker .buttons {
+  padding: 0 2px;
+}
+
+.check-tracker-locations {
+  display: grid;
+  grid-template-columns: 25% 25% 25% 25%;
+  font-family: "BPmono", sans-serif;
+}
+
+.check-tracker-locations .item {
+  padding: 2px;
+}
+
+.check-tracker-locations .item > button {
+  width: 100%;
+  aspect-ratio: 2/1;
+}
+
+.check-tracker-location {
+  padding: 2px;
+}
+
+.check-tracker .check-list {
+  padding: 0;
+  padding-left: 2px;
+  list-style: none;
+}
+
+.check-tracker .check-list .check {
+  line-height: 1;
+}
+
+.check-tracker .check-list .check button {
+  font-size: 14px;
+  background-color: transparent;
   border: none;
-  background: transparent;
-  color: rgb(0, 0, 238)
+  color: #fff;
+  cursor: pointer;
+  padding: 2px 0;
+}
+
+.check-tracker .check-list .check button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.check-tracker .info {
+  font-size: 0.75em;
+  margin: 1rem 0;
+}
+
+/** *************************************** */
+/** Editor */
+/** *************************************** */
+
+.editor {
+  width: 350px;
+  max-height: calc(100vh - 3rem);
+}
+
+.editor .uuid {
+  font-size: 0.7em;
+  opacity: 0.75;
+  margin: 0.25rem 0;
+}
+
+.editor .component-list ul {
+  overflow-y: auto;
+  max-height: 50vh;
+}
+
+.editor .component-list ul button {
+  width: 100%;
+  margin-bottom: 0.25rem;
+  text-align: left;
+}
+
+.editor .table-list {
+  max-height: 200px !important;
+}
+
+.editor .table-list li {
+  cursor: pointer;
+  background-color: #222;
+  border-radius: 2px;
+  padding: 0 0.25rem;
+  margin-bottom: 0.25rem;
 }

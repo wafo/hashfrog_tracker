@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom";
-import Welcome from "./scenes/Welcome/Welcome";
+import Welcome from "./scenes/Welcome";
 import TrackerChecks from "./scenes/TrackerChecks";
-import Layout from "./scenes/Layout/Layout";
+import Layout from "./scenes/Layout";
 import Editor from "./scenes/Editor/Editor";
 
 function App() {

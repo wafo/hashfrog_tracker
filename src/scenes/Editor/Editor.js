@@ -1,8 +1,7 @@
 import { Fragment, useCallback, useState } from "react";
-import Layout from "../Layout/Layout";
+import Layout from "../Layout";
 import EditorLayoutConfig from "./EditorLayoutConfig";
 import EditorComponentsList from "./EditorComponentsList";
-import styles from "./Editor.module.css";
 import { generateId, readFileAsText } from "../../utils/utils";
 import FileSaver from "file-saver";
 
@@ -10,7 +9,7 @@ const baseLayout = {
   id: "",
   layoutConfig: {
     name: "",
-    backgroundColor: "#222",
+    backgroundColor: "#222222",
     width: 300,
     height: 500,
     fontFamily: null,
@@ -21,6 +20,8 @@ const baseLayout = {
 };
 
 const Editor = () => {
+  const [tab, setTab] = useState(0);
+
   const [layout, setLayout] = useState({ ...baseLayout });
 
   const setLayoutConfig = value => {
@@ -53,36 +54,72 @@ const Editor = () => {
   }, [layout]);
 
   return (
-    <div className="container" style={{ padding: "1rem 0" }}>
-      {layout.id && <Layout layout={layout} hideFooter />}
-      {!layout.id && <p className={styles.noLayout}>Initialize a layer first.</p>}
-      <div className={styles.editor}>
-        <div className={styles.buttonRow}>
-          <button type="button" onClick={initializeNewLayout}>
-            New
-          </button>
-          <div>
-            <label htmlFor="open">Open</label>
-            <input
-              key={layoutKey}
-              type="file"
-              id="open"
-              onChange={handleLayoutOpen}
-              style={{ display: "none" }}
-              accept=".json"
-            />
+    <div className="container py-4">
+      <div className="row">
+        <div className="col-md-4">
+          <div className="editor card card-dark">
+            <div className="card-body">
+              <div className="btn-row">
+                <button type="button" className="btn btn-light btn-sm" onClick={initializeNewLayout}>
+                  New Layout
+                </button>
+                <div>
+                  <label htmlFor="open" className="btn btn-light btn-sm">
+                    Load JSON
+                  </label>
+                  <input
+                    key={layoutKey}
+                    type="file"
+                    id="open"
+                    onChange={handleLayoutOpen}
+                    style={{ display: "none" }}
+                    accept=".json"
+                  />
+                </div>
+                <button type="button" className="btn btn-light btn-sm" onClick={handleLayoutSave}>
+                  Export to JSON
+                </button>
+              </div>
+              <p className="uuid">Layout ID: {layout.id}</p>
+              {layout.id && (
+                <Fragment>
+                  <div className="btn-row mb-3">
+                    <button
+                      type="button"
+                      className={`btn btn-sm ${tab === 0 ? "btn-light" : "btn-dark"}`}
+                      onClick={() => setTab(0)}
+                    >
+                      Layout Config
+                    </button>
+                    <button
+                      type="button"
+                      className={`btn btn-sm ${tab === 1 ? "btn-light" : "btn-dark"}`}
+                      onClick={() => setTab(1)}
+                    >
+                      Components Config
+                    </button>
+                  </div>
+                  <div style={{ display: tab === 0 ? "unset" : "none" }}>
+                    <EditorLayoutConfig layoutConfig={layout.layoutConfig} setLayoutConfig={setLayoutConfig} />
+                  </div>
+                  <div style={{ display: tab === 1 ? "unset" : "none" }}>
+                    <EditorComponentsList components={layout.components} setLayout={setLayout} />
+                  </div>
+                </Fragment>
+              )}
+            </div>
           </div>
-          <button type="button" onClick={handleLayoutSave}>
-            Export Layout
-          </button>
         </div>
-        <p className={styles.displayId}>Layout ID: {layout.id}</p>
-        {layout.id && (
-          <Fragment>
-            <EditorLayoutConfig layoutConfig={layout.layoutConfig} setLayoutConfig={setLayoutConfig} />
-            <EditorComponentsList components={layout.components} setLayout={setLayout} />
-          </Fragment>
-        )}
+        <div className="col-md-8">
+          {layout.id && <Layout layout={layout} hideFooter />}
+          {!layout.id && (
+            <div className="card card-dark">
+              <div className="card-body">
+                <p className="my-3">Initialize or load a layout to start</p>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

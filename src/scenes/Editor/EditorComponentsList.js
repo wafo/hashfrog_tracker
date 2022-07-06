@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
 import { generateId } from "../../utils/utils";
-import styles from "./Editor.module.css";
 import EditorComponent from "./EditorComponent";
 
 const EditorComponentsList = ({ components, setLayout }) => {
@@ -46,27 +45,27 @@ const EditorComponentsList = ({ components, setLayout }) => {
   }, [component, setLayout]);
 
   return (
-    <div className={styles.componentsList}>
-      <p>Components</p>
-      <div className={styles.buttonRow}>
-        <button type="button" onClick={addComponent} disabled={component}>
+    <div className="component-list">
+      <h5>Components</h5>
+      <div className="btn-row mb-2">
+        <button type="button" className="btn btn-light btn-sm" onClick={addComponent} disabled={component}>
           Add
         </button>
-        <button type="button" onClick={deleteComponent} disabled={!component}>
+        <button type="button" className="btn btn-light btn-sm" onClick={deleteComponent} disabled={!component}>
           Delete
         </button>
-        <button type="button" onClick={() => setComponent(null)} disabled={!component}>
+        <button type="button" className="btn btn-light btn-sm" onClick={() => setComponent(null)} disabled={!component}>
           Save
         </button>
       </div>
       {component && <EditorComponent component={component} setComponent={setComponent} />}
-      <ul>
-        {components.length < 1 && <li>...</li>}
+      <ul className="list-unstyled">
+        {components.length < 1 && <li className="uuid my-2">Add a component to start</li>}
         {!component &&
           components.length > 0 &&
           components.map(component => (
             <li key={component.id}>
-              <button type="button" onClick={() => setComponent(component)}>
+              <button type="button" className="btn btn-dark btn-sm" onClick={() => setComponent(component)}>
                 {component.type} - {component.id}
               </button>
             </li>

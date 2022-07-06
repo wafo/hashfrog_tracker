@@ -2,7 +2,6 @@ import { Fragment, useCallback, useEffect, useState } from "react";
 import elementsJSON from "../../data/elements.json";
 import labelsJSON from "../../data/labels.json";
 import { generateId } from "../../utils/utils";
-import styles from "./Editor.module.css";
 
 const EditorComponent = ({ component, setComponent }) => {
   let { position, type } = component;
@@ -40,7 +39,7 @@ const EditorComponent = ({ component, setComponent }) => {
             position: component.position,
             labels: "locations",
             width: 250,
-            color: "#fff",
+            color: "#ffffff",
             backgroundColor: "#4a8ab6",
             showBoss: true,
             showItems: true,
@@ -117,55 +116,70 @@ const EditorComponent = ({ component, setComponent }) => {
   );
 
   return (
-    <div className={styles.editorComponent}>
-      <p className={styles.displayId}>Component Id: {component.id}</p>
-      <div>
-        <div>
-          <select name="type" id="type" value={type} onChange={handleTypeChange}>
-            <option value="" disabled>
-              Select Type
-            </option>
-            <option value="element">Element</option>
-            <option value="table">Table</option>
-            <option value="sometimeshint">Sometimes Hint</option>
-            <option value="locationhint">Location Hint</option>
-          </select>
-        </div>
-        <div>
+    <Fragment>
+      <p className="uuid">Component Id: {component.id}</p>
+      <div className="mb-2">
+        <label htmlFor="" className="form-label">
+          Element Type
+        </label>
+        <select className="form-select form-select-sm" id="type" name="type" value={type} onChange={handleTypeChange}>
+          <option value="" disabled>
+            Select type
+          </option>
+          <option value="element">Individual Element</option>
+          <option value="table">Table of Elements</option>
+          <option value="sometimeshint">Sometimes Hint</option>
+          <option value="locationhint">Location Hint</option>
+        </select>
+      </div>
+      <div className="col mb-2">
+        <label htmlFor="width" className="form-label">
+          Element Position
+        </label>
+        <div className="input-group input-group-sm ">
           <input
             type="number"
             id="coordX"
             name="coordX"
-            placeholder="Coord X"
-            style={{ width: 100 }}
+            className="form-control"
+            placeholder="X Coordinate"
             value={coordX}
             onChange={handleChange}
           />
-          <span>x</span>
+          <span className="input-group-text">X</span>
           <input
             type="number"
             id="coordY"
             name="coordY"
-            placeholder="Coord Y"
-            style={{ width: 100 }}
+            className="form-control"
+            placeholder="Y Coordinate"
             value={coordY}
             onChange={handleChange}
           />
         </div>
-        {type === "element" && <ElementEditor component={component} handleChange={handleChange} />}
-        {type === "table" && <TableEditor component={component} handleChange={handleChange} />}
-        {type === "sometimeshint" && <SometimeshintEditor component={component} handleChange={handleChange} />}
-        {type === "locationhint" && <LocationhintEditor component={component} handleChange={handleChange} />}
       </div>
-    </div>
+      {type === "element" && <ElementEditor component={component} handleChange={handleChange} />}
+      {type === "table" && <TableEditor component={component} handleChange={handleChange} />}
+      {type === "sometimeshint" && <SometimeshintEditor component={component} handleChange={handleChange} />}
+      {type === "locationhint" && <LocationhintEditor component={component} handleChange={handleChange} />}
+    </Fragment>
   );
 };
 
 const ElementEditor = ({ component, handleChange }) => {
   return (
     <Fragment>
-      <div>
-        <select name="elementId" id="elementId" value={component.elementId} onChange={handleChange}>
+      <div className="mb-2">
+        <label htmlFor="" className="form-label">
+          Element (Item / Equipment / Others)
+        </label>
+        <select
+          className="form-select form-select-sm"
+          id="elementId"
+          name="elementId"
+          value={component.elementId}
+          onChange={handleChange}
+        >
           {elementsJSON.map(element => (
             <option key={element.id} value={element.id}>
               {element.name}
@@ -173,26 +187,31 @@ const ElementEditor = ({ component, handleChange }) => {
           ))}
         </select>
       </div>
-      <div>
-        <input
-          type="number"
-          id="size_width"
-          name="size_width"
-          placeholder="Element Width"
-          style={{ width: 100 }}
-          value={component.size[0]}
-          onChange={handleChange}
-        />
-        <span>x</span>
-        <input
-          type="number"
-          id="size_height"
-          name="size_height"
-          placeholder="Element height"
-          style={{ width: 100 }}
-          value={component.size[1]}
-          onChange={handleChange}
-        />
+      <div className="col mb-2">
+        <label htmlFor="width" className="form-label">
+          Element Size
+        </label>
+        <div className="input-group input-group-sm ">
+          <input
+            type="number"
+            id="size_width"
+            name="size_width"
+            className="form-control"
+            placeholder="Element Width"
+            value={component.size[0]}
+            onChange={handleChange}
+          />
+          <span className="input-group-text">X</span>
+          <input
+            type="number"
+            id="size_height"
+            name="size_height"
+            className="form-control"
+            placeholder="Element Height"
+            value={component.size[1]}
+            onChange={handleChange}
+          />
+        </div>
       </div>
     </Fragment>
   );
@@ -259,64 +278,94 @@ const TableEditor = ({ component, handleChange }) => {
 
   return (
     <Fragment>
-      <div>
-        <input
-          type="number"
-          id="columns"
-          name="columns"
-          placeholder="Number of Columns"
-          style={{ width: 100, marginRight: "0.5rem" }}
-          value={component.columns}
-          onChange={handleChange}
-          min={1}
-        />
-        <input
-          type="text"
-          id="padding"
-          name="padding"
-          placeholder="Padding for items"
-          style={{ width: 100 }}
-          value={component.padding}
-          onChange={handleChange}
-        />
+      <div className="col mb-2">
+        <label htmlFor="width" className="form-label">
+          Elements Size
+        </label>
+        <div className="input-group input-group-sm">
+          <input
+            type="number"
+            id="size_width"
+            name="size_width"
+            className="form-control"
+            placeholder="Element Width"
+            value={component.elementsSize[0]}
+            onChange={handleChange}
+          />
+          <span className="input-group-text">X</span>
+          <input
+            type="number"
+            id="size_height"
+            name="size_height"
+            className="form-control"
+            placeholder="Element Height"
+            value={component.elementsSize[1]}
+            onChange={handleChange}
+          />
+        </div>
       </div>
-      <div>
-        <input
-          type="number"
-          id="size_width"
-          name="size_width"
-          placeholder="Element Width"
-          style={{ width: 100 }}
-          value={component.elementsSize[0]}
-          onChange={handleChange}
-        />
-        <span>x</span>
-        <input
-          type="number"
-          id="size_height"
-          name="size_height"
-          placeholder="Element height"
-          style={{ width: 100 }}
-          value={component.elementsSize[1]}
-          onChange={handleChange}
-        />
+      <div className="row mb-2">
+        <div className="col-6">
+          <label htmlFor="padding" className="form-label">
+            Elements Padding
+          </label>
+          <input
+            type="text"
+            id="padding"
+            name="padding"
+            className="form-control form-control-sm"
+            placeholder="Padding for items"
+            value={component.padding}
+            onChange={handleChange}
+          />
+        </div>
+        <div className="col-6">
+          <label htmlFor="columns" className="form-label">
+            Table Columns
+          </label>
+          <input
+            type="number"
+            id="columns"
+            name="columns"
+            className="form-control form-control-sm"
+            placeholder="Number of Columns"
+            value={component.columns}
+            onChange={handleChange}
+            min={1}
+          />
+        </div>
+        <div className="col-12">
+          <p className="uuid">In CSS Padding format</p>
+        </div>
       </div>
-      <div>
-        <select name="elementId" id="elementId" value={element} onChange={handleElementChange}>
-          {elementsJSON.map(element => (
-            <option key={element.id} value={element.name}>
-              {element.name}
-            </option>
-          ))}
-        </select>
-        <button type="button" onClick={addToTable} style={{ marginLeft: "0.5rem" }}>
-          Add
-        </button>
+      <div className="mb-2">
+        <label htmlFor="elementId" className="form-label">
+          Add Elements to Table
+        </label>
+        <div className="input-group input-group-sm">
+          <select
+            className="form-select"
+            id="elementId"
+            name="elementId"
+            value={element}
+            onChange={handleElementChange}
+          >
+            {elementsJSON.map(element => (
+              <option key={element.id} value={element.name}>
+                {element.name}
+              </option>
+            ))}
+          </select>
+          <button className="btn btn-light btn-sm" type="button" onClick={addToTable}>
+            Add
+          </button>
+        </div>
       </div>
+
       {elements.length > 0 && (
         <p style={{ fontSize: "0.75em", margin: 0, opacity: 0.5 }}>Right click to remove. Drag to re-order.</p>
       )}
-      <ol>
+      <ul className="list-unstyled table-list">
         {elements.map((element, index) => (
           <li
             key={element.id}
@@ -329,7 +378,7 @@ const TableEditor = ({ component, handleChange }) => {
             {element.value}
           </li>
         ))}
-      </ol>
+      </ul>
     </Fragment>
   );
 };
@@ -337,8 +386,17 @@ const TableEditor = ({ component, handleChange }) => {
 const SometimeshintEditor = ({ component, handleChange }) => {
   return (
     <Fragment>
-      <div>
-        <select name="elementId" id="elementId" value={component.elementId} onChange={handleChange}>
+      <div className="mb-2">
+        <label htmlFor="elementId" className="form-label">
+          Element (Item / Equipment / Others)
+        </label>
+        <select
+          className="form-select form-select-sm"
+          id="elementId"
+          name="elementId"
+          value={component.elementId}
+          onChange={handleChange}
+        >
           {elementsJSON.map(element => (
             <option key={element.id} value={element.id}>
               {element.name}
@@ -346,8 +404,17 @@ const SometimeshintEditor = ({ component, handleChange }) => {
           ))}
         </select>
       </div>
-      <div>
-        <select name="labels" id="labels" value={component.labels} onChange={handleChange}>
+      <div className="mb-2">
+        <label htmlFor="labels" className="form-label">
+          Label Pool
+        </label>
+        <select
+          className="form-select form-select-sm"
+          id="labels"
+          name="labels"
+          value={component.labels}
+          onChange={handleChange}
+        >
           {Object.keys(labelsJSON).map(key => (
             <option key={key} value={key}>
               {key}
@@ -355,13 +422,16 @@ const SometimeshintEditor = ({ component, handleChange }) => {
           ))}
         </select>
       </div>
-      <div>
+      <div className="mb-2">
+        <label htmlFor="width" className="form-label">
+          Element Width
+        </label>
         <input
           type="number"
           id="width"
           name="width"
+          className="form-control form-control-sm"
           placeholder="Element Width"
-          style={{ width: 100 }}
           value={component.width}
           onChange={handleChange}
         />
@@ -373,8 +443,17 @@ const SometimeshintEditor = ({ component, handleChange }) => {
 const LocationhintEditor = ({ component, handleChange }) => {
   return (
     <Fragment>
-      <div>
-        <select name="elementId" id="elementId" value={component.elementId} onChange={handleChange}>
+      <div className="mb-2">
+        <label htmlFor="elementId" className="form-label">
+          Element (Item / Equipment / Others)
+        </label>
+        <select
+          className="form-select form-select-sm"
+          id="elementId"
+          name="elementId"
+          value={component.elementId}
+          onChange={handleChange}
+        >
           {elementsJSON.map(element => (
             <option key={element.id} value={element.id}>
               {element.name}
@@ -382,8 +461,17 @@ const LocationhintEditor = ({ component, handleChange }) => {
           ))}
         </select>
       </div>
-      <div>
-        <select name="labels" id="labels" value={component.labels} onChange={handleChange}>
+      <div className="mb-2">
+        <label htmlFor="labels" className="form-label">
+          Label Pool
+        </label>
+        <select
+          className="form-select form-select-sm"
+          id="labels"
+          name="labels"
+          value={component.labels}
+          onChange={handleChange}
+        >
           {Object.keys(labelsJSON).map(key => (
             <option key={key} value={key}>
               {key}
@@ -391,60 +479,74 @@ const LocationhintEditor = ({ component, handleChange }) => {
           ))}
         </select>
       </div>
-      <div>
+      <div className="mb-2">
+        <label htmlFor="width" className="form-label">
+          Element Width
+        </label>
         <input
           type="number"
           id="width"
           name="width"
+          className="form-control form-control-sm"
           placeholder="Element Width"
-          style={{ width: 100 }}
           value={component.width}
           onChange={handleChange}
         />
       </div>
-      <div>
-        <input
-          type="text"
-          id="color"
-          name="color"
-          placeholder="Font color"
-          style={{ width: 100, marginRight: "0.5rem" }}
-          value={component.color}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          id="backgroundColor"
-          name="backgroundColor"
-          placeholder="Background Color"
-          style={{ width: 100 }}
-          value={component.backgroundColor}
-          onChange={handleChange}
-        />
+      <div className="row">
+        <div className="col-12">
+          <label htmlFor="color" className="form-label">
+            Text Color & Background Color
+          </label>
+        </div>
+        <div className="col-6 mb-2">
+          <input
+            type="color"
+            className="form-control form-control-sm"
+            id="color"
+            name="color"
+            title="Choose text color"
+            value={component.color}
+            onChange={handleChange}
+          />
+        </div>
+        <div className="col-6 mb-2">
+          <input
+            type="color"
+            className="form-control form-control-sm"
+            id="backgroundColor"
+            name="backgroundColor"
+            title="Choose background color"
+            value={component.backgroundColor}
+            onChange={handleChange}
+          />
+        </div>
       </div>
-      <div>
+      <div className="form-check mb-2">
         <input
           type="checkbox"
+          className="form-check-input"
           id="showBoss"
           name="showBoss"
           checked={component.showBoss}
           value={component.showBoss}
           onChange={handleChange}
         />
-        <label htmlFor="showBoss" style={{ marginLeft: "0.5rem" }}>
+        <label htmlFor="showBoss" className="form-check-label">
           Show Boss
         </label>
       </div>
-      <div>
+      <div className="form-check mb-2">
         <input
           type="checkbox"
+          className="form-check-input"
           id="showItems"
           name="showItems"
           checked={component.showItems}
           value={component.showItems}
           onChange={handleChange}
         />
-        <label htmlFor="showItems" style={{ marginLeft: "0.5rem" }}>
+        <label htmlFor="showItems" className="form-check-label">
           Show Items
         </label>
       </div>
