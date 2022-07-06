@@ -1,0 +1,257 @@
+{
+  "id": "1d5a40bc94254c548b2cd1ed77e3ea5d",
+  "layoutConfig": {
+    "name": "Standard Weekly",
+    "backgroundColor": "#000",
+    "width": 310,
+    "height": 615,
+    "fontFamily": null,
+    "fontSize": null,
+    "fontColor": null
+  },
+  "components": [
+    {
+      "id": "80104bad45684265a7c638b0af398c6d",
+      "type": "table",
+      "position": [0, 0],
+      "columns": 10,
+      "padding": "2px 3px",
+      "elements": [
+        "kokiri_sword",
+        "master_sword",
+        "biggoron_sword",
+        "sticks",
+        "nuts",
+        "bombs",
+        "bow",
+        "fire_arrows",
+        "dins",
+        "rutos_letter",
+        "deku_shield",
+        "hylian_shield",
+        "mirror_shield",
+        "slingshot",
+        "hammer",
+        "bombchus",
+        "hookshot",
+        "light_arrows",
+        "farores",
+        "bottle",
+        "tunic_goron",
+        "tunic_zora",
+        "strength",
+        "boomerang",
+        "lens",
+        "beans",
+        "magic",
+        "trade_1",
+        "trade_2",
+        "gerudo_card",
+        "boots_iron",
+        "boots_hover",
+        "scale",
+        "wallet"
+      ],
+      "elementsSize": [25, 25]
+    },
+    {
+      "id": "bd549bd8bdb847b391c94ca3fef05f31",
+      "type": "table",
+      "position": [130, 0],
+      "columns": 9,
+      "padding": "4px",
+      "elements": [
+        "stone_kokiri",
+        "stone_goron",
+        "stone_zora",
+        "medallion_yellow",
+        "medallion_green",
+        "medallion_red",
+        "medallion_blue",
+        "medallion_purple",
+        "medallion_orange"
+      ],
+      "elementsSize": [25, 25]
+    },
+    {
+      "id": "7717af26740543a88a97e44df5f73a9f",
+      "type": "table",
+      "position": [180, 0],
+      "columns": 6,
+      "padding": "4px 3px",
+      "elements": [
+        "song_lullaby",
+        "song_epona",
+        "song_saria",
+        "song_suns",
+        "song_time",
+        "song_storms",
+        "song_minuet",
+        "song_bolero",
+        "song_serenade",
+        "song_nocturne",
+        "song_requiem",
+        "song_prelude"
+      ],
+      "elementsSize": [25, 25]
+    },
+    {
+      "id": "30646a147ed24664aa082e2a27d57e23",
+      "type": "table",
+      "position": [182, 210],
+      "columns": 4,
+      "padding": "2px",
+      "elements": ["keys_forest", "keys_fire", "keys_water", "keys_shadow", "keys_spirit", "keys_botw", "keys_gtg"],
+      "elementsSize": [20, 20]
+    },
+    {
+      "id": "7cb45cc474cc482fa3d52e8a4bc7f4af",
+      "type": "sometimeshint",
+      "position": [265, 4],
+      "elementId": "4c1b24c3e3954038b14f4daa3656e0b5",
+      "width": 175
+    },
+    {
+      "id": "0d732aaeab2549bab5ea5e860c859150",
+      "type": "sometimeshint",
+      "position": [291, 4],
+      "elementId": "4c1b24c3e3954038b14f4daa3656e0b5",
+      "width": 175
+    },
+    {
+      "id": "943d7b95dc5942e5981f4ed721edac35",
+      "type": "sometimeshint",
+      "position": [317, 4],
+      "elementId": "4c1b24c3e3954038b14f4daa3656e0b5",
+      "width": 175
+    },
+    {
+      "id": "47e2f8d832974ed6b3cb8008779dbd84",
+      "type": "sometimeshint",
+      "position": [343, 4],
+      "elementId": "4c1b24c3e3954038b14f4daa3656e0b5",
+      "width": 175
+    },
+    {
+      "id": "02042e57c155490f80e03469d91e4471",
+      "type": "sometimeshint",
+      "position": [369, 4],
+      "elementId": "4c1b24c3e3954038b14f4daa3656e0b5",
+      "width": 175
+    },
+    {
+      "id": "df889a8fd561475782172035596398ef",
+      "type": "table",
+      "position": [261, 200],
+      "columns": 4,
+      "padding": "2px 4px",
+      "elementsSize": [20, 20],
+      "elements": [
+        "gs_30",
+        "sometimes",
+        "skull_mask",
+        "sometimes",
+        "gs_40",
+        "sometimes",
+        "biggoron",
+        "sometimes",
+        "gs_50",
+        "sometimes",
+        "frogs",
+        "sometimes"
+      ]
+    },
+    {
+      "id": "4925c5916c55499f869a80ad57b9c8b5",
+      "type": "element",
+      "elementId": "d055616ee0314701a6d1471c0a5595ff",
+      "position": [336, 204],
+      "size": [25, 25]
+    },
+    {
+      "id": "8a3b3543662f4a4bae43462ecab1c3ee",
+      "type": "locationhint",
+      "position": [408, 4],
+      "width": 300,
+      "color": "#fff",
+      "backgroundColor": "#4a8ab6",
+      "showBoss": false,
+      "showItems": true,
+      "elementId": "4c1b24c3e3954038b14f4daa3656e0b5"
+    },
+    {
+      "id": "465b60ab778740649f8c5afef1ec6a33",
+      "type": "locationhint",
+      "position": [432, 4],
+      "width": 300,
+      "color": "#fff",
+      "backgroundColor": "#4a8ab6",
+      "showBoss": false,
+      "showItems": true,
+      "elementId": "4c1b24c3e3954038b14f4daa3656e0b5"
+    },
+    {
+      "id": "28327abd381f463f8ada58172b26dc33",
+      "type": "locationhint",
+      "position": [456, 4],
+      "width": 300,
+      "color": "#fff",
+      "backgroundColor": "#4a8ab6",
+      "showBoss": false,
+      "showItems": true,
+      "elementId": "4c1b24c3e3954038b14f4daa3656e0b5"
+    },
+    {
+      "id": "8f2a1cf6dccb4a88b3abd10dbcc5d8a3",
+      "type": "locationhint",
+      "position": [480, 4],
+      "width": 300,
+      "color": "#fff",
+      "backgroundColor": "#4a8ab6",
+      "showBoss": false,
+      "showItems": true,
+      "elementId": "4c1b24c3e3954038b14f4daa3656e0b5"
+    },
+    {
+      "id": "eaa6200b36e04d558c47b4c45b2234c8",
+      "type": "locationhint",
+      "position": [504, 4],
+      "width": 300,
+      "color": "#fff",
+      "backgroundColor": "#4a8ab6",
+      "showBoss": false,
+      "showItems": true,
+      "elementId": "4c1b24c3e3954038b14f4daa3656e0b5"
+    },
+    {
+      "id": "a1bee10dd6e44aac81dcd50d52cd5338",
+      "type": "locationhint",
+      "position": [540, 4],
+      "width": 204,
+      "color": "#fff",
+      "backgroundColor": "#c6445c",
+      "showBoss": false,
+      "showItems": false
+    },
+    {
+      "id": "1acde873f10a4528a3849cd067b7abd3",
+      "type": "locationhint",
+      "position": [564, 4],
+      "width": 204,
+      "color": "#fff",
+      "backgroundColor": "#c6445c",
+      "showBoss": false,
+      "showItems": false
+    },
+    {
+      "id": "0d272b0c8044479991a32aa32bcd34ef",
+      "type": "locationhint",
+      "position": [588, 4],
+      "width": 204,
+      "color": "#fff",
+      "backgroundColor": "#c6445c",
+      "showBoss": false,
+      "showItems": false
+    }
+  ]
+}

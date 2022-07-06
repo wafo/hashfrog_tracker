@@ -6,7 +6,7 @@ const CustomReactSelect = (props) => {
     id = "960b29a364ca444abb5969c97580d973",
     name = "CustomSelect",
     options = [], // { value: ?, label: "" }
-    color = "#ffff00", // font color
+    color = "#fff", // font color
     backgroundColor = "#333", // background color for input
     onValueCallback = f => f // Callback for when the value changes,
   } = props;

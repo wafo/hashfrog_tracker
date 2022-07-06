@@ -46,10 +46,12 @@ const Checks = () => {
       loc.checks = checksByLocation[loc.id];
       loc.available = 0;
       loc.locked = 0;
+      loc.checked = 0;
 
       loc.checks.forEach((check) => {
         if (check.available && !check.checked) loc.available += 1;
         if (!check.available) loc.locked += 1;
+        if (check.checked) loc.checked += 1;
       });
 
       acc.push({ ...loc });
@@ -71,9 +73,12 @@ const Checks = () => {
         <div className={styles.locations}>
           {locationsByType.map((loc) => {
             const style = {};
-            if (loc.locked > 0) style.borderLeftColor = "#ffc107";
-            if (loc.available > 0) style.borderLeftColor = "#198754";
-            if (loc.available === 0 && loc.locked === 0) style.opacity = "0.75";
+            if ((loc.available === 0 && loc.locked === 0) || loc.checked >= loc.checks.length) {
+              style.opacity = "0.75";
+            } else {
+              if (loc.locked > 0) style.borderLeftColor = "#ffc107";
+              if (loc.available > 0) style.borderLeftColor = "#198754";
+            }
             return (
               <div key={loc.id} className={styles.locations_item}>
                 <button
@@ -100,7 +105,7 @@ const Buttons = ({ setType }) => {
       <button type="button" className="" onClick={() => setType("overworld")}>
         Overworld
       </button>
-      <button type="button" className="" onClick={() => setType("dungeon")}>
+      <button type="button" className="" onClick={() => setType("dungeon")} disabled>
         Dungeons
       </button>
     </div>

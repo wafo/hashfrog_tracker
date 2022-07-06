@@ -10,7 +10,6 @@ const LocationHint = (props) => {
     options = null, // overrides the options directly
     labels = "locations", // uses labels from the json
     width = 250, // In px
-    margin = "4px 0", // In px
     color = "#ffff00", // font color
     backgroundColor = "#333", // background color for input
     showBoss = true, // Show or not the left boss icon
@@ -48,7 +47,7 @@ const LocationHint = (props) => {
   }, [options, labels]);
 
   return (
-    <div style={{ width, display: "flex", margin }}>
+    <div style={{ width, display: "flex" }}>
       {showBoss && hasValue && (
         <Element
           id={`locations_boss_${id}`}
