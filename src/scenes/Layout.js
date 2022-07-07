@@ -58,7 +58,14 @@ const Layout = props => {
           const [top, left] = component.position;
           return (
             <div key={component.id} className="layout-component" style={{ top, left }}>
-              <SometimesHint width={component.width} icons={element.icons} labels={component.labels} />
+              <SometimesHint
+                width={component.width}
+                color={component.color}
+                backgroundColor={component.backgroundColor}
+                icons={element.icons}
+                labels={component.labels}
+                showIcon={component.showIcon}
+              />
             </div>
           );
         }

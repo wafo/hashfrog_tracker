@@ -3,7 +3,7 @@ import labelsJSON from "../data/labels.json";
 import CustomReactSelect from "./CustomReactSelect";
 import Element from "./Element";
 
-const SometimesHint = (props) => {
+const SometimesHint = props => {
   const {
     id = "257f3d17e81243d8af03b0987c8beed3",
     name = "sometimes",
@@ -11,11 +11,14 @@ const SometimesHint = (props) => {
     labels = "sometimes", // uses labels from the json
     width = 150, // In px
     icons = null, // overrides the default hashfrog icon
+    showIcon = true, // Hides the icon
+    color = "#ffffff", // font color
+    backgroundColor = "#333333", // background color for input
   } = props;
 
   const memoizedOptions = useMemo(() => {
     if (options) return options;
-    return labelsJSON[labels || "sometimes"].map((label) => ({
+    return labelsJSON[labels || "sometimes"].map(label => ({
       value: label,
       label: label,
     }));
@@ -27,16 +30,20 @@ const SometimesHint = (props) => {
         id={`sometimes_input_${id}`}
         name={`sometimes_input_${name}`}
         options={memoizedOptions}
+        color={color}
+        backgroundColor={backgroundColor}
       />
-      <Element
-        id={`sometimes_item_${id}`}
-        name={`sometimes_item_${name}`}
-        type="simple"
-        size={[20, 20]}
-        icons={icons || ["hash_frog_bw_32x32.png"]}
-        customStyle={{ marginLeft: "0.25rem" }}
-        receiver
-      />
+      {showIcon && (
+        <Element
+          id={`sometimes_item_${id}`}
+          name={`sometimes_item_${name}`}
+          type="simple"
+          size={[20, 20]}
+          icons={icons || ["hash_frog_bw_32x32.png"]}
+          customStyle={{ marginLeft: "0.25rem" }}
+          receiver
+        />
+      )}
     </div>
   );
 };

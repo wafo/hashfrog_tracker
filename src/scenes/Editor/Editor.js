@@ -19,6 +19,69 @@ const baseLayout = {
   components: [],
 };
 
+function prepareLayout(rawLayout) {
+  const cleanedComponents = [
+    ...rawLayout.components.map(component => {
+      switch (component.type) {
+        case "element":
+          return {
+            id: generateId(),
+            type: "element",
+            elementId: "0c44ac338d7249b39271d0b25425b7d9",
+            position: [0, 0],
+            size: [25, 25],
+            ...component,
+          };
+        case "table":
+          return {
+            id: generateId(),
+            type: "table",
+            position: [0, 0],
+            columns: 3,
+            padding: "2px",
+            elements: [],
+            elementsSize: [25, 25],
+            ...component,
+          };
+        case "sometimeshint":
+          return {
+            id: generateId(),
+            type: "sometimeshint",
+            elementId: "4c1b24c3e3954038b14f4daa3656e0b5",
+            position: [0, 0],
+            labels: "sometimes",
+            width: 150,
+            color: "#ffffff",
+            backgroundColor: "#333333",
+            showIcon: true,
+            ...component,
+          };
+        case "locationhint":
+          return {
+            id: generateId(),
+            type: "locationhint",
+            elementId: "4c1b24c3e3954038b14f4daa3656e0b5",
+            position: [0, 0],
+            labels: "locations",
+            width: 250,
+            color: "#ffffff",
+            backgroundColor: "#4a8ab6",
+            showBoss: true,
+            showItems: true,
+            ...component,
+          };
+        default:
+          return component;
+      }
+    }),
+  ];
+
+  return {
+    ...rawLayout,
+    components: cleanedComponents,
+  };
+}
+
 const Editor = () => {
   const [tab, setTab] = useState(0);
 
@@ -41,7 +104,8 @@ const Editor = () => {
 
     if (files.length > 0) {
       const content = await readFileAsText(files[0]);
-      const parsedLayout = JSON.parse(content);
+      let parsedLayout = JSON.parse(content);
+      parsedLayout = prepareLayout(parsedLayout);
       setLayout(parsedLayout);
       setLayoutKey(Math.random());
     }

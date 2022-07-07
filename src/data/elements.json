@@ -2,7 +2,8 @@
   {
     "id": "a081121b16f84366bf16e16ca90cd23f",
     "type": "simple",
-    "name": "Default HashFrog",
+    "name": "default_hashfrog",
+    "displayName": "Default Hashfrog",
     "label": "",
     "labelStartingIndex": 0,
     "size": [25, 25],
@@ -15,6 +16,7 @@
     "id": "0c44ac338d7249b39271d0b25425b7d9",
     "type": "simple",
     "name": "sticks",
+    "displayName": "Deku Sticks",
     "size": [25, 25],
     "icons": ["sticks_bw_32x32.png", "sticks_32x32.png"],
     "items": [null, "34b2ad3657e94b75b281cec30e617f37"]
@@ -23,6 +25,7 @@
     "id": "ca8ed02a22504625a59432b5bd36e1f7",
     "type": "simple",
     "name": "nuts",
+    "displayName": "Deku Nuts",
     "size": [25, 25],
     "icons": ["nuts_bw_32x32.png", "nuts_32x32.png"],
     "items": [null, "73a0f3f5688745a8bb4a0973d9858960"]
@@ -31,6 +34,7 @@
     "id": "41abf8d927884593b6652d03f7d7b4e0",
     "type": "simple",
     "name": "bombs",
+    "displayName": "Bombs",
     "size": [25, 25],
     "icons": ["bombs_bw_32x32.png", "bombs_32x32.png"],
     "items": [null, "2fcfafe04ec24a9cb3c2d03c2aa047aa"]
@@ -39,6 +43,7 @@
     "id": "e2259c4e07c84603b9d8ec735763bb0a",
     "type": "simple",
     "name": "bow",
+    "displayName": "Fairy Bow",
     "size": [25, 25],
     "icons": ["bow_bw_32x32.png", "bow_32x32.png"],
     "items": [null, "8633e18f860e4eccb821800eeec01c29"]
@@ -47,6 +52,7 @@
     "id": "4ffa3034c2d34e488a8c4e100c437204",
     "type": "simple",
     "name": "fire_arrows",
+    "displayName": "Fire Arrows",
     "size": [25, 25],
     "icons": ["fire_arrows_bw_32x32.png", "fire_arrows_32x32.png"],
     "items": [null, "7c3026558a6b49df97733d13ecc815c7"]
@@ -55,6 +61,7 @@
     "id": "b2369b26bb154a1c95e1b50e943facd6",
     "type": "simple",
     "name": "light_arrows",
+    "displayName": "Light Arrows",
     "size": [25, 25],
     "icons": ["light_arrows_bw_32x32.png", "light_arrows_32x32.png"],
     "items": [null, "ff67e2e04ce04aa8add77658ee932802"]
@@ -63,6 +70,7 @@
     "id": "4d690df905ec450aa13b558224147d5a",
     "type": "simple",
     "name": "fl_arrows",
+    "displayName": "Fire-Light Arrows",
     "size": [25, 25],
     "icons": [
       "fire_light_arrows_bw_32x32.png",
@@ -81,6 +89,7 @@
     "id": "9d59f8728d764624821b248ac84d64cb",
     "type": "simple",
     "name": "slingshot",
+    "displayName": "Fairy Slingshot",
     "size": [25, 25],
     "icons": ["slingshot_bw_32x32.png", "slingshot_32x32.png"],
     "items": [null, "f6eff46730cf46098deddab9d99d7677"]
@@ -89,6 +98,7 @@
     "id": "429279d84b614c529e1b979dbe2db283",
     "type": "simple",
     "name": "hammer",
+    "displayName": "Megaton Hammer",
     "size": [25, 25],
     "icons": ["hammer_bw_32x32.png", "hammer_32x32.png"],
     "items": [null, "0baa96ca7e344c86a7086dd11e2d8a74"]
@@ -97,6 +107,7 @@
     "id": "da02ed703faf48559179614e389c2dd1",
     "type": "simple",
     "name": "bombchus",
+    "displayName": "Bombchus",
     "size": [25, 25],
     "icons": ["bomb_chu_bw_32x32.png", "bomb_chu_32x32.png"],
     "items": [null, "22512dafa587497f98cd7135903b09c9"]
@@ -105,6 +116,7 @@
     "id": "eb57bc60abc34ea7b67f857b0f30fcc3",
     "type": "simple",
     "name": "hookshot",
+    "displayName": "Progressive Hookshot",
     "size": [25, 25],
     "icons": [
       "hookshot_bw_32x32.png",
@@ -121,6 +133,7 @@
     "id": "a81e243dac784154b83746c644c74dd8",
     "type": "simple",
     "name": "dins-farore",
+    "displayName": "Dins-Farore",
     "size": [25, 25],
     "icons": [
       "dins_farores_bw_32x32.png",
@@ -139,6 +152,7 @@
     "id": "4935246af9e34230b82a4b639d62a75c",
     "type": "simple",
     "name": "dins",
+    "displayName": "Din's Fire",
     "size": [25, 25],
     "icons": ["dins_fire_bw_32x32.png", "dins_fire_32x32.png"],
     "items": [null, "591d582f479140759fd6501caa23c2f9"]
@@ -147,6 +161,7 @@
     "id": "1b220c9255fe427e90f2da5bdfcd965a",
     "type": "simple",
     "name": "farores",
+    "displayName": "Farore's Wind",
     "size": [25, 25],
     "icons": ["farores_wind_bw_32x32.png", "farores_wind_32x32.png"],
     "items": [null, "0c3e8979165042f686357b4bcbaab8ec"]
@@ -155,6 +170,7 @@
     "id": "0f2e5a599a6645ae89ec3bd1b787a7b3",
     "type": "simple",
     "name": "boomerang",
+    "displayName": "Boomerang",
     "size": [25, 25],
     "icons": ["boomerang_bw_32x32.png", "boomerang_32x32.png"],
     "items": [null, "bc6099ef9091404e9b45aea12d4b6b65"]
@@ -163,6 +179,7 @@
     "id": "c783209d6be348dc821829e46095348f",
     "type": "simple",
     "name": "lens",
+    "displayName": "Lens of Truth",
     "size": [25, 25],
     "icons": ["lens_bw_32x32.png", "lens_32x32.png"],
     "items": [null, "2ac429aee9b5447e827a16e377fb6ce0"]
@@ -171,6 +188,7 @@
     "id": "e9adcab606b346379717e97f7c59ceff",
     "type": "simple",
     "name": "beans",
+    "displayName": "Magic Bean",
     "size": [25, 25],
     "icons": ["beans_bw_32x32.png", "beans_32x32.png"],
     "items": [null, "2e7752ec3fbc4c03b68c5621f853cad3"]
@@ -179,6 +197,7 @@
     "id": "9274be1cc1934da1927c96ca9a369c1a",
     "type": "simple",
     "name": "magic",
+    "displayName": "Progresive Magic",
     "size": [25, 25],
     "icons": [
       "magic_bw_32x32.png",
@@ -195,6 +214,7 @@
     "id": "57f93ba21e0145a0950bff721dabee07",
     "type": "simple",
     "name": "strength",
+    "displayName": "Progressive Strength",
     "size": [25, 25],
     "icons": [
       "strength_bw_32x32.png",
@@ -213,6 +233,7 @@
     "id": "b797e237d5754d4785b436ba44128740",
     "type": "simple",
     "name": "rutos_letter",
+    "displayName": "Rutos Letter",
     "size": [25, 25],
     "icons": [
       "bottle_rutos_letter_bw_32x32.png",
@@ -224,6 +245,7 @@
     "id": "b5550cfbf9fc4e36b70524fe2d253aee",
     "type": "counter",
     "name": "bottle_counter",
+    "displayName": "Bottle Counter",
     "size": [25, 25],
     "countConfig": [0, 4],
     "icons": ["bottle_empty_32x32.png"],
@@ -233,6 +255,7 @@
     "id": "973baa09459d468da633e9510bbdaa1f",
     "type": "simple",
     "name": "scale",
+    "displayName": "Progressive Scale",
     "size": [25, 25],
     "icons": [
       "scale_bw_32x32.png",
@@ -249,6 +272,7 @@
     "id": "8d96134f27634b7f9f21f7b8cb1b1e91",
     "type": "simple",
     "name": "wallet",
+    "displayName": "Progressive Wallet",
     "size": [25, 25],
     "icons": ["wallet_bw_32x32.png", "wallet2_32x32.png", "wallet3_32x32.png"],
     "items": [
@@ -261,6 +285,7 @@
     "id": "6e86caa5dbe549e1b3b87e3eb179c508",
     "type": "simple",
     "name": "trade_1",
+    "displayName": "Child Trade Sequence",
     "size": [25, 25],
     "icons": [
       "zeldas_letter_32x32.png",
@@ -274,6 +299,7 @@
     "id": "3bd2660084e04e13b0de10fd84b9dd22",
     "type": "simple",
     "name": "trade_2",
+    "displayName": "Adult Trade Sequence",
     "size": [25, 25],
     "icons": [
       "prescription_bw_32x32.png",
@@ -294,6 +320,7 @@
     "id": "ac1b262de0684222beb0eb23cf671a7e",
     "type": "simple",
     "name": "kokiri_sword",
+    "displayName": "Kokiri Sword",
     "size": [25, 25],
     "icons": ["kokiri_sword_bw_32x32.png", "kokiri_sword_32x32.png"],
     "items": [null, "b29ac88a18d646ce82b8b2e4752f8b30"]
@@ -302,6 +329,7 @@
     "id": "4cf982a84e834ca7a8f5a68c0af0a7e7",
     "type": "simple",
     "name": "master_sword",
+    "displayName": "Master Sword",
     "size": [25, 25],
     "selectedStartingIndex": 1,
     "icons": ["master_sword_bw_32x32.png", "master_sword_32x32.png"],
@@ -311,6 +339,7 @@
     "id": "250b5e9af3364df492d6831624119319",
     "type": "simple",
     "name": "biggoron_sword",
+    "displayName": "Biggoron Sword",
     "size": [25, 25],
     "icons": ["biggoron_sword_bw_32x32.png", "biggoron_sword_32x32.png"],
     "items": [null, "5196e02aafac4b39b12ff1dc7bd5cb1c"]
@@ -319,6 +348,7 @@
     "id": "133778d9e7344127ae4a3532e5ddcb45",
     "type": "simple",
     "name": "deku_shield",
+    "displayName": "Deku Shield",
     "size": [25, 25],
     "icons": ["deku_shield_bw_32x32.png", "deku_shield_32x32.png"],
     "items": [null, "06c4c254730149bd93bdd297f1a3b309"]
@@ -327,6 +357,7 @@
     "id": "cb4e8d979d6c4b71a8ee081580ef4b43",
     "type": "simple",
     "name": "hylian_shield",
+    "displayName": "Hylian Shield",
     "size": [25, 25],
     "icons": ["hylian_shield_bw_32x32.png", "hylian_shield_32x32.png"],
     "items": [null, "b4de2eabed4f40cea8661971a17d996e"]
@@ -335,6 +366,7 @@
     "id": "b91377bea50741b09a65c88490039bde",
     "type": "simple",
     "name": "mirror_shield",
+    "displayName": "Mirror Shield",
     "size": [25, 25],
     "icons": ["mirror_shield_bw_32x32.png", "mirror_shield_32x32.png"],
     "items": [null, "e0079e25283148f9a20fd43bf34d1f97"]
@@ -343,6 +375,7 @@
     "id": "e103b9bf216f4f279101389e9f1b586e",
     "type": "simple",
     "name": "adult_shield",
+    "displayName": "Adult Shields",
     "size": [25, 25],
     "icons": [
       "mirror_shield_bw_32x32.png",
@@ -359,6 +392,7 @@
     "id": "cd797979d81349299fcb49327528793d",
     "type": "simple",
     "name": "tunic_goron",
+    "displayName": "Goron Tunic",
     "size": [25, 25],
     "icons": ["tunic_goron_bw_32x32.png", "tunic_goron_32x32.png"],
     "items": [null, "cd6a55f0253f45159521efb2b3b515e8"]
@@ -367,6 +401,7 @@
     "id": "fc301b61b1fe4454ab50a62190285792",
     "type": "simple",
     "name": "tunic_zora",
+    "displayName": "Zora Tunic",
     "size": [25, 25],
     "icons": ["tunic_zora_bw_32x32.png", "tunic_zora_32x32.png"],
     "items": [null, "c562c7418d7141ffb70101509a52873e"]
@@ -375,6 +410,7 @@
     "id": "ae65a70f31c047eea8b5b4dea7f3cf2b",
     "type": "simple",
     "name": "tunics",
+    "displayName": "Goron-Zora Tunic",
     "size": [25, 25],
     "icons": [
       "tunics_bw_32x32.png",
@@ -393,6 +429,7 @@
     "id": "1cb911ed9d5042f69c7a19fe2bb36538",
     "type": "simple",
     "name": "boots_iron",
+    "displayName": "Iron Boots",
     "size": [25, 25],
     "icons": ["boots_iron_bw_32x32.png", "boots_iron_32x32.png"],
     "items": [null, "bad09131f88a440093087e11efc1c8b0"]
@@ -401,6 +438,7 @@
     "id": "f803a437eaa44905b73da81023c34a3c",
     "type": "simple",
     "name": "boots_hover",
+    "displayName": "Hover Boots",
     "size": [25, 25],
     "icons": ["boots_hover_bw_32x32.png", "boots_hover_32x32.png"],
     "items": [null, "33f4bc4c632846bea5fb88573f2f95b2"]
@@ -409,6 +447,7 @@
     "id": "c447628606044cfa82854fe9482affce",
     "type": "simple",
     "name": "boots",
+    "displayName": "Iron-Hover Boots",
     "size": [25, 25],
     "icons": [
       "boots_iron_hover_bw_32x32.png",
@@ -427,6 +466,7 @@
     "id": "cb672b13eb854a38a8615a5a64ea1a30",
     "type": "simple",
     "name": "gerudo_card",
+    "displayName": "Gerudo's Card",
     "size": [25, 25],
     "icons": ["gerudo_card_bw_32x32.png", "gerudo_card_32x32.png"],
     "items": [null, "7373656ec94f430f8fbf971e53930949"]
@@ -435,6 +475,7 @@
     "id": "1ba1379bab19454aa48f7203b3deda9a",
     "type": "simple",
     "name": "bottle",
+    "displayName": "Bottle",
     "size": [25, 25],
     "icons": ["bottle_empty_bw_32x32.png", "bottle_empty_32x32.png"],
     "items": [null, "55f6bcc569c14f1293eb50fda76c812d"]
@@ -443,6 +484,7 @@
     "id": "42c86e70f58f4cf2bed60bc57f7db77d",
     "type": "label",
     "name": "stone_kokiri",
+    "displayName": "Kokiri's Emerald",
     "label": ["JAB", "DOD", "DEK", "N/A", "FOR", "FIR", "WAT", "SHA", "SPI"],
     "labelStartingIndex": 3,
     "size": [25, 25],
@@ -453,6 +495,7 @@
     "id": "7976e88940704645ba08ffa2ff233ac3",
     "type": "label",
     "name": "stone_goron",
+    "displayName": "Goron's Ruby",
     "label": ["JAB", "DOD", "DEK", "N/A", "FOR", "FIR", "WAT", "SHA", "SPI"],
     "labelStartingIndex": 3,
     "size": [25, 25],
@@ -463,6 +506,7 @@
     "id": "c20602aa38604c16a6e2d2065d501667",
     "type": "label",
     "name": "stone_zora",
+    "displayName": "Zora's Sapphire",
     "label": ["JAB", "DOD", "DEK", "N/A", "FOR", "FIR", "WAT", "SHA", "SPI"],
     "labelStartingIndex": 3,
     "size": [25, 25],
@@ -473,6 +517,7 @@
     "id": "635c03029678417a94b3f368eca91397",
     "type": "label",
     "name": "medallion_green",
+    "displayName": "Forest Medallion",
     "label": ["JAB", "DOD", "DEK", "N/A", "FOR", "FIR", "WAT", "SHA", "SPI"],
     "labelStartingIndex": 3,
     "size": [25, 25],
@@ -483,6 +528,7 @@
     "id": "c1dbcf08a6054df3911ac50933294327",
     "type": "label",
     "name": "medallion_red",
+    "displayName": "Fire Medallion",
     "label": ["JAB", "DOD", "DEK", "N/A", "FOR", "FIR", "WAT", "SHA", "SPI"],
     "labelStartingIndex": 3,
     "size": [25, 25],
@@ -493,6 +539,7 @@
     "id": "30b5d2740159487bbdbd630157d93014",
     "type": "label",
     "name": "medallion_blue",
+    "displayName": "Water Medallion",
     "label": ["JAB", "DOD", "DEK", "N/A", "FOR", "FIR", "WAT", "SHA", "SPI"],
     "labelStartingIndex": 3,
     "size": [25, 25],
@@ -503,6 +550,7 @@
     "id": "739e10a1da284fc588962d5dbd938292",
     "type": "label",
     "name": "medallion_purple",
+    "displayName": "Shadow Medallion",
     "label": ["JAB", "DOD", "DEK", "N/A", "FOR", "FIR", "WAT", "SHA", "SPI"],
     "labelStartingIndex": 3,
     "size": [25, 25],
@@ -513,6 +561,7 @@
     "id": "f7a0d8c2a83541baa83a97e803528b09",
     "type": "label",
     "name": "medallion_orange",
+    "displayName": "Spirit Medallion",
     "label": ["JAB", "DOD", "DEK", "N/A", "FOR", "FIR", "WAT", "SHA", "SPI"],
     "labelStartingIndex": 3,
     "size": [25, 25],
@@ -523,6 +572,7 @@
     "id": "131c660d700943f7af019f09d7bb61b9",
     "type": "label",
     "name": "medallion_yellow",
+    "displayName": "Light Medallion",
     "label": ["JAB", "DOD", "DEK", "N/A", "FOR", "FIR", "WAT", "SHA", "SPI"],
     "labelStartingIndex": 3,
     "size": [25, 25],
@@ -533,6 +583,7 @@
     "id": "6616d206722c46d79e686dc5c00704ea",
     "type": "nested",
     "name": "song_minuet",
+    "displayName": "Minuet of Forest",
     "size": [25, 25],
     "icons": ["song_minuet_bw_32x32.png", "song_minuet_32x32.png"],
     "items": [null, "ce1f2799ff1a433ba0bb40fee47e49a1"]
@@ -541,6 +592,7 @@
     "id": "dbcf56141dbb4973809baa8656dabab9",
     "type": "nested",
     "name": "song_bolero",
+    "displayName": "Bolero of Fire",
     "size": [25, 25],
     "icons": ["song_bolero_bw_32x32.png", "song_bolero_32x32.png"],
     "items": [null, "e4769601bde54324a97704d29ca7f9b3"]
@@ -549,6 +601,7 @@
     "id": "8c157474e4ed4e4d9cbf6f62aeb36356",
     "type": "nested",
     "name": "song_serenade",
+    "displayName": "Serenade of Water",
     "size": [25, 25],
     "icons": ["song_serenade_bw_32x32.png", "song_serenade_32x32.png"],
     "items": [null, "daf9dc01414741aa9549f719abbabd54"]
@@ -557,6 +610,7 @@
     "id": "a63004582a91482fb5e253c2db36c987",
     "type": "nested",
     "name": "song_nocturne",
+    "displayName": "Nocturne of Shadow",
     "size": [25, 25],
     "icons": ["song_nocturne_bw_32x32.png", "song_nocturne_32x32.png"],
     "items": [null, "8091c91b7f244e16a8f8a1bca80194b1"]
@@ -565,6 +619,7 @@
     "id": "1e57ad7bb7a84961a46b21590794b722",
     "type": "nested",
     "name": "song_requiem",
+    "displayName": "Requiem of Spirit",
     "size": [25, 25],
     "icons": ["song_requiem_bw_32x32.png", "song_requiem_32x32.png"],
     "items": [null, "063dcc22e4f7422b80d7a4679be65db3"]
@@ -573,6 +628,7 @@
     "id": "b27f35d5a64d4165a5f091781ddf6c14",
     "type": "nested",
     "name": "song_prelude",
+    "displayName": "Prelude of Light",
     "size": [25, 25],
     "icons": ["song_prelude_bw_32x32.png", "song_prelude_32x32.png"],
     "items": [null, "c7244845fa1642a8bd8dd2a4291ddad6"]
@@ -581,6 +637,7 @@
     "id": "d8631b41c18a47b6a5f232b194bfaf3f",
     "type": "nested",
     "name": "song_lullaby",
+    "displayName": "Zelda's Lullaby",
     "size": [25, 25],
     "icons": ["song_lullaby_bw_32x32.png", "song_lullaby_32x32.png"],
     "items": [null, "2801c2b994864757a2363fbb053076db"]
@@ -589,6 +646,7 @@
     "id": "9c61c54fa3fd41f98302f82c744ac019",
     "type": "nested",
     "name": "song_epona",
+    "displayName": "Epona's Song",
     "size": [25, 25],
     "icons": ["song_epona_bw_32x32.png", "song_epona_32x32.png"],
     "items": [null, "96ebae804a3143438c2cfbc7680c464f"]
@@ -597,6 +655,7 @@
     "id": "5826f5735b3f4a54a02530413287822c",
     "type": "nested",
     "name": "song_saria",
+    "displayName": "Saria's Song",
     "size": [25, 25],
     "icons": ["song_saria_bw_32x32.png", "song_saria_32x32.png"],
     "items": [null, "4fd7fcb8249744d9ba7f0d951df061bf"]
@@ -605,6 +664,7 @@
     "id": "4f5625f979824ba0a8005a139c9df716",
     "type": "nested",
     "name": "song_suns",
+    "displayName": "Sun's Song",
     "size": [25, 25],
     "icons": ["song_suns_bw_32x32.png", "song_suns_32x32.png"],
     "items": [null, "4cc5a64c593c4e6b8b0ecc8d3dae3230"]
@@ -613,6 +673,7 @@
     "id": "a4e440022028431a9af08f305af240ee",
     "type": "nested",
     "name": "song_time",
+    "displayName": "Song of Time",
     "size": [25, 25],
     "icons": ["song_time_bw_32x32.png", "song_time_32x32.png"],
     "items": [null, "60671fe069e54ae38e763652bd7d9d97"]
@@ -621,6 +682,7 @@
     "id": "a6afa47c930546008f56b03ac364254b",
     "type": "nested",
     "name": "song_storms",
+    "displayName": "Song of Storms",
     "size": [25, 25],
     "icons": ["song_storms_bw_32x32.png", "song_storms_32x32.png"],
     "items": [null, "c2b35441c0604a9dbd0d63c9cd6755d9"]
@@ -629,6 +691,7 @@
     "id": "34fb4c398a1e43ed99a40a6351ceed8b",
     "type": "counter",
     "name": "keys_forest",
+    "displayName": "Small keys Forest",
     "size": [20, 20],
     "icons": ["key_forest_32x32.png"],
     "countConfig": [0, 5]
@@ -637,6 +700,7 @@
     "id": "e84c0569d7e546349565994885ca17c1",
     "type": "counter",
     "name": "keys_fire",
+    "displayName": "Small Keys Fire",
     "size": [20, 20],
     "icons": ["key_fire_32x32.png"],
     "countConfig": [0, 8]
@@ -645,6 +709,7 @@
     "id": "113c8c69a8d3410288eecc3efdcba9ac",
     "type": "counter",
     "name": "keys_water",
+    "displayName": "Small Keys Water",
     "size": [20, 20],
     "icons": ["key_water_32x32.png"],
     "countConfig": [0, 6]
@@ -653,6 +718,7 @@
     "id": "f960cb2e268b47378c1fbd280a36b7ae",
     "type": "counter",
     "name": "keys_shadow",
+    "displayName": "Small Keys Shadow",
     "size": [20, 20],
     "icons": ["key_shadow_32x32.png"],
     "countConfig": [0, 5]
@@ -661,6 +727,7 @@
     "id": "b1682f98da9547ec91364bec23522dbd",
     "type": "counter",
     "name": "keys_spirit",
+    "displayName": "Small Keys Spirit",
     "size": [20, 20],
     "icons": ["key_spirit_32x32.png"],
     "countConfig": [0, 5]
@@ -669,6 +736,7 @@
     "id": "b974af3f77fd4f6da41aca226176ed35",
     "type": "counter",
     "name": "keys_botw",
+    "displayName": "Small Keys BOTW",
     "size": [20, 20],
     "icons": ["key_32x32.png"],
     "countConfig": [0, 3]
@@ -677,6 +745,7 @@
     "id": "d8cf98dc40d245bfb81f8c5ab339319e",
     "type": "counter",
     "name": "keys_gtg",
+    "displayName": "Small Keys GTG",
     "size": [20, 20],
     "icons": ["key_32x32.png"],
     "countConfig": [0, 9]
@@ -685,6 +754,7 @@
     "id": "4c1b24c3e3954038b14f4daa3656e0b5",
     "type": "simple",
     "name": "sometimes",
+    "displayName": "Progressive Sometimes",
     "size": [20, 20],
     "icons": [
       "hash_frog_bw_32x32.png",
@@ -699,6 +769,7 @@
     "id": "7ac5c97bf662472599f66f70d4b83b16",
     "type": "simple",
     "name": "gs_10",
+    "displayName": "10 - Gold Skulltulas",
     "size": [25, 25],
     "icons": ["gs_10_32x32.png"]
   },
@@ -706,6 +777,7 @@
     "id": "ce0c6a199afe4cbb8cd330645c14b32f",
     "type": "simple",
     "name": "gs_20",
+    "displayName": "20 - Gold Skulltulas",
     "size": [25, 25],
     "icons": ["gs_20_32x32.png"]
   },
@@ -713,6 +785,7 @@
     "id": "4677c7d847b04867911ef8b93901cbe1",
     "type": "simple",
     "name": "gs_30",
+    "displayName": "30 - Gold Skulltulas",
     "size": [25, 25],
     "icons": ["gs_30_32x32.png"]
   },
@@ -720,6 +793,7 @@
     "id": "4cacb44f1ad74ee2a414e69d65c57d6e",
     "type": "simple",
     "name": "gs_40",
+    "displayName": "40 - Gold Skulltulas",
     "size": [25, 25],
     "icons": ["gs_40_32x32.png"]
   },
@@ -727,6 +801,7 @@
     "id": "7ab920520d0f4efa91732f5ea1fcd68c",
     "type": "simple",
     "name": "gs_50",
+    "displayName": "50 - Gold Skulltulas",
     "size": [25, 25],
     "icons": ["gs_50_32x32.png"]
   },
@@ -734,6 +809,7 @@
     "id": "a4a963b8f018474388eaf188518d577d",
     "type": "simple",
     "name": "skull_mask",
+    "displayName": "Skull Mask",
     "size": [25, 25],
     "icons": ["skull_mask_32x32.png"]
   },
@@ -741,6 +817,7 @@
     "id": "fb0d152f1cc44e9cbfa9c3417af239f2",
     "type": "simple",
     "name": "biggoron",
+    "displayName": "Biggoron",
     "size": [25, 25],
     "icons": ["biggoron_32x32.png"]
   },
@@ -748,6 +825,7 @@
     "id": "857a865df3474ff4a9b1742d70f8b7e3",
     "type": "simple",
     "name": "frogs",
+    "displayName": "Frogs",
     "size": [25, 25],
     "icons": ["frogs_32x32.png"]
   },
@@ -755,6 +833,7 @@
     "id": "d055616ee0314701a6d1471c0a5595ff",
     "type": "counter",
     "name": "gold_skulls",
+    "displayName": "Gold Skulltulas Counter",
     "size": [25, 25],
     "icons": ["gs_counter_32x32.png"],
     "countConfig": [0, 50]

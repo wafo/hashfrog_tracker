@@ -4,7 +4,7 @@ import labelsJSON from "../../data/labels.json";
 import { generateId } from "../../utils/utils";
 
 const EditorComponent = ({ component, setComponent }) => {
-  let { position, type } = component;
+  let { position, type, displayName = "" } = component;
   let [coordX, coordY] = position;
 
   const handleTypeChange = useCallback(
@@ -29,6 +29,9 @@ const EditorComponent = ({ component, setComponent }) => {
             position: component.position,
             labels: "sometimes",
             width: 150,
+            color: "#ffffff",
+            backgroundColor: "#333333",
+            showIcon: true,
           });
           break;
         case "locationhint":
@@ -98,6 +101,7 @@ const EditorComponent = ({ component, setComponent }) => {
         // Checkbox
         case "showBoss":
         case "showItems":
+        case "showIcon":
           setComponent(prev => ({
             ...prev,
             [name]: !prev[name],
@@ -118,6 +122,20 @@ const EditorComponent = ({ component, setComponent }) => {
   return (
     <Fragment>
       <p className="uuid">Component Id: {component.id}</p>
+      <div className="mb-2">
+        <label htmlFor="name" className="form-label">
+          Component Name
+        </label>
+        <input
+          type="text"
+          id="displayName"
+          name="displayName"
+          className="form-control form-control-sm"
+          placeholder="Component Name"
+          value={displayName}
+          onChange={handleChange}
+        />
+      </div>
       <div className="mb-2">
         <label htmlFor="" className="form-label">
           Element Type
@@ -182,7 +200,7 @@ const ElementEditor = ({ component, handleChange }) => {
         >
           {elementsJSON.map(element => (
             <option key={element.id} value={element.id}>
-              {element.name}
+              {element.displayName}
             </option>
           ))}
         </select>
@@ -352,7 +370,7 @@ const TableEditor = ({ component, handleChange }) => {
           >
             {elementsJSON.map(element => (
               <option key={element.id} value={element.name}>
-                {element.name}
+                {element.displayName}
               </option>
             ))}
           </select>
@@ -361,7 +379,6 @@ const TableEditor = ({ component, handleChange }) => {
           </button>
         </div>
       </div>
-
       {elements.length > 0 && (
         <p style={{ fontSize: "0.75em", margin: 0, opacity: 0.5 }}>Right click to remove. Drag to re-order.</p>
       )}
@@ -399,7 +416,7 @@ const SometimeshintEditor = ({ component, handleChange }) => {
         >
           {elementsJSON.map(element => (
             <option key={element.id} value={element.id}>
-              {element.name}
+              {element.displayName}
             </option>
           ))}
         </select>
@@ -436,6 +453,49 @@ const SometimeshintEditor = ({ component, handleChange }) => {
           onChange={handleChange}
         />
       </div>
+      <div className="row">
+        <div className="col-12">
+          <label htmlFor="color" className="form-label">
+            Text Color & Background Color
+          </label>
+        </div>
+        <div className="col-6 mb-2">
+          <input
+            type="color"
+            className="form-control form-control-sm"
+            id="color"
+            name="color"
+            title="Choose text color"
+            value={component.color}
+            onChange={handleChange}
+          />
+        </div>
+        <div className="col-6 mb-2">
+          <input
+            type="color"
+            className="form-control form-control-sm"
+            id="backgroundColor"
+            name="backgroundColor"
+            title="Choose background color"
+            value={component.backgroundColor}
+            onChange={handleChange}
+          />
+        </div>
+      </div>
+      <div className="form-check mb-2">
+        <input
+          type="checkbox"
+          className="form-check-input"
+          id="showIcon"
+          name="showIcon"
+          checked={component.showIcon}
+          value={component.showIcon}
+          onChange={handleChange}
+        />
+        <label htmlFor="showIcon" className="form-check-label">
+          Show Icon
+        </label>
+      </div>
     </Fragment>
   );
 };
@@ -456,7 +516,7 @@ const LocationhintEditor = ({ component, handleChange }) => {
         >
           {elementsJSON.map(element => (
             <option key={element.id} value={element.id}>
-              {element.name}
+              {element.displayName}
             </option>
           ))}
         </select>

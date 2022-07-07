@@ -9,6 +9,7 @@ const EditorComponentsList = ({ components, setLayout }) => {
     setComponent({
       id: generateId(),
       type: "",
+      displayName: "",
       position: [0, 0],
     });
   };
@@ -66,7 +67,7 @@ const EditorComponentsList = ({ components, setLayout }) => {
           components.map(component => (
             <li key={component.id}>
               <button type="button" className="btn btn-dark btn-sm" onClick={() => setComponent(component)}>
-                {component.type} - {component.id}
+                {component.type} - {component.displayName || component.id.substring(0, 12)}
               </button>
             </li>
           ))}
