@@ -1,7 +1,21 @@
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import elementsJSON from "../../data/elements.json";
 import labelsJSON from "../../data/labels.json";
 import { generateId } from "../../utils/utils";
+
+const toNumber = [
+  "coordX",
+  "coordY",
+  "size_width",
+  "size_height",
+  "width",
+  "columns",
+  "counterMin",
+  "counterMax",
+  "selectedStartingIndex",
+  "labelStartingIndex",
+  "hintNumber",
+];
 
 const EditorComponent = ({ component, setComponent }) => {
   let { position, type, displayName = "" } = component;
@@ -19,6 +33,22 @@ const EditorComponent = ({ component, setComponent }) => {
             elementId: "0c44ac338d7249b39271d0b25425b7d9",
             position: component.position,
             size: [25, 25],
+            receiver: false,
+            dragCurrent: false,
+            selectedStartingIndex: 0,
+            countConfig: [0, 5],
+            labelStartingIndex: 0,
+          });
+          break;
+        case "table":
+          setComponent({
+            id: component.id,
+            type: "table",
+            position: component.position,
+            columns: 3,
+            padding: "2px",
+            elements: [],
+            elementsSize: [25, 25],
           });
           break;
         case "sometimeshint":
@@ -32,6 +62,7 @@ const EditorComponent = ({ component, setComponent }) => {
             color: "#ffffff",
             backgroundColor: "#333333",
             showIcon: true,
+            inverted: false,
           });
           break;
         case "locationhint":
@@ -48,15 +79,25 @@ const EditorComponent = ({ component, setComponent }) => {
             showItems: true,
           });
           break;
-        case "table":
+
+        case "hinttable":
           setComponent({
             id: component.id,
-            type: "table",
+            type: "hinttable",
+            elementId: "4c1b24c3e3954038b14f4daa3656e0b5",
             position: component.position,
-            columns: 3,
+            hintType: "sometimes",
+            hintNumber: 1,
+            columns: 1,
+            width: 200,
             padding: "2px",
-            elements: [],
-            elementsSize: [25, 25],
+            labels: "sometimes",
+            color: "#ffffff",
+            backgroundColor: "#333333",
+            showIcon: true,
+            inverted: false,
+            showBoss: true,
+            showItems: true,
           });
           break;
         default:
@@ -71,18 +112,18 @@ const EditorComponent = ({ component, setComponent }) => {
       let { value } = event.target;
       const { name } = event.target;
 
-      const toNumber = ["coordX", "coordY", "size_width", "size_height", "width", "columns"];
       if (toNumber.includes(name)) value = parseInt(value, 10);
 
       switch (name) {
         // Coords specific
         case "coordX":
-        case "coordY":
+        case "coordY": {
           setComponent(prev => ({
             ...prev,
             position: name === "coordX" ? [value, prev.position[1]] : [prev.position[0], value],
           }));
           break;
+        }
         // Size specific
         case "size_width":
         case "size_height": {
@@ -98,22 +139,36 @@ const EditorComponent = ({ component, setComponent }) => {
           });
           break;
         }
+        // Counter
+        case "counterMin":
+        case "counterMax": {
+          setComponent(prev => ({
+            ...prev,
+            countConfig: name === "counterMin" ? [value, prev.countConfig[1]] : [prev.countConfig[0], value],
+          }));
+          break;
+        }
         // Checkbox
         case "showBoss":
         case "showItems":
         case "showIcon":
+        case "inverted":
+        case "dragCurrent":
+        case "receiver": {
           setComponent(prev => ({
             ...prev,
             [name]: !prev[name],
           }));
           break;
+        }
         // General
-        default:
+        default: {
           setComponent(prev => ({
             ...prev,
             [name]: value,
           }));
           break;
+        }
       }
     },
     [setComponent],
@@ -148,6 +203,7 @@ const EditorComponent = ({ component, setComponent }) => {
           <option value="table">Table of Elements</option>
           <option value="sometimeshint">Sometimes Hint</option>
           <option value="locationhint">Location Hint</option>
+          <option value="hinttable">Table of Hints</option>
         </select>
       </div>
       <div className="col mb-2">
@@ -180,11 +236,16 @@ const EditorComponent = ({ component, setComponent }) => {
       {type === "table" && <TableEditor component={component} handleChange={handleChange} />}
       {type === "sometimeshint" && <SometimeshintEditor component={component} handleChange={handleChange} />}
       {type === "locationhint" && <LocationhintEditor component={component} handleChange={handleChange} />}
+      {type === "hinttable" && <HintTableEditor component={component} handleChange={handleChange} />}
     </Fragment>
   );
 };
 
 const ElementEditor = ({ component, handleChange }) => {
+  const element = useMemo(() => {
+    return elementsJSON.find(x => x.id === component.elementId);
+  }, [component.elementId]);
+
   return (
     <Fragment>
       <div className="mb-2">
@@ -205,7 +266,7 @@ const ElementEditor = ({ component, handleChange }) => {
           ))}
         </select>
       </div>
-      <div className="col mb-2">
+      <div className="mb-2">
         <label htmlFor="width" className="form-label">
           Element Size
         </label>
@@ -231,13 +292,106 @@ const ElementEditor = ({ component, handleChange }) => {
           />
         </div>
       </div>
+      {element.type === "counter" && (
+        <div className="mb-2">
+          <label htmlFor="counterMin" className="form-label">
+            Counter Min/Max
+          </label>
+          <div className="input-group input-group-sm ">
+            <input
+              type="number"
+              id="counterMin"
+              name="counterMin"
+              className="form-control"
+              placeholder="Counter Min"
+              value={component.countConfig[0]}
+              onChange={handleChange}
+            />
+            <span className="input-group-text">To</span>
+            <input
+              type="number"
+              id="counterMax"
+              name="counterMax"
+              className="form-control"
+              placeholder="Counter Max"
+              value={component.countConfig[1]}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+      )}
+      {element.type !== "counter" && (
+        <div className="row">
+          <div className="col-6 mb-2">
+            <label htmlFor="width" className="form-label">
+              Starting Index
+            </label>
+            <input
+              type="number"
+              id="selectedStartingIndex"
+              name="selectedStartingIndex"
+              className="form-control form-control-sm"
+              placeholder="Selected Starting Index"
+              value={component.selectedStartingIndex}
+              onChange={handleChange}
+              min={0}
+              max={element.icons.length - 1}
+            />
+          </div>
+          <div className="col-6 mb-2">
+            <label htmlFor="width" className="form-label">
+              Label Starting Index
+            </label>
+            <input
+              type="number"
+              id="labelStartingIndex"
+              name="labelStartingIndex"
+              className="form-control form-control-sm"
+              placeholder="Label Starting Index"
+              value={component.labelStartingIndex}
+              onChange={handleChange}
+              min={0}
+              max={element?.label?.length - 1 || 0}
+              disabled={element?.type !== "label" || !Array.isArray(element?.label)}
+            />
+          </div>
+        </div>
+      )}
+      <div className="form-check mb-2">
+        <input
+          type="checkbox"
+          className="form-check-input"
+          id="receiver"
+          name="receiver"
+          checked={component.receiver}
+          value={component.receiver}
+          onChange={handleChange}
+        />
+        <label htmlFor="receiver" className="form-check-label">
+          Receiver (able to drag into it)
+        </label>
+      </div>
+      <div className="form-check mb-2">
+        <input
+          type="checkbox"
+          className="form-check-input"
+          id="dragCurrent"
+          name="dragCurrent"
+          checked={component.dragCurrent}
+          value={component.dragCurrent}
+          onChange={handleChange}
+        />
+        <label htmlFor="dragCurrent" className="form-check-label">
+          Drag currently selected
+        </label>
+      </div>
     </Fragment>
   );
 };
 
 const TableEditor = ({ component, handleChange }) => {
   const [elements, setElements] = useState([...component.elements.map(x => ({ id: generateId(), value: x }))]);
-  const [element, setElement] = useState("a081121b16f84366bf16e16ca90cd23f");
+  const [element, setElement] = useState("default_hashfrog");
   const [draggedElement, setDraggedElement] = useState(null);
 
   const handleElementChange = event => {
@@ -260,7 +414,7 @@ const TableEditor = ({ component, handleChange }) => {
       value: element,
     };
     setElements(prev => [...prev, newElement]);
-    setElement("a081121b16f84366bf16e16ca90cd23f");
+    // setElement("a081121b16f84366bf16e16ca90cd23f");
   }, [element]);
 
   const removeFromTable = (e, element) => {
@@ -380,22 +534,24 @@ const TableEditor = ({ component, handleChange }) => {
         </div>
       </div>
       {elements.length > 0 && (
-        <p style={{ fontSize: "0.75em", margin: 0, opacity: 0.5 }}>Right click to remove. Drag to re-order.</p>
+        <Fragment>
+          <p style={{ fontSize: "0.75em", margin: 0, opacity: 0.5 }}>Right click to remove. Drag to re-order.</p>
+          <ul className="list-unstyled table-list">
+            {elements.map((element, index) => (
+              <li
+                key={element.id}
+                onContextMenu={e => removeFromTable(e, element)}
+                onDragStart={e => onDragStart(e, element)}
+                onDragEnd={onDragEnd}
+                onDragOver={() => onDragOver(index)}
+                draggable
+              >
+                {element.value}
+              </li>
+            ))}
+          </ul>
+        </Fragment>
       )}
-      <ul className="list-unstyled table-list">
-        {elements.map((element, index) => (
-          <li
-            key={element.id}
-            onContextMenu={e => removeFromTable(e, element)}
-            onDragStart={e => onDragStart(e, element)}
-            onDragEnd={onDragEnd}
-            onDragOver={() => onDragOver(index)}
-            draggable
-          >
-            {element.value}
-          </li>
-        ))}
-      </ul>
     </Fragment>
   );
 };
@@ -494,6 +650,20 @@ const SometimeshintEditor = ({ component, handleChange }) => {
         />
         <label htmlFor="showIcon" className="form-check-label">
           Show Icon
+        </label>
+      </div>
+      <div className="form-check mb-2">
+        <input
+          type="checkbox"
+          className="form-check-input"
+          id="inverted"
+          name="inverted"
+          checked={component.inverted}
+          value={component.inverted}
+          onChange={handleChange}
+        />
+        <label htmlFor="inverted" className="form-check-label">
+          Reverse Icon
         </label>
       </div>
     </Fragment>
@@ -610,6 +780,222 @@ const LocationhintEditor = ({ component, handleChange }) => {
           Show Items
         </label>
       </div>
+    </Fragment>
+  );
+};
+
+const HintTableEditor = ({ component, handleChange }) => {
+  return (
+    <Fragment>
+      <div className="mb-2">
+        <label htmlFor="labels" className="form-label">
+          Hint Type
+        </label>
+        <select
+          className="form-select form-select-sm"
+          id="hintType"
+          name="hintType"
+          value={component.hintType}
+          onChange={handleChange}
+        >
+          <option value="" disabled>
+            Select type
+          </option>
+          <option value="sometimes">Sometimes Hints</option>
+          <option value="location">Location Hints</option>
+        </select>
+      </div>
+      <div className="mb-2">
+        <label htmlFor="labels" className="form-label">
+          Label Pool
+        </label>
+        <select
+          className="form-select form-select-sm"
+          id="labels"
+          name="labels"
+          value={component.labels}
+          onChange={handleChange}
+        >
+          {Object.keys(labelsJSON).map(key => (
+            <option key={key} value={key}>
+              {key}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="mb-2">
+        <label htmlFor="elementId" className="form-label">
+          Element (Item / Equipment / Others)
+        </label>
+        <select
+          className="form-select form-select-sm"
+          id="elementId"
+          name="elementId"
+          value={component.elementId}
+          onChange={handleChange}
+        >
+          {elementsJSON.map(element => (
+            <option key={element.id} value={element.id}>
+              {element.displayName}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="row">
+        <div className="col-6 mb-2">
+          <label htmlFor="hintNumber" className="form-label">
+            Number of Hints
+          </label>
+          <input
+            type="number"
+            id="hintNumber"
+            name="hintNumber"
+            className="form-control form-control-sm"
+            placeholder="Hint Number"
+            value={component.hintNumber}
+            onChange={handleChange}
+            min={1}
+          />
+        </div>
+        <div className="col-6 mb-2">
+          <label htmlFor="columns" className="form-label">
+            Table Columns
+          </label>
+          <input
+            type="number"
+            id="columns"
+            name="columns"
+            className="form-control form-control-sm"
+            placeholder="Table Columns"
+            value={component.columns}
+            onChange={handleChange}
+            min={1}
+          />
+        </div>
+      </div>
+      <div className="row">
+        <div className="col-6 mb-2">
+          <label htmlFor="width" className="form-label">
+            Element Width
+          </label>
+          <input
+            type="number"
+            id="width"
+            name="width"
+            className="form-control form-control-sm"
+            placeholder="Element Width"
+            value={component.width}
+            onChange={handleChange}
+          />
+        </div>
+        <div className="col-6 mb-2">
+          <label htmlFor="padding" className="form-label">
+            Hints Padding
+          </label>
+          <input
+            type="text"
+            id="padding"
+            name="padding"
+            className="form-control form-control-sm"
+            placeholder="Padding for hints"
+            value={component.padding}
+            onChange={handleChange}
+          />
+        </div>
+      </div>
+      <div className="row">
+        <div className="col-12">
+          <label htmlFor="color" className="form-label">
+            Text Color & Background Color
+          </label>
+        </div>
+        <div className="col-6 mb-2">
+          <input
+            type="color"
+            className="form-control form-control-sm"
+            id="color"
+            name="color"
+            title="Choose text color"
+            value={component.color}
+            onChange={handleChange}
+          />
+        </div>
+        <div className="col-6 mb-2">
+          <input
+            type="color"
+            className="form-control form-control-sm"
+            id="backgroundColor"
+            name="backgroundColor"
+            title="Choose background color"
+            value={component.backgroundColor}
+            onChange={handleChange}
+          />
+        </div>
+      </div>
+      {component.hintType === "sometimes" && (
+        <Fragment>
+          <div className="form-check mb-2">
+            <input
+              type="checkbox"
+              className="form-check-input"
+              id="showIcon"
+              name="showIcon"
+              checked={component.showIcon}
+              value={component.showIcon}
+              onChange={handleChange}
+            />
+            <label htmlFor="showIcon" className="form-check-label">
+              Show Icon
+            </label>
+          </div>
+          <div className="form-check mb-2">
+            <input
+              type="checkbox"
+              className="form-check-input"
+              id="inverted"
+              name="inverted"
+              checked={component.inverted}
+              value={component.inverted}
+              onChange={handleChange}
+            />
+            <label htmlFor="inverted" className="form-check-label">
+              Reverse Icon
+            </label>
+          </div>
+        </Fragment>
+      )}
+      {component.hintType === "location" && (
+        <Fragment>
+          <div className="form-check mb-2">
+            <input
+              type="checkbox"
+              className="form-check-input"
+              id="showBoss"
+              name="showBoss"
+              checked={component.showBoss}
+              value={component.showBoss}
+              onChange={handleChange}
+            />
+            <label htmlFor="showBoss" className="form-check-label">
+              Show Boss
+            </label>
+          </div>
+          <div className="form-check mb-2">
+            <input
+              type="checkbox"
+              className="form-check-input"
+              id="showItems"
+              name="showItems"
+              checked={component.showItems}
+              value={component.showItems}
+              onChange={handleChange}
+            />
+            <label htmlFor="showItems" className="form-check-label">
+              Show Items
+            </label>
+          </div>
+        </Fragment>
+      )}
     </Fragment>
   );
 };

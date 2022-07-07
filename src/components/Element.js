@@ -21,6 +21,7 @@ const Element = props => {
     icons = [],
     countConfig = [0, 5], // min, max
     receiver = false, // if draggin overrides item
+    dragCurrent = false, // if dragging should default or drag the current selected
     selectedStartingIndex = 0, // on which of the icons we start
     items = [],
   } = props;
@@ -66,13 +67,29 @@ const Element = props => {
     [icons, type, countConfig, selected, items, itemContext, counter],
   );
 
+  const wheelHandler = useCallback(
+    event => {
+      // event.preventDefault();
+      if (type !== "counter") return;
+
+      const { deltaY } = event;
+      if (deltaY > 0) {
+        setCounter(prev => (prev === countConfig[1] ? prev : ++prev));
+      } else if (deltaY < 0) {
+        setCounter(prev => (prev === countConfig[0] ? prev : --prev));
+      }
+    },
+    [type, countConfig],
+  );
+
   const dragHandler = useCallback(
     event => {
-      const dragIcon = `${baseURL}/icons/${icons[1] || icons[0]}`;
+      let dragIcon = `${baseURL}/icons/${icons[1] || icons[0]}`;
+      if (dragCurrent) dragIcon = `${baseURL}/icons/${icons[selected]}`;
       const item = JSON.stringify({ icon: dragIcon });
       event.dataTransfer.setData("item", item);
     },
-    [icons],
+    [dragCurrent, icons, selected],
   );
 
   const dropHandler = useCallback(
@@ -99,6 +116,7 @@ const Element = props => {
         }}
         onClick={clickHandler}
         onContextMenu={clickHandler}
+        onWheel={wheelHandler}
         onDragStart={dragHandler}
         onDragEnter={e => e.preventDefault()}
         onDragOver={e => e.preventDefault()}
@@ -112,7 +130,7 @@ const Element = props => {
           <Element
             name={`${name}_nested`}
             type="simple"
-            icons={["unknown_16x16.png"]}
+            icons={["unknown_16x16.png", "check_16x16.png"]}
             size={[16, 16]}
             customStyle={nestedStyles}
             receiver
@@ -146,12 +164,32 @@ const ElementLabel = ({ label, labelStartingIndex }) => {
     [label],
   );
 
+  const handleOnClick = useCallback(
+    event => {
+      event.preventDefault();
+      event.stopPropagation();
+      const max = label.length - 1 || 0;
+      if (event.nativeEvent.type === "click") {
+        setIndex(prev => (prev === max ? prev : ++prev));
+      } else if (event.nativeEvent.type === "contextmenu") {
+        setIndex(prev => (prev === 0 ? prev : --prev));
+      }
+    },
+    [label],
+  );
+
   if (!label) return null;
   if (typeof label === "string") {
     return <label className="element-label">{label}</label>;
   } else if (Array.isArray(label)) {
     return (
-      <label className="element-label" onWheel={handleOnWheel}>
+      <label
+        className="element-label"
+        style={{ cursor: "pointer" }}
+        onWheel={handleOnWheel}
+        onClick={handleOnClick}
+        onContextMenu={handleOnClick}
+      >
         {display}
       </label>
     );

@@ -9,7 +9,7 @@ const baseLayout = {
   id: "",
   layoutConfig: {
     name: "",
-    backgroundColor: "#222222",
+    backgroundColor: "#000000",
     width: 300,
     height: 500,
     fontFamily: null,
@@ -30,6 +30,11 @@ function prepareLayout(rawLayout) {
             elementId: "0c44ac338d7249b39271d0b25425b7d9",
             position: [0, 0],
             size: [25, 25],
+            receiver: false,
+            dragCurrent: false,
+            selectedStartingIndex: 0,
+            countConfig: [0, 5],
+            labelStartingIndex: 0,
             ...component,
           };
         case "table":
@@ -54,6 +59,7 @@ function prepareLayout(rawLayout) {
             color: "#ffffff",
             backgroundColor: "#333333",
             showIcon: true,
+            inverted: false,
             ...component,
           };
         case "locationhint":
@@ -66,6 +72,26 @@ function prepareLayout(rawLayout) {
             width: 250,
             color: "#ffffff",
             backgroundColor: "#4a8ab6",
+            showBoss: true,
+            showItems: true,
+            ...component,
+          };
+        case "hinttable":
+          return {
+            id: generateId(),
+            type: "hinttable",
+            elementId: "4c1b24c3e3954038b14f4daa3656e0b5",
+            position: component.position,
+            hintType: "sometimes",
+            hintNumber: 1,
+            columns: 1,
+            width: 200,
+            padding: "2px",
+            labels: "sometimes",
+            color: "#ffffff",
+            backgroundColor: "#333333",
+            showIcon: true,
+            inverted: false,
             showBoss: true,
             showItems: true,
             ...component,
@@ -112,9 +138,13 @@ const Editor = () => {
   };
 
   const handleLayoutSave = useCallback(() => {
-    //pass data from localStorage API to blob
+    // pass data from localStorage API to blob
+    let filename = "HashFrog_Tracker.layout";
+    if (layout.layoutConfig.name) {
+      filename = layout.layoutConfig.name.replace(/ /g, "_");
+    }
     const jsonBlob = new Blob([JSON.stringify(layout)], { type: "text/plain" });
-    FileSaver.saveAs(jsonBlob, `${layout.layoutConfig.name.replace(/ /g, "_")}.json`);
+    FileSaver.saveAs(jsonBlob, `${filename}.json`);
   }, [layout]);
 
   return (
@@ -175,7 +205,7 @@ const Editor = () => {
           </div>
         </div>
         <div className="col-md-8">
-          {layout.id && <Layout layout={layout} hideFooter />}
+          {layout.id && <Layout layout={layout} editing hideFooter />}
           {!layout.id && (
             <div className="card card-dark">
               <div className="card-body">

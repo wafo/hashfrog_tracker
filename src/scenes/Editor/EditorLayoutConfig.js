@@ -79,6 +79,11 @@ const EditorLayoutConfig = ({ layoutConfig, setLayoutConfig }) => {
           </div>
         </div>
       </div>
+      <div className="row">
+        <div className="col">
+          <p className="uuid">The faint dashed border around the layout is only there when editing.</p>
+        </div>
+      </div>
     </Fragment>
   );
 };

@@ -60,18 +60,20 @@ const EditorComponentsList = ({ components, setLayout }) => {
         </button>
       </div>
       {component && <EditorComponent component={component} setComponent={setComponent} />}
-      <ul className="list-unstyled">
-        {components.length < 1 && <li className="uuid my-2">Add a component to start</li>}
-        {!component &&
-          components.length > 0 &&
-          components.map(component => (
-            <li key={component.id}>
-              <button type="button" className="btn btn-dark btn-sm" onClick={() => setComponent(component)}>
-                {component.type} - {component.displayName || component.id.substring(0, 12)}
-              </button>
-            </li>
-          ))}
-      </ul>
+      {!component && components.length < 1 && <p className="uuid my-2">Add a component to start</p>}
+      {!component && components.length > 1 && (
+        <ul className="list-unstyled mb-0">
+          {!component &&
+            components.length > 0 &&
+            components.map(component => (
+              <li key={component.id}>
+                <button type="button" className="btn btn-dark btn-sm" onClick={() => setComponent(component)}>
+                  {component.type || "undefined"} - {component.displayName || component.id.substring(0, 12)}
+                </button>
+              </li>
+            ))}
+        </ul>
+      )}
     </div>
   );
 };

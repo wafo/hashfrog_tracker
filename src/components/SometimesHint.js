@@ -14,6 +14,7 @@ const SometimesHint = props => {
     showIcon = true, // Hides the icon
     color = "#ffffff", // font color
     backgroundColor = "#333333", // background color for input
+    inverted = false, // switch place of the icon/item
   } = props;
 
   const memoizedOptions = useMemo(() => {
@@ -25,7 +26,7 @@ const SometimesHint = props => {
   }, [options, labels]);
 
   return (
-    <div style={{ width, display: "flex" }}>
+    <div style={{ width, display: "flex", flexDirection: inverted ? "row-reverse" : "row" }}>
       <CustomReactSelect
         id={`sometimes_input_${id}`}
         name={`sometimes_input_${name}`}
@@ -40,7 +41,7 @@ const SometimesHint = props => {
           type="simple"
           size={[20, 20]}
           icons={icons || ["hash_frog_bw_32x32.png"]}
-          customStyle={{ marginLeft: "0.25rem" }}
+          customStyle={inverted ? { marginRight: "0.25rem" } : { marginLeft: "0.25rem" }}
           receiver
         />
       )}

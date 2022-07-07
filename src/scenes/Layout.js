@@ -8,6 +8,7 @@ import LocationHint from "../components/LocationHint";
 import SometimesHint from "../components/SometimesHint";
 // Data
 import elementsJSON from "../data/elements.json";
+import HintsTable from "../components/HintsTable";
 
 const Layout = props => {
   useEffect(() => {
@@ -33,7 +34,16 @@ const Layout = props => {
           const [top, left] = component.position;
           return (
             <div key={component.id} className="layout-component" style={{ top, left }}>
-              <Element {...element} size={component.size} />
+              <Element
+                {...element}
+                id={component.id}
+                size={component.size}
+                receiver={component.receiver}
+                dragCurrent={component.dragCurrent}
+                selectedStartingIndex={component.selectedStartingIndex}
+                countConfig={component.countConfig}
+                labelStartingIndex={component.labelStartingIndex}
+              />
             </div>
           );
         }
@@ -45,6 +55,7 @@ const Layout = props => {
           return (
             <div key={component.id} className="layout-component" style={{ top, left }}>
               <ElementsTable
+                id={component.id}
                 elements={elements}
                 elementsSize={component.elementsSize}
                 columns={component.columns}
@@ -59,12 +70,14 @@ const Layout = props => {
           return (
             <div key={component.id} className="layout-component" style={{ top, left }}>
               <SometimesHint
+                id={component.id}
                 width={component.width}
                 color={component.color}
                 backgroundColor={component.backgroundColor}
                 icons={element.icons}
                 labels={component.labels}
                 showIcon={component.showIcon}
+                inverted={component.inverted}
               />
             </div>
           );
@@ -75,6 +88,7 @@ const Layout = props => {
           return (
             <div key={component.id} className="layout-component" style={{ top, left }}>
               <LocationHint
+                id={component.id}
                 width={component.width}
                 color={component.color}
                 backgroundColor={component.backgroundColor}
@@ -85,22 +99,51 @@ const Layout = props => {
             </div>
           );
         }
+        case "hinttable": {
+          const element = elementsJSON.find(x => x.id === component.elementId);
+          const [top, left] = component.position;
+          return (
+            <div key={component.id} className="layout-component" style={{ top, left }}>
+              <HintsTable
+                id={component.id}
+                hintType={component.hintType}
+                hintNumber={component.hintNumber}
+                columns={component.columns}
+                width={component.width}
+                padding={component.padding}
+                labels={component.labels}
+                color={component.color}
+                backgroundColor={component.backgroundColor}
+                icons={element.icons}
+                showIcon={component.showIcon}
+                inverted={component.inverted}
+                showBoss={component.showBoss}
+                showItems={component.showItems}
+              />
+            </div>
+          );
+        }
         default:
           return null;
       }
     });
   }, [renderLayout.components]);
 
+  const layoutStyles = useMemo(() => {
+    const styles = {
+      width: layoutConfig.width,
+      height: layoutConfig.height,
+      backgroundColor: layoutConfig.backgroundColor,
+    };
+    if (props.editing) {
+      styles.border = "1px dashed #ffff0025";
+    }
+    return styles;
+  }, [props.editing, layoutConfig]);
+
   return (
     <div className="layout">
-      <div
-        className="layout-content"
-        style={{
-          width: layoutConfig.width,
-          height: layoutConfig.height,
-          backgroundColor: layoutConfig.backgroundColor,
-        }}
-      >
+      <div className="layout-content" style={layoutStyles}>
         {toRender}
       </div>
       {!props.hideFooter && <Footer showGitHub={false} opacity={0.5} />}

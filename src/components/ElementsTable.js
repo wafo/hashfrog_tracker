@@ -1,15 +1,6 @@
 import { Fragment, useMemo } from "react";
+import { splitIntoChunk } from "../utils/utils";
 import Element from "./Element";
-
-function splitIntoChunk(arr, chunk) {
-  let chunks = [];
-  for (let i = 0; i < arr.length; i += chunk) {
-    let tempArray;
-    tempArray = arr.slice(i, i + chunk);
-    chunks.push(tempArray);
-  }
-  return chunks;
-}
 
 const ElementsTable = props => {
   const {
