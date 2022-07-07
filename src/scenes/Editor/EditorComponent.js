@@ -651,6 +651,9 @@ const SometimeshintEditor = ({ component, handleChange }) => {
             onChange={handleChange}
           />
         </div>
+        <div className="col">
+          <p className="uuid">Wheel Click changes the hue of background color.</p>
+        </div>
       </div>
       <div className="form-check mb-2">
         <input
@@ -764,6 +767,9 @@ const LocationhintEditor = ({ component, handleChange }) => {
             value={component.backgroundColor}
             onChange={handleChange}
           />
+        </div>
+        <div className="col">
+          <p className="uuid">Wheel Click changes the hue of background color.</p>
         </div>
       </div>
       <div className="form-check mb-2">
@@ -947,6 +953,9 @@ const HintTableEditor = ({ component, handleChange }) => {
             value={component.backgroundColor}
             onChange={handleChange}
           />
+        </div>
+        <div className="col">
+          <p className="uuid">Wheel Click changes the hue of background color.</p>
         </div>
       </div>
       {component.hintType === "sometimes" && (
