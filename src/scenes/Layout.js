@@ -9,6 +9,7 @@ import SometimesHint from "../components/SometimesHint";
 // Data
 import elementsJSON from "../data/elements.json";
 import HintsTable from "../components/HintsTable";
+import Label from "../components/Label";
 
 const Layout = props => {
   useEffect(() => {
@@ -119,6 +120,21 @@ const Layout = props => {
                 inverted={component.inverted}
                 showBoss={component.showBoss}
                 showItems={component.showItems}
+              />
+            </div>
+          );
+        }
+        case "label": {
+          const [top, left] = component.position;
+          return (
+            <div key={component.id} className="layout-component" style={{ top, left }}>
+              <Label
+                id={component.id}
+                color={component.color}
+                backgroundColor={component.backgroundColor}
+                padding={component.padding}
+                text={component.text}
+                fontSize={component.fontSize}
               />
             </div>
           );

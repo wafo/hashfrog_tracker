@@ -100,6 +100,18 @@ const EditorComponent = ({ component, setComponent }) => {
             showItems: true,
           });
           break;
+        case "label":
+          setComponent({
+            id: component.id,
+            type: "label",
+            position: component.position,
+            color: "#ffffff",
+            backgroundColor: "#000000",
+            padding: "2px",
+            text: "Label Text",
+            fontSize: "12px",
+          });
+          break;
         default:
           break;
       }
@@ -204,6 +216,7 @@ const EditorComponent = ({ component, setComponent }) => {
           <option value="sometimeshint">Sometimes Hint</option>
           <option value="locationhint">Location Hint</option>
           <option value="hinttable">Table of Hints</option>
+          <option value="label">Label</option>
         </select>
       </div>
       <div className="col mb-2">
@@ -237,6 +250,7 @@ const EditorComponent = ({ component, setComponent }) => {
       {type === "sometimeshint" && <SometimeshintEditor component={component} handleChange={handleChange} />}
       {type === "locationhint" && <LocationhintEditor component={component} handleChange={handleChange} />}
       {type === "hinttable" && <HintTableEditor component={component} handleChange={handleChange} />}
+      {type === "label" && <LabelEditor component={component} handleChange={handleChange} />}
     </Fragment>
   );
 };
@@ -902,6 +916,9 @@ const HintTableEditor = ({ component, handleChange }) => {
             onChange={handleChange}
           />
         </div>
+        <div className="col-12">
+          <p className="uuid">In CSS Padding format</p>
+        </div>
       </div>
       <div className="row">
         <div className="col-12">
@@ -996,6 +1013,89 @@ const HintTableEditor = ({ component, handleChange }) => {
           </div>
         </Fragment>
       )}
+    </Fragment>
+  );
+};
+
+const LabelEditor = ({ component, handleChange }) => {
+  return (
+    <Fragment>
+      <div className="mb-2">
+        <label htmlFor="text" className="form-label">
+          Label Text
+        </label>
+        <input
+          type="text"
+          id="text"
+          name="text"
+          className="form-control form-control-sm"
+          placeholder="Label Text"
+          value={component.text}
+          onChange={handleChange}
+        />
+      </div>
+      <div className="row">
+        <div className="col-6 mb-2">
+          <label htmlFor="fontSize" className="form-label">
+            Font Size
+          </label>
+          <input
+            type="text"
+            id="fontSize"
+            name="fontSize"
+            className="form-control form-control-sm"
+            placeholder="Font Size"
+            value={component.fontSize}
+            onChange={handleChange}
+          />
+        </div>
+        <div className="col-6 mb-2">
+          <label htmlFor="padding" className="form-label">
+            Label Padding
+          </label>
+          <input
+            type="text"
+            id="padding"
+            name="padding"
+            className="form-control form-control-sm"
+            placeholder="Padding for Label"
+            value={component.padding}
+            onChange={handleChange}
+          />
+        </div>
+        <div className="col">
+          <p className="uuid">Both font size and padding accept CSS format.</p>
+        </div>
+      </div>
+      <div className="row">
+        <div className="col-12">
+          <label htmlFor="color" className="form-label">
+            Text Color & Background Color
+          </label>
+        </div>
+        <div className="col-6 mb-2">
+          <input
+            type="color"
+            className="form-control form-control-sm"
+            id="color"
+            name="color"
+            title="Choose text color"
+            value={component.color}
+            onChange={handleChange}
+          />
+        </div>
+        <div className="col-6 mb-2">
+          <input
+            type="color"
+            className="form-control form-control-sm"
+            id="backgroundColor"
+            name="backgroundColor"
+            title="Choose background color"
+            value={component.backgroundColor}
+            onChange={handleChange}
+          />
+        </div>
+      </div>
     </Fragment>
   );
 };

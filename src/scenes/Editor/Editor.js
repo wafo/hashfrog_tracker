@@ -96,6 +96,18 @@ function prepareLayout(rawLayout) {
             showItems: true,
             ...component,
           };
+        case "label":
+          return {
+            id: generateId(),
+            type: "label",
+            position: component.position,
+            color: "#ffffff",
+            backgroundColor: "#000000",
+            padding: "2px",
+            text: "",
+            fontSize: "12px",
+            ...component,
+          };
         default:
           return component;
       }

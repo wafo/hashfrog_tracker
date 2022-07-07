@@ -61,7 +61,7 @@ const EditorComponentsList = ({ components, setLayout }) => {
       </div>
       {component && <EditorComponent component={component} setComponent={setComponent} />}
       {!component && components.length < 1 && <p className="uuid my-2">Add a component to start</p>}
-      {!component && components.length > 1 && (
+      {!component && components.length > 0 && (
         <ul className="list-unstyled mb-0">
           {!component &&
             components.length > 0 &&

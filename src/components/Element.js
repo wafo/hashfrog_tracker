@@ -12,6 +12,7 @@ const nestedStyles = {
 
 const Element = props => {
   const {
+    id = "7d6ff858445845e5b95db3254e34b0dc",
     name = "Item",
     label = "",
     labelStartingIndex = 0,
@@ -107,7 +108,7 @@ const Element = props => {
   return (
     <Fragment>
       <div
-        id={name}
+        id={id}
         className="element"
         style={{
           width: size[0],
