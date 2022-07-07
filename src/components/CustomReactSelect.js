@@ -23,6 +23,7 @@ const CustomReactSelect = props => {
         minHeight: "20px",
         borderColor: backgroundColor,
         color: color,
+        filter: `hue-rotate(${hueRotate}deg)`
       }),
       indicatorsContainer: () => ({
         display: "none",
@@ -59,7 +60,7 @@ const CustomReactSelect = props => {
         backgroundColor: backgroundColor,
       }),
     };
-  }, [color, backgroundColor]);
+  }, [color, backgroundColor, hueRotate]);
 
   const handleRightClick = event => {
     event.preventDefault();
@@ -104,7 +105,7 @@ const CustomReactSelect = props => {
     <div
       onContextMenu={handleRightClick}
       onAuxClick={handleOnClick}
-      style={{ flex: 1, filter: `hue-rotate(${hueRotate}deg)` }}
+      style={{ flex: 1 }}
     >
       <Select
         id={id}
