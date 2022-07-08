@@ -7,7 +7,7 @@ const nestedStyles = {
   position: "absolute",
   left: "50%",
   transform: "translate(-50%, 0)",
-  bottom: "0px",
+  bottom: "-6px",
 };
 
 const Element = props => {
@@ -40,6 +40,7 @@ const Element = props => {
   const clickHandler = useCallback(
     event => {
       event.preventDefault();
+      event.stopPropagation();
 
       const isCounter = !["simple", "nested", "label"].includes(type);
       let updated = isCounter ? counter : selected;
