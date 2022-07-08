@@ -14,11 +14,11 @@ const TrackerLauncher = () => {
     } = layout;
 
     // Default padding to layouts
-    let widthPadding = 15;
-    let heightPadding = 60;
+    let widthPadding = 0;
+    let heightPadding = 25;
     if (checks) {
       widthPadding = 285;
-      heightPadding = 60;
+      heightPadding = 25;
     }
 
     return {

@@ -162,7 +162,7 @@ const Layout = props => {
       <div className="layout-content" style={layoutStyles}>
         {toRender}
       </div>
-      {!props.hideFooter && <Footer showGitHub={false} opacity={0.5} />}
+      {!props.hideFooter && <div className="ps-1"><Footer showGitHub={false} opacity={0.5} /></div>}
     </div>
   );
 };

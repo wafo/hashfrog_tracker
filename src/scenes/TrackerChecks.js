@@ -1,5 +1,6 @@
 import Checks from "./Checks";
 import Layout from "./Layout";
+import "../noscroll.css";
 
 const TrackerChecks = () => {
   return (
