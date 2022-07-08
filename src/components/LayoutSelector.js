@@ -5,8 +5,8 @@ import { readFileAsText } from "../utils/utils";
 import FileSaver from "file-saver";
 
 // Layouts
-import standardDefaultJSON from "../layouts/standard_default.layout.json";
-import standardWeeklyJSON from "../layouts/standard_weekly.layout.json";
+import standardPathJSON from "../layouts/standard_path.layout.json";
+import standardWothJSON from "../layouts/standard_woth.layout.json";
 import scrubsS4JSON from "../layouts/scrubs_s4.layout.json";
 
 const LayoutSelector = () => {
@@ -38,17 +38,17 @@ const LayoutSelector = () => {
   const downloadLayout = selected => {
     let layout = null;
     switch (selected) {
-      case "standard":
-        layout = standardDefaultJSON;
+      case "path":
+        layout = standardPathJSON;
         break;
-      case "weekly":
-        layout = standardWeeklyJSON;
+      case "woth":
+        layout = standardWothJSON;
         break;
       case "scrubs":
         layout = scrubsS4JSON;
         break;
       default:
-        layout = standardDefaultJSON;
+        layout = standardPathJSON;
         break;
     }
     const jsonBlob = new Blob([JSON.stringify(layout)], { type: "text/plain" });
@@ -83,13 +83,13 @@ const LayoutSelector = () => {
       <h5>Layout Presets</h5>
       <ul className="list-unstyled">
         <li>
-          <button type="button" className="btn btn-link btm-sm p-0" onClick={() => downloadLayout("standard")}>
-            Standard - Default
+          <button type="button" className="btn btn-link btm-sm p-0" onClick={() => downloadLayout("path")}>
+            Standard - Path
           </button>
         </li>
         <li>
-          <button type="button" className="btn btn-link btm-sm p-0" onClick={() => downloadLayout("weekly")}>
-            Standard - Weekly
+          <button type="button" className="btn btn-link btm-sm p-0" onClick={() => downloadLayout("woth")}>
+            Standard - WOTH
           </button>
         </li>
         <li>
