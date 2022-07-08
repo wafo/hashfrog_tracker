@@ -378,7 +378,7 @@
     "name": "master_sword",
     "displayName": "Master Sword",
     "size": [25, 25],
-    "selectedStartingIndex": 1,
+    "selectedStartingIndex": 0,
     "icons": ["master_sword_bw_32x32.png", "master_sword_32x32.png"],
     "items": [null, "c50e8543ab0c4bdaa8a23e6a80ae6d1c"]
   },
