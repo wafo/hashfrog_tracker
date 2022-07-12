@@ -1,9 +1,10 @@
-import Checks from "./Checks/Checks";
-import Layout from "./Layout/Layout";
+import Checks from "./Checks";
+import Layout from "./Layout";
+import "../noscroll.css";
 
 const TrackerChecks = () => {
   return (
-    <div style={{ display: "flex", justifyContent: "space-between" }}>
+    <div className="d-flex justify-content-between">
       <Layout />
       <Checks />
     </div>

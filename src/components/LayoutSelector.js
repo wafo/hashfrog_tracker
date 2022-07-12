@@ -5,8 +5,8 @@ import { readFileAsText } from "../utils/utils";
 import FileSaver from "file-saver";
 
 // Layouts
-import standardDefaultJSON from "../layouts/standard_default.layout.json";
-import standardWeeklyJSON from "../layouts/standard_weekly.layout.json";
+import standardPathJSON from "../layouts/standard_path.layout.json";
+import standardWothJSON from "../layouts/standard_woth.layout.json";
 import scrubsS4JSON from "../layouts/scrubs_s4.layout.json";
 
 const LayoutSelector = () => {
@@ -38,46 +38,62 @@ const LayoutSelector = () => {
   const downloadLayout = selected => {
     let layout = null;
     switch (selected) {
-      case "standard":
-        layout = standardDefaultJSON;
+      case "path":
+        layout = standardPathJSON;
         break;
-      case "weekly":
-        layout = standardWeeklyJSON;
+      case "woth":
+        layout = standardWothJSON;
         break;
       case "scrubs":
         layout = scrubsS4JSON;
         break;
       default:
-        layout = standardDefaultJSON;
+        layout = standardPathJSON;
         break;
     }
     const jsonBlob = new Blob([JSON.stringify(layout)], { type: "text/plain" });
-    FileSaver.saveAs(jsonBlob, `${layout.layoutConfig.name.replace(/ /g,"_")}.json`);
+    FileSaver.saveAs(jsonBlob, `${layout.layoutConfig.name.replace(/ /g, "_")}.json`);
   };
 
   return (
-    <div className="form-control">
-      <label htmlFor="layout-selector">Layout JSON File</label>
-      <input key={key} type="file" id="layout-selector" onChange={handleInputChange} accept=".json" />
-      <button type="button" style={{ width: "87px" }} onClick={resetLayout}>
-        Reset
-      </button>
-      <p>Current layout: {layout.layoutConfig.name}</p>
-      <Link to="/editor">Go to editor</Link>
-      <p>Layout presets:</p>
-      <ul style={{ fontSize: "0.85em", margin: 0, padding: "0 1rem" }}>
+    <div className="">
+      <div className="mb-2">
+        <label htmlFor="layout-selector" className="form-label">
+          Layout JSON File
+        </label>
+        <input
+          key={key}
+          className="form-control form-control-sm"
+          type="file"
+          id="layout-selector"
+          onChange={handleInputChange}
+          accept=".json"
+        />
+      </div>
+      <div className="mb-2">
+        <Link to="/editor" className="btn btn-light btn-sm w-25 me-2">
+          Editor
+        </Link>
+        <button type="button" className="btn btn-light btn-sm w-25" onClick={resetLayout}>
+          Reset
+        </button>
+      </div>
+      <p className="m-0 mb-2">Current layout: {layout.layoutConfig.name}</p>
+
+      <h5>Layout Presets</h5>
+      <ul className="list-unstyled">
         <li>
-          <button type="button" className="btn-link" onClick={() => downloadLayout("standard")}>
-            Standard - Default
+          <button type="button" className="btn btn-link btm-sm p-0" onClick={() => downloadLayout("path")}>
+            Standard - Path
           </button>
         </li>
         <li>
-          <button type="button" className="btn-link" onClick={() => downloadLayout("weekly")}>
-            Standard - Weekly
+          <button type="button" className="btn btn-link btm-sm p-0" onClick={() => downloadLayout("woth")}>
+            Standard - WOTH
           </button>
         </li>
         <li>
-          <button type="button" className="btn-link" onClick={() => downloadLayout("scrubs")}>
+          <button type="button" className="btn btn-link btm-sm p-0" onClick={() => downloadLayout("scrubs")}>
             Scrubs - S4
           </button>
         </li>

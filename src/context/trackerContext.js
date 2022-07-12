@@ -65,7 +65,7 @@ const TrackerContext = createContext();
 
 function parseItems(items_list) {
   const items = { ...defaultItems };
-  items_list.forEach((item) => {
+  items_list.forEach(item => {
     // Songs
     if (item === "2801c2b994864757a2363fbb053076db") items.zelda = true;
     if (item === "96ebae804a3143438c2cfbc7680c464f") items.epona = true;
@@ -112,6 +112,10 @@ function parseItems(items_list) {
     }
     if (item === "bad09131f88a440093087e11efc1c8b0") items.iron_boots = true;
     if (item === "33f4bc4c632846bea5fb88573f2f95b2") items.hover_boots = true;
+    if (item === "2c5c72812a6b49c68bb49773e6d3dd98") {
+      items.iron_boots = true;
+      items.hover_boots = true;
+    }
     if (item === "5c3d12eba0814d87a362202d03ffcdeb") items.strength_1 = true;
     if (item === "0ff0a90a20d54a42b4fa4721c63d357c") {
       items.strength_1 = true;
@@ -123,24 +127,15 @@ function parseItems(items_list) {
       items.strength_3 = true;
     }
     // Medallions
-    if (item === "2c592d344777457f87c1507845864418")
-      items.medallion_green = true;
+    if (item === "2c592d344777457f87c1507845864418") items.medallion_green = true;
     if (item === "880f118d9f80482cb5e3a5091917d965") items.medallion_red = true;
-    if (item === "4e77495743cd44919d4c06061536b445")
-      items.medallion_blue = true;
-    if (item === "099497c5610a43659bd2d31aee5d7250")
-      items.medallion_purple = true;
-    if (item === "9e57725a38d344cfa2f5ebd41c953c71")
-      items.medallion_orange = true;
+    if (item === "4e77495743cd44919d4c06061536b445") items.medallion_blue = true;
+    if (item === "099497c5610a43659bd2d31aee5d7250") items.medallion_purple = true;
+    if (item === "9e57725a38d344cfa2f5ebd41c953c71") items.medallion_orange = true;
   });
 
   // Extra
-  if (
-    items.bombs ||
-    items.bow ||
-    items.strength_1 ||
-    (items.bolero && (items.hover_boots || items.hookshot))
-  ) {
+  if (items.bombs || items.bow || items.strength_1 || (items.bolero && (items.hover_boots || items.hookshot))) {
     items.dmc_entrance = true;
   }
   if (items.bombs || items.scale) {
@@ -188,7 +183,7 @@ function reducer(state, action) {
   switch (action.type) {
     case "CHECK_MARK": {
       // Finding check
-      const checkIndex = state.checks.findIndex((x) => x.id === action.payload);
+      const checkIndex = state.checks.findIndex(x => x.id === action.payload);
       if (checkIndex === -1) return state;
       // Manipulating check
       const check = { ...state.checks[checkIndex] };
@@ -205,9 +200,7 @@ function reducer(state, action) {
     case "ITEM_MARK": {
       const { items, item } = action.payload;
       // Preping collecting items
-      const items_list = [
-        ...state.items_list.filter((x) => !items.includes(x)),
-      ];
+      const items_list = [...state.items_list.filter(x => !items.includes(x))];
       if (item) items_list.push(item);
       const parsedItems = parseItems(items_list);
       // Validating checks based on items collected
@@ -257,9 +250,9 @@ const useCheck = () => {
 
   const actions = useMemo(
     () => ({
-      markCheck: (id) => dispatch({ type: "CHECK_MARK", payload: id }),
+      markCheck: id => dispatch({ type: "CHECK_MARK", payload: id }),
     }),
-    [dispatch]
+    [dispatch],
   );
 
   return [actions];
@@ -270,10 +263,9 @@ const useItem = () => {
 
   const actions = useMemo(
     () => ({
-      markItem: (items, item) =>
-        dispatch({ type: "ITEM_MARK", payload: { items, item } }),
+      markItem: (items, item) => dispatch({ type: "ITEM_MARK", payload: { items, item } }),
     }),
-    [dispatch]
+    [dispatch],
   );
 
   return actions;

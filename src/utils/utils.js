@@ -13,3 +13,13 @@ export async function readFileAsText(file) {
 export function generateId() {
   return uuidv4().replace(/-/g, "");
 }
+
+export function splitIntoChunk(arr, chunk) {
+  let chunks = [];
+  for (let i = 0; i < arr.length; i += chunk) {
+    let tempArray;
+    tempArray = arr.slice(i, i + chunk);
+    chunks.push(tempArray);
+  }
+  return chunks;
+}

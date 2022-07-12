@@ -1,6 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
-import { useCheck, useChecks } from "../../context/trackerContext";
-import styles from "./Checks.module.css";
+import { useCheck, useChecks } from "../context/trackerContext";
 
 const Checks = () => {
   const { checks, locations } = useChecks();
@@ -15,7 +14,7 @@ const Checks = () => {
       remaining: 0,
     };
 
-    checks.forEach((check) => {
+    checks.forEach(check => {
       if (check.available && !check.checked) counter.available += 1;
       if (!check.available) counter.locked += 1;
       if (check.checked) counter.checked += 1;
@@ -25,8 +24,8 @@ const Checks = () => {
     return counter;
   }, [checks]);
 
-  const handleLocationClick = (id) => {
-    setSelected((prev) => (prev === id ? null : id));
+  const handleLocationClick = id => {
+    setSelected(prev => (prev === id ? null : id));
   };
 
   useEffect(() => {
@@ -40,7 +39,7 @@ const Checks = () => {
       return acc;
     }, {});
 
-    let locationsByType = locations.filter((x) => x.type === type);
+    let locationsByType = locations.filter(x => x.type === type);
 
     return locationsByType.reduce((acc, loc) => {
       loc.checks = checksByLocation[loc.id];
@@ -48,7 +47,7 @@ const Checks = () => {
       loc.locked = 0;
       loc.checked = 0;
 
-      loc.checks.forEach((check) => {
+      loc.checks.forEach(check => {
         if (check.available && !check.checked) loc.available += 1;
         if (!check.available) loc.locked += 1;
         if (check.checked) loc.checked += 1;
@@ -61,17 +60,17 @@ const Checks = () => {
 
   const location = useMemo(() => {
     if (!selected) return null;
-    const location = locationsByType.find((x) => x.id === selected);
+    const location = locationsByType.find(x => x.id === selected);
     return location;
   }, [locationsByType, selected]);
 
   return (
-    <div id="checks" style={{ width: "250px" }} className={styles.checks}>
+    <div id="checks" className="check-tracker">
       <Buttons type={type} setType={setType} />
       {location && <Location location={location} setSelected={setSelected} />}
       {!location && (
-        <div className={styles.locations}>
-          {locationsByType.map((loc) => {
+        <div className="check-tracker-locations">
+          {locationsByType.map(loc => {
             const style = {};
             if ((loc.available === 0 && loc.locked === 0) || loc.checked >= loc.checks.length) {
               style.opacity = "0.75";
@@ -80,11 +79,12 @@ const Checks = () => {
               if (loc.available > 0) style.borderLeftColor = "#198754";
             }
             return (
-              <div key={loc.id} className={styles.locations_item}>
+              <div key={loc.id} className="item">
                 <button
                   type="button"
+                  className="btn btn-dark btn-sm"
                   onClick={() => handleLocationClick(loc.id)}
-                  onContextMenu={(e) => e.preventDefault()}
+                  onContextMenu={e => e.preventDefault()}
                   style={style}
                 >
                   <span>{loc.short_label}</span>
@@ -101,11 +101,11 @@ const Checks = () => {
 
 const Buttons = ({ setType }) => {
   return (
-    <div className={styles.buttons}>
-      <button type="button" className="" onClick={() => setType("overworld")}>
+    <div className="buttons mb-2">
+      <button type="button" className="btn btn-dark btn-sm me-1" onClick={() => setType("overworld")}>
         Overworld
       </button>
-      <button type="button" className="" onClick={() => setType("dungeon")} disabled>
+      <button type="button" className="btn btn-dark btn-sm" onClick={() => setType("dungeon")} disabled>
         Dungeons
       </button>
     </div>
@@ -116,23 +116,23 @@ const Location = ({ location, setSelected }) => {
   const [actions] = useCheck();
 
   return (
-    <div className={styles.location}>
-      <button type="button" onClick={() => setSelected(null)}>
+    <div className="check-tracker-location">
+      <button type="button" className="btn btn-dark btn-sm py-0 mb-2" onClick={() => setSelected(null)}>
         Back
       </button>
-      <ul className={styles.checks}>
-        {location.checks.map((check) => {
+      <ul className="check-list">
+        {location.checks.map(check => {
           const style = {};
           if (check.checked) style.textDecoration = "line-through";
           if (!check.available) style.opacity = "0.5";
 
           return (
-            <li key={check.id} className={styles.check}>
+            <li key={check.id} className="check">
               <button
                 type="button"
                 style={style}
                 onClick={() => actions.markCheck(check.id)}
-                onContextMenu={(e) => {
+                onContextMenu={e => {
                   e.preventDefault();
                   actions.markCheck(check.id);
                 }}
@@ -149,7 +149,7 @@ const Location = ({ location, setSelected }) => {
 
 const Info = ({ counter }) => {
   return (
-    <div className={styles.info}>
+    <div className="info">
       <table>
         <tbody>
           <tr>
