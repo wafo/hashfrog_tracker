@@ -205,7 +205,7 @@ const EditorComponent = ({ component, setComponent }) => {
       </div>
       <div className="mb-2">
         <label htmlFor="" className="form-label">
-          Element Type
+          Component Type
         </label>
         <select className="form-select form-select-sm" id="type" name="type" value={type} onChange={handleTypeChange}>
           <option value="" disabled>
@@ -221,7 +221,7 @@ const EditorComponent = ({ component, setComponent }) => {
       </div>
       <div className="col mb-2">
         <label htmlFor="width" className="form-label">
-          Element Position
+          Component Position
         </label>
         <div className="input-group input-group-sm ">
           <input
@@ -611,7 +611,7 @@ const SometimeshintEditor = ({ component, handleChange }) => {
       </div>
       <div className="mb-2">
         <label htmlFor="width" className="form-label">
-          Element Width
+          Component Width
         </label>
         <input
           type="number"
@@ -728,7 +728,7 @@ const LocationhintEditor = ({ component, handleChange }) => {
       </div>
       <div className="mb-2">
         <label htmlFor="width" className="form-label">
-          Element Width
+          Component Width
         </label>
         <input
           type="number"

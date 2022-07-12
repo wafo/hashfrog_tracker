@@ -195,14 +195,14 @@ const Editor = () => {
                       className={`btn btn-sm ${tab === 0 ? "btn-light" : "btn-dark"}`}
                       onClick={() => setTab(0)}
                     >
-                      Layout Config
+                      Layout
                     </button>
                     <button
                       type="button"
                       className={`btn btn-sm ${tab === 1 ? "btn-light" : "btn-dark"}`}
                       onClick={() => setTab(1)}
                     >
-                      Components Config
+                      Components
                     </button>
                   </div>
                   <div style={{ display: tab === 0 ? "unset" : "none" }}>
