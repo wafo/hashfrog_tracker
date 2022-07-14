@@ -13,19 +13,9 @@ const LocationHint = (props) => {
     color = "#ffff00", // font color
     backgroundColor = "#333", // background color for input
     showBoss = true, // Show or not the left boss icon
-    bossIcons = [
-      "boss_na_25x25.png",
-      "boss_go_25x25.png",
-      "boss_do_25x25.png",
-      "boss_ba_25x25.png",
-      "boss_pg_25x25.png",
-      "boss_vo_25x25.png",
-      "boss_mo_25x25.png",
-      "boss_bo_25x25.png",
-      "boss_tw_25x25.png",
-    ], // to override the boss icons
+    bossIcons = [], // to override the boss icons
     showItems = true, // Show or not the right icons
-    itemsIcons = ["hash_frog_bw_32x32.png"], //
+    itemsIcons = [], //
   } = props;
 
   const [hasValue, setHasValue] = useState(false);
