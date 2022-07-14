@@ -1,4 +1,4 @@
-const { useMemo, useEffect } = require("react");
+import { useCallback, useState, useMemo, useEffect } from "react";
 import { useLayout } from "../context/layoutContext";
 // Components
 import Element from "../components/Element";
@@ -11,13 +11,64 @@ import elementsJSON from "../data/elements.json";
 import HintsTable from "../components/HintsTable";
 import Label from "../components/Label";
 
-const Layout = props => {
-  useEffect(() => {
-    document.title = "HashFrog - Tracker";
-  }, []);
+const baseURL = process.env.PUBLIC_URL;
 
+const Layout = props => {
   const { state: layoutContext } = useLayout();
 
+  /** ************************** */
+  /** CACHE FOR ICONS */
+  /** ************************** */
+  const [cachedIcons, setCachedIcons] = useState(null);
+
+  const getCacheIcons = useCallback(async () => {
+    let icons = elementsJSON.reduce((accumulator, element) => {
+      return [...accumulator, ...element.icons];
+    }, []);
+    icons = [...new Set(icons)];
+
+    icons = await Promise.all(
+      icons.map(icon =>
+        fetch(`${baseURL}/icons/${icon}`)
+          .then(response => response.blob())
+          .then(image => ({
+            icon,
+            image: URL.createObjectURL(image),
+          })),
+      ),
+    );
+    icons = icons.reduce((accumulator, image) => {
+      accumulator[image.icon] = image.image;
+      return accumulator;
+    }, {});
+
+    setCachedIcons(icons);
+    return icons;
+  }, []);
+
+  const getCacheElement = useCallback(
+    id => {
+      // Destructuring to create new element,
+      // otherwise on repeated elements it rips
+      // because on next search it will loop through already cached icons.
+      let element = elementsJSON.find(element => element.name === id || element.id === id);
+      if (!element) return null;
+      element = { ...element };
+      if (!cachedIcons) element.icons = [];
+      if (cachedIcons) element.icons = element.icons.map(icon => cachedIcons[icon]);
+      return element;
+    },
+    [cachedIcons],
+  );
+
+  useEffect(() => {
+    document.title = "HashFrog - Tracker";
+    getCacheIcons();
+  }, [getCacheIcons]);
+
+  /** ************************** */
+  /** RENDERING LAYOUT */
+  /** ************************** */
   const renderLayout = useMemo(() => {
     if (props.layout) return props.layout;
     return layoutContext;
@@ -31,7 +82,7 @@ const Layout = props => {
     return renderLayout.components.map(component => {
       switch (component.type) {
         case "element": {
-          const element = elementsJSON.find(x => x.id === component.elementId);
+          const element = getCacheElement(component.elementId);
           const [top, left] = component.position;
           return (
             <div key={component.id} className="layout-component" style={{ top, left }}>
@@ -49,9 +100,7 @@ const Layout = props => {
           );
         }
         case "table": {
-          const elements = component.elements.map(x => {
-            return elementsJSON.find(element => element.name === x || element.id === x);
-          });
+          const elements = component.elements.map(x => getCacheElement(x));
           const [top, left] = component.position;
           return (
             <div key={component.id} className="layout-component" style={{ top, left }}>
@@ -66,7 +115,7 @@ const Layout = props => {
           );
         }
         case "sometimeshint": {
-          const element = elementsJSON.find(x => x.id === component.elementId);
+          const element = getCacheElement(component.elementId);
           const [top, left] = component.position;
           return (
             <div key={component.id} className="layout-component" style={{ top, left }}>
@@ -84,7 +133,8 @@ const Layout = props => {
           );
         }
         case "locationhint": {
-          const element = elementsJSON.find(x => x.id === component.elementId);
+          const element = getCacheElement(component.elementId);
+          const bossElement = getCacheElement("9e6f493869f84c19b23081bdb92bc621");
           const [top, left] = component.position;
           return (
             <div key={component.id} className="layout-component" style={{ top, left }}>
@@ -95,13 +145,15 @@ const Layout = props => {
                 backgroundColor={component.backgroundColor}
                 showBoss={component.showBoss}
                 showItems={component.showItems}
+                {...(bossElement && bossElement.icons && { bossIcons: bossElement.icons })}
                 {...(element && element.icons && { itemsIcons: element.icons })}
               />
             </div>
           );
         }
         case "hinttable": {
-          const element = elementsJSON.find(x => x.id === component.elementId);
+          const element = getCacheElement(component.elementId);
+          const bossElement = getCacheElement("9e6f493869f84c19b23081bdb92bc621");
           const [top, left] = component.position;
           return (
             <div key={component.id} className="layout-component" style={{ top, left }}>
@@ -116,6 +168,7 @@ const Layout = props => {
                 color={component.color}
                 backgroundColor={component.backgroundColor}
                 icons={element.icons}
+                bossIcons={bossElement.icons}
                 showIcon={component.showIcon}
                 inverted={component.inverted}
                 showBoss={component.showBoss}
@@ -143,7 +196,7 @@ const Layout = props => {
           return null;
       }
     });
-  }, [renderLayout.components]);
+  }, [renderLayout.components, getCacheElement]);
 
   const layoutStyles = useMemo(() => {
     const styles = {
@@ -162,7 +215,11 @@ const Layout = props => {
       <div className="layout-content" style={layoutStyles}>
         {toRender}
       </div>
-      {!props.hideFooter && <div className="ps-1"><Footer showGitHub={false} opacity={0.5} /></div>}
+      {!props.hideFooter && (
+        <div className="ps-1">
+          <Footer showGitHub={false} opacity={0.5} />
+        </div>
+      )}
     </div>
   );
 };

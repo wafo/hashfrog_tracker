@@ -1,7 +1,9 @@
 import { Fragment, useCallback, useMemo, useState } from "react";
 import { useItem } from "../context/trackerContext";
-
-const baseURL = process.env.PUBLIC_URL;
+// Base Icons
+import icon_hashfrog from "../assets/icons/hash_frog_bw_32x32.png";
+import icon_unknown from "../assets/icons/unknown_16x16.png";
+import icon_check from "../assets/icons/check_16x16.png";
 
 const nestedStyles = {
   position: "absolute",
@@ -34,7 +36,7 @@ const Element = props => {
   const [draggedIcon, setDraggedIcon] = useState(null);
 
   const icon = useMemo(() => {
-    return `${baseURL}/icons/${icons[selected]}`;
+    return icons[selected];
   }, [icons, selected]);
 
   const clickHandler = useCallback(
@@ -86,8 +88,8 @@ const Element = props => {
 
   const dragHandler = useCallback(
     event => {
-      let dragIcon = `${baseURL}/icons/${icons[1] || icons[0]}`;
-      if (dragCurrent) dragIcon = `${baseURL}/icons/${icons[selected]}`;
+      let dragIcon = icons[1] || icons[0];
+      if (dragCurrent) dragIcon = icons[selected];
       const item = JSON.stringify({ icon: dragIcon });
       event.dataTransfer.setData("item", item);
     },
@@ -125,14 +127,14 @@ const Element = props => {
         onDrop={dropHandler}
         draggable
       >
-        <img className="element-icon" src={draggedIcon || icon} alt={name} />
+        <img className="element-icon" src={draggedIcon || icon || icon_hashfrog} alt={name} />
         {type === "counter" && <CounterLabel counter={counter} />}
         {type === "label" && <ElementLabel label={label} labelStartingIndex={labelStartingIndex} />}
         {type === "nested" && (
           <Element
             name={`${name}_nested`}
             type="simple"
-            icons={["unknown_16x16.png", "check_16x16.png"]}
+            icons={[icon_unknown, icon_check]}
             size={[16, 16]}
             customStyle={nestedStyles}
             receiver

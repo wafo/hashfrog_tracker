@@ -15,6 +15,7 @@ const HintsTable = props => {
     color = "#ffffff",
     backgroundColor = "#333333",
     icons = [],
+    bossIcons = [],
     // Sometimes only
     showIcon = true, // Hides the icon
     inverted = false, // switch place of the icon/item
@@ -49,6 +50,7 @@ const HintsTable = props => {
               color={color}
               backgroundColor={backgroundColor}
               itemsIcons={icons}
+              bossIcons={bossIcons}
               showBoss={showBoss}
               showItems={showItems}
             />
@@ -71,6 +73,7 @@ const HintsTable = props => {
     backgroundColor,
     padding,
     icons,
+    bossIcons,
     showIcon,
     inverted,
     showBoss,

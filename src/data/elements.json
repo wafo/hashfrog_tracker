@@ -976,5 +976,24 @@
     "icons": ["hash_frog_bw_32x32.png", "sold_out_32x32.png", "light_arrows_32x32.png", "bottle_big_poe_32x32.png"],
     "countConfig": [0, 9],
     "receiver": true
+  },
+  {
+    "id": "9e6f493869f84c19b23081bdb92bc621",
+    "type": "simple",
+    "name": "boss_initials",
+    "displayName": "Boss Initials",
+    "size": [20, 20],
+    "icons": [
+      "boss_na_25x25.png",
+      "boss_go_25x25.png",
+      "boss_do_25x25.png",
+      "boss_ba_25x25.png",
+      "boss_pg_25x25.png",
+      "boss_vo_25x25.png",
+      "boss_mo_25x25.png",
+      "boss_bo_25x25.png",
+      "boss_tw_25x25.png"
+    ],
+    "receiver": false
   }
 ]
