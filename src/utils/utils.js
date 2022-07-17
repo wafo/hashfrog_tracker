@@ -23,3 +23,14 @@ export function splitIntoChunk(arr, chunk) {
   }
   return chunks;
 }
+
+export function cleanJSONString(jsonString) {
+  // Remove comments
+  jsonString = jsonString.replace(/(\/\/.*|\/\*[\s\S]*?\*\/)|(#.*[\s\S]*?)/g, (m, ...args) => {
+    return args.every(x => x === undefined) ? m : "";
+  });
+  // Remove line breaks
+  jsonString = jsonString.replace(/(\r\n|\n|\r)/g, (m, g) => (g ? "" : m));
+  // Return
+  return jsonString;
+}

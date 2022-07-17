@@ -1,6 +1,8 @@
 import { useContext, useReducer, createContext, useMemo } from "react";
 import locationsJSON from "../data/locations.json";
 import checksJSON from "../data/checks.json";
+import { useEffect } from "react";
+import { cleanJSONString } from "../utils/utils";
 
 const defaultItems = {
   // Songs
@@ -226,6 +228,22 @@ function reducer(state, action) {
 
 function TrackerProvider(props) {
   const [state, dispatch] = useReducer(reducer, initialState);
+
+  useEffect(() => {
+    fetch("https://raw.githubusercontent.com/TestRunnerSRL/OoT-Randomizer/master/data/LogicHelpers.json")
+      .then(response => {
+        return response.text();
+      })
+      .then(response => {
+        const jsonString = cleanJSONString(response);
+        const parsedJSON = JSON.parse(jsonString);
+        console.log(parsedJSON);
+        return parsedJSON;
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }, []);
 
   // Implementar local storage?
   return <TrackerContext.Provider value={{ state, dispatch }} {...props} />;
