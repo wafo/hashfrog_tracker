@@ -10,7 +10,7 @@ const SometimesHint = props => {
     options = null, // overrides the options directly
     labels = "sometimes", // uses labels from the json
     width = 150, // In px
-    icons = null, // overrides the default hashfrog icon
+    icons = [], // overrides the default hashfrog icon
     showIcon = true, // Hides the icon
     color = "#ffffff", // font color
     backgroundColor = "#333333", // background color for input
@@ -40,7 +40,7 @@ const SometimesHint = props => {
           name={`sometimes_item_${name}`}
           type="simple"
           size={[20, 20]}
-          icons={icons || ["hash_frog_bw_32x32.png"]}
+          icons={icons}
           customStyle={inverted ? { marginRight: "0.25rem" } : { marginLeft: "0.25rem" }}
           receiver
         />

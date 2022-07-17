@@ -33,6 +33,7 @@ const Welcome = () => {
           </ul>
           <h3>Changelog</h3>
           <ul>
+            <li>0.4.3 - Cached icons for improved performance. No more lag when clicking icons for the first time.</li>
             <li>0.4.2 - QoL improvements for Layout Editor. New QoL functionalities.</li>
             <li>0.4.1 - Styling</li>
             <li>0.4.0 - Layout based of JSON file and editor UI (beta).</li>

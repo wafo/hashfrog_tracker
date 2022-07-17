@@ -75,8 +75,13 @@ const Checks = () => {
             if ((loc.available === 0 && loc.locked === 0) || loc.checked >= loc.checks.length) {
               style.opacity = "0.75";
             } else {
-              if (loc.locked > 0) style.borderLeftColor = "#ffc107";
-              if (loc.available > 0) style.borderLeftColor = "#198754";
+              if ((loc.locked < 1 && loc.available > 0) || loc.available + loc.checked >= loc.checks.length) {
+                style.borderLeftColor = "#198754";
+              } else if (loc.locked > 0 && loc.available > 0) {
+                style.borderLeftColor = "#ffc107";
+              } else if (loc.locked > 0 && loc.available < 1) {
+                style.borderLeftColor = "#dc3545";
+              }
             }
             return (
               <div key={loc.id} className="item">
