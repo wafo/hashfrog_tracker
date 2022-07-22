@@ -1,8 +1,290 @@
 import { useContext, useReducer, createContext, useMemo } from "react";
 import locationsJSON from "../data/locations.json";
 import checksJSON from "../data/checks.json";
+import itemsJSON from "../data/items.json";
 import { useEffect } from "react";
 import { cleanJSONString } from "../utils/utils";
+
+const settings = {
+  age: "child", // child || adult
+  blue_fire_arrows: false,
+  bombchus_in_logic: false,
+  bridge: "vanilla",
+  bridge_hearts: 3, // ??
+  bridge_medallions: 6, // ??
+  bridge_rewards: 3, // ??
+  bridge_stones: 3, // ??
+  bridge_tokens: 100, // ??
+  damage_multiplier: "",
+  deadly_bonks: "",
+  disable_trade_revert: false,
+  dungeon_shortcuts: [],
+  ganon_bosskey_hearts: 3,
+  ganon_bosskey_medallions: 6,
+  ganon_bosskey_rewards: 3,
+  ganon_bosskey_stones: 3,
+  ganon_bosskey_tokens: 100,
+  gerudo_fortress: "normal",
+  lacs_condition: "vanilla",
+  lacs_hearts: 3,
+  lacs_medallions: 6,
+  lacs_rewards: 3,
+  lacs_stones: 3,
+  lacs_tokens: 100,
+  logic_dmt_climb_hovers: false,
+  logic_gerudo_kitchen: false,
+  logic_grottos_without_agony: true,
+  logic_king_zora_skip: false,
+  logic_rules: "glitchless", // glitchless || ...
+  logic_zora_with_cucco: false,
+  open_forest: "open", // open || closed || ...
+  shuffle_ganon_bosskey: false,
+  shuffle_ocarinas: false,
+  starting_age: "child",
+  plant_beans: "", // TODO: Does this goes here?
+  zora_fountain: "open",
+};
+
+// This imitates the LogicHelpers.json from the OoT-Randomizer repo
+// Will allow us to then consume the other logic files and make the assertions
+// prettier-ignore
+const logicHelper = (itemsArray, settings) => {
+  const _ = itemsJSON;
+  const s = settings;
+
+  const items = itemsArray.reduce((accumulator, item_uuid) => {
+    const [key, value] = Object.entries(itemsJSON).find(([key]) => itemsJSON[key] === item_uuid);
+    accumulator[key] = value;
+    return accumulator;
+  }, {});
+
+  // All the assertions for the helper. h = helper
+  let h = {};
+
+  h["is_child"] = true; // s.age === "child", // Override al age requirements for simplicity
+  h["is_adult"] = true; // s.age == "adult", // Override al age requirements for simplicity
+
+  function can_play(song) {
+    if (
+      (s.shuffle_ocarinas && (!!items.progressive_ocarina_1 || !!items.progressive_ocarina_2))
+      || !s.shuffle_ocarinas
+    ) {
+      if (!!items[song] || song === _.song_scarecrow) return true;
+    }
+    return false;
+  }
+
+  function can_use(item) {
+    const scarecrow = !!items.progressive_hookshot_1 && can_play(_.song_scarecrow);
+    const distant_scarecrow = !!items.progressive_hookshot_2 && can_play(_.song_scarecrow);
+
+    const is_magic_item = (item) => item === _.dins_fire || item === _.farores_wind || item === _.nayrus_love || item === _.lens;
+    const is_adult_item = (item) => item === _.bow || item === _.megaton_hammer || item === _.boots_iron || item === _.boots_hover || item === _.progressive_hookshot_1 || item === _.progressive_hookshot_2 || item === _.progressive_strength_2 || item === _.progressive_strength_2 || item === _.tunic_goron || item === _.tunic_zora || item === scarecrow || item === distant_scarecrow || item === _.shield_mirror;
+    const is_child_item = (item) => item === _.slingshot || item === _.boomerang || item === _.sword_kokiri || item === _.sticks || item === _.shield_deku;
+    const is_magic_arrow = (item) => item === _.arrows_fire || item === _.arrows_light || (s.blue_fire_arrows && item === _.arrows_ice);
+
+    return (
+      (is_magic_item(item) && !!items[item] && (!!items.progressive_magic_1 || !!items.progressive_magic_2))
+      || (is_adult_item(item) && h.is_adult && !!items[item])
+      || (is_child_item(item) && h.is_child && !!items[item])
+      || (is_magic_arrow(item) && h.is_adult && !!items[item] && !!items.bow && (!!items.progressive_magic_1 || !!items.progressive_magic_2))
+    )
+  }
+
+  function has_projectile(for_age) {
+    return (
+      h.has_explosives
+      || (for_age === "child" && (items.slingshot || items.boomerang))
+      || (for_age === "adult" && (items.bow || (items.progressive_hookshot_1 || items.progressive_hookshot_2)))
+      || (for_age === "both" && ((items.slingshot || items.boomerang) && (items.bow || (items.progressive_hookshot_1 || items.progressive_hookshot_2))))
+      || (for_age === "either" && (items.slingshot || items.boomerang || items.bow || (items.progressive_hookshot_1 || items.progressive_hookshot_2)))
+    );
+  }
+
+  function at(location, condition) {
+    // No idea
+    return false;
+  }
+
+  function has_stones(stones) {
+    // No idea
+    return false;
+  }
+
+  function has_medallions(medallions) {
+    // No idea
+    return false;
+  }
+
+  function has_dungeon_rewards(rewards) {
+    // No idea
+    return false;
+  }
+
+  function has_hearts(hearts) {
+    // No idea
+    return false;
+  }
+
+  function region_has_shortcuts(region) {
+    // No idea
+    return false;
+  }
+
+  const warp_songs = [_.song_minuet, _.song_bolero, _.song_serenade, _.song_nocturne, _.song_requiem, _.song_prelude];
+
+  // Bridge Requirements
+  h["has_all_stones"] = !!items.stone_kokiri && !!items.stone_goron && !!items.stone_zora;
+  h["has_all_medallions"] = !!items.medallion_green && !!items.medallion_red && !!items.medallion_blue && !!items.medallion_purple && !!items.medallion_orange && !!items.medallion_yellow;
+  h["can_build_rainbow_bridge"] = (
+    (s.bridge === "open") ||
+    (s.bridge === "vanilla" && !!items.medallion_purple && !!items.medallion_orange && !!items.arrows_light) ||
+    (s.bridge === "stones" && has_stones(s.bridge_stones)) ||
+    (s.bridge === "medallions" && has_medallions(s.bridge_medallions)) ||
+    (s.bridge === "dungeons" && has_dungeon_rewards(s.bridge_rewards)) ||
+    (s.bridge === "tokens" && h.Gold_Skulltula_Token === s.bridge_tokens) ||
+    (s.bridge === "hearts" && has_hearts(s.bridge_hearts))
+  );
+  h["can_trigger_lacs"] = (
+    (s.lacs_condition === "vanilla" && !!items.medallion_purple && !!items.medallion_orange) ||
+    (s.lacs_condition === "stones" && has_stones(s.lacs_stones)) ||
+    (s.lacs_condition === "medallions" && has_medallions(s.lacs_medallions)) ||
+    (s.lacs_condition === "dungeons" && has_dungeon_rewards(s.lacs_rewards)) ||
+    (s.lacs_condition === "tokens" && h.Gold_Skulltula_Token === s.lacs_tokens) ||
+    (s.lacs_condition === "hearts" && has_hearts(s.lacs_hearts))
+  )
+  h["can_receive_ganon_bosskey"] = (
+    (s.shuffle_ganon_bosskey === "stones" && has_stones(s.ganon_bosskey_stones)) ||
+    (s.shuffle_ganon_bosskey === "medallions" && has_medallions(s.ganon_bosskey_medallions)) ||
+    (s.shuffle_ganon_bosskey === "dungeons" && has_dungeon_rewards(s.ganon_bosskey_rewards)) ||
+    (s.shuffle_ganon_bosskey === "tokens" && h.Gold_Skulltula_Token === s.ganon_bosskey_tokens) ||
+    (s.shuffle_ganon_bosskey === "hearts" && has_hearts(s.ganon_bosskey_hearts))
+  ) || (
+    s.shuffle_ganon_bosskey !== "stones" && s.shuffle_ganon_bosskey !== "medallions" &&
+    s.shuffle_ganon_bosskey !== "dungeons" && s.shuffle_ganon_bosskey !== "tokens" &&
+    s.shuffle_ganon_bosskey !== "hearts"
+  );
+  // Abilities ??
+  h["has_explosives"] = !!items.bombs || (s.bombchus_in_logic && h.has_bombchus);
+  h["can_dive"] = !!items.progressive_scale_1 || !!items.progressive_scale_2;
+  h["Epona"] = can_play(_.song_epona); // && no setting that messes this up ??
+  // Could not find how the OoT-Randomizer repo defines some of these.
+  // Added my own logic, tho they might break under specific rulesets
+  h["Deliver_Letter"] = !!items.rutos_letter && ((h.has_explosives && (can_play(_.song_lullaby) || (h.is_child && s.logic_zora_with_cucco))) || (h.is_child && h.can_dive));
+  h["Buy_Goron_Tunic"] = h.is_adult && (!!items.progressive_wallet_1 || !!items.progressive_wallet_2);
+  h["Buy_Zora_Tunic"] = h.is_adult && !!items.progressive_wallet_2;
+  h["Buy_Deku_Shield"] = true;
+  h["Buy_Hylian_Shield"] = true;
+  h["Buy_Deku_Nut_5"] = true;
+  h["Buy_Deku_Nut_10"] = true;
+  h["Deku_Nut_Drop"] = true;
+  h["Buy_Deku_Stick_1"] = true;
+  h["Deku_Stick_Drop"] = true;
+  h["Buy_Bottle_Bug"] = !!items.bottle; // Asume normal shop logic ??
+  h["Bugs"] = !!h.Buy_Bottle_Bug || !!items.bottle;
+  h["Buy_Blue_Fire"] = !!items.bottle && !!items.progressive_wallet_2; // Asume normal shop logic ??
+  h["Blue_Fire"] = h.Buy_Blue_Fire || (!!items.bottle && (
+    ((can_play(_.song_lullaby) || (!!items.boots_hover && s.logic_zora_with_hovers)) && (h.Deliver_Letter || s.zora_fountain === "open" || (s.zora_fountain === "adult" && h.is_adult) || (s.logic_king_zora_skip && h.is_adult)))
+    || h.can_build_rainbow_bridge
+  ));
+  h["Buy_Fish"] = !!items.bottle; // Asume normal shop logic ??
+  h["Fish"] = !!h.Buy_Fish || !!items.bottle;
+  h["Buy_Fairys_Spirit"] = !!items.bottle; // Asume normal shop logic ??
+  h["Fairy"] = !!h.Buy_Fairys_Spirit || !!items.bottle;
+  h["Big_Poe"] = h.is_adult && !!items.bottle && !!items.bow && h.Epona;
+  // TODO: Fix bombchu buying
+  h["Buy_Bombchu_5"] = h.is_child && (!!items.bombs || s.bombchus_in_logic);
+  h["Buy_Bombchu_10"] = (h.is_child && (!!items.bombs || s.bombchus_in_logic)) || (h.is_adult && (!!items.progressive_wallet_1 || !!items.progressive_wallet_2));
+  h["Buy_Bombchu_20"] = h.is_child && (!!items.bombs || s.bombchus_in_logic);
+  h["Bombchu_Drop"] = true; // No idea what bombchu drop is. Is it a setting ??
+  h["Bombchus_5"] = !!items.bombchus;
+  h["Bombchus_10"] = !!items.bombchus;
+  h["Bombchus_20"] = !!items.bombchus;
+  h["Deku_Tree_Clear"] = true; // ?? Not sure how to track this one
+  h["Stop_GC_Rolling_Goron_Adult"] = true; // ?? Not sure how to track this one
+  h["not_warp_songs"] = !itemsArray.some(item => warp_songs.includes(item));
+  // Counters
+  h["Small_Key_Thieves_Hideout"] = 9;
+  h["Gold_Skulltula_Token"] = 0;
+  // items & Equipments
+  h["Hookshot"] = !!items.progressive_hookshot_1 || !!items.progressive_hookshot_2;
+  h["Longshot"] = !!items.progressive_hookshot_2;
+  h["Silver_Gauntlets"] = !!items.progressive_strength_2 || !!items.progressive_strength_3;
+  h["Golden_Gauntlets"] = !!items.progressive_strength_3;
+  h["Scarecrow"] = !!items.progressive_hookshot_1 && can_play(_.song_scarecrow);
+  h["Distant_Scarecrow"] = !!items.progressive_hookshot_2 && can_play(_.song_scarecrow);
+  h["Goron_Tunic"] = !!items.tunic_goron || h.Buy_Goron_Tunic;
+  h["Zora_Tunic"] = !!items.tunic_zora || h.Buy_Zora_Tunic;
+  h["Ocarina"] = !!items.progressive_ocarina_1 || !!items.progressive_ocarina_2;
+  h["Bow"] = !!items.bow;
+  h["Slingshot"] = !!items.slingshot;
+  h["Bombs"] = !!items.bombs;
+  h["Deku_Shield"] = h.Buy_Deku_Shield;
+  h["Hylian_Shield"] = h.Buy_Hylian_Shield;
+  h["Nuts"] = h.Buy_Deku_Nut_5 || h.Buy_Deku_Nut_10 || h.Deku_Nut_Drop;
+  h["Sticks"] = h.Buy_Deku_Stick_1 || h.Deku_Stick_Drop;
+  // Abilities ?
+  h["has_bombchus"] = (h.Buy_Bombchu_5 || h.Buy_Bombchu_10 || h.Buy_Bombchu_20 || h.Bombchu_Drop) && (s.bombchus_in_logic || !!items.bombs);
+  h["found_bombchus"] = (s.bombchus_in_logic && (!!items.bombchus || h.Bombchus_5 || h.Bombchus_10 || h.Bombchus_20)) || (!s.bombchus_in_logic &&  !!items.bombs);
+  h["is_starting_age"] = true; // s.age === s.starting_age, // Override al age requirements for simplicity
+  h["is_glitched"] = s.logic_rules !== "glitchless";
+  h["can_blast_or_smash"] = h.has_explosives || can_use(_.megaton_hammer);
+  h["can_child_attack"] = h.is_child && (!!items.slingshot || !!items.boomerang || !!items.sticks || !!items.sword_kokiri || h.has_explosives || can_use(_.dins_fire));
+  h["can_child_damage"] = h.is_child && (!!items.slingshot || !!items.sticks || !!items.sword_kokiri || h.has_explosives || can_use(_.dins_fire));
+  h["can_cut_shrubs"] = h.is_adult || !!items.sticks || !!items.sword_kokiri || !!items.boomerang || h.has_explosives;
+  h["can_leave_forest"] = s.open_forest !== "closed" || h.is_adult || h.is_glitched || h.Deku_Tree_Clear;
+  h["can_plant_bugs"] = h.is_child && h.Bugs;
+  h["can_ride_epona"] = h.is_adult && h.Epona && (can_play(_.song_epona) || (h.is_glitched && h.can_hover));
+  h["can_stun_deku"] = h.is_adult || (!!items.slingshot || !!items.boomerang || !!items.sticks || !!items.sword_kokiri || h.has_explosives || can_use(_.dins_fire) ||  !!items.nuts ||  !!items.shield_deku);
+  h["can_summon_gossip_fairy"] = h.Ocarina && (can_play(_.song_lullaby) || can_play(_.song_epona) || can_play(_.song_time) || can_play(_.song_suns));
+  h["can_summon_gossip_fairy_without_suns"] = h.Ocarina && (can_play(_.song_lullaby) || can_play(_.song_epona) || can_play(_.song_time));
+  h["can_take_damage"] = s.damage_multiplier !== "ohko" || h.Fairy || can_use(_.nayrus_love);
+  h["can_plant_bean"] = s.plant_beans || (h.is_child && !!items.magic_beans);
+  h["can_open_bomb_grotto"] = h.can_blast_or_smash && (!!items.stone_agony || s.logic_grottos_without_agony);
+  h["can_open_storm_grotto"] = can_play(_.song_storms) && (!!items.stone_agony || s.logic_grottos_without_agony);
+  h["can_use_projectile"] = h.has_explosives || (h.is_adult && (h.Bow || h.Hookshot)) || (h.is_child && (h.Slingshot || !!items.boomerang));
+  h["can_bonk_tree"] = s.deadly_bonks !== "ohko" || h.Fairy || can_use(_.nayrus_love);
+  h["can_bonk_crate"] = s.deadly_bonks !== "ohko" || h.Fairy || can_use(_.nayrus_love) || h.can_blast_or_smash;
+  h["can_bonk_underwater_crate"] = s.deadly_bonks !== "ohko" || h.Fairy || can_use(_.nayrus_love);
+  h["can_bonk_heated_crate"] = (s.deadly_bonks !== "ohko" || (h.Fairy && (can_use(_.tunic_goron) || s.damage_multiplier !== "ohko")) || can_use(_.nayrus_love) || h.can_blast_or_smash);
+  // Biggoron trade path
+  h["guarantee_trade_path"] = s.disable_trade_revert || h.can_blast_or_smash || h.Stop_GC_Rolling_Goron_Adult || (s.logic_dmt_climb_hovers && can_use(_.boots_hover)) || (s.logic_biggoron_bolero && h.not_warp_songs && can_play(_.song_bolero) && at('DMC Central Local', h.Hookshot || can_use(_.boots_hover) || h.can_plant_bean));
+  h["guarantee_hint"] = (s.hints === "mask" && !!items.mask_truth) || (s.hints === "agony" && !!items.stone_agony) || (s.hints !== "mask" && s.hints !== "agony");
+  h["has_fire_source"] = can_use(_.dins_fire) || can_use(_.arrows_fire);
+  h["has_fire_source_with_torch"] = h.has_fire_source || (h.is_child && !!items.sticks);
+  // Fortress
+  h["can_finish_GerudoFortress"] = (s.gerudo_fortress === "normal" && h.Small_Key_Thieves_Hideout === 4 && (h.is_adult || !!items.sword_kokiri || s.is_glitched) && (h.is_adult && (h.Bow || h.Hookshot || !!items.boots_hover) || !!items.gerudo_card || s.logic_gerudo_kitchen || s.is_glitched)) || (s.gerudo_fortress === "fast" && h.Small_Key_Thieves_Hideout && (h.is_adult || !!items.sword_kokiri || s.is_glitched)) || (s.gerudo_fortress !== "normal" && s.gerudo_fortress !== "fast");
+  h["has_shield"] = (h.is_adult && !!items.shield_hylian) || (h.is_child && !!items.shield_deku) // Mirror Shield does not reflect scrub attack.
+  h["can_shield"] = (h.is_adult && (!!items.shield_hylian || !!items.shield_mirror)) || (h.is_child && !!items.shield_deku);
+  h["can_mega"] = h.has_explosives && h.can_shield;
+  h["can_isg"] = h.can_shield && (h.is_adult || !!items.sticks || !!items.sword_kokiri);
+  h["can_hover"] = h.can_mega && h.can_isg;
+  h["can_weirdshot"] = h.can_mega && (can_use(_.progressive_hookshot_1) || can_use(_.progressive_hookshot_2));
+  h["can_jumpslash"] = h.is_adult || !!items.sticks || !!items.sword_kokiri;
+  // Dungeon Shortcuts
+  h["deku_tree_shortcuts"] = s.dungeon_shortcuts.includes("Deku Tree");
+  h["dodongos_cavern_shortcuts"] = s.dungeon_shortcuts.includes("Dodongos Cavern");
+  h["jabu_shortcuts"] = s.dungeon_shortcuts.includes("Jabu Jabus Belly");
+  h["forest_temple_shortcuts"] = s.dungeon_shortcuts.includes("Forest Temple");
+  h["fire_temple_shortcuts"] = s.dungeon_shortcuts.includes("Fire Temple");
+  h["shadow_temple_shortcuts"] = s.dungeon_shortcuts.includes("Shadow Temple");
+  h["spirit_temple_shortcuts"] = s.dungeon_shortcuts.includes("Spirit Temple");
+  h["king_dodongo_shortcuts"] = region_has_shortcuts("King Dodongo Boss Room");
+
+  return {
+    ...h,
+    can_play,
+    can_use,
+    has_projectile,
+    at,
+    has_stones,
+    has_medallions,
+    has_dungeon_rewards,
+    has_hearts,
+    region_has_shortcuts,
+    warp_songs,
+  }
+}
 
 const defaultItems = {
   // Songs
@@ -213,6 +495,9 @@ function reducer(state, action) {
         }
         return check;
       });
+
+      const test = logicHelper(items_list, settings);
+      console.log(test);
 
       return {
         ...state,
