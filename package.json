@@ -8,6 +8,8 @@
     "@testing-library/user-event": "^13.5.0",
     "bootstrap": "^5.2.0-beta1",
     "file-saver": "^2.0.5",
+    "hash-it": "^5.0.2",
+    "localstorage-slim": "^2.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.3.0",

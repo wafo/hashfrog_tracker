@@ -4,46 +4,8 @@ import checksJSON from "../data/checks.json";
 import itemsJSON from "../data/items.json";
 import { useEffect } from "react";
 import { cleanJSONString } from "../utils/utils";
-
-const settings = {
-  age: "child", // child || adult
-  blue_fire_arrows: false,
-  bombchus_in_logic: false,
-  bridge: "vanilla",
-  bridge_hearts: 3, // ??
-  bridge_medallions: 6, // ??
-  bridge_rewards: 3, // ??
-  bridge_stones: 3, // ??
-  bridge_tokens: 100, // ??
-  damage_multiplier: "",
-  deadly_bonks: "",
-  disable_trade_revert: false,
-  dungeon_shortcuts: [],
-  ganon_bosskey_hearts: 3,
-  ganon_bosskey_medallions: 6,
-  ganon_bosskey_rewards: 3,
-  ganon_bosskey_stones: 3,
-  ganon_bosskey_tokens: 100,
-  gerudo_fortress: "normal",
-  lacs_condition: "vanilla",
-  lacs_hearts: 3,
-  lacs_medallions: 6,
-  lacs_rewards: 3,
-  lacs_stones: 3,
-  lacs_tokens: 100,
-  logic_dmt_climb_hovers: false,
-  logic_gerudo_kitchen: false,
-  logic_grottos_without_agony: true,
-  logic_king_zora_skip: false,
-  logic_rules: "glitchless", // glitchless || ...
-  logic_zora_with_cucco: false,
-  open_forest: "open", // open || closed || ...
-  shuffle_ganon_bosskey: false,
-  shuffle_ocarinas: false,
-  starting_age: "child",
-  plant_beans: "", // TODO: Does this goes here?
-  zora_fountain: "open",
-};
+import hash from "hash-it";
+import lss from "localstorage-slim";
 
 // This imitates the LogicHelpers.json from the OoT-Randomizer repo
 // Will allow us to then consume the other logic files and make the assertions
@@ -51,6 +13,7 @@ const settings = {
 const logicHelper = (itemsArray, settings) => {
   const _ = itemsJSON;
   const s = settings;
+  // TODO: Need to fix all the settings assertions since my version was different than what ootr returns.
 
   const items = itemsArray.reduce((accumulator, item_uuid) => {
     const [key, value] = Object.entries(itemsJSON).find(([key]) => itemsJSON[key] === item_uuid);
@@ -461,13 +424,15 @@ const initialState = {
   locations: [...locationsJSON],
   items: { ...defaultItems },
   items_list: [],
+  settings: {}, // TODO: Maybe have some default settings ?
 };
 
 function reducer(state, action) {
+  const { payload } = action;
   switch (action.type) {
     case "CHECK_MARK": {
       // Finding check
-      const checkIndex = state.checks.findIndex(x => x.id === action.payload);
+      const checkIndex = state.checks.findIndex(x => x.id === payload);
       if (checkIndex === -1) return state;
       // Manipulating check
       const check = { ...state.checks[checkIndex] };
@@ -482,7 +447,7 @@ function reducer(state, action) {
       };
     }
     case "ITEM_MARK": {
-      const { items, item } = action.payload;
+      const { items, item } = payload;
       // Preping collecting items
       const items_list = [...state.items_list.filter(x => !items.includes(x))];
       if (item) items_list.push(item);
@@ -496,7 +461,7 @@ function reducer(state, action) {
         return check;
       });
 
-      const test = logicHelper(items_list, settings);
+      const test = logicHelper(items_list, state.settings);
       console.log(test);
 
       return {
@@ -506,6 +471,12 @@ function reducer(state, action) {
         checks,
       };
     }
+    case "SETTINGS_SET": {
+      return {
+        ...state,
+        settings: payload,
+      };
+    }
     default:
       throw new Error();
   }
@@ -513,6 +484,37 @@ function reducer(state, action) {
 
 function TrackerProvider(props) {
   const [state, dispatch] = useReducer(reducer, initialState);
+
+  useEffect(() => {
+    // TODO: this should come from user input somehow
+    const version = "dev_6.2.135";
+    const settingsString =
+    "BAAKMFQNALH2EAAJARUCSDEAAACAECABLTDDSJFQNACAAUAASAJAESBSAHNCWAG4FMCV4EJD4TCAYEBAAGAXXASHWAJCA";
+    // use hash
+    const settingsHash = hash({ version, settingsString });
+
+    // check for cache first
+    const settings = lss.get(settingsHash);
+    if (settings) {
+      dispatch({ type: "SETTINGS_SET", payload: settings });
+    } else {
+      // If not already in cache, check the backend.
+      const fetchURL =
+        `${process.env.REACT_APP_API_URL}/settings/string?` +
+        new URLSearchParams({
+          version,
+          settingsString,
+        });
+      fetch(fetchURL)
+        .then(response => response.json())
+        .then(response => {
+          // 86400 seconds == 1 day | the server caches for 1 week from ootr
+          lss.set(settingsHash, response.settings, { ttl: 86400 });
+          dispatch({ type: "SETTINGS_SET", payload: response.settings });
+        })
+        .catch(err => console.error(err));
+    }
+  }, []);
 
   useEffect(() => {
     fetch("https://raw.githubusercontent.com/TestRunnerSRL/OoT-Randomizer/master/data/LogicHelpers.json")
