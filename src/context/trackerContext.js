@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { cleanJSONString } from "../utils/utils";
 import hash from "hash-it";
 import lss from "localstorage-slim";
+import "../utils/pyodide";
 
 // This imitates the LogicHelpers.json from the OoT-Randomizer repo
 // Will allow us to then consume the other logic files and make the assertions
@@ -14,6 +15,10 @@ const logicHelper = (itemsArray, settings) => {
   const _ = itemsJSON;
   const s = settings;
   // TODO: Need to fix all the settings assertions since my version was different than what ootr returns.
+  const t = settings.allowed_tricks.reduce((accumulator, trick) => {
+    accumulator[trick] = true;
+    return accumulator;
+  }, {});
 
   const items = itemsArray.reduce((accumulator, item_uuid) => {
     const [key, value] = Object.entries(itemsJSON).find(([key]) => itemsJSON[key] === item_uuid);
@@ -70,27 +75,52 @@ const logicHelper = (itemsArray, settings) => {
   }
 
   function has_stones(stones) {
-    // No idea
-    return false;
+    let current = 0;
+    if (items.stone_kokiri) current += 1;
+    if (items.stone_goron) current += 1;
+    if (items.stone_zora) current += 1;
+
+    return current >= stones;
   }
 
   function has_medallions(medallions) {
-    // No idea
-    return false;
+    // medallions would be an int
+    // count medallions number and compare
+    let current = 0;
+    if (items.medallion_green) current += 1;
+    if (items.medallion_red) current += 1;
+    if (items.medallion_blue) current += 1;
+    if (items.medallion_purple) current += 1;
+    if (items.medallion_orange) current += 1;
+    if (items.medallion_yellow) current += 1;
+
+    return current >= medallions;
   }
 
   function has_dungeon_rewards(rewards) {
-    // No idea
-    return false;
+    // rewards would be an int
+    // count rewards number and compare
+    let current = 0;
+    if (items.stone_kokiri) current += 1;
+    if (items.stone_goron) current += 1;
+    if (items.stone_zora) current += 1;
+    if (items.medallion_green) current += 1;
+    if (items.medallion_red) current += 1;
+    if (items.medallion_blue) current += 1;
+    if (items.medallion_purple) current += 1;
+    if (items.medallion_orange) current += 1;
+    if (items.medallion_yellow) current += 1;
+
+    return current >= rewards;
   }
 
   function has_hearts(hearts) {
-    // No idea
+    // TODO: Currently not tracking this one.
     return false;
   }
 
   function region_has_shortcuts(region) {
-    // No idea
+    // TODO: No idea
     return false;
   }
 
@@ -133,7 +163,7 @@ const logicHelper = (itemsArray, settings) => {
   h["Epona"] = can_play(_.song_epona); // && no setting that messes this up ??
   // Could not find how the OoT-Randomizer repo defines some of these.
   // Added my own logic, tho they might break under specific rulesets
-  h["Deliver_Letter"] = !!items.rutos_letter && ((h.has_explosives && (can_play(_.song_lullaby) || (h.is_child && s.logic_zora_with_cucco))) || (h.is_child && h.can_dive));
+  h["Deliver_Letter"] = !!items.rutos_letter && ((h.has_explosives && (can_play(_.song_lullaby) || (h.is_child && t.logic_zora_with_cucco))) || (h.is_child && h.can_dive));
   h["Buy_Goron_Tunic"] = h.is_adult && (!!items.progressive_wallet_1 || !!items.progressive_wallet_2);
   h["Buy_Zora_Tunic"] = h.is_adult && !!items.progressive_wallet_2;
   h["Buy_Deku_Shield"] = true;
@@ -147,7 +177,7 @@ const logicHelper = (itemsArray, settings) => {
   h["Bugs"] = !!h.Buy_Bottle_Bug || !!items.bottle;
   h["Buy_Blue_Fire"] = !!items.bottle && !!items.progressive_wallet_2; // Asume normal shop logic ??
   h["Blue_Fire"] = h.Buy_Blue_Fire || (!!items.bottle && (
-    ((can_play(_.song_lullaby) || (!!items.boots_hover && s.logic_zora_with_hovers)) && (h.Deliver_Letter || s.zora_fountain === "open" || (s.zora_fountain === "adult" && h.is_adult) || (s.logic_king_zora_skip && h.is_adult)))
+    ((can_play(_.song_lullaby) || (!!items.boots_hover && t.logic_zora_with_hovers)) && (h.Deliver_Letter || s.zora_fountain === "open" || (s.zora_fountain === "adult" && h.is_adult) || (t.logic_king_zora_skip && h.is_adult)))
     || h.can_build_rainbow_bridge
   ));
   h["Buy_Fish"] = !!items.bottle; // Asume normal shop logic ??
@@ -203,20 +233,20 @@ const logicHelper = (itemsArray, settings) => {
   h["can_summon_gossip_fairy_without_suns"] = h.Ocarina && (can_play(_.song_lullaby) || can_play(_.song_epona) || can_play(_.song_time));
   h["can_take_damage"] = s.damage_multiplier !== "ohko" || h.Fairy || can_use(_.nayrus_love);
   h["can_plant_bean"] = s.plant_beans || (h.is_child && !!items.magic_beans);
-  h["can_open_bomb_grotto"] = h.can_blast_or_smash && (!!items.stone_agony || s.logic_grottos_without_agony);
-  h["can_open_storm_grotto"] = can_play(_.song_storms) && (!!items.stone_agony || s.logic_grottos_without_agony);
+  h["can_open_bomb_grotto"] = h.can_blast_or_smash && (!!items.stone_agony || t.logic_grottos_without_agony);
+  h["can_open_storm_grotto"] = can_play(_.song_storms) && (!!items.stone_agony || t.logic_grottos_without_agony);
   h["can_use_projectile"] = h.has_explosives || (h.is_adult && (h.Bow || h.Hookshot)) || (h.is_child && (h.Slingshot || !!items.boomerang));
   h["can_bonk_tree"] = s.deadly_bonks !== "ohko" || h.Fairy || can_use(_.nayrus_love);
   h["can_bonk_crate"] = s.deadly_bonks !== "ohko" || h.Fairy || can_use(_.nayrus_love) || h.can_blast_or_smash;
   h["can_bonk_underwater_crate"] = s.deadly_bonks !== "ohko" || h.Fairy || can_use(_.nayrus_love);
   h["can_bonk_heated_crate"] = (s.deadly_bonks !== "ohko" || (h.Fairy && (can_use(_.tunic_goron) || s.damage_multiplier !== "ohko")) || can_use(_.nayrus_love) || h.can_blast_or_smash);
   // Biggoron trade path
-  h["guarantee_trade_path"] = s.disable_trade_revert || h.can_blast_or_smash || h.Stop_GC_Rolling_Goron_Adult || (s.logic_dmt_climb_hovers && can_use(_.boots_hover)) || (s.logic_biggoron_bolero && h.not_warp_songs && can_play(_.song_bolero) && at('DMC Central Local', h.Hookshot || can_use(_.boots_hover) || h.can_plant_bean));
+  h["guarantee_trade_path"] = s.disable_trade_revert || h.can_blast_or_smash || h.Stop_GC_Rolling_Goron_Adult || (t.logic_dmt_climb_hovers && can_use(_.boots_hover)) || (t.logic_biggoron_bolero && h.not_warp_songs && can_play(_.song_bolero) && at('DMC Central Local', h.Hookshot || can_use(_.boots_hover) || h.can_plant_bean));
   h["guarantee_hint"] = (s.hints === "mask" && !!items.mask_truth) || (s.hints === "agony" && !!items.stone_agony) || (s.hints !== "mask" && s.hints !== "agony");
   h["has_fire_source"] = can_use(_.dins_fire) || can_use(_.arrows_fire);
   h["has_fire_source_with_torch"] = h.has_fire_source || (h.is_child && !!items.sticks);
   // Fortress
-  h["can_finish_GerudoFortress"] = (s.gerudo_fortress === "normal" && h.Small_Key_Thieves_Hideout === 4 && (h.is_adult || !!items.sword_kokiri || s.is_glitched) && (h.is_adult && (h.Bow || h.Hookshot || !!items.boots_hover) || !!items.gerudo_card || s.logic_gerudo_kitchen || s.is_glitched)) || (s.gerudo_fortress === "fast" && h.Small_Key_Thieves_Hideout && (h.is_adult || !!items.sword_kokiri || s.is_glitched)) || (s.gerudo_fortress !== "normal" && s.gerudo_fortress !== "fast");
+  h["can_finish_GerudoFortress"] = (s.gerudo_fortress === "normal" && h.Small_Key_Thieves_Hideout === 4 && (h.is_adult || !!items.sword_kokiri || h.is_glitched) && (h.is_adult && (h.Bow || h.Hookshot || !!items.boots_hover) || !!items.gerudo_card || t.logic_gerudo_kitchen || h.is_glitched)) || (s.gerudo_fortress === "fast" && h.Small_Key_Thieves_Hideout && (h.is_adult || !!items.sword_kokiri || h.is_glitched)) || (s.gerudo_fortress !== "normal" && s.gerudo_fortress !== "fast");
   h["has_shield"] = (h.is_adult && !!items.shield_hylian) || (h.is_child && !!items.shield_deku) // Mirror Shield does not reflect scrub attack.
   h["can_shield"] = (h.is_adult && (!!items.shield_hylian || !!items.shield_mirror)) || (h.is_child && !!items.shield_deku);
   h["can_mega"] = h.has_explosives && h.can_shield;
@@ -424,7 +454,122 @@ const initialState = {
   locations: [...locationsJSON],
   items: { ...defaultItems },
   items_list: [],
-  settings: {}, // TODO: Maybe have some default settings ?
+  // Settings are by default S5
+  settings: {
+    world_count: 1,
+    create_spoiler: false,
+    randomize_settings: false,
+    open_forest: "closed_deku",
+    open_kakariko: "open",
+    open_door_of_time: true,
+    zora_fountain: "closed",
+    gerudo_fortress: "fast",
+    bridge: "medallions",
+    bridge_medallions: 6,
+    bridge_stones: 3,
+    bridge_rewards: 9,
+    bridge_tokens: 100,
+    triforce_hunt: false,
+    triforce_goal_per_world: 20,
+    logic_rules: "glitchless",
+    reachable_locations: "all",
+    bombchus_in_logic: false,
+    one_item_per_dungeon: false,
+    trials_random: false,
+    trials: 0,
+    skip_child_zelda: true,
+    no_escape_sequence: true,
+    no_guard_stealth: true,
+    no_epona_race: true,
+    skip_some_minigame_phases: true,
+    useful_cutscenes: false,
+    complete_mask_quest: false,
+    fast_chests: true,
+    logic_no_night_tokens_without_suns_song: false,
+    free_scarecrow: false,
+    fast_bunny_hood: true,
+    start_with_rupees: false,
+    start_with_consumables: true,
+    starting_hearts: 3,
+    chicken_count_random: false,
+    chicken_count: 7,
+    big_poe_count_random: false,
+    big_poe_count: 1,
+    shuffle_kokiri_sword: true,
+    shuffle_ocarinas: false,
+    shuffle_weird_egg: false,
+    shuffle_gerudo_card: false,
+    shuffle_song_items: "song",
+    shuffle_cows: false,
+    shuffle_beans: false,
+    shuffle_medigoron_carpet_salesman: false,
+    shuffle_interior_entrances: "off",
+    shuffle_grotto_entrances: false,
+    shuffle_dungeon_entrances: false,
+    shuffle_overworld_entrances: false,
+    owl_drops: false,
+    warp_songs: false,
+    spawn_positions: true,
+    shuffle_scrubs: "off",
+    shopsanity: "off",
+    tokensanity: "off",
+    shuffle_mapcompass: "startwith",
+    shuffle_smallkeys: "dungeon",
+    shuffle_hideoutkeys: "vanilla",
+    shuffle_bosskeys: "dungeon",
+    shuffle_ganon_bosskey: "remove",
+    ganon_bosskey_medallions: 6,
+    ganon_bosskey_stones: 3,
+    ganon_bosskey_rewards: 9,
+    ganon_bosskey_tokens: 100,
+    lacs_condition: "vanilla",
+    lacs_medallions: 6,
+    lacs_stones: 3,
+    lacs_rewards: 9,
+    lacs_tokens: 100,
+    enhance_map_compass: false,
+    mq_dungeons_random: false,
+    mq_dungeons: 0,
+    disabled_locations: ["Deku Theater Mask of Truth"],
+    allowed_tricks: [
+      "logic_fewer_tunic_requirements",
+      "logic_grottos_without_agony",
+      "logic_child_deadhand",
+      "logic_man_on_roof",
+      "logic_dc_jump",
+      "logic_rusted_switches",
+      "logic_windmill_poh",
+      "logic_crater_bean_poh_with_hovers",
+      "logic_forest_vines",
+      "logic_lens_botw",
+      "logic_lens_castle",
+      "logic_lens_gtg",
+      "logic_lens_shadow",
+      "logic_lens_shadow_back",
+      "logic_lens_spirit",
+    ],
+    logic_earliest_adult_trade: "prescription",
+    logic_latest_adult_trade: "claim_check",
+    starting_equipment: ["deku_shield"],
+    starting_items: ["ocarina"],
+    starting_songs: [],
+    ocarina_songs: false,
+    correct_chest_sizes: true,
+    clearer_hints: true,
+    no_collectible_hearts: false,
+    hints: "always",
+    hint_dist: "tournament",
+    item_hints: [],
+    hint_dist_user: {},
+    text_shuffle: "none",
+    misc_hints: true,
+    ice_trap_appearance: "junk_only",
+    junk_ice_traps: "off",
+    item_pool_value: "balanced",
+    damage_multiplier: "normal",
+    starting_tod: "default",
+    starting_age: "random",
+  },
 };
 
 function reducer(state, action) {
@@ -486,10 +631,9 @@ function TrackerProvider(props) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
-    // TODO: this should come from user input somehow
-    const version = "dev_6.2.135";
-    const settingsString =
-    "BAAKMFQNALH2EAAJARUCSDEAAACAECABLTDDSJFQNACAAUAASAJAESBSAHNCWAG4FMCV4EJD4TCAYEBAAGAXXASHWAJCA";
+    // TODO: this should come from user input somehow. By default S5.
+    const version = "6.2.0";
+    const settingsString = "AATWXCHYKAA8KLAHJAASAECCWCHGLTDDAKAAJAEAC2AJSDGBLADLED7JKQUXEANKCAJAAYMASBFAB";
     // use hash
     const settingsHash = hash({ version, settingsString });
 
@@ -516,8 +660,9 @@ function TrackerProvider(props) {
     }
   }, []);
 
+  // Testing Overworld
   useEffect(() => {
-    fetch("https://raw.githubusercontent.com/TestRunnerSRL/OoT-Randomizer/master/data/LogicHelpers.json")
+    fetch("https://raw.githubusercontent.com/TestRunnerSRL/OoT-Randomizer/master/data/World/Overworld.json")
       .then(response => {
         return response.text();
       })
