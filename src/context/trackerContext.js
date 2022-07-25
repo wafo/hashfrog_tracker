@@ -6,7 +6,6 @@ import { useEffect } from "react";
 import { cleanJSONString } from "../utils/utils";
 import hash from "hash-it";
 import lss from "localstorage-slim";
-import "../utils/pyodide";
 
 // This imitates the LogicHelpers.json from the OoT-Randomizer repo
 // Will allow us to then consume the other logic files and make the assertions
