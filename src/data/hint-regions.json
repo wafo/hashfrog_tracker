@@ -1,0 +1,267 @@
+{
+  "Links Pocket": [
+    "Root"
+  ],
+  "Kokiri Forest": [
+    "Kokiri Forest",
+    "KF Outside Deku Tree",
+    "KF Links House",
+    "KF Midos House",
+    "KF Kokiri Shop",
+    "KF Storms Grotto"
+  ],
+  "Lost Woods": [
+    "Lost Woods",
+    "LW Beyond Mido",
+    "LW Bridge From Forest",
+    "LW Near Shortcuts Grotto",
+    "Deku Theater",
+    "LW Scrubs Grotto"
+  ],
+  "Sacred Forest Meadow": [
+    "Sacred Forest Meadow",
+    "SFM Fairy Grotto",
+    "SFM Storms Grotto",
+    "SFM Wolfos Grotto"
+  ],
+  "Hyrule Field": [
+    "Hyrule Field",
+    "HF Southeast Grotto",
+    "HF Open Grotto",
+    "HF Inside Fence Grotto",
+    "HF Cow Grotto",
+    "HF Near Market Grotto",
+    "HF Fairy Grotto",
+    "HF Near Kak Grotto",
+    "HF Tektite Grotto"
+  ],
+  "Lake Hylia": [
+    "Lake Hylia",
+    "LH Lab",
+    "LH Fishing Hole",
+    "LH Grotto"
+  ],
+  "Gerudo Valley": [
+    "Gerudo Valley",
+    "GV Upper Stream",
+    "GV Crate Ledge",
+    "GV Fortress Side",
+    "GV Storms Grotto"
+  ],
+  "Gerudos Fortress": [
+    "Gerudo Fortress",
+    "GF Storms Grotto"
+  ],
+  "Haunted Wasteland": [
+    "Haunted Wasteland"
+  ],
+  "Desert Colossus": [
+    "Desert Colossus",
+    "Desert Colossus From Spirit Lobby",
+    "Colossus Great Fairy Fountain",
+    "Colossus Grotto"
+  ],
+  "Market": [
+    "ToT Entrance",
+    "Market Guard House",
+    "Market Bazaar",
+    "Market Mask Shop",
+    "Market Shooting Gallery",
+    "Market Bombchu Bowling",
+    "Market Potion Shop",
+    "Market Treasure Chest Game",
+    "Market Bombchu Shop",
+    "Market Dog Lady House"
+  ],
+  "Temple of Time": [
+    "Temple of Time",
+    "Beyond Door of Time"
+  ],
+  "Hyrule Castle": [
+    "Hyrule Castle Grounds",
+    "HC Garden Locations",
+    "HC Great Fairy Fountain",
+    "HC Storms Grotto"
+  ],
+  "outside Ganons Castle": [
+    "Ganons Castle Grounds",
+    "OGC Great Fairy Fountain"
+  ],
+  "Kakariko Village": [
+    "Kakariko Village",
+    "Kak Impas Rooftop",
+    "Kak Odd Medicine Rooftop",
+    "Kak Carpenter Boss House",
+    "Kak House of Skulltula",
+    "Kak Impas House Back",
+    "Kak Impas House Near Cow",
+    "Kak Windmill",
+    "Kak Bazaar",
+    "Kak Shooting Gallery",
+    "Kak Potion Shop Front",
+    "Kak Odd Medicine Building",
+    "Kak Redead Grotto",
+    "Kak Open Grotto"
+  ],
+  "Graveyard": [
+    "Graveyard",
+    "Graveyard Shield Grave",
+    "Graveyard Heart Piece Grave",
+    "Graveyard Royal Familys Tomb",
+    "Graveyard Dampes Grave",
+    "Graveyard Dampes House",
+    "Graveyard Warp Pad Region"
+  ],
+  "Death Mountain Trail": [
+    "Death Mountain",
+    "Death Mountain Summit",
+    "DMT Great Fairy Fountain",
+    "DMT Cow Grotto",
+    "DMT Storms Grotto"
+  ],
+  "Goron City": [
+    "Goron City",
+    "GC Woods Warp",
+    "GC Darunias Chamber",
+    "GC Shop",
+    "GC Grotto"
+  ],
+  "Death Mountain Crater": [
+    "DMC Upper Nearby",
+    "DMC Upper Local",
+    "DMC Ladder Area Nearby",
+    "DMC Lower Nearby",
+    "DMC Central Nearby",
+    "DMC Central Local",
+    "DMC Great Fairy Fountain",
+    "DMC Upper Grotto",
+    "DMC Hammer Grotto"
+  ],
+  "Zoras River": [
+    "ZR Front",
+    "Zora River",
+    "ZR Open Grotto",
+    "ZR Fairy Grotto",
+    "ZR Storms Grotto"
+  ],
+  "Zoras Domain": [
+    "Zoras Domain",
+    "ZD Shop",
+    "ZD Storms Grotto"
+  ],
+  "Zoras Fountain": [
+    "Zoras Fountain",
+    "ZF Great Fairy Fountain"
+  ],
+  "Lon Lon Ranch": [
+    "Lon Lon Ranch",
+    "LLR Talons House",
+    "LLR Stables",
+    "LLR Tower",
+    "LLR Grotto"
+  ],
+  "Deku Tree": [
+    "Gohma Boss Room",
+    "Deku Tree Lobby",
+    "Deku Tree Slingshot Room",
+    "Deku Tree Basement Back Room",
+    "Deku Tree Basement Ledge"
+  ],
+  "Dodongos Cavern": [
+    "King Dodongo Boss Room",
+    "Dodongos Cavern Beginning",
+    "Dodongos Cavern Lobby",
+    "Dodongos Cavern Staircase Room",
+    "Dodongos Cavern Climb",
+    "Dodongos Cavern Far Bridge",
+    "Dodongos Cavern Before Boss"
+  ],
+  "Jabu Jabus Belly": [
+    "Barinade Boss Room",
+    "Jabu Jabus Belly Main",
+    "Jabu Jabus Belly Depths",
+    "Jabu Jabus Belly Before Boss"
+  ],
+  "Forest Temple": [
+    "Phantom Ganon Boss Room",
+    "Forest Temple Lobby",
+    "Forest Temple Central Area",
+    "Forest Temple NW Outdoors",
+    "Forest Temple NE Outdoors",
+    "Forest Temple Outdoors High Balconies",
+    "Forest Temple Falling Room",
+    "Forest Temple Block Push Room",
+    "Forest Temple Straightened Hall",
+    "Forest Temple Outside Upper Ledge",
+    "Forest Temple Bow Region",
+    "Forest Temple Before Boss"
+  ],
+  "Fire Temple": [
+    "Volvagia Boss Room",
+    "Fire Temple Lower",
+    "Fire Temple Big Lava Room",
+    "Fire Temple Middle",
+    "Fire Temple Upper"
+  ],
+  "Water Temple": [
+    "Morpha Boss Room",
+    "Water Temple Lobby",
+    "Water Temple Dive",
+    "Water Temple North Basement",
+    "Water Temple Cracked Wall",
+    "Water Temple Dragon Statue",
+    "Water Temple Middle Water Level",
+    "Water Temple Falling Platform Room",
+    "Water Temple Dark Link Region"
+  ],
+  "Shadow Temple": [
+    "Bongo Bongo Boss Room",
+    "Shadow Temple Beginning",
+    "Shadow Temple First Beamos",
+    "Shadow Temple Huge Pit",
+    "Shadow Temple Invisible Spikes",
+    "Shadow Temple Wind Tunnel",
+    "Shadow Temple After Wind",
+    "Shadow Temple Boat",
+    "Shadow Temple Before Boss"
+  ],
+  "Spirit Temple": [
+    "Twinrova Boss Room",
+    "Child Spirit Temple",
+    "Child Spirit Before Locked Door",
+    "Early Adult Spirit Temple",
+    "Child Spirit Temple Climb",
+    "Spirit Temple Central Chamber",
+    "Adult Spirit Temple Climb",
+    "Spirit Temple Beyond Anubis Room",
+    "Spirit Temple Beyond Final Locked Door"
+  ],
+  "Inside Ganons Castle": [
+    "Ganons Castle Tower",
+    "Ganons Castle Deku Scrubs",
+    "Ganons Castle Forest Trial",
+    "Ganons Castle Fire Trial",
+    "Ganons Castle Water Trial",
+    "Ganons Castle Shadow Trial",
+    "Ganons Castle Spirit Trial",
+    "Ganons Castle Light Trial"
+  ],
+  "Ice Cavern": [
+    "Ice Cavern Beginning",
+    "Ice Cavern"
+  ],
+  "Bottom of the Well": [
+    "Bottom of the Well Main Area"
+  ],
+  "Gerudo Training Ground": [
+    "Gerudo Training Ground Lobby",
+    "Gerudo Training Ground Central Maze",
+    "Gerudo Training Ground Central Maze Right",
+    "Gerudo Training Ground Lava Room",
+    "Gerudo Training Ground Hammer Room",
+    "Gerudo Training Ground Eye Statue Lower",
+    "Gerudo Training Ground Eye Statue Upper",
+    "Gerudo Training Ground Heavy Block Room",
+    "Gerudo Training Ground Like Like Room"
+  ]
+}

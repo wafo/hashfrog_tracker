@@ -1,105 +1,71 @@
-import { useMemo, useState, useEffect } from "react";
-import { useCheck, useChecks } from "../context/trackerContext";
+import _ from "lodash";
+import { useEffect, useMemo, useState } from "react";
+import { useChecks, useLocation } from "../context/trackerContext";
+
+import Locations from "../utils/locations";
+
+import DUNGEONS from "../data/dungeons.json";
+import HINT_REGIONS_SHORT_NAMES from "../data/hint-regions-short-names.json";
 
 const Checks = () => {
-  const { checks, locations } = useChecks();
+  const [actions] = useLocation();
+  const { locations } = useChecks();
   const [type, setType] = useState("overworld");
-  const [selected, setSelected] = useState(null);
+  const [selectedRegion, setSelectedRegion] = useState(null);
 
-  const counter = useMemo(() => {
-    const counter = {
+  useEffect(() => {
+    _.forEach(Locations.mapLocationsToHintAreas(), (regionLocations, regionName) => {
+      _.forEach(regionLocations, locationName => {
+        actions.addLocation(locationName, regionName);
+      });
+    });
+  }, [actions]);
+
+  const countLocations = (locationsList, counter) => {
+    _.forEach(_.values(locationsList), locationData => {
+      if (locationData.isAvailable && !locationData.isChecked) counter.available += 1;
+      if (!locationData.isAvailable) counter.locked += 1;
+      if (locationData.isChecked) counter.checked += 1;
+      if (!locationData.isChecked) counter.remaining += 1;
+    });
+  };
+
+  const locationsCounter = useMemo(() => {
+    const newCounter = {
       locked: 0,
       checked: 0,
       available: 0,
       remaining: 0,
     };
 
-    checks.forEach(check => {
-      if (check.available && !check.checked) counter.available += 1;
-      if (!check.available) counter.locked += 1;
-      if (check.checked) counter.checked += 1;
-      if (!check.checked) counter.remaining += 1;
+    _.forEach(_.values(locations), regionLocations => {
+      countLocations(regionLocations, newCounter);
     });
 
-    return counter;
-  }, [checks]);
+    return newCounter;
+  }, [locations]);
 
-  const handleLocationClick = id => {
-    setSelected(prev => (prev === id ? null : id));
+  const onRegionClicked = regionName => {
+    setSelectedRegion(prev => (prev === regionName ? null : regionName));
   };
 
   useEffect(() => {
-    setSelected(null);
+    setSelectedRegion(null);
   }, [type]);
-
-  const locationsByType = useMemo(() => {
-    const checksByLocation = checks.reduce((acc, check) => {
-      if (!acc[check.location_id]) acc[check.location_id] = [];
-      acc[check.location_id].push({ ...check });
-      return acc;
-    }, {});
-
-    let locationsByType = locations.filter(x => x.type === type);
-
-    return locationsByType.reduce((acc, loc) => {
-      loc.checks = checksByLocation[loc.id];
-      loc.available = 0;
-      loc.locked = 0;
-      loc.checked = 0;
-
-      loc.checks.forEach(check => {
-        if (check.available && !check.checked) loc.available += 1;
-        if (!check.available) loc.locked += 1;
-        if (check.checked) loc.checked += 1;
-      });
-
-      acc.push({ ...loc });
-      return acc;
-    }, []);
-  }, [checks, locations, type]);
-
-  const location = useMemo(() => {
-    if (!selected) return null;
-    const location = locationsByType.find(x => x.id === selected);
-    return location;
-  }, [locationsByType, selected]);
 
   return (
     <div id="checks" className="check-tracker">
-      <Buttons type={type} setType={setType} />
-      {location && <Location location={location} setSelected={setSelected} />}
-      {!location && (
-        <div className="check-tracker-locations">
-          {locationsByType.map(loc => {
-            const style = {};
-            if ((loc.available === 0 && loc.locked === 0) || loc.checked >= loc.checks.length) {
-              style.opacity = "0.75";
-            } else {
-              if ((loc.locked < 1 && loc.available > 0) || loc.available + loc.checked >= loc.checks.length) {
-                style.borderLeftColor = "#198754";
-              } else if (loc.locked > 0 && loc.available > 0) {
-                style.borderLeftColor = "#ffc107";
-              } else if (loc.locked > 0 && loc.available < 1) {
-                style.borderLeftColor = "#dc3545";
-              }
-            }
-            return (
-              <div key={loc.id} className="item">
-                <button
-                  type="button"
-                  className="btn btn-dark btn-sm"
-                  onClick={() => handleLocationClick(loc.id)}
-                  onContextMenu={e => e.preventDefault()}
-                  style={style}
-                >
-                  <span>{loc.short_label}</span>
-                </button>
-              </div>
-            );
-          })}
-        </div>
-      )}
-      <Info counter={counter} />
+      <Buttons setType={setType} />
+      <LocationsList
+        actions={actions}
+        countLocations={countLocations}
+        locations={locations}
+        onRegionClicked={onRegionClicked}
+        selectedRegion={selectedRegion}
+        setSelectedRegion={setSelectedRegion}
+        type={type}
+      />
+      <Info locationsCounter={locationsCounter} />
     </div>
   );
 };
@@ -110,63 +76,137 @@ const Buttons = ({ setType }) => {
       <button type="button" className="btn btn-dark btn-sm me-1" onClick={() => setType("overworld")}>
         Overworld
       </button>
-      <button type="button" className="btn btn-dark btn-sm" onClick={() => setType("dungeon")} disabled>
+      <button type="button" className="btn btn-dark btn-sm" onClick={() => setType("dungeon")}>
         Dungeons
       </button>
     </div>
   );
 };
 
-const Location = ({ location, setSelected }) => {
-  const [actions] = useCheck();
-
+const HintRegion = ({ actions, locations, selectedRegion, setSelectedRegion }) => {
+  const locationsList = _.map(locations[selectedRegion], (locationData, locationName) => {
+    const style = {};
+    if (locationData.isChecked) style.textDecoration = "line-through";
+    if (!locationData.isAvailable) style.opacity = "0.5";
+    return (
+      <li key={locationName} className="check">
+        <button
+          type="button"
+          style={style}
+          onClick={() => actions.markLocation(locationName, selectedRegion)}
+          onContextMenu={e => {
+            e.preventDefault();
+            actions.markLocation(locationName, selectedRegion);
+          }}
+        >
+          {Locations.removeRegionPrefix(locationName, selectedRegion)}
+        </button>
+      </li>
+    );
+  });
   return (
     <div className="check-tracker-location">
-      <button type="button" className="btn btn-dark btn-sm py-0 mb-2" onClick={() => setSelected(null)}>
+      <button type="button" className="btn btn-dark btn-sm py-0 mb-2" onClick={() => setSelectedRegion(null)}>
         Back
       </button>
-      <ul className="check-list">
-        {location.checks.map(check => {
-          const style = {};
-          if (check.checked) style.textDecoration = "line-through";
-          if (!check.available) style.opacity = "0.5";
-
-          return (
-            <li key={check.id} className="check">
-              <button
-                type="button"
-                style={style}
-                onClick={() => actions.markCheck(check.id)}
-                onContextMenu={e => {
-                  e.preventDefault();
-                  actions.markCheck(check.id);
-                }}
-              >
-                {check.label}
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+      <ul className="check-list">{locationsList}</ul>
     </div>
   );
 };
 
-const Info = ({ counter }) => {
+const LocationsList = ({
+  actions,
+  countLocations,
+  locations,
+  onRegionClicked,
+  selectedRegion,
+  setSelectedRegion,
+  type,
+}) => {
+  if (selectedRegion) {
+    return (
+      <HintRegion
+        actions={actions}
+        locations={locations}
+        selectedRegion={selectedRegion}
+        setSelectedRegion={setSelectedRegion}
+      />
+    );
+  } else {
+    const filteredLocations = _.filter(_.keys(locations), regionName => {
+      if (type === "dungeon") {
+        return _.includes(DUNGEONS, regionName);
+      } else {
+        return !_.includes(DUNGEONS, regionName);
+      }
+    });
+
+    const locationsList = _.map(locations, (locationData, regionName) => {
+      if (!_.includes(filteredLocations, regionName)) {
+        return;
+      }
+
+      const numLocations = _.size(locationData);
+      const locationsCounter = {
+        locked: 0,
+        checked: 0,
+        available: 0,
+        remaining: 0,
+      };
+      countLocations(locationData, locationsCounter);
+
+      const style = {};
+      if (
+        (locationsCounter.available === 0 && locationsCounter.locked === 0) ||
+        locationsCounter.checked >= numLocations
+      ) {
+        style.opacity = "0.75";
+      } else {
+        if (
+          (locationsCounter.locked < 1 && locationsCounter.available > 0) ||
+          locationsCounter.available + locationsCounter.checked >= numLocations
+        ) {
+          style.borderLeftColor = "#198754";
+        } else if (locationsCounter.locked > 0 && locationsCounter.available > 0) {
+          style.borderLeftColor = "#ffc107";
+        } else if (locationsCounter.locked > 0 && locationsCounter.available < 1) {
+          style.borderLeftColor = "#dc3545";
+        }
+      }
+      return (
+        <div key={regionName} className="item">
+          <button
+            type="button"
+            className="btn btn-dark btn-sm"
+            onClick={() => onRegionClicked(regionName)}
+            onContextMenu={e => e.preventDefault()}
+            style={style}
+          >
+            <span>{HINT_REGIONS_SHORT_NAMES[regionName]}</span>
+          </button>
+        </div>
+      );
+    });
+
+    return <div className="check-tracker-locations">{locationsList}</div>;
+  }
+};
+
+const Info = ({ locationsCounter }) => {
   return (
     <div className="info">
       <table>
         <tbody>
           <tr>
-            <td>{counter.checked}</td>
+            <td>{locationsCounter.checked}</td>
             <td>Checked</td>
           </tr>
           <tr>
-            <td>{counter.available}</td>
+            <td>{locationsCounter.available}</td>
             <td>Available</td>
           </tr>
           <tr>
-            <td>{counter.remaining}</td>
+            <td>{locationsCounter.remaining}</td>
             <td>Remaining</td>
           </tr>
         </tbody>

@@ -1,0 +1,23 @@
+{
+    "gerudo_fortress": "fast",
+    "bombchus_in_logic": false,
+    "shopsanity": "off",
+    "tokensanity": "off",
+    "shuffle_scrubs": "off",
+    "shuffle_cows": false,
+    "shuffle_kokiri_sword": true,
+    "shuffle_ocarinas": false,
+    "shuffle_weird_egg": false,
+    "shuffle_gerudo_card": false,
+    "shuffle_beans": false,
+    "shuffle_medigoron_carpet_salesman": false,
+    "shuffle_frog_song_rupees": false,
+    "shuffle_mapcompass": "startwith",
+    "shuffle_smallkeys": "dungeon",
+    "shuffle_bosskeys": "dungeon",
+    "shuffle_ganon_bosskey": "medallions",
+    "disabled_locations": [
+        "Deku Theater Mask of Truth"
+    ],
+    "skip_child_zelda": true
+}

@@ -1,6 +1,6 @@
-import { useContext, useReducer, createContext, useMemo } from "react";
-import locationsJSON from "../data/locations.json";
-import checksJSON from "../data/checks.json";
+import _ from "lodash";
+
+import { createContext, useContext, useMemo, useReducer } from "react";
 
 const defaultItems = {
   // Songs
@@ -172,51 +172,62 @@ function parseItems(items_list) {
   return items;
 }
 
-const initialState = {
-  checks: [...checksJSON],
-  locations: [...locationsJSON],
-  items: { ...defaultItems },
-  items_list: [],
-};
-
 function reducer(state, action) {
+  const { payload } = action;
   switch (action.type) {
-    case "CHECK_MARK": {
-      // Finding check
-      const checkIndex = state.checks.findIndex(x => x.id === action.payload);
-      if (checkIndex === -1) return state;
-      // Manipulating check
-      const check = { ...state.checks[checkIndex] };
-      check.checked = !check.checked;
-      // Manipulating state
-      const checks = [...state.checks];
-      checks[checkIndex] = { ...check };
+    case "LOCATION_ADD": {
+      const { locationName, regionName } = payload;
+
+      const locations = _.cloneDeep(state.locations);
+      _.set(locations, [regionName, locationName], { isAvailable: true, isChecked: false });
 
       return {
         ...state,
-        checks,
+        locations,
+      };
+    }
+    case "LOCATION_MARK": {
+      const { locationName, regionName } = payload;
+
+      // Finding check
+      if (
+        !_.includes(_.keys(state.locations), regionName) ||
+        !_.includes(_.keys(state.locations[regionName]), locationName)
+      ) {
+        return state;
+      }
+      // Manipulating check
+      const location = state.locations[regionName][locationName];
+      location.isChecked = !location.isChecked;
+      // Manipulating state
+      const locations = _.cloneDeep(state.locations);
+      _.set(locations, [regionName, locationName], location);
+
+      return {
+        ...state,
+        locations,
       };
     }
     case "ITEM_MARK": {
-      const { items, item } = action.payload;
+      const { items, item } = payload;
       // Preping collecting items
       const items_list = [...state.items_list.filter(x => !items.includes(x))];
       if (item) items_list.push(item);
       const parsedItems = parseItems(items_list);
       // Validating checks based on items collected
-      let checks = [...state.checks];
-      checks = checks.map(check => {
-        if (check.condition) {
-          check.available = new Function("return " + check.condition)()(parsedItems);
-        }
-        return check;
-      });
+      // let checks = [...state.checks];
+      // checks = checks.map(check => {
+      //   if (check.condition) {
+      //     check.available = new Function("return " + check.condition)()(parsedItems);
+      //   }
+      //   return check;
+      // });
 
       return {
         ...state,
         items_list,
         items: parsedItems,
-        checks,
+        // checks,
       };
     }
     default:
@@ -225,6 +236,13 @@ function reducer(state, action) {
 }
 
 function TrackerProvider(props) {
+  const initialState = {
+    locations: {},
+    items: { ...defaultItems },
+    items_list: [],
+    settings: {}, // TODO: Maybe have some default settings ?
+  };
+
   const [state, dispatch] = useReducer(reducer, initialState);
 
   // Implementar local storage?
@@ -235,22 +253,24 @@ const useTracker = () => useContext(TrackerContext);
 
 const useChecks = () => {
   const {
-    state: { checks, locations, items },
+    state: { locations, items },
   } = useTracker();
 
   return {
-    checks,
     locations,
     items,
   };
 };
 
-const useCheck = () => {
+const useLocation = () => {
   const { dispatch } = useTracker();
 
   const actions = useMemo(
     () => ({
-      markCheck: id => dispatch({ type: "CHECK_MARK", payload: id }),
+      addLocation: (locationName, regionName) =>
+        dispatch({ type: "LOCATION_ADD", payload: { locationName, regionName } }),
+      markLocation: (locationName, regionName) =>
+        dispatch({ type: "LOCATION_MARK", payload: { locationName, regionName } }),
     }),
     [dispatch],
   );
@@ -271,4 +291,4 @@ const useItem = () => {
   return actions;
 };
 
-export { TrackerProvider, useTracker, useChecks, useCheck, useItem };
+export { TrackerProvider, useTracker, useChecks, useLocation, useItem };
