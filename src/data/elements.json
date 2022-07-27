@@ -978,6 +978,15 @@
     "receiver": true
   },
   {
+    "id": "b912ad0bfcc942ccac7c4584cd74c921",
+    "type": "simple",
+    "name": "triforce_piece",
+    "displayName": "Triforce Piece",
+    "size": [25, 25],
+    "icons": ["single_triforce_bw_32x32.png", "single_triforce_32x32.png"],
+    "receiver": false
+  },
+  {
     "id": "9e6f493869f84c19b23081bdb92bc621",
     "type": "simple",
     "name": "boss_initials",

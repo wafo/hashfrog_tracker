@@ -23,7 +23,7 @@ const CustomReactSelect = props => {
         minHeight: "20px",
         borderColor: backgroundColor,
         color: color,
-        filter: `hue-rotate(${hueRotate}deg)`
+        filter: `hue-rotate(${hueRotate}deg)`,
       }),
       indicatorsContainer: () => ({
         display: "none",
@@ -93,7 +93,7 @@ const CustomReactSelect = props => {
     event.preventDefault();
     if (event.nativeEvent.which === 2) {
       // Wheel Click
-      setHueRotate(prev => (prev + 45 <= 360 ? prev + 45 : 0));
+      setHueRotate(prev => (prev + 45 < 360 ? prev + 45 : 0));
     }
   };
 
@@ -102,11 +102,7 @@ const CustomReactSelect = props => {
   }, [onValueCallback, value]);
 
   return (
-    <div
-      onContextMenu={handleRightClick}
-      onAuxClick={handleOnClick}
-      style={{ flex: 1 }}
-    >
+    <div onContextMenu={handleRightClick} onAuxClick={handleOnClick} style={{ flex: 1 }}>
       <Select
         id={id}
         name={name}

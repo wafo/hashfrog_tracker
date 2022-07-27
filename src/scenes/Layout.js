@@ -145,6 +145,7 @@ const Layout = props => {
                 backgroundColor={component.backgroundColor}
                 showBoss={component.showBoss}
                 showItems={component.showItems}
+                labels={component.labels}
                 {...(bossElement && bossElement.icons && { bossIcons: bossElement.icons })}
                 {...(element && element.icons && { itemsIcons: element.icons })}
               />
