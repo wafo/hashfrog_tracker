@@ -4,6 +4,7 @@ import EditorLayoutConfig from "./EditorLayoutConfig";
 import EditorComponentsList from "./EditorComponentsList";
 import { generateId, readFileAsText } from "../../utils/utils";
 import FileSaver from "file-saver";
+import EditorElementsList from "./EditorElementsList";
 
 const baseLayout = {
   id: "",
@@ -204,13 +205,25 @@ const Editor = () => {
                     >
                       Components
                     </button>
+                    <button
+                      type="button"
+                      className={`btn btn-sm ${tab === 2 ? "btn-light" : "btn-dark"}`}
+                      onClick={() => setTab(2)}
+                    >
+                      Elements
+                    </button>
                   </div>
-                  <div style={{ display: tab === 0 ? "unset" : "none" }}>
+                  {tab === 0 && (
                     <EditorLayoutConfig layoutConfig={layout.layoutConfig} setLayoutConfig={setLayoutConfig} />
-                  </div>
-                  <div style={{ display: tab === 1 ? "unset" : "none" }}>
-                    <EditorComponentsList components={layout.components} setLayout={setLayout} />
-                  </div>
+                  )}
+                  {tab === 1 && (
+                    <EditorComponentsList
+                      customElements={layout.elements}
+                      components={layout.components}
+                      setLayout={setLayout}
+                    />
+                  )}
+                  {tab === 2 && <EditorElementsList elements={layout.elements || []} setLayout={setLayout} />}
                 </Fragment>
               )}
             </div>

@@ -23,3 +23,12 @@ export function splitIntoChunk(arr, chunk) {
   }
   return chunks;
 }
+
+export function splitNameBase64(string) {
+  const [name, file] = string.split(/;(.*)/s);
+  return { name, file };
+}
+
+export function isBase64(string) {
+  return string.match(/data:image\/png;base64{1}.*/);
+}

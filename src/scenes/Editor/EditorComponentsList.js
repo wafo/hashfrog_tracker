@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { generateId } from "../../utils/utils";
 import EditorComponent from "./EditorComponent";
 
-const EditorComponentsList = ({ components, setLayout }) => {
+const EditorComponentsList = ({ components, setLayout, customElements }) => {
   const [component, setComponent] = useState(null);
 
   const addComponent = () => {
@@ -59,7 +59,9 @@ const EditorComponentsList = ({ components, setLayout }) => {
           Save
         </button>
       </div>
-      {component && <EditorComponent component={component} setComponent={setComponent} />}
+      {component && (
+        <EditorComponent component={component} setComponent={setComponent} customElements={customElements} />
+      )}
       {!component && components.length < 1 && <p className="uuid my-2">Add a component to start</p>}
       {!component && components.length > 0 && (
         <ul className="list-unstyled mb-0">

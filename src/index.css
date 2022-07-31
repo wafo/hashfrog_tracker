@@ -30,6 +30,10 @@ body {
   font-weight: bold;
 }
 
+.form-control:disabled {
+  background-color: #ccc;
+}
+
 .btn {
   border-radius: 2px;
 }
@@ -185,12 +189,14 @@ body {
   margin: 0.25rem 0;
 }
 
-.editor .component-list ul {
+.editor .component-list ul,
+.editor .element-list ul {
   overflow-y: auto;
   /* max-height: 50vh; */
 }
 
-.editor .component-list ul button {
+.editor .component-list ul button,
+.editor .element-list ul button {
   width: 100%;
   margin-bottom: 0.25rem;
   text-align: left;
