@@ -13,13 +13,17 @@ const Checks = () => {
   const [type, setType] = useState("overworld");
   const [selectedRegion, setSelectedRegion] = useState(null);
 
+  const [isInitialized, setIsInitialized] = useState(false);
   useEffect(() => {
-    _.forEach(Locations.mapLocationsToHintAreas(), (regionLocations, regionName) => {
-      _.forEach(regionLocations, locationName => {
-        actions.addLocation(locationName, regionName);
+    if (!isInitialized) {
+      _.forEach(Locations.mapLocationsToHintAreas(), (regionLocations, regionName) => {
+        _.forEach(regionLocations, locationName => {
+          actions.addLocation(locationName, regionName);
+        });
       });
-    });
-  }, [actions]);
+      setIsInitialized(true);
+    }
+  }, [actions, isInitialized]);
 
   const countLocations = (locationsList, counter) => {
     _.forEach(_.values(locationsList), locationData => {

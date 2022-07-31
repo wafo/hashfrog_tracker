@@ -1,22 +1,35 @@
 import _ from "lodash";
 
-import DEFAULT_SETTINGS from "../data/setting-presets/league-s3.json";
-import HINT_REGIONS from "../data/hint-regions.json";
 import HINT_REGIONS_SHORT_NAMES from "../data/hint-regions-short-names.json";
+import HINT_REGIONS from "../data/hint-regions.json";
 import LOCATION_TABLE from "../data/location-table.json";
+import DEFAULT_SETTINGS from "../data/setting-presets/league-s3.json";
+
+import LogicHelper from "./logic-helper";
 
 class Locations {
   static initialize(dungeonFiles, overworldFile, settings = DEFAULT_SETTINGS) {
     this.settings = settings;
 
     this.locations = new Map();
-    this.events = new Map();
-    this.exits = new Map();
+    this.events = {};
+    this.exits = {};
 
     this._mapHintRegions();
 
     this._parseDungeonFiles(dungeonFiles);
     this._parseOverworldFile(overworldFile);
+  }
+
+  static isAlwaysPlacedLocation(location) {
+    const [type, vanillaItem] = LOCATION_TABLE[location];
+
+    return (
+      _.includes(
+        ["Zeldas Letter", "Triforce", "Scarecrow Song", "Deliver Letter", "Time Travel", "Bombchu Drop"],
+        vanillaItem,
+      ) || type === "Drop"
+    );
   }
 
   static isProgressLocation(location, isDungeon, settings) {
@@ -32,13 +45,7 @@ class Locations {
     }
 
     // Always Placed Items
-    else if (
-      _.includes(
-        ["Zeldas Letter", "Triforce", "Scarecrow Song", "Deliver Letter", "Time Travel", "Bombchu Drop"],
-        vanillaItem,
-      ) ||
-      type === "Drop"
-    ) {
+    else if (Locations.isAlwaysPlacedLocation(location)) {
       return false;
     }
 
@@ -214,27 +221,33 @@ class Locations {
   }
 
   static _parseDungeonFiles(dungeonFiles) {
-    _.forEach(dungeonFiles, (dungeonRegions, dungeonName) => {
+    _.forEach(_.values(dungeonFiles), dungeonRegions => {
       _.forEach(dungeonRegions, region => {
         if (_.includes(_.keys(region), "locations")) {
           _.forEach(region.locations, (rule, locationName) => {
             if (Locations.isProgressLocation(locationName, true, this.settings)) {
               const locationData = {
                 parentRegion: region.region_name,
-                rule: _.trim(rule),
+                rule: LogicHelper.parseRule(rule),
               };
               _.set(this.locations, locationName, locationData);
             }
           });
         }
 
+        if (_.includes(_.keys(region), "events")) {
+          _.forEach(region.events, (rule, eventName) => {
+            const eventData = {
+              parentRegion: region.region_name,
+              rule: LogicHelper.parseRule(rule),
+            };
+            _.set(this.events, eventName, eventData);
+          });
+        }
+
         if (_.includes(_.keys(region), "exits")) {
           _.forEach(region.exits, (rule, exitName) => {
-            const exitData = {
-              parentRegion: region.region_name,
-              rule: _.trim(rule),
-            };
-            _.set(this.exits, exitName, exitData);
+            _.set(this.exits, [region.region_name, exitName], LogicHelper.parseRule(rule));
           });
         }
       });
@@ -248,7 +261,7 @@ class Locations {
           if (Locations.isProgressLocation(locationName, false, this.settings)) {
             const locationData = {
               parentRegion: region.region_name,
-              rule: _.trim(rule),
+              rule: LogicHelper.parseRule(rule),
             };
             _.set(this.locations, locationName, locationData);
           }
@@ -259,7 +272,7 @@ class Locations {
         _.forEach(region.events, (rule, eventName) => {
           const eventData = {
             parentRegion: region.region_name,
-            rule: _.trim(rule),
+            rule: LogicHelper.parseRule(rule),
           };
           _.set(this.events, eventName, eventData);
         });
@@ -267,11 +280,7 @@ class Locations {
 
       if (_.includes(_.keys(region), "exits")) {
         _.forEach(region.exits, (rule, exitName) => {
-          const exitData = {
-            parentRegion: region.region_name,
-            rule: _.trim(rule),
-          };
-          _.set(this.exits, exitName, exitData);
+          _.set(this.exits, [region.region_name, exitName], LogicHelper.parseRule(rule));
         });
       }
     });
