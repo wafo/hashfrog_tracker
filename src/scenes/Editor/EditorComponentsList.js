@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { generateId } from "../../utils/utils";
 import EditorComponent from "./EditorComponent";
+import elementsJSON from "../../data/elements.json";
 
 const EditorComponentsList = ({ components, setLayout, customElements }) => {
   const [component, setComponent] = useState(null);
@@ -45,6 +46,11 @@ const EditorComponentsList = ({ components, setLayout, customElements }) => {
     });
   }, [component, setLayout]);
 
+  // From default elements and custom in layout
+  const combinedElements = useMemo(() => {
+    return [...elementsJSON, ...customElements];
+  }, [customElements]);
+
   return (
     <div className="component-list">
       <h5>Components</h5>
@@ -60,7 +66,7 @@ const EditorComponentsList = ({ components, setLayout, customElements }) => {
         </button>
       </div>
       {component && (
-        <EditorComponent component={component} setComponent={setComponent} customElements={customElements} />
+        <EditorComponent component={component} setComponent={setComponent} combinedElements={combinedElements} />
       )}
       {!component && components.length < 1 && <p className="uuid my-2">Add a component to start</p>}
       {!component && components.length > 0 && (

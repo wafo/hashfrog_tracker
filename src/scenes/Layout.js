@@ -67,7 +67,7 @@ const Layout = props => {
       // otherwise on repeated elements it rips
       // because on next search it will loop through already cached icons.
       let element = elements.find(element => element.name === id || element.id === id);
-      if (!element) return null;
+      if (!element) element = elements[0] // Fallback to hashfrog
       element = { ...element };
       if (!cachedIcons) element.icons = [];
       if (cachedIcons)

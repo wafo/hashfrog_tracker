@@ -1,5 +1,4 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
-import elementsJSON from "../../data/elements.json";
 import labelsJSON from "../../data/labels.json";
 import { generateId } from "../../utils/utils";
 
@@ -17,7 +16,7 @@ const toNumber = [
   "hintNumber",
 ];
 
-const EditorComponent = ({ component, setComponent, customElements }) => {
+const EditorComponent = ({ component, setComponent, combinedElements }) => {
   let { position, type, displayName = "" } = component;
   let [coordX, coordY] = position;
 
@@ -30,7 +29,7 @@ const EditorComponent = ({ component, setComponent, customElements }) => {
           setComponent({
             id: component.id,
             type: "element",
-            elementId: "0c44ac338d7249b39271d0b25425b7d9",
+            elementId: "a081121b16f84366bf16e16ca90cd23f",
             position: component.position,
             size: [25, 25],
             receiver: false,
@@ -186,9 +185,16 @@ const EditorComponent = ({ component, setComponent, customElements }) => {
     [setComponent],
   );
 
-  const combinedElements = useMemo(() => {
-    return [...elementsJSON, ...customElements];
-  }, [customElements]);
+  // Check if element inexistent because is a custom and got deleted. Revert to an existing one.
+  useEffect(() => {
+    const index = combinedElements.findIndex(x => x.id === component.elementId);
+    if (index === -1) {
+      setComponent(prev => ({
+        ...prev,
+        elementId: "a081121b16f84366bf16e16ca90cd23f",
+      }));
+    }
+  }, [combinedElements, component.elementId, setComponent]);
 
   return (
     <Fragment>
@@ -273,6 +279,8 @@ const ElementEditor = ({ component, handleChange, combinedElements }) => {
   const element = useMemo(() => {
     return combinedElements.find(x => x.id === component.elementId);
   }, [combinedElements, component.elementId]);
+
+  if (!element) return null;
 
   return (
     <Fragment>
