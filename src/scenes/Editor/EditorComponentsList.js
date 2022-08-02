@@ -48,7 +48,7 @@ const EditorComponentsList = ({ components, setLayout, customElements }) => {
 
   // From default elements and custom in layout
   const combinedElements = useMemo(() => {
-    return [...elementsJSON, ...customElements];
+    return [...elementsJSON, ...customElements || []];
   }, [customElements]);
 
   return (
