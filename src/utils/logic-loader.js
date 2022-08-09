@@ -8,7 +8,7 @@ class LogicLoader {
 
     const dungeonFiles = new Map();
     for await (let dungeonName of DUNGEONS) {
-      if (dungeonName === "Inside Ganons Castle") {
+      if (_.isEqual(dungeonName, "Inside Ganons Castle")) {
         dungeonName = "Ganons Castle";
       }
       _.set(dungeonFiles, dungeonName, await this._loadLogicFile(this._logicFileUrl(`${dungeonName}.json`)));

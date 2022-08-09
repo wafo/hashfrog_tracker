@@ -3,13 +3,14 @@ import { useEffect, useMemo, useState } from "react";
 import { useChecks, useLocation } from "../context/trackerContext";
 
 import Locations from "../utils/locations";
+import LogicHelper from "../utils/logic-helper";
 
 import DUNGEONS from "../data/dungeons.json";
 import HINT_REGIONS_SHORT_NAMES from "../data/hint-regions-short-names.json";
 
 const Checks = () => {
   const [actions] = useLocation();
-  const { locations } = useChecks();
+  const { locations, items } = useChecks();
   const [type, setType] = useState("overworld");
   const [selectedRegion, setSelectedRegion] = useState(null);
 
@@ -18,12 +19,15 @@ const Checks = () => {
     if (!isInitialized) {
       _.forEach(Locations.mapLocationsToHintAreas(), (regionLocations, regionName) => {
         _.forEach(regionLocations, locationName => {
-          actions.addLocation(locationName, regionName);
+          if (Locations.isProgressLocation(Locations.locations[locationName])) {
+            actions.addLocation(locationName, regionName);
+          }
         });
       });
+      LogicHelper.updateItems(items);
       setIsInitialized(true);
     }
-  }, [actions, isInitialized]);
+  }, [actions, isInitialized, items]);
 
   const countLocations = (locationsList, counter) => {
     _.forEach(_.values(locationsList), locationData => {
@@ -50,7 +54,7 @@ const Checks = () => {
   }, [locations]);
 
   const onRegionClicked = regionName => {
-    setSelectedRegion(prev => (prev === regionName ? null : regionName));
+    setSelectedRegion(prev => (_.isEqual(prev, regionName) ? null : regionName));
   };
 
   useEffect(() => {
@@ -138,7 +142,7 @@ const LocationsList = ({
     );
   } else {
     const filteredLocations = _.filter(_.keys(locations), regionName => {
-      if (type === "dungeon") {
+      if (_.isEqual(type, "dungeon")) {
         return _.includes(DUNGEONS, regionName);
       } else {
         return !_.includes(DUNGEONS, regionName);
@@ -186,7 +190,7 @@ const LocationsList = ({
             onContextMenu={e => e.preventDefault()}
             style={style}
           >
-            <span>{HINT_REGIONS_SHORT_NAMES[regionName]}</span>
+            <span>{_.toUpper(HINT_REGIONS_SHORT_NAMES[regionName])}</span>
           </button>
         </div>
       );

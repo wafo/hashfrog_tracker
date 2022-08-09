@@ -1,40 +1,53 @@
 import { parse } from "acorn";
 import _ from "lodash";
 
-import Locations from "./locations";
-
 import DEFAULT_SETTINGS from "../data/setting-presets/league-s3.json";
+
+import Locations from "./locations";
 
 class LogicHelper {
   static initialize(logicHelpersFile) {
-    this.rule_aliases = {};
+    // TODO: load settings from string/file
+    this.settings = _.cloneDeep(DEFAULT_SETTINGS);
+
+    this.ruleAliases = {};
     _.forEach(logicHelpersFile, (rule, alias) => {
-      _.set(this.rule_aliases, alias, LogicHelper.parseRule(rule));
+      if (!_.endsWith(alias, ")")) {
+        _.set(this.ruleAliases, alias, this.parseRule(rule));
+      }
     });
+
+    this.renamedAttributes = this._initRenamedAttributes();
+
+    if (
+      _.isEqual(this.settings.open_forest, "closed") &&
+      (this.renamedAttributes.shuffle_special_interior_entrances ||
+        this.settings.shuffle_overworld_entrances ||
+        this.settings.warp_songs ||
+        this.settings.spawn_positions ||
+        !_.isEqual(this.settings.shuffle_bosses, "off"))
+    ) {
+      _.set(this.settings, "open_forest", "closed_deku");
+    }
+
+    if (this.settings.triforce_hunt) {
+      _.set(this.settings, "shuffle_ganon_bosskey", "triforce");
+    }
+
     this.items = {};
-    this.events = {};
-    this.accessibleRegions = [];
+    this.regions = { child: [], adult: [] };
+    this._regionsQueue = [];
+
+    this.debug = false;
   }
 
   static updateItems(newItems) {
     this.items = _.cloneDeep(newItems);
 
-    this.accessibleRegions = [];
-    if (!_.isUndefined(Locations.exits)) {
-      LogicHelper._recalculateAccessibleRegions("Root");
-    }
-  }
-
-  static _recalculateAccessibleRegions(rootRegion) {
-    _.forEach(Locations.exits[rootRegion], (exitRule, exitName) => {
-      if (_.includes(this.accessibleRegions, exitName)) {
-        return;
-      }
-      if (LogicHelper._evalNode(exitRule)) {
-        this.accessibleRegions.push(exitName);
-        LogicHelper._recalculateAccessibleRegions(exitName);
-      }
-    });
+    this.regions = { child: [], adult: [] };
+    this._regionsQueue = [];
+    this._recalculateAccessibleRegions("Root", "child");
+    this._recalculateAccessibleRegions("Root", "adult");
   }
 
   static parseRule(ruleString) {
@@ -44,33 +57,111 @@ class LogicHelper {
       str => _.replace(str, / or /g, " || "),
       str => _.replace(str, /not /g, "! "),
     )(ruleString);
+
     return parse(rule, { ecmaVersion: 2020 }).body[0];
   }
 
-  static isLocationAvailable(locationName) {
+  static isLocationAvailable(locationName, age) {
     const parentRegion = Locations.locations[locationName].parentRegion;
-    const locatioNRule = Locations.locations[locationName].rule;
-    return _.includes(this.accessibleRegions, parentRegion) && LogicHelper._evalNode(locatioNRule);
+    const locationRule = Locations.locations[locationName].rule;
+
+    if (_.isUndefined(age)) {
+      return this.isLocationAvailable(locationName, "child") || this.isLocationAvailable(locationName, "adult");
+    } else {
+      return this._isRegionAccessible(parentRegion, age) && this._evalNode(locationRule, age);
+    }
   }
 
-  static _evalNode(node) {
+  static _initRenamedAttributes() {
+    // source: World.py __init__()
+
+    const keysanity = _.includes(["keysanity", "remove", "any_dungeon", "overworld"], this.settings.shuffle_smallkeys);
+    const checkBeatableOnly = _.isEqual(this.settings.reachable_locations, "all");
+    const shuffleSpecialInteriorEntrances = _.isEqual(this.settings.shuffle_interior_entrances, "all");
+    const shuffleInteriorEntrances = _.includes(["simple", "all"], this.settings.shuffle_interior_entrances);
+    const shuffleSpecialDungeonEntrances = _.isEqual(this.settings.shuffle_dungeon_entrances, "all");
+    const shuffleDungeonEntrances = _.includes(["simple", "all"], this.settings.shuffle_dungeon_entrances);
+
+    const entranceShuffle =
+      shuffleInteriorEntrances ||
+      this.settings.shuffle_grotto_entrances ||
+      shuffleDungeonEntrances ||
+      this.settings.shuffle_overworld_entrances ||
+      this.settings.owl_drops ||
+      this.settings.warp_songs ||
+      this.settings.spawn_positions ||
+      !_.isEqual(this.settings.shuffle_bosses, "off");
+
+    const ensureTodAccess =
+      shuffleInteriorEntrances || this.settings.shuffle_overworld_entrances || this.settings.spawn_positions;
+    const disable_trade_revert = shuffleInteriorEntrances || this.settings.shuffle_overworld_entrances;
+
+    const triforceGoal = this.settings.triforce_goal_per_world * this.settings.world_count;
+
+    return {
+      keysanity: keysanity,
+      check_beatable_only: checkBeatableOnly,
+      shuffle_special_interior_entrances: shuffleSpecialInteriorEntrances,
+      shuffle_interior_entrances: shuffleInteriorEntrances,
+      shuffle_special_dungeon_entrances: shuffleSpecialDungeonEntrances,
+      shuffle_dungeon_entrances: shuffleDungeonEntrances,
+      entrance_shuffle: entranceShuffle,
+      ensure_tod_access: ensureTodAccess,
+      disable_trade_revert: disable_trade_revert,
+      triforce_goal: triforceGoal,
+    };
+  }
+
+  static _recalculateAccessibleRegions(rootRegion, age) {
+    // iterate through regions BOTH depth-wise and breadth-wise
+
+    _.forEach(Locations.exits[rootRegion], (exitRule, exitName) => {
+      if (!_.includes(this.regions[age], exitName)) {
+        if (this._evalNode(exitRule, age)) {
+          this.regions[age] = _.union(this.regions[age], [exitName]);
+          this._regionsQueue = _.union(this._regionsQueue, [exitName]);
+          this._recalculateAccessibleRegions(exitName, age);
+        }
+      }
+    });
+
+    while (_.size(this._regionsQueue) > 0) {
+      const regionName = this._regionsQueue.shift();
+      this._recalculateAccessibleRegions(regionName, age);
+    }
+  }
+
+  static _isRegionAccessible(regionName, age) {
+    switch (age) {
+      case "child":
+        return _.includes(this.regions.child, regionName);
+      case "adult":
+        return _.includes(this.regions.adult, regionName);
+      default:
+        throw Error(`Invalid age ${age}`);
+    }
+  }
+
+  static _evalNode(node, age) {
     switch (node.type) {
       case "BinaryExpression":
-        return LogicHelper._evalBinaryExpression(node);
+        return this._evalBinaryExpression(node);
       case "CallExpression":
-        return LogicHelper._evalCallExpression(node);
+        return this._evalCallExpression(node, age);
       case "ExpressionStatement":
-        return LogicHelper._evalNode(node.expression);
+        return this._evalNode(node.expression, age);
       case "Identifier":
-        return LogicHelper._evalIdentifier(node);
+        return this._evalIdentifier(node.name, age);
       case "Literal":
-        return LogicHelper._evalLiteral(node);
+        return this._evalLiteral(node.value, age);
       case "LogicalExpression":
-        return LogicHelper._evalLogicalExpression(node);
+        return this._evalLogicalExpression(node, age);
+      case "MemberExpression":
+        return this._evalMemberExpression();
       case "SequenceExpression":
-        return LogicHelper._evalSequenceExpression(node);
+        return this._evalSequenceExpression(node, age);
       case "UnaryExpression":
-        return LogicHelper._evalUnaryExpression(node);
+        return this._evalUnaryExpression(node, age);
       default:
         throw Error(`Unknown AST node of type ${node.type}`);
     }
@@ -80,40 +171,58 @@ class LogicHelper {
     const leftSide = _.isEqual(node.left.type, "Identifier") ? node.left.name : node.left.value;
     const rightSide = _.isEqual(node.right.type, "Identifier") ? node.right.name : node.right.value;
 
-    // Hardcode open DoT (TODO: don't hardcode this)
-    if (_.includes(["==", "!="], node.operator) && _.isEqual(leftSide, "age")) {
-      return true;
-    }
-
     switch (node.operator) {
       case "==":
-        return _.includes(_.keys(DEFAULT_SETTINGS), leftSide) && _.isEqual(DEFAULT_SETTINGS[leftSide], rightSide);
+        if (_.includes(_.keys(this.settings), leftSide)) {
+          return _.isEqual(this.settings[leftSide], rightSide);
+        } else if (_.isEqual(leftSide, "age") && _.isEqual(rightSide, "starting_age")) {
+          return true; //TODO: don't hardcode this
+        }
+        break;
       case "!=":
-        return _.includes(_.keys(DEFAULT_SETTINGS), leftSide) && !_.isEqual(DEFAULT_SETTINGS[leftSide], rightSide);
+        if (_.includes(_.keys(this.settings), leftSide)) {
+          return !_.isEqual(this.settings[leftSide], rightSide);
+        }
+        break;
+      case "<":
+        if (_.includes(_.keys(this.settings), leftSide)) {
+          return this.settings[leftSide] < rightSide;
+        }
+        break;
       case "in":
-        return _.includes(_.keys(DEFAULT_SETTINGS), rightSide) && _.includes(DEFAULT_SETTINGS[rightSide], leftSide);
-      default:
-        throw Error(`Unable to eval BinaryExpression: ${leftSide} ${node.operator} ${rightSide}`);
+        if (_.includes(_.keys(this.settings), leftSide)) {
+          return _.includes(this.settings[rightSide], leftSide);
+        } else {
+          return false;
+        }
     }
+
+    throw Error(`Unable to eval BinaryExpression: ${leftSide} ${node.operator} ${rightSide}`);
   }
 
-  static _evalCallExpression(node) {
+  static _evalCallExpression(node, age) {
     const arg = node.arguments[0].name;
     switch (node.callee.name) {
       case "at":
         // TODO: this is hardcoded for now
         return true;
       case "can_play":
-        return LogicHelper._evalCanPlay(arg);
+        return this._canPlay(arg);
       case "can_use":
-        return LogicHelper._evalCanUse(arg);
+        return this._canUse(arg, age);
+      case "has_dungeon_rewards":
+        return this._hasDungeonRewards(arg);
+      case "has_hearts":
+        return this._hasHearts(arg);
       case "has_medallions":
-        return LogicHelper._evalHasMedallions(arg);
+        return this._hasMedallions(arg);
       case "has_projectile":
-        return LogicHelper._evalHasProjectile(arg);
-      // Hardcoded cases (TODO: don't hardcode these)
+        return this._hasProjectile(arg, age);
+      case "has_stones":
+        return this._hasStones(arg);
       case "here":
-        return true;
+        return this._evalNode(node.arguments[0], age);
+      // Hardcoded (TODO: don't hardcode this)
       case "region_has_shortcuts":
         return false;
       default:
@@ -121,81 +230,86 @@ class LogicHelper {
     }
   }
 
-  static _evalIdentifier(node) {
-    if (_.isEqual(node.name, "True")) {
-      return true;
-    }
-    if (_.startsWith(node.name, "logic_")) {
-      return _.includes(DEFAULT_SETTINGS.allowed_tricks, node.name);
-    }
-    if (_.includes(_.keys(this.items), node.name)) {
-      return this.items[node.name] > 0;
-    }
-    if (_.includes(_.keys(DEFAULT_SETTINGS), node.name)) {
-      return DEFAULT_SETTINGS[node.name];
-    }
-    if (_.includes(_.keys(this.rule_aliases), node.name)) {
-      return LogicHelper._evalNode(this.rule_aliases[node.name]);
-    }
-    if (_.includes(_.keys(Locations.events), _.replace(node.name, /_/g, " "))) {
-      const escapedIdentifier = _.replace(node.name, /_/g, " ");
-      return LogicHelper._evalEvent(escapedIdentifier);
-    }
-
-    switch (node.name) {
-      case "disable_trade_revert":
-        return (
-          _.includes(["simple", "all"], DEFAULT_SETTINGS.shuffle_interior_entrances) ||
-          DEFAULT_SETTINGS.shuffle_overworld_entrances
-        );
+  static _evalIdentifier(name, age) {
+    switch (name) {
+      case "True":
+        return true;
+      case "had_night_start":
+        return this._hadNightStart();
       case "has_bottle":
-        return this.items.Bottle > 0 || LogicHelper._canDeliverRutosLetter();
+        return this._hasBottle();
       case "Big_Poe":
-        return LogicHelper._canKillBigPoe();
+        return this._canAccessDrop("Big Poe");
+      case "Bombchu_Drop":
+        return this.isLocationAvailable("Market Bombchu Bowling Bombchus");
+      case "Bottle_with_Big_Poe":
+        return false; // TODO: not on tracker yet
       case "Deliver_Letter":
-        return LogicHelper._canDeliverRutosLetter();
+        return this.isLocationAvailable("Deliver Rutos Letter");
+      case "Time_Travel":
+        return this.isLocationAvailable("Master Sword Pedestal");
+
+      case "is_child":
+        return _.isEqual(age, "child");
+      case "is_adult":
+        return _.isEqual(age, "adult");
     }
 
-    // Some hardcoded special cases (TODO: don't hardcode these)
-    // Can only buy Bombchus if you have bomb bag
-    if (_.startsWith(node.name, "Buy_Bombchu") || _.startsWith(node.name, "Bombchu_Drop")) {
-      return this.items.Bomb_Bag > 0;
+    if (_.includes(_.keys(this.items), name)) {
+      return this.items[name] > 0;
     }
-    // Can only buy Blue Fire with two wallet upgrades
-    if (_.startsWith(node.name, "Buy_Blue_Fire")) {
-      return this.items.Progressive_Wallet > 2;
+    if (_.includes(_.keys(this.settings), name)) {
+      return this.settings[name];
+    }
+    if (_.includes(_.keys(this.ruleAliases), name)) {
+      return this._evalRuleAlias(name);
+    }
+    if (_.includes(_.keys(this.renamedAttributes), name)) {
+      return this.renamedAttributes[name];
+    }
+    const escapedIdentifier = _.replace(name, /_/g, " ");
+    if (_.includes(_.keys(Locations.events), escapedIdentifier)) {
+      return this._evalEvent(escapedIdentifier);
+    }
+
+    if (_.startsWith(name, "logic_")) {
+      return _.includes(this.settings.allowed_tricks, name);
     }
     // Assume can always let time of day pass
-    if (_.startsWith(node.name, "at_")) {
+    if (_.startsWith(name, "at_")) {
       return true;
     }
-
-    throw Error(`Unknown identifier: ${node.name}`);
-  }
-
-  static _evalLiteral(node) {
-    const escapedLiteral = _.replace(node.value, /_/g, " ");
-    if (_.includes(_.keys(Locations.events), escapedLiteral)) {
-      return LogicHelper._evalEvent(escapedLiteral);
+    if (_.startsWith(name, "Buy_")) {
+      return this._canBuy(name, age);
     }
 
-    // Hardcode 'Blue Fire' literal (TODO: don't hardcode this)
-    if (_.isEqual(node.value, "Blue Fire")) {
-      return LogicHelper._canGetBlueFire();
-    }
-
-    throw Error(`Unknown Literal: ${node.value}`);
+    throw Error(`Unknown identifier: ${name}`);
   }
 
-  static _evalLogicalExpression(node) {
+  static _evalLiteral(value) {
+    if (_.includes(_.keys(Locations.dropLocations), value)) {
+      return this._canAccessDrop(value);
+    } else if (_.includes(_.keys(Locations.events), value)) {
+      return this._evalEvent(value);
+    }
+
+    throw Error(`Unknown Literal: ${value}`);
+  }
+
+  static _evalLogicalExpression(node, age) {
     switch (node.operator) {
       case "&&":
-        return LogicHelper._evalNode(node.left) && LogicHelper._evalNode(node.right);
+        return this._evalNode(node.left, age) && this._evalNode(node.right, age);
       case "||":
-        return LogicHelper._evalNode(node.left) || LogicHelper._evalNode(node.right);
+        return this._evalNode(node.left, age) || this._evalNode(node.right, age);
       default:
         throw Error(`Unknown logical operator: ${node.operator}`);
     }
+  }
+
+  static _evalMemberExpression() {
+    // TODO: not yet implemented
+    return true;
   }
 
   static _evalSequenceExpression(node) {
@@ -208,24 +322,85 @@ class LogicHelper {
     return this.items[itemName] >= itemCount;
   }
 
-  static _evalUnaryExpression(node) {
+  static _evalUnaryExpression(node, age) {
     if (_.isEqual(node.operator, "!")) {
-      return !LogicHelper._evalNode(node.argument);
+      return !this._evalNode(node.argument, age);
     }
 
     throw Error(`Unknown unary operator: ${node.operator}`);
   }
 
-  static _evalCanPlay(songName) {
-    return this.items.Ocarina > 0 && this.items[songName] > 0;
+  static _canAccessDrop(dropName) {
+    return _.some(Locations.dropLocations[dropName], locationData => {
+      const parentRegion = locationData.parentRegion;
+      const rule = locationData.rule;
+
+      const asChild = this._isRegionAccessible(parentRegion, "child") && this._evalNode(rule, "child");
+      const asAdult = this._isRegionAccessible(parentRegion, "adult") && this._evalNode(rule, "adult");
+
+      return asChild || asAdult;
+    });
   }
 
-  static _evalCanUse(itemName) {
+  static _canBuy(itemName, age) {
+    const rules = [];
+
+    if (_.includes(["Buy_Arrows_50", "Buy_Fish", "Buy_Goron_Tunic", "Buy_Bombchu_20", "Buy_Bombs_30"], itemName)) {
+      rules.push("Progressive_Wallet");
+    } else if (_.includes(["Buy_Zora_Tunic", "Buy_Blue_Fire"], itemName)) {
+      rules.push("(Progressive_Wallet, 2)");
+    }
+
+    if (_.includes(["Buy_Zora_Tunic", "Buy_Blue_Fire"], itemName)) {
+      rules.push("is_adult");
+    }
+
+    if (
+      _.includes(
+        [
+          "Buy_Blue_Fire",
+          "Buy_Blue_Potion",
+          "Buy_Bottle_Bug",
+          "Buy_Fish",
+          "Buy_Green_Potion",
+          "Buy_Poe",
+          "Buy_Red_Potion_for_30_Rupees",
+          "Buy_Red_Potion_for_40_Rupees",
+          "Buy_Red_Potion_for_50_Rupees",
+          "Buy_Fairy's_Spirit",
+        ],
+        itemName,
+      )
+    ) {
+      rules.push("has_bottle");
+    }
+
+    if (_.includes(["Buy_Bombchu_10", "Buy_Bombchu_20", "Buy_Bombchu_5"], itemName)) {
+      rules.push("found_bombchus");
+    }
+
+    if (_.isEmpty(rules)) {
+      return true;
+    } else {
+      const combinedRule = _.join(rules, " and ");
+      return this._evalNode(this.parseRule(combinedRule), age);
+    }
+  }
+
+  static _canPlay(songName) {
+    if (_.isEqual(songName, "Scarecrow_Song")) {
+      return this.items.Ocarina > 0 && this.isLocationAvailable("Pierre");
+    } else {
+      return this.items.Ocarina > 0 && this.items[songName] > 0;
+    }
+  }
+
+  static _canUse(itemName, age) {
     if (_.isEqual(itemName, "Scarecrow")) {
-      return this.items.Progressive_Hookshot > 0 && LogicHelper._evalCanPlay("Scarecrow_Song");
+      return this.items.Progressive_Hookshot > 0 && this._canPlay("Scarecrow_Song", age);
     }
     if (_.isEqual(itemName, "Distant_Scarecrow")) {
-      return this.items.Progressive_Hookshot > 1 && LogicHelper._evalCanPlay("Scarecrow_Song");
+      return this.items.Progressive_Hookshot > 1 && this._canPlay("Scarecrow_Song", age);
     }
 
     const isChildItem = _.includes(["Slingshot", "Boomerang", "Kokiri_Sword", "Sticks", "Deku_Shield"], itemName);
@@ -248,40 +423,108 @@ class LogicHelper {
     const isMagicItem = _.includes(["Dins_Fire", "Farores_Wind", "Nayrus_Love", "Lens_of_Truth"], itemName);
     const isMagicArrow =
       _.includes(["Fire_Arrows", "Light_Arrows"], itemName) ||
-      (DEFAULT_SETTINGS.blue_fire_arrows && _.isEqual(itemName, "Ice_Arrows"));
+      (this.settings.blue_fire_arrows && _.isEqual(itemName, "Ice_Arrows"));
 
+    if (_.isUndefined(age)) {
+      (isChildItem && this._evalNode(this.parseRule(`${itemName}`), age)) ||
+        (isAdultItem && this._evalNode(this.parseRule(`${itemName}`), age)) ||
+        (isMagicItem && this._evalNode(this.parseRule(`${itemName} and Magic_Meter`), age)) ||
+        (isMagicArrow && this._evalNode(this.parseRule(`${itemName} and Bow and Magic_Meter`), age));
+    } else {
+      return (
+        (isChildItem && this._evalNode(this.parseRule(`is_child and ${itemName}`), age)) ||
+        (isAdultItem && this._evalNode(this.parseRule(`is_adult and ${itemName}`), age)) ||
+        (isMagicItem && this._evalNode(this.parseRule(`${itemName} and Magic_Meter`), age)) ||
+        (isMagicArrow && this._evalNode(this.parseRule(`is_adult and ${itemName} and Bow and Magic_Meter`), age))
+      );
+    }
+  }
+
+  static _evalEvent(eventName) {
+    // TOOD: hardcode adult trade to start at Prescription
+    if (_.isEqual(eventName, "Broken Sword Access")) {
+      return false;
+    }
+
+    return _.some(Locations.events[eventName], eventData => {
+      const parentRegion = eventData.parentRegion;
+      const rule = eventData.rule;
+
+      const asChild = this._isRegionAccessible(parentRegion, "child") && this._evalNode(rule, "child");
+      const asAdult = this._isRegionAccessible(parentRegion, "adult") && this._evalNode(rule, "adult");
+
+      return asChild || asAdult;
+    });
+  }
+
+  static _evalRuleAlias(ruleName) {
+    const rule = this.ruleAliases[ruleName];
+
+    const asChild = this._evalNode(rule, "child");
+    const asAdult = this._evalNode(rule, "adult");
+
+    return asChild || asAdult;
+  }
+
+  static _hadNightStart() {
+    const stod = this.settings.starting_tod;
+    return _.includes(["sunset", "evening", "midnight", "witching-hour"], stod);
+  }
+
+  static _hasBottle() {
+    return this.items.Bottle > 0 || this.isLocationAvailable("Deliver Rutos Letter");
+  }
+
+  static _hasDungeonRewards(count) {
+    if (!_.includes(_.keys(this.settings), count)) {
+      throw Error(`Bad argument to has_dungeon_rewards: ${count}`);
+    }
+
+    const dungeonRewardsCount = this.settings[count];
     return (
-      (isChildItem && LogicHelper._evalNode(LogicHelper.parseRule(`is_child and ${itemName}`))) ||
-      (isAdultItem && LogicHelper._evalNode(LogicHelper.parseRule(`is_adult and ${itemName}`))) ||
-      (isMagicItem && this.items.Magic_Meter > 0) ||
-      (isMagicArrow && this.items.Bow > 0 && this.items.Magic_Meter > 0)
+      _.sum([
+        this.items.Kokiri_Emerald,
+        this.items.Goron_Ruby,
+        this.items.Zora_Sapphire,
+        this.items.Forest_Medallion,
+        this.items.Fire_Medallion,
+        this.items.Water_Medallion,
+        this.items.Spirit_Medallion,
+        this.items.Shadow_Medallion,
+        this.items.Light_Medallion,
+      ]) >= dungeonRewardsCount
     );
   }
 
-  static _evalHasMedallions(count) {
-    if (!_.includes(_.keys(DEFAULT_SETTINGS), count)) {
+  static _hasHearts() {
+    // TODO: not yet implemented
+    return false;
+  }
+
+  static _hasMedallions(count) {
+    if (!_.includes(_.keys(this.settings), count)) {
       throw Error(`Bad argument to has_medallions: ${count}`);
     }
 
-    const medallionCount = DEFAULT_SETTINGS[count];
+    const medallionCount = this.settings[count];
     return (
       _.sum([
-        "Forest_Medallion",
-        "Fire_Medallion",
-        "Water_Medallion",
-        "Spirit_Medallion",
-        "Shadow_Medallion",
-        "Light_Medallion",
+        this.items.Forest_Medallion,
+        this.items.Fire_Medallion,
+        this.items.Water_Medallion,
+        this.items.Spirit_Medallion,
+        this.items.Shadow_Medallion,
+        this.items.Light_Medallion,
       ]) >= medallionCount
     );
   }
 
-  static _evalHasProjectile(forAge) {
+  static _hasProjectile(forAge, age) {
     const canChildProjectile = this.items.Slingshot > 0 || this.items.Boomerang > 0;
     const canAdultProjectile = this.items.Bow > 0 || this.items.Hookshot > 0;
 
     return (
-      LogicHelper._evalNode(LogicHelper.parseRule("has_explosives")) ||
+      this._evalNode(this.parseRule("has_explosives"), age) ||
       (_.isEqual(forAge, "child") && canChildProjectile) ||
       (_.isEqual(forAge, "adult") && canAdultProjectile) ||
       (_.isEqual(forAge, "both") && canChildProjectile && canAdultProjectile) ||
@@ -289,30 +532,13 @@ class LogicHelper {
     );
   }
 
-  static _evalEvent(eventName) {
-    const rule = Locations.events[eventName].rule;
-    return _.includes(this.accessibleRegions, Locations.events[eventName].parentRegion) && LogicHelper._evalNode(rule);
-  }
+  static _hasStones(count) {
+    if (!_.includes(_.keys(this.settings), count)) {
+      throw Error(`Bad argument to has_stones: ${count}`);
+    }
 
-  static _canGetBlueFire() {
-    const iceCavernRule = LogicHelper.parseRule("is_adult and has_bottle");
-    const ganonsCastleRule = LogicHelper.parseRule(
-      "has_bottle and (is_adult or (is_child and (Sticks or Kokiri_Sword or has_explosives)))",
-    );
-    return (
-      (_.includes(this.accessibleRegions, "Ice Cavern") && LogicHelper._evalNode(iceCavernRule)) ||
-      (_.includes(this.accessibleRegions, "Ganons Castle Water Trial") && LogicHelper._evalNode(ganonsCastleRule))
-    );
-  }
-
-  static _canDeliverRutosLetter() {
-    const rule = LogicHelper.parseRule("(is_child and Rutos_Letter) and zora_fountain != 'open'");
-    return _.includes(this.accessibleRegions, "Zoras Domain") && LogicHelper._evalNode(rule);
-  }
-
-  static _canKillBigPoe() {
-    const rule = LogicHelper.parseRule("can_use(Bow) and can_ride_epona and has_bottle");
-    return _.includes(this.accessibleRegions, "Hyrule Field") && LogicHelper._evalNode(rule);
+    const stonesCount = this.settings[count];
+    return _.sum([this.items.Kokiri_Emerald, this.items.Goron_Ruby, this.items.Zora_Sapphire]) >= stonesCount;
   }
 }
 

@@ -1,8 +1,8 @@
 import _ from "lodash";
-
 import { createContext, useContext, useMemo, useReducer } from "react";
 
 import DEFAULT_ITEMS from "../data/default-items.json";
+
 import LogicHelper from "../utils/logic-helper";
 
 const TrackerContext = createContext();
@@ -15,14 +15,24 @@ function parseItems(items_list) {
     if (item === "0baa96ca7e344c86a7086dd11e2d8a74") items.Megaton_Hammer = 1;
     if (item === "55f6bcc569c14f1293eb50fda76c812d") items.Bottle = 1;
     if (item === "a391497285c34d56b762ca84b1450d5d") items.Rutos_Letter = 1;
-    if (item === "2e7752ec3fbc4c03b68c5621f853cad3") items.Magic_Bean = 1;
-    // Skull_Mask: 0,
+    if (item === "2e7752ec3fbc4c03b68c5621f853cad3") items.Magic_Bean = 10;
+    // Skull_Mask: 1,
+    // Spooky_Mask: 0,
     // Keaton_Mask: 0,
+    // Bunny_Hood: 0,
+    // Mask_of_Truth: 0,
+    // Pocket_Egg: 0,
+    // Pocket_Cucco: 0,
+    // Odd_Mushroom: 0,
+    // Odd_Potion: 0,
+    // Poachers_Saw: 0,
+    // Broken_Sword: 0,
     // Prescription: 0,
     // Eyeball_Frog: 0,
     // Eyedrops: 0,
-    // Claim_Check: 0,
+    if (item === "3b07b8868e7a4e438b5c874a1f0ae677") items.Claim_Check = 1;
     if (item === "b29ac88a18d646ce82b8b2e4752f8b30") items.Kokiri_Sword = 1;
+    // Giants_Knife: 0,
     if (item === "06c4c254730149bd93bdd297f1a3b309") items.Deku_Shield = 1;
     if (item === "b4de2eabed4f40cea8661971a17d996e") items.Hylian_Shield = 1;
     if (item === "e0079e25283148f9a20fd43bf34d1f97") items.Mirror_Shield = 1;
@@ -30,12 +40,16 @@ function parseItems(items_list) {
     if (item === "c562c7418d7141ffb70101509a52873e") items.Zora_Tunic = 1;
     if (item === "bad09131f88a440093087e11efc1c8b0") items.Iron_Boots = 1;
     if (item === "33f4bc4c632846bea5fb88573f2f95b2") items.Hover_Boots = 1;
+    // Stone_of_Agony: 0,
     if (item === "7373656ec94f430f8fbf971e53930949") items.Gerudo_Membership_Card = 1;
+    // Weird_Egg: 0,
     if (item === "5196e02aafac4b39b12ff1dc7bd5cb1c") items.Biggoron_Sword = 1;
     if (item === "7c3026558a6b49df97733d13ecc815c7") items.Fire_Arrows = 1;
+    // Ice_Arrows: 0,
     if (item === "ff67e2e04ce04aa8add77658ee932802") items.Light_Arrows = 1;
     // Gold_Skulltula_Token: 0,
     if (item === "591d582f479140759fd6501caa23c2f9") items.Dins_Fire = 1;
+    // Nayrus_Love: 0,
     if (item === "0c3e8979165042f686357b4bcbaab8ec") items.Farores_Wind = 1;
     if (item === "29e0384c520a4e7dad505b48a2156097") items.Progressive_Hookshot = 1;
     if (item === "1c9d61dc0b974a55a17120c81dcfb71b") items.Progressive_Hookshot = 2;
@@ -43,6 +57,7 @@ function parseItems(items_list) {
     if (item === "0ff0a90a20d54a42b4fa4721c63d357c") items.Progressive_Strength_Upgrade = 2;
     if (item === "e965d22b67474d6a9072c75ddcc50aed") items.Progressive_Strength_Upgrade = 3;
     if (item === "2fcfafe04ec24a9cb3c2d03c2aa047aa") items.Bomb_Bag = 1;
+    if (item === "8633e18f860e4eccb821800eeec01c29") items.Bow = 1;
     if (item === "f6eff46730cf46098deddab9d99d7677") items.Slingshot = 1;
     if (item === "8bfe80d648134ed9985c6f390bcd48ce") items.Progressive_Wallet = 1;
     if (item === "5d029979a4ce402ba09042e0fda97c82") items.Progressive_Wallet = 2;
@@ -53,7 +68,9 @@ function parseItems(items_list) {
     if (item === "22512dafa587497f98cd7135903b09c9") items.Bombchus = 1;
     if (item === "10498d96274048598706264078789899") items.Magic_Meter = 1;
     if (item === "29cddaecf35a49dfb6f80682f69b5df9") items.Magic_Meter = 2;
-    // Zeldas_Letter: 1,
+    // Ocarina: 1,
+    // Double_Defense: 0,
+    // Zeldas_Letter: 0,
 
     if (item === "ce1f2799ff1a433ba0bb40fee47e49a1") items.Minuet_of_Forest = 1;
     if (item === "e4769601bde54324a97704d29ca7f9b3") items.Bolero_of_Fire = 1;
@@ -159,7 +176,6 @@ function TrackerProvider(props) {
     items_list: [],
     settings: {}, // TODO: Maybe have some default settings ?
   };
-  LogicHelper.updateItems(initialState.items);
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
