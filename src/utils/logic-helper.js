@@ -1,14 +1,15 @@
 import { parse } from "acorn";
 import _ from "lodash";
 
-import DEFAULT_SETTINGS from "../data/setting-presets/league-s3.json";
-
 import Locations from "./locations";
+import Settings from "./settings";
 
 class LogicHelper {
   static initialize(logicHelpersFile) {
     // TODO: load settings from string/file
-    this.settings = _.cloneDeep(DEFAULT_SETTINGS);
+    this.settings = Settings.getSettingsFromString(
+      "BACKDFQNALH2EAAJARUCSDEAAAEAJEACYCHGATL62AEAAACUAASAJAESDSBQXUZNG9KSLWASFKAA3CGAAYGDAWHJBAUA",
+    );
 
     this.ruleAliases = {};
     _.forEach(logicHelpersFile, (rule, alias) => {
