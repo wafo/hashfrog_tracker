@@ -174,7 +174,6 @@ function TrackerProvider(props) {
     locations: {},
     items: _.cloneDeep(DEFAULT_ITEMS),
     items_list: [],
-    settings: {}, // TODO: Maybe have some default settings ?
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);

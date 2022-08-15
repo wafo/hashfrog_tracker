@@ -38,8 +38,6 @@ class LogicHelper {
     this.items = {};
     this.regions = { child: [], adult: [] };
     this._regionsQueue = [];
-
-    this.debug = false;
   }
 
   static updateItems(newItems) {
