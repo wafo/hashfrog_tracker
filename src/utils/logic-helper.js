@@ -257,14 +257,14 @@ class LogicHelper {
     if (_.includes(_.keys(this.items), name)) {
       return this.items[name] > 0;
     }
+    if (_.includes(_.keys(this.renamedAttributes), name)) {
+      return this.renamedAttributes[name];
+    }
     if (_.includes(_.keys(this.settings), name)) {
       return this.settings[name];
     }
     if (_.includes(_.keys(this.ruleAliases), name)) {
       return this._evalRuleAlias(name);
-    }
-    if (_.includes(_.keys(this.renamedAttributes), name)) {
-      return this.renamedAttributes[name];
     }
     const escapedIdentifier = _.replace(name, /_/g, " ");
     if (_.includes(_.keys(Locations.events), escapedIdentifier)) {
