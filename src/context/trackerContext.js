@@ -93,6 +93,7 @@ function parseItems(items_list) {
     if (item === "4e77495743cd44919d4c06061536b445") items.Water_Medallion = 1;
     if (item === "099497c5610a43659bd2d31aee5d7250") items.Spirit_Medallion = 1;
     if (item === "9e57725a38d344cfa2f5ebd41c953c71") items.Shadow_Medallion = 1;
+    if (item === "c18df5764dd54f82802986fd102e42d7") items.Light_Medallion = 1;
   });
 
   return items;
