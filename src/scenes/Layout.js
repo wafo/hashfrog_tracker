@@ -10,11 +10,19 @@ import SometimesHint from "../components/SometimesHint";
 import elementsJSON from "../data/elements.json";
 import HintsTable from "../components/HintsTable";
 import Label from "../components/Label";
+import { isBase64, splitNameBase64 } from "../utils/utils";
 
 const baseURL = process.env.PUBLIC_URL;
 
 const Layout = props => {
   const { state: layoutContext } = useLayout();
+
+  const elements = useMemo(() => {
+    if (props.layout) {
+      return [...elementsJSON, ...(props.layout.elements || [])];
+    }
+    return [...elementsJSON, ...(layoutContext?.elements || [])];
+  }, [layoutContext, props.layout]);
 
   /** ************************** */
   /** CACHE FOR ICONS */
@@ -22,20 +30,27 @@ const Layout = props => {
   const [cachedIcons, setCachedIcons] = useState(null);
 
   const getCacheIcons = useCallback(async () => {
-    let icons = elementsJSON.reduce((accumulator, element) => {
+    let icons = elements.reduce((accumulator, element) => {
       return [...accumulator, ...element.icons];
     }, []);
     icons = [...new Set(icons)];
 
     icons = await Promise.all(
-      icons.map(icon =>
-        fetch(`${baseURL}/icons/${icon}`)
+      icons.map(icon => {
+        // Checking for base64 image coming from the json
+        if (isBase64(icon)) {
+          return new Promise(resolve => {
+            const { name, file } = splitNameBase64(icon);
+            resolve({ icon: name, image: file });
+          });
+        }
+        return fetch(`${baseURL}/icons/${icon}`)
           .then(response => response.blob())
           .then(image => ({
             icon,
             image: URL.createObjectURL(image),
-          })),
-      ),
+          }));
+      }),
     );
     icons = icons.reduce((accumulator, image) => {
       accumulator[image.icon] = image.image;
@@ -44,21 +59,29 @@ const Layout = props => {
 
     setCachedIcons(icons);
     return icons;
-  }, []);
+  }, [elements]);
 
   const getCacheElement = useCallback(
     id => {
       // Destructuring to create new element,
       // otherwise on repeated elements it rips
       // because on next search it will loop through already cached icons.
-      let element = elementsJSON.find(element => element.name === id || element.id === id);
-      if (!element) return null;
+      let element = elements.find(element => element.name === id || element.id === id);
+      if (!element) element = elements[0] // Fallback to hashfrog
       element = { ...element };
       if (!cachedIcons) element.icons = [];
-      if (cachedIcons) element.icons = element.icons.map(icon => cachedIcons[icon]);
+      if (cachedIcons)
+        element.icons = element.icons.map(icon => {
+          // Checking for base64 coming from the json
+          if (isBase64(icon)) {
+            const { name } = splitNameBase64(icon);
+            return cachedIcons[name];
+          }
+          return cachedIcons[icon];
+        });
       return element;
     },
-    [cachedIcons],
+    [cachedIcons, elements],
   );
 
   useEffect(() => {
@@ -145,6 +168,7 @@ const Layout = props => {
                 backgroundColor={component.backgroundColor}
                 showBoss={component.showBoss}
                 showItems={component.showItems}
+                labels={component.labels}
                 {...(bossElement && bossElement.icons && { bossIcons: bossElement.icons })}
                 {...(element && element.icons && { itemsIcons: element.icons })}
               />

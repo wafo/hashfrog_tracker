@@ -1,5 +1,4 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
-import elementsJSON from "../../data/elements.json";
 import labelsJSON from "../../data/labels.json";
 import { generateId } from "../../utils/utils";
 
@@ -17,7 +16,7 @@ const toNumber = [
   "hintNumber",
 ];
 
-const EditorComponent = ({ component, setComponent }) => {
+const EditorComponent = ({ component, setComponent, combinedElements }) => {
   let { position, type, displayName = "" } = component;
   let [coordX, coordY] = position;
 
@@ -30,7 +29,7 @@ const EditorComponent = ({ component, setComponent }) => {
           setComponent({
             id: component.id,
             type: "element",
-            elementId: "0c44ac338d7249b39271d0b25425b7d9",
+            elementId: "a081121b16f84366bf16e16ca90cd23f",
             position: component.position,
             size: [25, 25],
             receiver: false,
@@ -186,6 +185,17 @@ const EditorComponent = ({ component, setComponent }) => {
     [setComponent],
   );
 
+  // Check if element inexistent because is a custom and got deleted. Revert to an existing one.
+  useEffect(() => {
+    const index = combinedElements.findIndex(x => x.id === component.elementId);
+    if (index === -1) {
+      setComponent(prev => ({
+        ...prev,
+        elementId: "a081121b16f84366bf16e16ca90cd23f",
+      }));
+    }
+  }, [combinedElements, component.elementId, setComponent]);
+
   return (
     <Fragment>
       <p className="uuid">Component Id: {component.id}</p>
@@ -245,20 +255,32 @@ const EditorComponent = ({ component, setComponent }) => {
           />
         </div>
       </div>
-      {type === "element" && <ElementEditor component={component} handleChange={handleChange} />}
-      {type === "table" && <TableEditor component={component} handleChange={handleChange} />}
-      {type === "sometimeshint" && <SometimeshintEditor component={component} handleChange={handleChange} />}
-      {type === "locationhint" && <LocationhintEditor component={component} handleChange={handleChange} />}
-      {type === "hinttable" && <HintTableEditor component={component} handleChange={handleChange} />}
+      {type === "element" && (
+        <ElementEditor component={component} handleChange={handleChange} combinedElements={combinedElements} />
+      )}
+      {type === "table" && (
+        <TableEditor component={component} handleChange={handleChange} combinedElements={combinedElements} />
+      )}
+      {type === "sometimeshint" && (
+        <SometimeshintEditor component={component} handleChange={handleChange} combinedElements={combinedElements} />
+      )}
+      {type === "locationhint" && (
+        <LocationhintEditor component={component} handleChange={handleChange} combinedElements={combinedElements} />
+      )}
+      {type === "hinttable" && (
+        <HintTableEditor component={component} handleChange={handleChange} combinedElements={combinedElements} />
+      )}
       {type === "label" && <LabelEditor component={component} handleChange={handleChange} />}
     </Fragment>
   );
 };
 
-const ElementEditor = ({ component, handleChange }) => {
+const ElementEditor = ({ component, handleChange, combinedElements }) => {
   const element = useMemo(() => {
-    return elementsJSON.find(x => x.id === component.elementId);
-  }, [component.elementId]);
+    return combinedElements.find(x => x.id === component.elementId);
+  }, [combinedElements, component.elementId]);
+
+  if (!element) return null;
 
   return (
     <Fragment>
@@ -273,7 +295,7 @@ const ElementEditor = ({ component, handleChange }) => {
           value={component.elementId}
           onChange={handleChange}
         >
-          {elementsJSON.map(element => (
+          {combinedElements.map(element => (
             <option key={element.id} value={element.id}>
               {element.displayName}
             </option>
@@ -403,7 +425,7 @@ const ElementEditor = ({ component, handleChange }) => {
   );
 };
 
-const TableEditor = ({ component, handleChange }) => {
+const TableEditor = ({ component, handleChange, combinedElements }) => {
   const [elements, setElements] = useState([...component.elements.map(x => ({ id: generateId(), value: x }))]);
   const [element, setElement] = useState("default_hashfrog");
   const [draggedElement, setDraggedElement] = useState(null);
@@ -536,7 +558,7 @@ const TableEditor = ({ component, handleChange }) => {
             value={element}
             onChange={handleElementChange}
           >
-            {elementsJSON.map(element => (
+            {combinedElements.map(element => (
               <option key={element.id} value={element.name}>
                 {element.displayName}
               </option>
@@ -570,7 +592,7 @@ const TableEditor = ({ component, handleChange }) => {
   );
 };
 
-const SometimeshintEditor = ({ component, handleChange }) => {
+const SometimeshintEditor = ({ component, handleChange, combinedElements }) => {
   return (
     <Fragment>
       <div className="mb-2">
@@ -584,7 +606,7 @@ const SometimeshintEditor = ({ component, handleChange }) => {
           value={component.elementId}
           onChange={handleChange}
         >
-          {elementsJSON.map(element => (
+          {combinedElements.map(element => (
             <option key={element.id} value={element.id}>
               {element.displayName}
             </option>
@@ -687,7 +709,7 @@ const SometimeshintEditor = ({ component, handleChange }) => {
   );
 };
 
-const LocationhintEditor = ({ component, handleChange }) => {
+const LocationhintEditor = ({ component, handleChange, combinedElements }) => {
   return (
     <Fragment>
       <div className="mb-2">
@@ -701,7 +723,7 @@ const LocationhintEditor = ({ component, handleChange }) => {
           value={component.elementId}
           onChange={handleChange}
         >
-          {elementsJSON.map(element => (
+          {combinedElements.map(element => (
             <option key={element.id} value={element.id}>
               {element.displayName}
             </option>
@@ -804,7 +826,7 @@ const LocationhintEditor = ({ component, handleChange }) => {
   );
 };
 
-const HintTableEditor = ({ component, handleChange }) => {
+const HintTableEditor = ({ component, handleChange, combinedElements }) => {
   return (
     <Fragment>
       <div className="mb-2">
@@ -854,7 +876,7 @@ const HintTableEditor = ({ component, handleChange }) => {
           value={component.elementId}
           onChange={handleChange}
         >
-          {elementsJSON.map(element => (
+          {combinedElements.map(element => (
             <option key={element.id} value={element.id}>
               {element.displayName}
             </option>

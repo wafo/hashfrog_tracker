@@ -8,11 +8,12 @@ const Label = props => {
     color = "#ffffff", // font color
     backgroundColor = "#000000", // background color for input
     padding = "0px",
+    borderRadius = "0.1rem",
   } = props;
 
   return (
     <Fragment>
-      <span id={id} className="layout-label" style={{ fontSize, color, backgroundColor, padding }}>
+      <span id={id} className="layout-label" style={{ fontSize, color, backgroundColor, padding, borderRadius }}>
         {text}
       </span>
     </Fragment>

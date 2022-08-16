@@ -1,6 +1,9 @@
 import Footer from "../components/Footer";
 import TrackerLauncher from "./TrackerLauncher";
 
+import profile_tanjo3 from "../assets/contributors/tanjo3.jpeg";
+import profile_wafo from "../assets/contributors/wafo.png";
+
 const Welcome = () => {
   return (
     <div className="container py-4">
@@ -23,21 +26,34 @@ const Welcome = () => {
             the checks in the game.
           </p>
           <h3>Features</h3>
-          <p>These are in no order and I make no promises of when I&apos;ll get to them.</p>
           <ul>
-            <li>Basic customization like font, colors, etc.</li>
-            <li>UI for layout customization.</li>
-            <li>Storing layout configurations.</li>
-            <li>Creating custom elements for the tracker.</li>
-            <li>Saving tracking sessions.</li>
+            <li>Layout customization & UI editor.</li>
+            <li>Creating custom elements and custom icons.</li>
+            <li>Storing layout configuration in JSON format.</li>
+            <li>Check/Location tracking based on the randomizer generator logic.</li>
           </ul>
           <h3>Changelog</h3>
           <ul>
+            <li>0.5.0 - Logic funtionality parsing logic from the randomizer generator.</li>
+            <li>0.4.4 - Custom Elements in Layout and Editor.</li>
             <li>0.4.3 - Cached icons for improved performance. No more lag when clicking icons for the first time.</li>
-            <li>0.4.2 - QoL improvements for Layout Editor. New QoL functionalities.</li>
+            {/* <li>0.4.2 - QoL improvements for Layout Editor. New QoL functionalities.</li>
             <li>0.4.1 - Styling</li>
             <li>0.4.0 - Layout based of JSON file and editor UI (beta).</li>
-            <li>0.3.4 - All check tracking logic changed to standard glitchless logic.</li>
+            <li>0.3.4 - All check tracking logic changed to standard glitchless logic.</li> */}
+          </ul>
+          <h3>Contributors</h3>
+          <ul className="list-unstyled list-horizontal contributors">
+            <li>
+              <a href="https://www.twitch.tv/tanjo3" target="_blank" rel="noreferrer">
+                <img src={profile_tanjo3} alt="tanjo3" className="contributor-profile" title="tanjo3" />
+              </a>
+            </li>
+            <li>
+              <a href="https://www.twitch.tv/elwafo" target="_blank" rel="noreferrer">
+                <img src={profile_wafo} alt="Wafo" className="contributor-profile" title="Wafo" />
+              </a>
+            </li>
           </ul>
           <div style={{ margin: "3rem 0" }} />
           <Footer />

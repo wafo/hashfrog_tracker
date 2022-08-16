@@ -1,8 +1,6 @@
 import _ from "lodash";
 import { createContext, useContext, useMemo, useReducer } from "react";
-
 import DEFAULT_ITEMS from "../data/default-items.json";
-
 import LogicHelper from "../utils/logic-helper";
 
 const TrackerContext = createContext();
@@ -104,6 +102,19 @@ function parseItems(items_list) {
   return items;
 }
 
+function getSettingsStringCache() {
+  let string = localStorage.getItem("settings_string");
+  if (!string) {
+    // League S3
+    string = "BACKDFQNALH2EAAJARUCSDEAAAEAJEACYCHGATL62AEAAACUAASAJAESDSBQXUZNG9KSLWASFKAA3CGAAYGDAWHJBAUA";
+  }
+  return string;
+}
+
+function setSettingsStringCache(string) {
+  localStorage.setItem("settings_string", string);
+}
+
 function reducer(state, action) {
   const { payload } = action;
   switch (action.type) {
@@ -170,6 +181,13 @@ function reducer(state, action) {
         locations,
       };
     }
+    case "STRING_SET": {
+      setSettingsStringCache(payload);
+      return {
+        ...state,
+        settings_string: payload,
+      };
+    }
     default:
       throw new Error();
   }
@@ -180,6 +198,7 @@ function TrackerProvider(props) {
     locations: {},
     items: _.cloneDeep(DEFAULT_ITEMS),
     items_list: [],
+    settings_string: getSettingsStringCache(),
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -230,4 +249,20 @@ const useItem = () => {
   return actions;
 };
 
-export { TrackerProvider, useTracker, useChecks, useLocation, useItem };
+const useSettingsString = () => {
+  const {
+    state: { settings_string },
+    dispatch,
+  } = useTracker();
+
+  const actions = useMemo(
+    () => ({
+      setString: string => dispatch({ type: "STRING_SET", payload: string }),
+    }),
+    [dispatch],
+  );
+
+  return { ...actions, settings_string };
+};
+
+export { TrackerProvider, useTracker, useChecks, useLocation, useItem, useSettingsString };

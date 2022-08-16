@@ -81,17 +81,19 @@ const LayoutSelector = () => {
       <p className="m-0 mb-2">Current layout: {layout.layoutConfig.name}</p>
 
       <h5>Layout Presets</h5>
-      <ul className="list-unstyled">
+      <ul className="list-unstyled list-horizontal">
         <li>
           <button type="button" className="btn btn-link btm-sm p-0" onClick={() => downloadLayout("path")}>
             Standard - Path
           </button>
         </li>
+        <li className="list-divider">|</li>
         <li>
           <button type="button" className="btn btn-link btm-sm p-0" onClick={() => downloadLayout("woth")}>
             Standard - WOTH
           </button>
         </li>
+        <li className="list-divider">|</li>
         <li>
           <button type="button" className="btn btn-link btm-sm p-0" onClick={() => downloadLayout("scrubs")}>
             Scrubs - S4
