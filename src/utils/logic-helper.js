@@ -8,7 +8,7 @@ class LogicHelper {
   static initialize(logicHelpersFile) {
     // TODO: load settings from string/file
     this.settings = Settings.getSettingsFromString(
-      "BSCKMFQNALH2EAAJARUCSDEAAAEAJEACWCHGATL62AEAAACUAASAJAESBSAHNCWAG2XL8U36HBLTCAYEBAEAAYYBAWHJBAUA",
+      "BACKDFQNALH2EAAJARUCSDEAAAEAJEACYCHGATL62AEAAACUAASAJAESDSBQXUZNG9KSLWASFKAA3CGAAYGDAWHJBAUA",
     );
 
     this.ruleAliases = {};
