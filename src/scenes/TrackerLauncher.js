@@ -1,6 +1,9 @@
+import { useEffect } from "react";
 import { Fragment, useCallback, useMemo, useState } from "react";
 import LayoutSelector from "../components/LayoutSelector";
 import { useLayout } from "../context/layoutContext";
+import { useSettingsString } from "../context/trackerContext";
+import useDebounce from "../hooks/useDebounce";
 
 const baseURL = process.env.PUBLIC_URL;
 
@@ -40,6 +43,14 @@ const TrackerLauncher = () => {
     );
   }, [checks, layoutSize]);
 
+  const { setString: setSettingsStringCache, settings_string: cachedSettingsString } = useSettingsString();
+  const [settingsString, setSettingsString] = useState(() => cachedSettingsString || "");
+  const debouncedString = useDebounce(settingsString, 300);
+
+  useEffect(() => {
+    setSettingsStringCache(debouncedString);
+  }, [debouncedString, setSettingsStringCache]);
+
   return (
     <Fragment>
       <div className="row">
@@ -48,6 +59,20 @@ const TrackerLauncher = () => {
           <button type="button" className="btn btn-light btn-sm mb-2" onClick={launchTracker}>
             Launch tracker
           </button>
+          <div className="mb-3">
+            <label htmlFor="layout-selector" className="form-label">
+              Settings String
+            </label>
+            <input
+              type="text"
+              className="form-control form-control-sm"
+              id="setting_string"
+              name="setting_string"
+              placeholder="BACKDFQNALH2EAAJARUCSDEAAAEAJEACYCHGATL62AEAAACUAASAJAESDSBQXUZNG9KSLWASFKAA3CGAAYGDAWHJBAUA" // League S3
+              value={settingsString}
+              onChange={({ target: { value } }) => setSettingsString(value)}
+            />
+          </div>
           <div className="form-check mb-3">
             <input
               type="checkbox"

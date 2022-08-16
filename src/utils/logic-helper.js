@@ -4,12 +4,17 @@ import _ from "lodash";
 import Locations from "./locations";
 import Settings from "./settings";
 
+function getSettingsStringCache() {
+  let string = localStorage.getItem("settings_string");
+  if (!string) {
+    string = "BACKDFQNALH2EAAJARUCSDEAAAEAJEACYCHGATL62AEAAACUAASAJAESDSBQXUZNG9KSLWASFKAA3CGAAYGDAWHJBAUA";
+  }
+  return string;
+}
+
 class LogicHelper {
   static initialize(logicHelpersFile) {
-    // TODO: load settings from string/file
-    this.settings = Settings.getSettingsFromString(
-      "BACKDFQNALH2EAAJARUCSDEAAAEAJEACYCHGATL62AEAAACUAASAJAESDSBQXUZNG9KSLWASFKAA3CGAAYGDAWHJBAUA",
-    );
+    this.settings = Settings.getSettingsFromString(getSettingsStringCache());
 
     this.ruleAliases = {};
     _.forEach(logicHelpersFile, (rule, alias) => {
