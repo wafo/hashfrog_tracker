@@ -401,7 +401,7 @@ class LogicHelper {
 
   static _canPlay(songName) {
     if (_.isEqual(songName, "Scarecrow_Song")) {
-      return this.items.Ocarina > 0 && this.isLocationAvailable("Pierre");
+      return this.items.Ocarina > 0 && (this.settings.free_scarecrow || this.isLocationAvailable("Pierre"));
     } else {
       return this.items.Ocarina > 0 && this.items[songName] > 0;
     }
