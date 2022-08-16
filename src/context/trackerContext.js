@@ -65,7 +65,12 @@ function parseItems(items_list) {
     if (item === "5fe58641b313493ea21ffb20bca6cd66") items.Progressive_Scale = 2;
     if (item === "73a0f3f5688745a8bb4a0973d9858960") items.Deku_Nut_Capacity = 1;
     if (item === "34b2ad3657e94b75b281cec30e617f37") items.Deku_Stick_Capacity = 1;
-    if (item === "22512dafa587497f98cd7135903b09c9") items.Bombchus = 1;
+    if (item === "22512dafa587497f98cd7135903b09c9") {
+      items.Bombchus_10 = 1;
+      items.Bombchus_5 = 1;
+      items.Bombchus_20 = 1;
+      items.Bombchus = 1;
+    }
     if (item === "10498d96274048598706264078789899") items.Magic_Meter = 1;
     if (item === "29cddaecf35a49dfb6f80682f69b5df9") items.Magic_Meter = 2;
     // Ocarina: 1,
