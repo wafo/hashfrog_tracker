@@ -67,16 +67,23 @@ const TrackerLauncher = () => {
       <div className="row">
         <div className="col">
           <h3>Notes</h3>
-          <p>
-            * Check tracking requires a compatible layout configuration to work properly. It is based on glitchless
-            logic and common enabled tricks.
-          </p>
-          <ul>
-            <li>Hidden Grottos without Stone of Agony</li>
-            <li>Man on Roof without Hookshot</li>
-            <li>Windmill PoH as Adult with Nothing</li>
-            <li>Craters Bean PoH with Hover Boots</li>
-            <li>Ignoring age requirements</li>
+          <p>* Check tracking requires a compatible layout configuration to work properly.</p>
+          <ul style={{ fontSize: "0.8em" }}>
+            <li>The logic assumes you can access both ages, so checks against starting age default to true.</li>
+            <li>Closed Deku and Closed Door of Time do not work for the same reason.</li>
+            <li>The logic assumes vanilla spawns.</li>
+            <li>The logic assumes that the player can let the time of day pass.</li>
+            <li>MQ does not work, as the tracker has no option to specify that a dungeon is MQ.</li>
+            <li>Trading sequences are not fully implemented but should work well enough.</li>
+            <li>Region shortcuts are not implemented.</li>
+            <li>
+              The settings string parser assumes it is generated using v6.2.163 of the dev randomizer, or a settings
+              string that would otherwise be compatible with this version.
+            </li>
+            <li>
+              Counters are not hooked up. For items such as dungeon small keys, the logic assumes you have the maximum
+              amount, or 50, in the case of Gold Skulltula Tokens.
+            </li>
           </ul>
         </div>
       </div>

@@ -46,6 +46,34 @@ body {
   margin-right: 0.25rem;
 }
 
+.list-horizontal li {
+  display: inline-block;
+}
+
+.list-horizontal .list-divider {
+  margin: 0 0.5rem;
+  opacity: 0.5;
+}
+
+/** *************************************** */
+/** Contributors */
+/** *************************************** */
+
+.contributors li {
+  margin-right: 0.5rem;
+}
+
+.contributors li:last-child {
+  margin-right: 0;
+}
+
+.contributor-profile {
+  border-radius: 10em;
+  height: 30px;
+  width: 30px;
+  border: 1px solid #ffffff;
+}
+
 /** *************************************** */
 /** Layout */
 /** *************************************** */
