@@ -156,6 +156,23 @@ function reducer(state, action) {
         locations,
       };
     }
+    case "REGION_TOGGLE": {
+      // payload = regionName
+      const locations = _.cloneDeep(state.locations);
+      const setTo = Object.entries(locations[payload]).every(([, value]) => value.isChecked);
+      locations[payload] = Object.entries(locations[payload]).reduce((accumulator, [key, value]) => {
+        accumulator[key] = {
+          ...value,
+          isChecked: !setTo,
+        };
+        return accumulator;
+      }, {});
+
+      return {
+        ...state,
+        locations,
+      };
+    }
     case "ITEM_MARK": {
       const { items, item } = payload;
 
@@ -229,6 +246,7 @@ const useLocation = () => {
         dispatch({ type: "LOCATION_ADD", payload: { locationName, regionName, items } }),
       markLocation: (locationName, regionName) =>
         dispatch({ type: "LOCATION_MARK", payload: { locationName, regionName } }),
+      toggleRegion: regionName => dispatch({ type: "REGION_TOGGLE", payload: regionName }),
     }),
     [dispatch],
   );
