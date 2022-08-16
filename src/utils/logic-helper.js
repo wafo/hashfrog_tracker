@@ -8,7 +8,7 @@ class LogicHelper {
   static initialize(logicHelpersFile) {
     // TODO: load settings from string/file
     this.settings = Settings.getSettingsFromString(
-      "BACKDFQNALH2EAAJARUCSDEAAAEAJEACYCHGATL62AEAAACUAASAJAESDSBQXUZNG9KSLWASFKAA3CGAAYGDAWHJBAUA",
+      "BSCKMFQNALH2EAAJARUCSDEAAAEAJEACWCHGATL62AEAAACUAASAJAESBSAHNCWAG2XL8U36HBLTCAYEBAEAAYYBAWHJBAUA",
     );
 
     this.ruleAliases = {};
@@ -37,16 +37,31 @@ class LogicHelper {
 
     this.items = {};
     this.regions = { child: [], adult: [] };
-    this._regionsQueue = [];
   }
 
   static updateItems(newItems) {
     this.items = _.cloneDeep(newItems);
 
     this.regions = { child: [], adult: [] };
-    this._regionsQueue = [];
-    this._recalculateAccessibleRegions("Root", "child");
-    this._recalculateAccessibleRegions("Root", "adult");
+
+    let oldRegionsToCheck = [];
+    let newRegionsToCheck = [];
+
+    do {
+      newRegionsToCheck = [];
+      _.forEach(oldRegionsToCheck, regionName => {
+        newRegionsToCheck = _.union(newRegionsToCheck, this._recalculateAccessibleRegions(regionName, "child"));
+      });
+      oldRegionsToCheck = this._recalculateAccessibleRegions("Root", "child");
+    } while (!_.isEqual(oldRegionsToCheck, newRegionsToCheck));
+
+    do {
+      newRegionsToCheck = [];
+      _.forEach(oldRegionsToCheck, regionName => {
+        newRegionsToCheck = _.union(newRegionsToCheck, this._recalculateAccessibleRegions(regionName, "adult"));
+      });
+      oldRegionsToCheck = this._recalculateAccessibleRegions("Root", "adult");
+    } while (!_.isEqual(oldRegionsToCheck, newRegionsToCheck));
   }
 
   static parseRule(ruleString) {
@@ -112,30 +127,28 @@ class LogicHelper {
   }
 
   static _recalculateAccessibleRegions(rootRegion, age) {
-    // iterate through regions BOTH depth-wise and breadth-wise
+    let regionsToCheck = [];
 
     _.forEach(Locations.exits[rootRegion], (exitRule, exitName) => {
       if (!_.includes(this.regions[age], exitName)) {
         if (this._evalNode(exitRule, age)) {
           this.regions[age] = _.union(this.regions[age], [exitName]);
-          this._regionsQueue = _.union(this._regionsQueue, [exitName]);
-          this._recalculateAccessibleRegions(exitName, age);
+          regionsToCheck = _.union(regionsToCheck, this._recalculateAccessibleRegions(exitName, age));
+        } else {
+          regionsToCheck = _.union(regionsToCheck, [rootRegion]);
         }
       }
     });
 
-    while (_.size(this._regionsQueue) > 0) {
-      const regionName = this._regionsQueue.shift();
-      this._recalculateAccessibleRegions(regionName, age);
-    }
+    return regionsToCheck;
   }
 
   static _isRegionAccessible(regionName, age) {
     switch (age) {
       case "child":
-        return _.includes(this.regions.child, regionName);
+        return _.includes(this.regions["child"], regionName);
       case "adult":
-        return _.includes(this.regions.adult, regionName);
+        return _.includes(this.regions["adult"], regionName);
       default:
         throw Error(`Invalid age ${age}`);
     }
