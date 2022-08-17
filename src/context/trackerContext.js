@@ -304,6 +304,7 @@ const useItems = items => {
       }
     }
     return itemIndex;
+    // eslint-disable-next-line
   }, [items]);
 
   return { ...actions, startingIndex };
