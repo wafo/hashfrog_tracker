@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useMemo, useState } from "react";
-import { useItem } from "../context/trackerContext";
+import { useItems } from "../context/trackerContext";
 // Base Icons
 import icon_hashfrog from "../assets/icons/hash_frog_bw_32x32.png";
 import icon_unknown from "../assets/icons/unknown_16x16.png";
@@ -29,9 +29,9 @@ const Element = props => {
     items = [],
   } = props;
 
-  const itemContext = useItem();
+  const { markItem, startingIndex: trackerContextStartingIndex } = useItems(items);
 
-  const [selected, setSelected] = useState(selectedStartingIndex);
+  const [selected, setSelected] = useState(trackerContextStartingIndex || selectedStartingIndex);
   const [counter, setCounter] = useState(0);
   const [draggedIcon, setDraggedIcon] = useState(null);
 
@@ -65,10 +65,10 @@ const Element = props => {
 
       // For context
       if (!isCounter) {
-        itemContext.markItem(items, items[updated]);
+        markItem(items, items[updated]);
       }
     },
-    [icons, type, countConfig, selected, items, itemContext, counter],
+    [icons, type, countConfig, selected, items, markItem, counter],
   );
 
   const wheelHandler = useCallback(
