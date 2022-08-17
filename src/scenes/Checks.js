@@ -63,7 +63,7 @@ const Checks = () => {
 
   return (
     <div id="checks" className="check-tracker">
-      <Buttons setType={setType} />
+      <Buttons type={type} setType={setType} />
       <LocationsList
         actions={actions}
         countLocations={countLocations}
@@ -78,13 +78,23 @@ const Checks = () => {
   );
 };
 
-const Buttons = ({ setType }) => {
+const Buttons = ({ type, setType }) => {
   return (
     <div className="buttons mb-2">
-      <button type="button" className="btn btn-dark btn-sm me-1" onClick={() => setType("overworld")}>
+      <button
+        type="button"
+        className="btn btn-dark btn-sm me-1"
+        onClick={() => setType("overworld")}
+        style={{ opacity: type === "overworld" ? 1 : 0.5 }}
+      >
         Overworld
       </button>
-      <button type="button" className="btn btn-dark btn-sm" onClick={() => setType("dungeon")}>
+      <button
+        type="button"
+        className="btn btn-dark btn-sm"
+        onClick={() => setType("dungeon")}
+        style={{ opacity: type === "dungeon" ? 1 : 0.5 }}
+      >
         Dungeons
       </button>
     </div>
@@ -112,10 +122,18 @@ const HintRegion = ({ actions, locations, selectedRegion, setSelectedRegion }) =
       </li>
     );
   });
+
+  const toggleRegion = () => {
+    actions.toggleRegion(selectedRegion);
+  };
+
   return (
     <div className="check-tracker-location">
-      <button type="button" className="btn btn-dark btn-sm py-0 mb-2" onClick={() => setSelectedRegion(null)}>
+      <button type="button" className="btn btn-dark btn-sm py-0 mb-2 me-1" onClick={() => setSelectedRegion(null)}>
         Back
+      </button>
+      <button type="button" className="btn btn-dark btn-sm py-0 mb-2" onClick={toggleRegion}>
+        Toggle All
       </button>
       <ul className="check-list">{locationsList}</ul>
     </div>

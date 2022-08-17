@@ -156,6 +156,23 @@ function reducer(state, action) {
         locations,
       };
     }
+    case "REGION_TOGGLE": {
+      // payload = regionName
+      const locations = _.cloneDeep(state.locations);
+      const setTo = Object.entries(locations[payload]).every(([, value]) => value.isChecked);
+      locations[payload] = Object.entries(locations[payload]).reduce((accumulator, [key, value]) => {
+        accumulator[key] = {
+          ...value,
+          isChecked: !setTo,
+        };
+        return accumulator;
+      }, {});
+
+      return {
+        ...state,
+        locations,
+      };
+    }
     case "ITEM_MARK": {
       const { items, item } = payload;
 
@@ -165,14 +182,17 @@ function reducer(state, action) {
       const parsedItems = parseItems(items_list);
 
       // Validating checks based on items collected
+
       const locations = _.cloneDeep(state.locations);
-      LogicHelper.updateItems(parsedItems);
-      _.forEach(_.values(locations), regionLocations => {
-        _.forEach(regionLocations, (locationData, locationName) => {
-          const isAvailable = LogicHelper.isLocationAvailable(locationName);
-          _.set(locationData, "isAvailable", isAvailable);
+      if (!_.isEmpty(locations)) {
+        LogicHelper.updateItems(parsedItems);
+        _.forEach(_.values(locations), regionLocations => {
+          _.forEach(regionLocations, (locationData, locationName) => {
+            const isAvailable = LogicHelper.isLocationAvailable(locationName);
+            _.set(locationData, "isAvailable", isAvailable);
+          });
         });
-      });
+      }
 
       return {
         ...state,
@@ -229,6 +249,7 @@ const useLocation = () => {
         dispatch({ type: "LOCATION_ADD", payload: { locationName, regionName, items } }),
       markLocation: (locationName, regionName) =>
         dispatch({ type: "LOCATION_MARK", payload: { locationName, regionName } }),
+      toggleRegion: regionName => dispatch({ type: "REGION_TOGGLE", payload: regionName }),
     }),
     [dispatch],
   );
