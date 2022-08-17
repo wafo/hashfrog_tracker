@@ -7,17 +7,21 @@ import Layout from "./Layout";
 import Locations from "../utils/locations";
 import LogicHelper from "../utils/logic-helper";
 import LogicLoader from "../utils/logic-loader";
+import { useItems } from "../context/trackerContext";
 
 const TrackerChecks = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const { updateItemsFromLogic } = useItems();
 
   useEffect(() => {
     LogicLoader.loadLogicFiles().then(({ logicHelpersFile, dungeonFiles, overworldFile }) => {
       Locations.initialize(dungeonFiles, overworldFile);
-      LogicHelper.initialize(logicHelpersFile);
+      const settings = LogicHelper.initialize(logicHelpersFile);
+      console.log(settings);
+      updateItemsFromLogic([...settings.starting_equipment, ...settings.starting_items, ...settings.starting_songs]);
       setIsLoading(false);
     });
-  }, []);
+  }, [updateItemsFromLogic]);
 
   if (isLoading) {
     return <div>Loading...</div>;

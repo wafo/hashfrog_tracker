@@ -1,6 +1,7 @@
 import _ from "lodash";
 import { createContext, useContext, useMemo, useReducer } from "react";
 import DEFAULT_ITEMS from "../data/default-items.json";
+import ITEMS_JSON from "../data/items.json";
 import LogicHelper from "../utils/logic-helper";
 
 const TrackerContext = createContext();
@@ -102,6 +103,20 @@ function parseItems(items_list) {
   return items;
 }
 
+function validateLocations(locations, parsedItems) {
+  locations = _.cloneDeep(locations);
+  if (!_.isEmpty(locations)) {
+    LogicHelper.updateItems(parsedItems);
+    _.forEach(_.values(locations), regionLocations => {
+      _.forEach(regionLocations, (locationData, locationName) => {
+        const isAvailable = LogicHelper.isLocationAvailable(locationName);
+        _.set(locationData, "isAvailable", isAvailable);
+      });
+    });
+  }
+  return locations;
+}
+
 function getSettingsStringCache() {
   let string = localStorage.getItem("settings_string");
   if (!string) {
@@ -173,6 +188,23 @@ function reducer(state, action) {
         locations,
       };
     }
+    case "ITEMS_UPDATE_FROM_LOGIC": {
+      // payload should be an array of strings with items, equipments and songs coming from the settings
+      const items_list = payload.map(item => {
+        return ITEMS_JSON[item];
+      });
+      const parsedItems = parseItems(items_list);
+
+      // Validating checks based on items collected
+      const locations = validateLocations(state.locations, parsedItems);
+
+      return {
+        ...state,
+        items_list,
+        items: parsedItems,
+        locations,
+      };
+    }
     case "ITEM_MARK": {
       const { items, item } = payload;
 
@@ -182,17 +214,7 @@ function reducer(state, action) {
       const parsedItems = parseItems(items_list);
 
       // Validating checks based on items collected
-
-      const locations = _.cloneDeep(state.locations);
-      if (!_.isEmpty(locations)) {
-        LogicHelper.updateItems(parsedItems);
-        _.forEach(_.values(locations), regionLocations => {
-          _.forEach(regionLocations, (locationData, locationName) => {
-            const isAvailable = LogicHelper.isLocationAvailable(locationName);
-            _.set(locationData, "isAvailable", isAvailable);
-          });
-        });
-      }
+      const locations = validateLocations(state.locations, parsedItems);
 
       return {
         ...state,
@@ -257,17 +279,34 @@ const useLocation = () => {
   return [actions];
 };
 
-const useItem = () => {
-  const { dispatch } = useTracker();
+const useItems = items => {
+  const { state, dispatch } = useTracker();
 
   const actions = useMemo(
     () => ({
       markItem: (items, item) => dispatch({ type: "ITEM_MARK", payload: { items, item } }),
+      updateItemsFromLogic: items => dispatch({ type: "ITEMS_UPDATE_FROM_LOGIC", payload: items }),
     }),
     [dispatch],
   );
 
-  return actions;
+  // IMPORTANT: Intentionally ignoring state.items_list on the dependency array.
+  const startingIndex = useMemo(() => {
+    // Loops through the items of the element,
+    // searching for a match against the items in the tracker context.
+    // Returns the index that matched, otherwise defaults to 0.
+    let itemIndex = 0;
+    if (!items || !items.length) return 0;
+    for (let i = 0; i < items.length; i++) {
+      if (state.items_list.includes(items[i])) {
+        itemIndex = i;
+        break;
+      }
+    }
+    return itemIndex;
+  }, [items]);
+
+  return { ...actions, startingIndex };
 };
 
 const useSettingsString = () => {
@@ -286,4 +325,4 @@ const useSettingsString = () => {
   return { ...actions, settings_string };
 };
 
-export { TrackerProvider, useTracker, useChecks, useLocation, useItem, useSettingsString };
+export { TrackerProvider, useTracker, useChecks, useLocation, useItems, useSettingsString };

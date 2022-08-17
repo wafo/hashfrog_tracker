@@ -42,6 +42,8 @@ class LogicHelper {
 
     this.items = {};
     this.regions = { child: [], adult: [] };
+
+    return this.settings;
   }
 
   static updateItems(newItems) {
