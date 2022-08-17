@@ -182,14 +182,17 @@ function reducer(state, action) {
       const parsedItems = parseItems(items_list);
 
       // Validating checks based on items collected
+
       const locations = _.cloneDeep(state.locations);
-      LogicHelper.updateItems(parsedItems);
-      _.forEach(_.values(locations), regionLocations => {
-        _.forEach(regionLocations, (locationData, locationName) => {
-          const isAvailable = LogicHelper.isLocationAvailable(locationName);
-          _.set(locationData, "isAvailable", isAvailable);
+      if (!_.isEmpty(locations)) {
+        LogicHelper.updateItems(parsedItems);
+        _.forEach(_.values(locations), regionLocations => {
+          _.forEach(regionLocations, (locationData, locationName) => {
+            const isAvailable = LogicHelper.isLocationAvailable(locationName);
+            _.set(locationData, "isAvailable", isAvailable);
+          });
         });
-      });
+      }
 
       return {
         ...state,
