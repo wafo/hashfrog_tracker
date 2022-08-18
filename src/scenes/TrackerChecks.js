@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import "../noscroll.css";
 import Checks from "./Checks";
 import Layout from "./Layout";
+import frog from "../assets/icons/hashfrogsping.gif";
 
 import Locations from "../utils/locations";
 import LogicHelper from "../utils/logic-helper";
@@ -23,7 +24,12 @@ const TrackerChecks = () => {
   }, [updateItemsFromLogic]);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="w-100 d-flex flex-column align-items-center flex-direction-column my-5">
+        <img src={frog} alt="Frog" />
+        <span>Loading...</span>
+      </div>
+    );
   } else {
     return (
       <div className="d-flex justify-content-between">
