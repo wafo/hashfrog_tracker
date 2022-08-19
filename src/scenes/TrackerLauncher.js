@@ -68,7 +68,7 @@ const TrackerLauncher = () => {
               className="form-control form-control-sm"
               id="setting_string"
               name="setting_string"
-              placeholder="BACKDFQNALH2EAAJARUCSDEAAAEAJEACYCHGATL62AEAAACUAASAJAESDSBQXUZNG9KSLWASFKAA3CGAAYGDAWHJBAUA" // League S3
+              placeholder="BACKDFQNALH2EAAJARUCSDEAAAEAJEAJ2L62AELTDDSAAAJJCAACABSAQAG2XL8U36HBLTCAYEBAEM2AA24NAS8AFAJCA" // League S3
               value={settingsString}
               onChange={({ target: { value } }) => setSettingsString(value)}
             />
@@ -102,7 +102,7 @@ const TrackerLauncher = () => {
             <li>Trading sequences are not fully implemented but should work well enough.</li>
             <li>Region shortcuts are not implemented.</li>
             <li>
-              The settings string parser assumes it is generated using v6.2.163 of the dev randomizer, or a settings
+              The settings string parser assumes it is generated using v6.2.181 of the dev randomizer, or a settings
               string that would otherwise be compatible with this version.
             </li>
             <li>
