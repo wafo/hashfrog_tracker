@@ -4,6 +4,7 @@ import LayoutSelector from "../components/LayoutSelector";
 import { useLayout } from "../context/layoutContext";
 import { useSettingsString } from "../context/trackerContext";
 import useDebounce from "../hooks/useDebounce";
+import SettingStringsJSON from "../data/setting-strings.json";
 
 const baseURL = process.env.PUBLIC_URL;
 
@@ -51,6 +52,10 @@ const TrackerLauncher = () => {
     setSettingsStringCache(debouncedString);
   }, [debouncedString, setSettingsStringCache]);
 
+  const updateString = preset => {
+    setSettingsString(SettingStringsJSON[preset]);
+  };
+
   return (
     <Fragment>
       <div className="row">
@@ -72,13 +77,13 @@ const TrackerLauncher = () => {
               Use check tracking *
             </label>
           </div>
-          <div className="mb-3">
+          <div className="">
             <label htmlFor="layout-selector" className="form-label">
               Settings String
             </label>
             <input
               type="text"
-              className="form-control form-control-sm"
+              className="form-control form-control-sm w-75"
               id="setting_string"
               name="setting_string"
               placeholder="Settings String same as the generator" // League S3
@@ -86,6 +91,20 @@ const TrackerLauncher = () => {
               onChange={({ target: { value } }) => setSettingsString(value)}
               disabled={!checks}
             />
+          </div>
+          <div className="mb-3">
+            <label htmlFor="layout-selector" className="form-label w-100">
+              Common Presets
+            </label>
+            <button type="button" className="btn btn-light btn-sm me-2" onClick={() => updateString("league_s3")} disabled={!checks}>
+              League S3
+            </button>
+            <button type="button" className="btn btn-light btn-sm me-2" onClick={() => updateString("scrubs_s4")} disabled={!checks}>
+              Scrubs S4
+            </button>
+            <button type="button" className="btn btn-light btn-sm me-2" onClick={() => updateString("weekly")} disabled={!checks}>
+              Weekly (Latest)
+            </button>
           </div>
 
           <LayoutSelector />
