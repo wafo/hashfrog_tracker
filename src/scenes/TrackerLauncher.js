@@ -105,6 +105,9 @@ const TrackerLauncher = () => {
             <button type="button" className="btn btn-light btn-sm me-2" onClick={() => updateString("weekly")} disabled={!checks}>
               Weekly (Latest)
             </button>
+            <button type="button" className="btn btn-light btn-sm me-2" onClick={() => updateString("sgl")} disabled={!checks}>
+              SGL *
+            </button>
           </div>
 
           <LayoutSelector />
@@ -115,6 +118,7 @@ const TrackerLauncher = () => {
           <h3>Notes</h3>
           <p>* Check tracking requires a compatible layout configuration to work properly.</p>
           <ul style={{ fontSize: "0.8em" }}>
+            <li>SGL seeds are generated on a special branch. Use this one on your own risk.</li>
             <li>The logic assumes you can access both ages, so checks against starting age default to true.</li>
             <li>Closed Deku and Closed Door of Time do not work for the same reason.</li>
             <li>The logic assumes vanilla spawns.</li>
