@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 
-import "../noscroll.css";
 import Checks from "./Checks";
 import Layout from "./Layout";
 import frog from "../assets/icons/hashfrogsping.gif";
@@ -18,7 +17,6 @@ const TrackerChecks = () => {
     LogicLoader.loadLogicFiles().then(({ logicHelpersFile, dungeonFiles, overworldFile }) => {
       Locations.initialize(dungeonFiles, overworldFile);
       const settings = LogicHelper.initialize(logicHelpersFile);
-      console.log(settings);
       updateItemsFromLogic(settings); // Starting items.
       setIsLoading(false);
     });

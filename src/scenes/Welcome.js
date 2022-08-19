@@ -13,10 +13,10 @@ const Welcome = () => {
         </div>
       </div>
       <div className="row justify-content-between">
-        <div className="col-md-4">
+        <div className="col-md-6">
           <TrackerLauncher />
         </div>
-        <div className="col-md-7">
+        <div className="col-md-6">
           <h3>About</h3>
           <p>
             This is a tracker for the <a href="https://ootrandomizer.com/">Ocarina of Time Randomizer</a>.

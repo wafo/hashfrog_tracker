@@ -1,5 +1,4 @@
 import Layout from "./Layout";
-import "../noscroll.css";
 
 const TrackerLayout = () => {
   return (

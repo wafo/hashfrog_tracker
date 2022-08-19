@@ -63,7 +63,7 @@ const LayoutSelector = () => {
         </label>
         <input
           key={key}
-          className="form-control form-control-sm"
+          className="form-control form-control-sm w-75"
           type="file"
           id="layout-selector"
           onChange={handleInputChange}
