@@ -56,24 +56,10 @@ const TrackerLauncher = () => {
       <div className="row">
         <div className="col">
           <h3>Layout Configuration</h3>
-          <button type="button" className="btn btn-light btn-sm mb-2" onClick={launchTracker}>
+          <button type="button" className="btn btn-light btn-sm mb-3" onClick={launchTracker}>
             Launch tracker
           </button>
-          <div className="mb-3">
-            <label htmlFor="layout-selector" className="form-label">
-              Settings String
-            </label>
-            <input
-              type="text"
-              className="form-control form-control-sm"
-              id="setting_string"
-              name="setting_string"
-              placeholder="BACKDFQNALH2EAAJARUCSDEAAAEAJEAJ2L62AELTDDSAAAJJCAACABSAQAG2XL8U36HBLTCAYEBAEM2AA24NAS8AFAJCA" // League S3
-              value={settingsString}
-              onChange={({ target: { value } }) => setSettingsString(value)}
-            />
-          </div>
-          <div className="form-check mb-3">
+          <div className="form-check">
             <input
               type="checkbox"
               className="form-check-input"
@@ -86,6 +72,22 @@ const TrackerLauncher = () => {
               Use check tracking *
             </label>
           </div>
+          <div className="mb-3">
+            <label htmlFor="layout-selector" className="form-label">
+              Settings String
+            </label>
+            <input
+              type="text"
+              className="form-control form-control-sm"
+              id="setting_string"
+              name="setting_string"
+              placeholder="Settings String same as the generator" // League S3
+              value={settingsString}
+              onChange={({ target: { value } }) => setSettingsString(value)}
+              disabled={!checks}
+            />
+          </div>
+
           <LayoutSelector />
         </div>
       </div>
