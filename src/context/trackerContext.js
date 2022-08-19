@@ -189,10 +189,19 @@ function reducer(state, action) {
       };
     }
     case "ITEMS_UPDATE_FROM_LOGIC": {
-      // payload should be an array of strings with items, equipments and songs coming from the settings
-      const items_list = payload.map(item => {
+      const settings = payload;
+      const items = [...settings.starting_equipment, ...settings.starting_items, ...settings.starting_songs];
+
+      const items_list = items.map(item => {
         return ITEMS_JSON[item];
       });
+      if (settings.start_with_consumables) {
+        items_list.push("34b2ad3657e94b75b281cec30e617f37");
+        items_list.push("73a0f3f5688745a8bb4a0973d9858960");
+      }
+      if (settings.open_door_of_time && settings.open_forest !== "closed") {
+        items_list.push("c50e8543ab0c4bdaa8a23e6a80ae6d1c");
+      }
       const parsedItems = parseItems(items_list);
 
       // Validating checks based on items collected
@@ -285,12 +294,29 @@ const useItems = items => {
   const actions = useMemo(
     () => ({
       markItem: (items, item) => dispatch({ type: "ITEM_MARK", payload: { items, item } }),
-      updateItemsFromLogic: items => dispatch({ type: "ITEMS_UPDATE_FROM_LOGIC", payload: items }),
+      updateItemsFromLogic: settings => dispatch({ type: "ITEMS_UPDATE_FROM_LOGIC", payload: settings }),
     }),
     [dispatch],
   );
 
-  return actions;
+  // IMPORTANT: Intentionally ignoring state.items_list on the dependency array.
+  const startingIndex = useMemo(() => {
+    // Loops through the items of the element,
+    // searching for a match against the items in the tracker context.
+    // Returns the index that matched, otherwise defaults to 0.
+    let itemIndex = 0;
+    if (!items || !items.length) return 0;
+    for (let i = 0; i < items.length; i++) {
+      if (state.items_list.includes(items[i])) {
+        itemIndex = i;
+        break;
+      }
+    }
+    return itemIndex;
+    // eslint-disable-next-line
+  }, [items]);
+
+  return { ...actions, startingIndex };
 };
 
 const useSettingsString = () => {

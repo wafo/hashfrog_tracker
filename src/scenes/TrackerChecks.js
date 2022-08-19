@@ -18,7 +18,8 @@ const TrackerChecks = () => {
     LogicLoader.loadLogicFiles().then(({ logicHelpersFile, dungeonFiles, overworldFile }) => {
       Locations.initialize(dungeonFiles, overworldFile);
       const settings = LogicHelper.initialize(logicHelpersFile);
-      updateItemsFromLogic([...settings.starting_equipment, ...settings.starting_items, ...settings.starting_songs]);
+      console.log(settings);
+      updateItemsFromLogic(settings); // Starting items.
       setIsLoading(false);
     });
   }, [updateItemsFromLogic]);
