@@ -7,7 +7,7 @@ import Settings from "./settings";
 function getSettingsStringCache() {
   let string = localStorage.getItem("settings_string");
   if (!string) {
-    string = "BACKDFQNALH2EAAJARUCSDEAAAEAJEACYCHGATL62AEAAACUAASAJAESDSBQXUZNG9KSLWASFKAA3CGAAYGDAWHJBAUA";
+    string = "BACKDFQNALH2EAAJARUCSDEAAAEAJEAJ2L62AELTDDSAAAJJCAACABSAQAG2XL8U36HBLTCAYEBAEM2AA24NAS8AFAJCA";
   }
   return string;
 }

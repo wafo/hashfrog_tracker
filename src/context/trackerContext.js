@@ -121,7 +121,7 @@ function getSettingsStringCache() {
   let string = localStorage.getItem("settings_string");
   if (!string) {
     // League S3
-    string = "BACKDFQNALH2EAAJARUCSDEAAAEAJEACYCHGATL62AEAAACUAASAJAESDSBQXUZNG9KSLWASFKAA3CGAAYGDAWHJBAUA";
+    string = "BACKDFQNALH2EAAJARUCSDEAAAEAJEAJ2L62AELTDDSAAAJJCAACABSAQAG2XL8U36HBLTCAYEBAEM2AA24NAS8AFAJCA";
   }
   return string;
 }
@@ -290,24 +290,7 @@ const useItems = items => {
     [dispatch],
   );
 
-  // IMPORTANT: Intentionally ignoring state.items_list on the dependency array.
-  const startingIndex = useMemo(() => {
-    // Loops through the items of the element,
-    // searching for a match against the items in the tracker context.
-    // Returns the index that matched, otherwise defaults to 0.
-    let itemIndex = 0;
-    if (!items || !items.length) return 0;
-    for (let i = 0; i < items.length; i++) {
-      if (state.items_list.includes(items[i])) {
-        itemIndex = i;
-        break;
-      }
-    }
-    return itemIndex;
-    // eslint-disable-next-line
-  }, [items]);
-
-  return { ...actions, startingIndex };
+  return actions;
 };
 
 const useSettingsString = () => {

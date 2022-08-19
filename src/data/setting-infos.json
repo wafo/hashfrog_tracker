@@ -434,6 +434,12 @@
     "choice_list": ["vanilla", "overworld", "any_dungeon", "keysanity"]
   },
   {
+    "name": "key_rings_choice",
+    "type": "str",
+    "bitwidth": 2,
+    "choice_list": ["off", "choice", "all", "random"]
+  },
+  {
     "name": "key_rings",
     "type": "list",
     "bitwidth": 4,
@@ -1668,7 +1674,9 @@
       "weekly",
       "coop2",
       "league",
-      "mw2"
+      "mw3",
+      "tournament_test_goal",
+      "tournament_test_woth"
     ]
   },
   {
