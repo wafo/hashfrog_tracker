@@ -419,19 +419,19 @@
     "name": "shuffle_mapcompass",
     "type": "str",
     "bitwidth": 3,
-    "choice_list": ["remove", "startwith", "vanilla", "dungeon", "overworld", "any_dungeon", "keysanity"]
+    "choice_list": ["remove", "startwith", "vanilla", "dungeon", "regional", "overworld", "any_dungeon", "keysanity"]
   },
   {
     "name": "shuffle_smallkeys",
     "type": "str",
     "bitwidth": 3,
-    "choice_list": ["remove", "vanilla", "dungeon", "overworld", "any_dungeon", "keysanity"]
+    "choice_list": ["remove", "vanilla", "dungeon", "regional", "overworld", "any_dungeon", "keysanity"]
   },
   {
     "name": "shuffle_hideoutkeys",
     "type": "str",
-    "bitwidth": 2,
-    "choice_list": ["vanilla", "overworld", "any_dungeon", "keysanity"]
+    "bitwidth": 3,
+    "choice_list": ["vanilla", "fortress", "regional", "overworld", "any_dungeon", "keysanity"]
   },
   {
     "name": "key_rings_choice",
@@ -459,7 +459,7 @@
     "name": "shuffle_bosskeys",
     "type": "str",
     "bitwidth": 3,
-    "choice_list": ["remove", "vanilla", "dungeon", "overworld", "any_dungeon", "keysanity"]
+    "choice_list": ["remove", "vanilla", "dungeon", "regional", "overworld", "any_dungeon", "keysanity"]
   },
   {
     "name": "shuffle_ganon_bosskey",
@@ -469,6 +469,7 @@
       "remove",
       "vanilla",
       "dungeon",
+      "regional",
       "overworld",
       "any_dungeon",
       "keysanity",
