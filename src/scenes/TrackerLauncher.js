@@ -123,7 +123,7 @@ const TrackerLauncher = () => {
             <li>Trading sequences are not fully implemented but should work well enough.</li>
             <li>Region shortcuts are not implemented.</li>
             <li>
-              The settings string parser assumes it is generated using v6.2.181 of the dev randomizer, or a settings
+              The settings string parser assumes it is generated using v6.2.183 of the dev randomizer, or a settings
               string that would otherwise be compatible with this version.
             </li>
             <li>
