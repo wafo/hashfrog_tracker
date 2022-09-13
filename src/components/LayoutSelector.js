@@ -56,14 +56,14 @@ const LayoutSelector = () => {
   };
 
   return (
-    <div className="">
+    <div className="w-75">
       <div className="mb-2">
         <label htmlFor="layout-selector" className="form-label">
           Layout JSON File
         </label>
         <input
           key={key}
-          className="form-control form-control-sm w-75"
+          className="form-control form-control-sm"
           type="file"
           id="layout-selector"
           onChange={handleInputChange}
