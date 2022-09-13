@@ -177,6 +177,11 @@
     "bitwidth": 1
   },
   {
+    "name": "shuffle_child_trade",
+    "type": "bool",
+    "bitwidth": 1
+  },
+  {
     "name": "dungeon_shortcuts_choice",
     "type": "str",
     "bitwidth": 2,
@@ -1522,6 +1527,23 @@
   },
   {
     "name": "logic_latest_adult_trade",
+    "type": "str",
+    "bitwidth": 4,
+    "choice_list": [
+      "pocket_egg",
+      "pocket_cucco",
+      "cojiro",
+      "odd_mushroom",
+      "poachers_saw",
+      "broken_sword",
+      "prescription",
+      "eyeball_frog",
+      "eyedrops",
+      "claim_check"
+    ]
+  },
+  {
+    "name": "adult_trade_start",
     "type": "str",
     "bitwidth": 4,
     "choice_list": [

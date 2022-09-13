@@ -788,5 +788,7 @@
   "DMC Upper Grotto Gossip Stone":                               ["HintStone",   "None"],
 
   "Dampe Diary Hint":                                            ["Hint",        "None"],
-  "Ganondorf Hint":                                              ["Hint",        "None"]
+  "Ganondorf Hint":                                              ["Hint",        "None"],
+  "ToT Child Altar Hint":                                        ["Hint",        "None"],
+  "ToT Adult Altar Hint":                                        ["Hint",        "None"]
 }
