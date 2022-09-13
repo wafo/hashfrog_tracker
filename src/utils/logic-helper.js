@@ -2,19 +2,12 @@ import { parse } from "acorn";
 import _ from "lodash";
 
 import Locations from "./locations";
-import Settings from "./settings";
-
-function getSettingsStringCache() {
-  let string = localStorage.getItem("settings_string");
-  if (!string) {
-    string = "BACKDFQNALH2EAAJARUCSDEAAAEAJEASUX2TBJWCHGABAASSEAAEACAB6ANSMX6FV3RCWCFANKCAJYSBASX3AA7BLASEA";
-  }
-  return string;
-}
+// import Settings from "./settings"; // Local setting string parsing.
 
 class LogicHelper {
-  static initialize(logicHelpersFile) {
-    this.settings = Settings.getSettingsFromString(getSettingsStringCache());
+  static async initialize(logicHelpersFile, settings) {
+    // this.settings = Settings.getSettingsFromString(getSettingsStringCache());
+    this.settings = settings;
 
     this.ruleAliases = {};
     _.forEach(logicHelpersFile, (rule, alias) => {

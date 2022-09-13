@@ -130,6 +130,19 @@ function setSettingsStringCache(string) {
   localStorage.setItem("settings_string", string);
 }
 
+function getGeneratorVersionCache() {
+  let version = localStorage.getItem("generator_version");
+  if (!version) {
+    // Current Dev
+    version = "dev_6.2.195";
+  }
+  return version;
+}
+
+function setGeneratorVersionCache(version) {
+  localStorage.setItem("generator_version", version);
+}
+
 function reducer(state, action) {
   const { payload } = action;
   switch (action.type) {
@@ -239,6 +252,13 @@ function reducer(state, action) {
         settings_string: payload,
       };
     }
+    case "VERSION_SET": {
+      setGeneratorVersionCache(payload);
+      return {
+        ...state,
+        generator_version: payload,
+      };
+    }
     default:
       throw new Error();
   }
@@ -250,6 +270,7 @@ function TrackerProvider(props) {
     items: _.cloneDeep(DEFAULT_ITEMS),
     items_list: [],
     settings_string: getSettingsStringCache(),
+    generator_version: getGeneratorVersionCache(),
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -321,18 +342,19 @@ const useItems = items => {
 
 const useSettingsString = () => {
   const {
-    state: { settings_string },
+    state: { settings_string, generator_version },
     dispatch,
   } = useTracker();
 
   const actions = useMemo(
     () => ({
       setString: string => dispatch({ type: "STRING_SET", payload: string }),
+      setVersion: version => dispatch({ type: "VERSION_SET", payload: version }),
     }),
     [dispatch],
   );
 
-  return { ...actions, settings_string };
+  return { ...actions, settings_string, generator_version };
 };
 
-export { TrackerProvider, useTracker, useChecks, useLocation, useItems, useSettingsString };
+export { TrackerProvider, useTracker, useChecks, useLocation, useItems, useSettingsString, getSettingsStringCache, getGeneratorVersionCache };
