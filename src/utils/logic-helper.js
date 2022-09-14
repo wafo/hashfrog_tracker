@@ -86,6 +86,10 @@ class LogicHelper {
     }
   }
 
+  static countSkullsInLogic() {
+    return _.size(_.filter(Locations.skullsLocations, locationName => LogicHelper.isLocationAvailable(locationName)));
+  }
+
   static _initRenamedAttributes() {
     // source: World.py __init__()
 

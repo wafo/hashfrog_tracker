@@ -11,6 +11,7 @@ class Locations {
     this.locations = new Map();
 
     this.dropLocations = {};
+    this.skullsLocations = [];
     this.events = {};
     this.exits = {};
 
@@ -241,6 +242,10 @@ class Locations {
               vanillaItem: vanillaItem,
             };
             _.set(this.locations, locationName, locationData);
+
+            if (_.isEqual(type, "GS Token")) {
+              this.skullsLocations.push(locationName);
+            }
           }
         });
       }
