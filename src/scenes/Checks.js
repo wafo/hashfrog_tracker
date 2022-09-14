@@ -44,11 +44,13 @@ const Checks = () => {
       checked: 0,
       available: 0,
       remaining: 0,
+      skulls: 0,
     };
 
     _.forEach(_.values(locations), regionLocations => {
       countLocations(regionLocations, newCounter);
     });
+    newCounter.skulls = LogicHelper.countSkullsInLogic();
 
     return newCounter;
   }, [locations]);
@@ -178,6 +180,7 @@ const LocationsList = ({
         checked: 0,
         available: 0,
         remaining: 0,
+        skulls: 0,
       };
       countLocations(locationData, locationsCounter);
 
@@ -234,6 +237,10 @@ const Info = ({ locationsCounter }) => {
           <tr>
             <td>{locationsCounter.remaining}</td>
             <td>Remaining</td>
+          </tr>
+          <tr>
+            <td>{locationsCounter.skulls}</td>
+            <td>Skulls in Logic</td>
           </tr>
         </tbody>
       </table>
