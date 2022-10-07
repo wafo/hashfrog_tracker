@@ -574,6 +574,7 @@
   "Shadow Temple Bongo Bongo Heart":                             ["BossHeart",   "Heart Container"],
 
   "Spirit Temple Child Bridge Chest":                            ["Chest",       "Deku Shield"],
+  "Deku Shield Pot":                                             ["Drop",        "Deku Shield"],
   "Spirit Temple Child Early Torches Chest":                     ["Chest",       "Small Key (Spirit Temple)"],
   "Spirit Temple Child Climb North Chest":                       ["Chest",       "Bombchus (10)"],
   "Spirit Temple Child Climb East Chest":                        ["Chest",       "Deku Shield"],
