@@ -120,8 +120,8 @@ function validateLocations(locations, parsedItems) {
 function getSettingsStringCache() {
   let string = localStorage.getItem("settings_string");
   if (!string) {
-    // League S3
-    string = "BACKDFQNALH2EAAJARUCSDEAAAEAJEASUX2TBJWCHGABAASSEAAEACAB6ANSMX6FV3RCWCFANKCAJYSBASX3AA7BLASEA";
+    // Tournament S6
+    string = "BSCKMFQNALH2EAAASHKBABUAAAEAACBAEJFQNACX2TBJAAAEEBAABSAJADABQ2EJBNSMX6FV3RCWCFAQ2WCSAACAAVQCACDCEJBAUA";
   }
   return string;
 }
@@ -134,7 +134,7 @@ function getGeneratorVersionCache() {
   let version = localStorage.getItem("generator_version");
   if (!version) {
     // Current Dev
-    version = "dev_6.2.196";
+    version = "dev_6.2.227";
   }
   return version;
 }
