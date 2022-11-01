@@ -34,7 +34,7 @@ const Welcome = () => {
           </ul>
           <h3>Changelog</h3>
           <ul>
-            <li>0.5.3 - Skulls in logic counter.</li>
+            <li>0.5.3 - Skulls available counter.</li>
             <li>0.5.2 - Settings string parsing directly from the generator. General bug fixes.</li>
             <li>0.5.1 - Starting items from settings. General bug fixes.</li>
             <li>0.5.0 - Logic funtionality parsing logic from the randomizer generator.</li>

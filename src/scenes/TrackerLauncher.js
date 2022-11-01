@@ -67,7 +67,7 @@ const TrackerLauncher = () => {
 
   const updateString = preset => {
     setSettingsString(SettingStringsJSON[preset]);
-    setGeneratorVersion("dev_6.2.196"); // hardcoded to latest version
+    setGeneratorVersion("dev_6.2.227"); // hardcoded to latest version
   };
 
   return (
@@ -146,10 +146,10 @@ const TrackerLauncher = () => {
             <button
               type="button"
               className="btn btn-light btn-sm me-2"
-              onClick={() => updateString("weekly")}
+              onClick={() => updateString("tournament_s6")}
               disabled={!checks}
             >
-              Weekly (Latest)
+              Tournament S6
             </button>
           </div>
 

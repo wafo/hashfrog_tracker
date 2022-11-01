@@ -228,19 +228,19 @@ const Info = ({ locationsCounter }) => {
         <tbody>
           <tr>
             <td>{locationsCounter.checked}</td>
-            <td>Checked</td>
+            <td className="ps-2">Checked</td>
           </tr>
           <tr>
             <td>{locationsCounter.available}</td>
-            <td>Available</td>
+            <td className="ps-2">Available</td>
           </tr>
           <tr>
             <td>{locationsCounter.remaining}</td>
-            <td>Remaining</td>
+            <td className="ps-2">Remaining</td>
           </tr>
           <tr>
             <td>{locationsCounter.skulls}</td>
-            <td>Skulls in Logic</td>
+            <td className="ps-2">Skulls available</td>
           </tr>
         </tbody>
       </table>

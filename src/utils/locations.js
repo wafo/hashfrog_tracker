@@ -222,30 +222,35 @@ class Locations {
     _.forEach(logicFile, region => {
       if (_.includes(_.keys(region), "locations")) {
         _.forEach(region.locations, (rule, locationName) => {
-          const [type, vanillaItem] = LOCATION_TABLE[locationName];
+          try {
+            const [type, vanillaItem] = LOCATION_TABLE[locationName];
 
-          if (_.startsWith(type, "Hint")) {
-            return;
-          } else if (_.isEqual(type, "Drop")) {
-            const dropData = {
-              parentRegion: region.region_name,
-              rule: LogicHelper.parseRule(rule),
-            };
-            _.set(this.dropLocations, vanillaItem, _.union(this.dropLocations[vanillaItem], [dropData]));
-          } else {
-            const locationData = {
-              isDungeon: isDungeon,
-              locationName: locationName,
-              parentRegion: region.region_name,
-              rule: LogicHelper.parseRule(rule),
-              type: type,
-              vanillaItem: vanillaItem,
-            };
-            _.set(this.locations, locationName, locationData);
+            if (_.startsWith(type, "Hint")) {
+              return;
+            } else if (_.isEqual(type, "Drop")) {
+              const dropData = {
+                parentRegion: region.region_name,
+                rule: LogicHelper.parseRule(rule),
+              };
+              _.set(this.dropLocations, vanillaItem, _.union(this.dropLocations[vanillaItem], [dropData]));
+            } else {
+              const locationData = {
+                isDungeon: isDungeon,
+                locationName: locationName,
+                parentRegion: region.region_name,
+                rule: LogicHelper.parseRule(rule),
+                type: type,
+                vanillaItem: vanillaItem,
+              };
+              _.set(this.locations, locationName, locationData);
 
-            if (_.isEqual(type, "GS Token")) {
-              this.skullsLocations.push(locationName);
+              if (_.isEqual(type, "GS Token")) {
+                this.skullsLocations.push(locationName);
+              }
             }
+          } catch (error) {
+            console.warn(`Location [${locationName}] missing from location-table.json`); // Alert that a location is missing.
+            return; // Don't stop if an unknown location pops up
           }
         });
       }

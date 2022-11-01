@@ -791,5 +791,11 @@
   "Dampe Diary Hint":                                            ["Hint",        "None"],
   "Ganondorf Hint":                                              ["Hint",        "None"],
   "ToT Child Altar Hint":                                        ["Hint",        "None"],
-  "ToT Adult Altar Hint":                                        ["Hint",        "None"]
+  "ToT Adult Altar Hint":                                        ["Hint",        "None"],
+
+  "10 Skulltulas Reward Hint":                                   ["Hint",        "None"],
+  "20 Skulltulas Reward Hint":                                   ["Hint",        "None"],
+  "30 Skulltulas Reward Hint":                                   ["Hint",        "None"],
+  "40 Skulltulas Reward Hint":                                   ["Hint",        "None"],
+  "50 Skulltulas Reward Hint":                                   ["Hint",        "None"]
 }
