@@ -2,11 +2,9 @@ import { parse } from "acorn";
 import _ from "lodash";
 
 import Locations from "./locations";
-// import Settings from "./settings"; // Local setting string parsing.
 
 class LogicHelper {
   static async initialize(logicHelpersFile, settings) {
-    // this.settings = Settings.getSettingsFromString(getSettingsStringCache());
     this.settings = settings;
 
     this.ruleAliases = {};
