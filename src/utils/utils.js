@@ -1,4 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
+import _ from "lodash";
+import HINT_REGIONS from "../data/hint-regions.json";
+import HINT_REGIONS_KEYWORDS from "../data/hint-regions-keywords.json";
 
 export async function readFileAsText(file) {
   let result = await new Promise(resolve => {
@@ -31,4 +34,32 @@ export function splitNameBase64(string) {
 
 export function isBase64(string) {
   return string.match(/data:image\/png;base64{1}.*/);
+}
+
+export function updateHintRegionsJSON(files) {
+  // Cleaning the regions before rebuilding ?
+  const regions = Object.keys(HINT_REGIONS).reduce((accumulator, key) => {
+    accumulator[key] = [];
+    return accumulator;
+  }, {});
+
+  _.forEach(files, file => {
+    file.forEach(({ dungeon, locations, region_name }) => {
+      if (!locations) return;
+      if (dungeon && regions[dungeon]) {
+        regions[dungeon].push(region_name);
+      } else if (regions[region_name]) {
+        regions[region_name].push(region_name);
+      } else {
+        const match = Object.entries(HINT_REGIONS_KEYWORDS).find(([, keywords]) => {
+          return keywords.find(keyword => region_name.includes(keyword));
+        });
+        if (match) regions[match[0]].push(region_name);
+      }
+    });
+  });
+
+  // console.log(JSON.stringify(regions));
+
+  return regions;
 }

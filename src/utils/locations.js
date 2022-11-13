@@ -5,6 +5,7 @@ import HINT_REGIONS from "../data/hint-regions.json";
 import LOCATION_TABLE from "../data/location-table.json";
 
 import LogicHelper from "./logic-helper";
+// import { updateHintRegionsJSON } from "./utils";
 
 class Locations {
   static initialize(dungeonFiles, overworldFile) {
@@ -26,6 +27,10 @@ class Locations {
       this._parseLogicFile(file, true);
     });
     this._parseLogicFile(overworldFile, false);
+
+    // TODO: Include this in the normal flow to always have a regions object up to date ?
+    // Not really optimized, so leaving it out for now.
+    // updateHintRegionsJSON(_.set(dungeonFiles, "Overworld", overworldFile));
   }
 
   static isAlwaysPlacedLocation(location) {
@@ -221,10 +226,10 @@ class Locations {
   static _parseLogicFile(logicFile, isDungeon) {
     _.forEach(logicFile, region => {
       if (_.includes(_.keys(region), "locations")) {
+        const missingLocations = [];
         _.forEach(region.locations, (rule, locationName) => {
           try {
             const [type, vanillaItem] = LOCATION_TABLE[locationName];
-
             if (_.startsWith(type, "Hint")) {
               return;
             } else if (_.isEqual(type, "Drop")) {
@@ -249,10 +254,15 @@ class Locations {
               }
             }
           } catch (error) {
-            console.warn(`Location [${locationName}] missing from location-table.json`); // Alert that a location is missing.
-            return; // Don't stop if an unknown location pops up
+            // Don't stop if an unknown location pops up
+            // console.warn(`Location [${locationName}] missing from location-table.json`); // Alert that a location is missing.
+            missingLocations.push(locationName);
+            return;
           }
         });
+        if (missingLocations.length) {
+          console.warn(`[${region.region_name}]: ${missingLocations.length} locations missing from locations table.`);
+        }
       }
 
       if (_.includes(_.keys(region), "events")) {
