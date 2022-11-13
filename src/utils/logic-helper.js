@@ -2,11 +2,9 @@ import { parse } from "acorn";
 import _ from "lodash";
 
 import Locations from "./locations";
-// import Settings from "./settings"; // Local setting string parsing.
 
 class LogicHelper {
   static async initialize(logicHelpersFile, settings) {
-    // this.settings = Settings.getSettingsFromString(getSettingsStringCache());
     this.settings = settings;
 
     this.ruleAliases = {};
@@ -93,7 +91,7 @@ class LogicHelper {
   static _initRenamedAttributes() {
     // source: World.py __init__()
 
-    const keysanity = _.includes(["keysanity", "remove", "any_dungeon", "overworld"], this.settings.shuffle_smallkeys);
+    const keysanity = _.includes(["keysanity", "remove", "any_dungeon", "overworld", "regional"], this.settings.shuffle_smallkeys);
     const checkBeatableOnly = _.isEqual(this.settings.reachable_locations, "all");
     const shuffleSpecialInteriorEntrances = _.isEqual(this.settings.shuffle_interior_entrances, "all");
     const shuffleInteriorEntrances = _.includes(["simple", "all"], this.settings.shuffle_interior_entrances);
@@ -220,6 +218,9 @@ class LogicHelper {
     const arg = node.arguments[0].name;
     switch (node.callee.name) {
       case "at":
+        // TODO: this is hardcoded for now
+        return true;
+      case "at_night":
         // TODO: this is hardcoded for now
         return true;
       case "can_play":

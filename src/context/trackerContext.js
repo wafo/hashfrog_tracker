@@ -134,7 +134,7 @@ function getGeneratorVersionCache() {
   let version = localStorage.getItem("generator_version");
   if (!version) {
     // Current Dev
-    version = "dev_6.2.227";
+    version = "dev_6.9.1";
   }
   return version;
 }

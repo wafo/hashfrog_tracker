@@ -92,7 +92,7 @@ class Locations {
       if (LogicHelper.settings.skip_child_zelda) {
         return false;
       } else {
-        return LogicHelper.settings.shuffle_weird_egg;
+        return !_.isEqual(LogicHelper.settings.shuffle_child_trade, "vanilla");
       }
     }
 
@@ -137,6 +137,50 @@ class Locations {
     // Thieves' Hideout
     else if (_.isEqual(location.vanillaItem, "Small Key (Thieves Hideout)")) {
       return _.includes(["any_dungeon", "overworld", "keysanity"], LogicHelper.settings.shuffle_hideoutkeys);
+    }
+
+    // Freestanding Rupees and Hearts
+    else if (_.includes(["ActorOverride", "Freestanding", "RupeeTower"], location.type)) {
+      if (_.isEqual(LogicHelper.settings.shuffle_freestanding_items, "all")) {
+        return true;
+      } else if (_.isEqual(LogicHelper.settings.shuffle_freestanding_items, "dungeons") && location.isDungeon) {
+        return true;
+      } else if (_.isEqual(LogicHelper.settings.shuffle_freestanding_items, "overworld") && !location.isDungeon) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    // Pots
+    else if (_.includes(["Pot", "FlyingPot"], location.type)) {
+      if (_.isEqual(LogicHelper.settings.shuffle_pots, "all")) {
+        return true;
+      } else if (_.isEqual(LogicHelper.settings.shuffle_pots, "dungeons") && location.isDungeon) {
+        return true;
+      } else if (_.isEqual(LogicHelper.settings.shuffle_pots, "overworld") && !location.isDungeon) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    // Crates
+    else if (_.includes(["Crate", "SmallCrate"], location.type)) {
+      if (_.isEqual(LogicHelper.settings.shuffle_crates, "all")) {
+        return true;
+      } else if (_.isEqual(LogicHelper.settings.shuffle_crates, "dungeons") && location.isDungeon) {
+        return true;
+      } else if (_.isEqual(LogicHelper.settings.shuffle_crates, "overworld") && !location.isDungeon) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    // Beehives
+    else if (_.isEqual(location.type, "Beehive")) {
+      return LogicHelper.settings.shuffle_beehives;
     }
 
     // Dungeon Items
@@ -215,9 +259,6 @@ class Locations {
       return _.slice(locationName, _.size(regionName) + 1);
     } else if (_.isEqual(regionName, "Desert Colossus")) {
       if (_.startsWith(locationName, "Colossus ")) return _.slice(locationName, _.size("Colossus "));
-    } else if (_.isEqual(regionName, "Inside Ganons Castle")) {
-      if (_.startsWith(locationName, "Ganons Castle ")) return _.slice(locationName, _.size("Ganons Castle "));
-      if (_.startsWith(locationName, "Ganons Tower ")) return _.slice(locationName, _.size("Ganons Tower "));
     }
 
     return locationName;
