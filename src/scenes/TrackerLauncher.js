@@ -67,7 +67,7 @@ const TrackerLauncher = () => {
 
   const updateString = preset => {
     setSettingsString(SettingStringsJSON[preset]);
-    setGeneratorVersion("dev_6.2.227"); // hardcoded to latest version
+    setGeneratorVersion("dev_6.9.1"); // hardcoded to latest version
   };
 
   return (
