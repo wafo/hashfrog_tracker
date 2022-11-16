@@ -89,7 +89,7 @@ class Locations {
 
     // Weird Egg
     else if (_.isEqual(location.vanillaItem, "Weird Egg")) {
-      if (LogicHelper.settings.skip_child_zelda) {
+      if (_.isEqual(LogicHelper.settings.shuffle_child_trade, "skip_child_zelda")) {
         return false;
       } else {
         return !_.isEqual(LogicHelper.settings.shuffle_child_trade, "vanilla");
