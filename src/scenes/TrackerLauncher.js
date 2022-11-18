@@ -169,8 +169,7 @@ const TrackerLauncher = () => {
             <li>Trading sequences are not fully implemented but should work well enough.</li>
             <li>Region shortcuts are not implemented.</li>
             <li>
-              Counters are not hooked up. For items such as dungeon small keys, the logic assumes you have the maximum
-              amount, or 50, in the case of Gold Skulltula Tokens.
+              The logic assumes that the initial value for a counter is zero. Click the counter to update it if not.
             </li>
           </ul>
         </div>
