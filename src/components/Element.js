@@ -29,7 +29,7 @@ const Element = props => {
     items = [],
   } = props;
 
-  const { markItem, startingIndex: trackerContextStartingIndex } = useItems(items);
+  const { markCounter, markItem, startingIndex: trackerContextStartingIndex } = useItems(items);
 
   const [selected, setSelected] = useState(trackerContextStartingIndex || selectedStartingIndex);
   const [counter, setCounter] = useState(0);
@@ -66,9 +66,11 @@ const Element = props => {
       // For context
       if (!isCounter) {
         markItem(items, items[updated]);
+      } else {
+        markCounter(updated, name);
       }
     },
-    [icons, type, countConfig, selected, items, markItem, counter],
+    [icons, type, countConfig, selected, items, markCounter, markItem, counter, name],
   );
 
   const wheelHandler = useCallback(
@@ -79,11 +81,13 @@ const Element = props => {
       const { deltaY } = event;
       if (deltaY > 0) {
         setCounter(prev => (prev === countConfig[1] ? prev : ++prev));
+        markCounter(counter, name);
       } else if (deltaY < 0) {
         setCounter(prev => (prev === countConfig[0] ? prev : --prev));
+        markCounter(counter, name);
       }
     },
-    [type, countConfig],
+    [type, countConfig, markCounter, counter, name],
   );
 
   const dragHandler = useCallback(
