@@ -3,6 +3,9 @@ import { createContext, useContext, useMemo, useReducer } from "react";
 import DEFAULT_ITEMS from "../data/default-items.json";
 import ITEMS_JSON from "../data/items.json";
 import LogicHelper from "../utils/logic-helper";
+import SettingStringsJSON from "../data/setting-strings.json";
+
+const GENERATOR_VERSION = process.env.REACT_APP_GENERATOR_VERSION;
 
 const TrackerContext = createContext();
 
@@ -289,8 +292,8 @@ function validateLocations(locations, parsedItems) {
 function getSettingsStringCache() {
   let string = localStorage.getItem("settings_string");
   if (!string) {
-    // Tournament S6
-    string = "BSCKMFQNALH2EAAASHKBABUAAAEAACBAEJFQNACX2TBJAAAEEBAABSAJADABQ2EJBNSMX6FV3RCWCFAQ2WCSAACAAVQCACDCEJBAUA";
+    // Taking the Tournament S6 as default
+    string = SettingStringsJSON.tournament_s6
   }
   return string;
 }
@@ -302,8 +305,8 @@ function setSettingsStringCache(string) {
 function getGeneratorVersionCache() {
   let version = localStorage.getItem("generator_version");
   if (!version) {
-    // Current Dev
-    version = "dev_6.9.1";
+    // Coming from .env and using it as default
+    version = GENERATOR_VERSION;
   }
   return version;
 }

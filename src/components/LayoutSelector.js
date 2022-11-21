@@ -5,9 +5,8 @@ import { readFileAsText } from "../utils/utils";
 import FileSaver from "file-saver";
 
 // Layouts
-import standardPathJSON from "../layouts/standard_path.layout.json";
-import standardWothJSON from "../layouts/standard_woth.layout.json";
-import scrubsS4JSON from "../layouts/scrubs_s4.layout.json";
+import standardJSON from "../layouts/standard.json";
+import linsoJSON from "../layouts/linso.json";
 
 const LayoutSelector = () => {
   const [key, setKey] = useState(Math.random());
@@ -38,17 +37,14 @@ const LayoutSelector = () => {
   const downloadLayout = selected => {
     let layout = null;
     switch (selected) {
-      case "path":
-        layout = standardPathJSON;
+      case "standard":
+        layout = standardJSON;
         break;
-      case "woth":
-        layout = standardWothJSON;
-        break;
-      case "scrubs":
-        layout = scrubsS4JSON;
-        break;
+        case "linso":
+          layout = linsoJSON;
+          break;
       default:
-        layout = standardPathJSON;
+        layout = standardJSON;
         break;
     }
     const jsonBlob = new Blob([JSON.stringify(layout)], { type: "text/plain" });
@@ -78,25 +74,19 @@ const LayoutSelector = () => {
           Reset
         </button>
       </div>
-      <p className="m-0 mb-2">Current layout: {layout.layoutConfig.name}</p>
+      <p className="m-0 mb-2 note">Current layout: {layout.layoutConfig.name}</p>
 
       <h5>Layout Presets</h5>
       <ul className="list-unstyled list-horizontal">
         <li>
-          <button type="button" className="btn btn-link btm-sm p-0" onClick={() => downloadLayout("path")}>
-            Standard - Path
+          <button type="button" className="btn btn-link btm-sm p-0" onClick={() => downloadLayout("standard")}>
+            Standard
           </button>
         </li>
         <li className="list-divider">|</li>
         <li>
-          <button type="button" className="btn btn-link btm-sm p-0" onClick={() => downloadLayout("woth")}>
-            Standard - WOTH
-          </button>
-        </li>
-        <li className="list-divider">|</li>
-        <li>
-          <button type="button" className="btn btn-link btm-sm p-0" onClick={() => downloadLayout("scrubs")}>
-            Scrubs - S4
+          <button type="button" className="btn btn-link btm-sm p-0" onClick={() => downloadLayout("linso")}>
+            LinSo Like
           </button>
         </li>
       </ul>

@@ -27,18 +27,19 @@ const Welcome = () => {
           </p>
           <h3>Features</h3>
           <ul>
-            <li>Layout customization & UI editor.</li>
-            <li>Creation of custom elements and custom icons.</li>
-            <li>Ability to store layout configuration in JSON format.</li>
+            <li>Layout customization, UI editor, custom elements/icons and more.</li>
+            <li>Store and share layout configuration in JSON files.</li>
             <li>Check/Location tracking based on the randomizer generator logic.</li>
           </ul>
           <h3>Changelog</h3>
           <ul>
-            <li>0.5.5 - Counters (small keys & skulls) now hooked to the logic.</li>
+            <li>0.6.0 - Separation of release and dev logic branches.</li>
+            <li>0.5.x - Logic parsing from the generator including setting string parsing and counters.</li>
+            {/* <li>0.5.5 - Counters (small keys & skulls) now hooked to the logic.</li>
             <li>0.5.3 - Skulls available counter.</li>
             <li>0.5.2 - Settings string parsing directly from the generator. General bug fixes.</li>
             <li>0.5.1 - Starting items from settings. General bug fixes.</li>
-            <li>0.5.0 - Logic funtionality parsing logic from the randomizer generator.</li>
+            <li>0.5.0 - Logic funtionality parsing logic from the randomizer generator.</li> */}
             <li>0.4.x - Layout based of JSON file and editor UI. Custom Elements in Layout and Editor. Cached icons for improved performance.</li>
             {/* <li>0.4.4 - Custom Elements in Layout and Editor.</li>
             <li>0.4.3 - Cached icons for improved performance. No more lag when clicking icons for the first time.</li>

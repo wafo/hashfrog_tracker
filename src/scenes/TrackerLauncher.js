@@ -7,6 +7,8 @@ import useDebounce from "../hooks/useDebounce";
 import SettingStringsJSON from "../data/setting-strings.json";
 
 const baseURL = process.env.PUBLIC_URL;
+const GENERATOR_VERSION = process.env.REACT_APP_GENERATOR_VERSION;
+const LOGIC_BRANCH = process.env.REACT_APP_LOGIC_BRANCH
 
 const TrackerLauncher = () => {
   const [checks, setChecks] = useState(false);
@@ -67,7 +69,7 @@ const TrackerLauncher = () => {
 
   const updateString = preset => {
     setSettingsString(SettingStringsJSON[preset]);
-    setGeneratorVersion("dev_6.9.1"); // hardcoded to latest version
+    setGeneratorVersion(GENERATOR_VERSION); // coming from .env
   };
 
   return (
@@ -93,7 +95,7 @@ const TrackerLauncher = () => {
           </div>
           <div className="row m-0 w-75">
             <div className="col-4 ps-0">
-              <label htmlFor="layout-selector" className="form-label">
+              <label htmlFor="generator_version" className="form-label">
                 Generator version
               </label>
               <input
@@ -108,7 +110,7 @@ const TrackerLauncher = () => {
               />
             </div>
             <div className="col-8 pe-0">
-              <label htmlFor="layout-selector" className="form-label">
+              <label htmlFor="setting_string" className="form-label">
                 Settings String
               </label>
               <input
@@ -124,7 +126,7 @@ const TrackerLauncher = () => {
             </div>
           </div>
           <div className="mb-3">
-            <label htmlFor="layout-selector" className="form-label w-100">
+            <label htmlFor="" className="form-label w-100">
               Common Presets
             </label>
             <button
@@ -151,6 +153,14 @@ const TrackerLauncher = () => {
             >
               Tournament S6
             </button>
+            {LOGIC_BRANCH === "release" && (
+              <p className="note">Note: Release logic files being used. <a href="https://hashfrog-dev.wafo.dev/">Go to dev logic</a></p>
+            )}
+            {LOGIC_BRANCH !== "release" && (
+              <p className="note">Note: Dev logic files being used and things may break. <a href="https://hashfrog.wafo.dev/">Go to release logic</a></p>
+            )}
+          </div>
+          <div className="mb-3">
           </div>
 
           <LayoutSelector />
@@ -161,13 +171,10 @@ const TrackerLauncher = () => {
           <h3>Notes</h3>
           <p>* Check tracking requires a compatible layout configuration to work properly.</p>
           <ul style={{ fontSize: "0.8em" }}>
-            <li>The logic assumes you can access both ages, so checks against starting age default to true.</li>
-            <li>Closed Deku and Closed Door of Time do not work for the same reason.</li>
-            <li>The logic assumes vanilla spawns.</li>
-            <li>The logic assumes that the player can let the time of day pass.</li>
+            <li>The logic assumes: Access to both ages, vanilla spawns and that the player can let the time of day pass.</li>
+            <li>Closed Deku and Closed Door of Time do not work for the reasons above.</li>
             <li>MQ does not work, as the tracker has no option to specify that a dungeon is MQ.</li>
-            <li>Trading sequences are not fully implemented but should work well enough.</li>
-            <li>Region shortcuts are not implemented.</li>
+            <li>Region shortcuts are not implemented. Trading sequences are not fully implemented.</li>
             <li>
               The logic assumes that the initial value for a counter is zero. Click the counter to update it if not.
             </li>

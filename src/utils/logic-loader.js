@@ -2,6 +2,8 @@ import _ from "lodash";
 
 import DUNGEONS from "../data/dungeons.json";
 
+const LOGIC_BRANCH = process.env.REACT_APP_LOGIC_BRANCH
+
 class LogicLoader {
   static async loadLogicFiles() {
     const logicHelpersFile = await this._loadLogicFile(this._logicHelpersFileUrl());
@@ -45,11 +47,11 @@ class LogicLoader {
   }
 
   static _logicHelpersFileUrl() {
-    return "https://raw.githubusercontent.com/TestRunnerSRL/OoT-Randomizer/Dev/data/LogicHelpers.json";
+    return `https://raw.githubusercontent.com/TestRunnerSRL/OoT-Randomizer/${LOGIC_BRANCH}/data/LogicHelpers.json`;
   }
 
   static _logicFileUrl(fileName) {
-    return `https://raw.githubusercontent.com/TestRunnerSRL/OoT-Randomizer/Dev/data/World/${fileName}`;
+    return `https://raw.githubusercontent.com/TestRunnerSRL/OoT-Randomizer/${LOGIC_BRANCH}/data/World/${fileName}`;
   }
 }
 

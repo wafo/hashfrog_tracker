@@ -1,5 +1,5 @@
 import { useContext, useReducer, createContext } from "react";
-import defaultLayout from "../layouts/standard_path.layout.json";
+import defaultLayout from "../layouts/standard.json";
 
 function getInitialLayout() {
   let layout = localStorage.getItem("layout");
