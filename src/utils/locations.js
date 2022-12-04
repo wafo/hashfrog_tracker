@@ -67,8 +67,12 @@ class Locations {
     }
 
     // Shops
-    else if (_.isEqual(location.type, "Shop") && _.isEqual(LogicHelper.settings.shopsanity, "off")) {
-      return false;
+    else if (_.isEqual(location.type, "Shop")) {
+      if (_.isEqual(LogicHelper.settings.shopsanity, "off")) {
+        return false;
+      } else {
+        return _.toInteger(LogicHelper.settings.shopsanity) >= _.toInteger(_.slice(location.locationName, -1));
+      }
     }
 
     // Business Scrubs
