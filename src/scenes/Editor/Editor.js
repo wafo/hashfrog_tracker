@@ -5,6 +5,7 @@ import EditorComponentsList from "./EditorComponentsList";
 import { generateId, readFileAsText } from "../../utils/utils";
 import FileSaver from "file-saver";
 import EditorElementsList from "./EditorElementsList";
+import useDebounce from "../../hooks/useDebounce"
 
 const baseLayout = {
   id: "",
@@ -126,6 +127,8 @@ const Editor = () => {
 
   const [layout, setLayout] = useState({ ...baseLayout });
 
+  const debouncedLayout = useDebounce(layout, 300)
+
   const setLayoutConfig = value => {
     setLayout(prev => ({ ...prev, layoutConfig: value }));
   };
@@ -214,23 +217,23 @@ const Editor = () => {
                     </button>
                   </div>
                   {tab === 0 && (
-                    <EditorLayoutConfig layoutConfig={layout.layoutConfig} setLayoutConfig={setLayoutConfig} />
+                    <EditorLayoutConfig layoutConfig={debouncedLayout.layoutConfig} setLayoutConfig={setLayoutConfig} />
                   )}
                   {tab === 1 && (
                     <EditorComponentsList
-                      customElements={layout.elements}
-                      components={layout.components}
+                      customElements={debouncedLayout.elements}
+                      components={debouncedLayout.components}
                       setLayout={setLayout}
                     />
                   )}
-                  {tab === 2 && <EditorElementsList elements={layout.elements || []} setLayout={setLayout} />}
+                  {tab === 2 && <EditorElementsList elements={debouncedLayout.elements || []} setLayout={setLayout} />}
                 </Fragment>
               )}
             </div>
           </div>
         </div>
         <div className="col-md-8">
-          {layout.id && <Layout layout={layout} editing hideFooter />}
+          {layout.id && <Layout layout={debouncedLayout} editing hideFooter />}
           {!layout.id && (
             <div className="card card-dark">
               <div className="card-body">
