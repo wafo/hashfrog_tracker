@@ -204,7 +204,7 @@ class LogicHelper {
         }
         break;
       case "in":
-        if (_.includes(_.keys(this.settings), leftSide)) {
+        if (_.includes(_.keys(this.settings), rightSide)) {
           return _.includes(this.settings[rightSide], leftSide);
         } else {
           return false;
