@@ -74,23 +74,26 @@ class LogicHelper {
 
     this.regions = { child: [], adult: [] };
 
-    let accessibleChildRegions = this._recalculateAccessibleRegions("Root", "child");
-    let newChildRegions = [];
+    let accessibleChildRegions = [];
+    let newChildRegions = this._recalculateAccessibleRegions("Root", "child");
 
-    let accessibleAdultRegions = this._recalculateAccessibleRegions("Root", "adult");
-    let newAdultRegions = [];
+    let accessibleAdultRegions = [];
+    let newAdultRegions = this._recalculateAccessibleRegions("Root", "adult");
 
-    while (!_.isEqual(accessibleChildRegions, newChildRegions) || !_.isEqual(accessibleChildRegions, newChildRegions)) {
-      newChildRegions = _.cloneDeep(accessibleChildRegions);
+    do {
+      accessibleChildRegions = _.cloneDeep(newChildRegions);
+      accessibleAdultRegions = _.cloneDeep(newAdultRegions);
+
       _.forEach(accessibleChildRegions, regionName => {
         newChildRegions = _.union(newChildRegions, this._recalculateAccessibleRegions(regionName, "child"));
       });
-
-      newAdultRegions = _.cloneDeep(accessibleAdultRegions);
       _.forEach(accessibleAdultRegions, regionName => {
         newAdultRegions = _.union(newAdultRegions, this._recalculateAccessibleRegions(regionName, "adult"));
       });
-    }
+    } while (
+      !_.isEqual(accessibleChildRegions, newChildRegions) ||
+      !_.isEqual(accessibleAdultRegions, newAdultRegions)
+    );
   }
 
   static parseRule(ruleString) {
