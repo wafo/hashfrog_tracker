@@ -132,6 +132,22 @@ const TrackerLauncher = () => {
             <button
               type="button"
               className="btn btn-light btn-sm me-2"
+              onClick={() => updateString("tournament_s6")}
+              disabled={!checks}
+            >
+              Tournament S6
+            </button>
+            <button
+              type="button"
+              className="btn btn-light btn-sm me-2"
+              onClick={() => updateString("tfb_s2")}
+              disabled={!checks}
+            >
+              Triforce Blitz S2
+            </button>
+            <button
+              type="button"
+              className="btn btn-light btn-sm me-2"
               onClick={() => updateString("league_s3")}
               disabled={!checks}
             >
@@ -144,14 +160,6 @@ const TrackerLauncher = () => {
               disabled={!checks}
             >
               Scrubs S4
-            </button>
-            <button
-              type="button"
-              className="btn btn-light btn-sm me-2"
-              onClick={() => updateString("tournament_s6")}
-              disabled={!checks}
-            >
-              Tournament S6
             </button>
             {LOGIC_BRANCH === "release" && (
               <p className="note">
