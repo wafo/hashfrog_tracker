@@ -31,6 +31,32 @@ class LogicHelper {
       _.set(this.settings, "shuffle_ganon_bosskey", "triforce");
     }
 
+    if (_.isEqual(this.settings.dungeon_shortcuts_choice, "all")) {
+      _.set(this.settings, "dungeon_shortcuts", [
+        "Deku Tree",
+        "Dodongos Cavern",
+        "Jabu Jabus Belly",
+        "Forest Temple",
+        "Fire Temple",
+        "Water Temple",
+        "Shadow Temple",
+        "Spirit Temple",
+      ]);
+    }
+
+    if (_.isEqual(this.settings.key_rings_choice, "all")) {
+      _.set(this.settings, "key_rings", [
+        "Thieves Hideout",
+        "Forest Temple",
+        "Fire Temple",
+        "Water Temple",
+        "Shadow Temple",
+        "Spirit Temple",
+        "Bottom of the Well",
+        "Gerudo Training Ground",
+        "Ganons Castle",
+      ]);
+    }
     this.items = {};
     this.regions = { child: [], adult: [] };
 
