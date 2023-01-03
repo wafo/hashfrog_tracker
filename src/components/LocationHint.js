@@ -1,9 +1,10 @@
 import { Fragment, useMemo, useState } from "react";
-import CustomReactSelect from "./CustomReactSelect";
+
 import labelsJSON from "../data/labels.json";
+import CustomReactSelect from "./CustomReactSelect";
 import Element from "./Element";
 
-const LocationHint = (props) => {
+const LocationHint = props => {
   const {
     id = "5b69e6b1a19a45b2ad043b3851b202d8",
     name = "locations",
@@ -20,7 +21,7 @@ const LocationHint = (props) => {
 
   const [hasValue, setHasValue] = useState(false);
 
-  const onValueCallback = (value) => {
+  const onValueCallback = value => {
     if (value) {
       setHasValue(true);
     } else {
@@ -30,7 +31,7 @@ const LocationHint = (props) => {
 
   const memoizedOptions = useMemo(() => {
     if (options) return options;
-    return labelsJSON[labels].map((label) => ({
+    return labelsJSON[labels].map(label => ({
       value: label,
       label: label,
     }));

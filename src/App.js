@@ -1,9 +1,10 @@
 import { Route, Routes } from "react-router-dom";
-import Welcome from "./scenes/Welcome";
-import TrackerLayout from "./scenes/TrackerLayout";
-import TrackerChecks from "./scenes/TrackerChecks";
-import Layout from "./scenes/Layout";
+
 import Editor from "./scenes/Editor/Editor";
+import Layout from "./scenes/Layout";
+import TrackerChecks from "./scenes/TrackerChecks";
+import TrackerLayout from "./scenes/TrackerLayout";
+import Welcome from "./scenes/Welcome";
 
 function App() {
   return (

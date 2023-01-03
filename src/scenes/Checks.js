@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { useEffect, useMemo, useState } from "react";
-import { useChecks, useLocation } from "../context/trackerContext";
 
+import { useChecks, useLocation } from "../context/trackerContext";
 import Locations from "../utils/locations";
 import LogicHelper from "../utils/logic-helper";
 

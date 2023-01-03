@@ -1,14 +1,13 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
+import frog from "../assets/icons/hashfrogsping.gif";
 import Checks from "./Checks";
 import Layout from "./Layout";
-import frog from "../assets/icons/hashfrogsping.gif";
 
+import { getGeneratorVersionCache, getSettingsStringCache, useItems } from "../context/trackerContext";
 import Locations from "../utils/locations";
 import LogicHelper from "../utils/logic-helper";
 import LogicLoader from "../utils/logic-loader";
-import { getGeneratorVersionCache, getSettingsStringCache, useItems } from "../context/trackerContext";
-import { useCallback } from "react";
 
 const TrackerChecks = () => {
   const [isLoading, setIsLoading] = useState(true);

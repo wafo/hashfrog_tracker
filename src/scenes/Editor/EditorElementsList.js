@@ -1,9 +1,8 @@
-import { useCallback, useState } from "react";
-import { generateId, isBase64, splitNameBase64 } from "../../utils/utils";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
 import Element from "../../components/Element";
-import { useEffect } from "react";
+import { generateId, isBase64, splitNameBase64 } from "../../utils/utils";
 import EditorElement from "./EditorElement";
-import { useMemo } from "react";
 
 const baseURL = process.env.PUBLIC_URL;
 

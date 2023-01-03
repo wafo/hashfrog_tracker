@@ -1,12 +1,13 @@
+import FileSaver from "file-saver";
 import { useCallback, useState } from "react";
+
 import { Link } from "react-router-dom";
 import { useLayout } from "../context/layoutContext";
 import { readFileAsText } from "../utils/utils";
-import FileSaver from "file-saver";
 
 // Layouts
-import standardJSON from "../layouts/standard.json";
 import linsoJSON from "../layouts/linso.json";
+import standardJSON from "../layouts/standard.json";
 
 const LayoutSelector = () => {
   const [key, setKey] = useState(Math.random());
@@ -40,9 +41,9 @@ const LayoutSelector = () => {
       case "standard":
         layout = standardJSON;
         break;
-        case "linso":
-          layout = linsoJSON;
-          break;
+      case "linso":
+        layout = linsoJSON;
+        break;
       default:
         layout = standardJSON;
         break;

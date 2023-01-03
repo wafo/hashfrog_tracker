@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+
+import elementsJSON from "../../data/elements.json";
 import { generateId } from "../../utils/utils";
 import EditorComponent from "./EditorComponent";
-import elementsJSON from "../../data/elements.json";
 
 const EditorComponentsList = ({ components, setLayout, customElements }) => {
   const [component, setComponent] = useState(null);
@@ -48,7 +49,7 @@ const EditorComponentsList = ({ components, setLayout, customElements }) => {
 
   // From default elements and custom in layout
   const combinedElements = useMemo(() => {
-    return [...elementsJSON, ...customElements || []];
+    return [...elementsJSON, ...(customElements || [])];
   }, [customElements]);
 
   return (
