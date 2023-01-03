@@ -252,8 +252,7 @@ class LogicHelper {
     const arg = node.arguments[0].name;
     switch (node.callee.name) {
       case "at":
-        // TODO: this is hardcoded for now
-        return true;
+        return this._at(node);
       case "at_night":
         // TODO: this is hardcoded for now
         return true;
@@ -379,6 +378,16 @@ class LogicHelper {
     }
 
     throw Error(`Unknown unary operator: ${node.operator}`);
+  }
+
+  static _at(node) {
+    const spotToCheck = node.arguments[0].value;
+    const expression = node.arguments[1];
+
+    return (
+      (this._isRegionAccessible(spotToCheck, "child") && this._evalNode(expression, "child")) ||
+      (this._isRegionAccessible(spotToCheck, "adult") && this._evalNode(expression, "adult"))
+    );
   }
 
   static _canAccessDrop(dropName) {
