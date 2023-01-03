@@ -57,6 +57,7 @@ class LogicHelper {
         "Ganons Castle",
       ]);
     }
+
     this.items = {};
     this.regions = { child: [], adult: [] };
 
@@ -64,28 +65,32 @@ class LogicHelper {
   }
 
   static updateItems(newItems) {
+    // don't update if items haven't changed
+    if (_.isEqual(this.items, newItems)) {
+      return;
+    }
+
     this.items = _.cloneDeep(newItems);
 
     this.regions = { child: [], adult: [] };
 
-    let oldRegionsToCheck = [];
-    let newRegionsToCheck = [];
+    let accessibleChildRegions = this._recalculateAccessibleRegions("Root", "child");
+    let newChildRegions = [];
 
-    do {
-      newRegionsToCheck = [];
-      _.forEach(oldRegionsToCheck, regionName => {
-        newRegionsToCheck = _.union(newRegionsToCheck, this._recalculateAccessibleRegions(regionName, "child"));
-      });
-      oldRegionsToCheck = this._recalculateAccessibleRegions("Root", "child");
-    } while (!_.isEqual(oldRegionsToCheck, newRegionsToCheck));
+    let accessibleAdultRegions = this._recalculateAccessibleRegions("Root", "adult");
+    let newAdultRegions = [];
 
-    do {
-      newRegionsToCheck = [];
-      _.forEach(oldRegionsToCheck, regionName => {
-        newRegionsToCheck = _.union(newRegionsToCheck, this._recalculateAccessibleRegions(regionName, "adult"));
+    while (!_.isEqual(accessibleChildRegions, newChildRegions) || !_.isEqual(accessibleChildRegions, newChildRegions)) {
+      newChildRegions = _.cloneDeep(accessibleChildRegions);
+      _.forEach(accessibleChildRegions, regionName => {
+        newChildRegions = _.union(newChildRegions, this._recalculateAccessibleRegions(regionName, "child"));
       });
-      oldRegionsToCheck = this._recalculateAccessibleRegions("Root", "adult");
-    } while (!_.isEqual(oldRegionsToCheck, newRegionsToCheck));
+
+      newAdultRegions = _.cloneDeep(accessibleAdultRegions);
+      _.forEach(accessibleAdultRegions, regionName => {
+        newAdultRegions = _.union(newAdultRegions, this._recalculateAccessibleRegions(regionName, "adult"));
+      });
+    }
   }
 
   static parseRule(ruleString) {
@@ -117,7 +122,10 @@ class LogicHelper {
   static _initRenamedAttributes() {
     // source: World.py __init__()
 
-    const keysanity = _.includes(["keysanity", "remove", "any_dungeon", "overworld", "regional"], this.settings.shuffle_smallkeys);
+    const keysanity = _.includes(
+      ["keysanity", "remove", "any_dungeon", "overworld", "regional"],
+      this.settings.shuffle_smallkeys,
+    );
     const checkBeatableOnly = _.isEqual(this.settings.reachable_locations, "all");
     const shuffleSpecialInteriorEntrances = _.isEqual(this.settings.shuffle_interior_entrances, "all");
     const shuffleInteriorEntrances = _.includes(["simple", "all"], this.settings.shuffle_interior_entrances);
