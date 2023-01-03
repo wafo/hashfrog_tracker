@@ -368,7 +368,13 @@ class LogicHelper {
     }
 
     const itemName = node.expressions[0].name;
-    const itemCount = node.expressions[1].value;
+    let itemCount = node.expressions[1].value;
+
+    // account for removed locked door in Fire Temple when keysanity is off
+    if (!this.renamedAttributes.keysanity && _.isEqual(itemName, "Small_Key_Fire_Temple")) {
+      itemCount -= 1;
+    }
+
     return this.items[itemName] >= itemCount;
   }
 
