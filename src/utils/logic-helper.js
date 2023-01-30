@@ -31,6 +31,33 @@ class LogicHelper {
       _.set(this.settings, "shuffle_ganon_bosskey", "triforce");
     }
 
+    if (_.isEqual(this.settings.dungeon_shortcuts_choice, "all")) {
+      _.set(this.settings, "dungeon_shortcuts", [
+        "Deku Tree",
+        "Dodongos Cavern",
+        "Jabu Jabus Belly",
+        "Forest Temple",
+        "Fire Temple",
+        "Water Temple",
+        "Shadow Temple",
+        "Spirit Temple",
+      ]);
+    }
+
+    if (_.isEqual(this.settings.key_rings_choice, "all")) {
+      _.set(this.settings, "key_rings", [
+        "Thieves Hideout",
+        "Forest Temple",
+        "Fire Temple",
+        "Water Temple",
+        "Shadow Temple",
+        "Spirit Temple",
+        "Bottom of the Well",
+        "Gerudo Training Ground",
+        "Ganons Castle",
+      ]);
+    }
+
     this.items = {};
     this.regions = { child: [], adult: [] };
 
@@ -38,28 +65,35 @@ class LogicHelper {
   }
 
   static updateItems(newItems) {
+    // don't update if items haven't changed
+    if (_.isEqual(this.items, newItems)) {
+      return;
+    }
+
     this.items = _.cloneDeep(newItems);
 
     this.regions = { child: [], adult: [] };
 
-    let oldRegionsToCheck = [];
-    let newRegionsToCheck = [];
+    let accessibleChildRegions = [];
+    let newChildRegions = this._recalculateAccessibleRegions("Root", "child");
+
+    let accessibleAdultRegions = [];
+    let newAdultRegions = this._recalculateAccessibleRegions("Root", "adult");
 
     do {
-      newRegionsToCheck = [];
-      _.forEach(oldRegionsToCheck, regionName => {
-        newRegionsToCheck = _.union(newRegionsToCheck, this._recalculateAccessibleRegions(regionName, "child"));
-      });
-      oldRegionsToCheck = this._recalculateAccessibleRegions("Root", "child");
-    } while (!_.isEqual(oldRegionsToCheck, newRegionsToCheck));
+      accessibleChildRegions = _.cloneDeep(newChildRegions);
+      accessibleAdultRegions = _.cloneDeep(newAdultRegions);
 
-    do {
-      newRegionsToCheck = [];
-      _.forEach(oldRegionsToCheck, regionName => {
-        newRegionsToCheck = _.union(newRegionsToCheck, this._recalculateAccessibleRegions(regionName, "adult"));
+      _.forEach(accessibleChildRegions, regionName => {
+        newChildRegions = _.union(newChildRegions, this._recalculateAccessibleRegions(regionName, "child"));
       });
-      oldRegionsToCheck = this._recalculateAccessibleRegions("Root", "adult");
-    } while (!_.isEqual(oldRegionsToCheck, newRegionsToCheck));
+      _.forEach(accessibleAdultRegions, regionName => {
+        newAdultRegions = _.union(newAdultRegions, this._recalculateAccessibleRegions(regionName, "adult"));
+      });
+    } while (
+      !_.isEqual(accessibleChildRegions, newChildRegions) ||
+      !_.isEqual(accessibleAdultRegions, newAdultRegions)
+    );
   }
 
   static parseRule(ruleString) {
@@ -91,7 +125,10 @@ class LogicHelper {
   static _initRenamedAttributes() {
     // source: World.py __init__()
 
-    const keysanity = _.includes(["keysanity", "remove", "any_dungeon", "overworld", "regional"], this.settings.shuffle_smallkeys);
+    const keysanity = _.includes(
+      ["keysanity", "remove", "any_dungeon", "overworld", "regional"],
+      this.settings.shuffle_smallkeys,
+    );
     const checkBeatableOnly = _.isEqual(this.settings.reachable_locations, "all");
     const shuffleSpecialInteriorEntrances = _.isEqual(this.settings.shuffle_interior_entrances, "all");
     const shuffleInteriorEntrances = _.includes(["simple", "all"], this.settings.shuffle_interior_entrances);
@@ -204,7 +241,7 @@ class LogicHelper {
         }
         break;
       case "in":
-        if (_.includes(_.keys(this.settings), leftSide)) {
+        if (_.includes(_.keys(this.settings), rightSide)) {
           return _.includes(this.settings[rightSide], leftSide);
         } else {
           return false;
@@ -218,8 +255,7 @@ class LogicHelper {
     const arg = node.arguments[0].name;
     switch (node.callee.name) {
       case "at":
-        // TODO: this is hardcoded for now
-        return true;
+        return this._at(node);
       case "at_night":
         // TODO: this is hardcoded for now
         return true;
@@ -335,7 +371,13 @@ class LogicHelper {
     }
 
     const itemName = node.expressions[0].name;
-    const itemCount = node.expressions[1].value;
+    let itemCount = node.expressions[1].value;
+
+    // account for removed locked door in Fire Temple when keysanity is off
+    if (!this.renamedAttributes.keysanity && _.isEqual(itemName, "Small_Key_Fire_Temple")) {
+      itemCount -= 1;
+    }
+
     return this.items[itemName] >= itemCount;
   }
 
@@ -345,6 +387,16 @@ class LogicHelper {
     }
 
     throw Error(`Unknown unary operator: ${node.operator}`);
+  }
+
+  static _at(node) {
+    const spotToCheck = node.arguments[0].value;
+    const expression = node.arguments[1];
+
+    return (
+      (this._isRegionAccessible(spotToCheck, "child") && this._evalNode(expression, "child")) ||
+      (this._isRegionAccessible(spotToCheck, "adult") && this._evalNode(expression, "adult"))
+    );
   }
 
   static _canAccessDrop(dropName) {

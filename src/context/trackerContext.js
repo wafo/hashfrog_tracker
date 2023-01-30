@@ -1,9 +1,10 @@
 import _ from "lodash";
 import { createContext, useContext, useMemo, useReducer } from "react";
+
 import DEFAULT_ITEMS from "../data/default-items.json";
 import ITEMS_JSON from "../data/items.json";
-import LogicHelper from "../utils/logic-helper";
 import SettingStringsJSON from "../data/setting-strings.json";
+import LogicHelper from "../utils/logic-helper";
 
 const GENERATOR_VERSION = process.env.REACT_APP_GENERATOR_VERSION;
 
@@ -293,7 +294,7 @@ function getSettingsStringCache() {
   let string = localStorage.getItem("settings_string");
   if (!string) {
     // Taking the Tournament S6 as default
-    string = SettingStringsJSON.tournament_s6
+    string = SettingStringsJSON.tournament_s6;
   }
   return string;
 }

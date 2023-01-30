@@ -1,4 +1,5 @@
-import { useContext, useReducer, createContext } from "react";
+import { createContext, useContext, useReducer } from "react";
+
 import defaultLayout from "../layouts/standard.json";
 
 function getInitialLayout() {
@@ -14,7 +15,7 @@ function setLayoutCache(layout) {
 const initialState = getInitialLayout();
 const LayoutContext = createContext();
 
-function reducer(state, action) {
+function reducer(_state, action) {
   switch (action.type) {
     case "LAYOUT_UPDATE": {
       setLayoutCache(action.payload);

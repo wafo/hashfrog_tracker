@@ -1,15 +1,18 @@
-import { useCallback, useState, useMemo, useEffect } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
 import { useLayout } from "../context/layoutContext";
+
 // Components
 import Element from "../components/Element";
 import ElementsTable from "../components/ElementsTable";
 import Footer from "../components/Footer";
 import LocationHint from "../components/LocationHint";
 import SometimesHint from "../components/SometimesHint";
+
 // Data
-import elementsJSON from "../data/elements.json";
 import HintsTable from "../components/HintsTable";
 import Label from "../components/Label";
+import elementsJSON from "../data/elements.json";
 import { isBase64, splitNameBase64 } from "../utils/utils";
 
 const baseURL = process.env.PUBLIC_URL;
@@ -67,7 +70,7 @@ const Layout = props => {
       // otherwise on repeated elements it rips
       // because on next search it will loop through already cached icons.
       let element = elements.find(element => element.name === id || element.id === id);
-      if (!element) element = elements[0] // Fallback to hashfrog
+      if (!element) element = elements[0]; // Fallback to hashfrog
       element = { ...element };
       if (!cachedIcons) element.icons = [];
       if (cachedIcons)

@@ -1,8 +1,7 @@
-import { useState } from "react";
-import { useCallback } from "react";
-import { Fragment } from "react";
-import labelsJSON from "../../data/labels.json";
+import { Fragment, useCallback, useState } from "react";
+
 import iconsJSON from "../../data/icons.json";
+import labelsJSON from "../../data/labels.json";
 import { splitNameBase64 } from "../../utils/utils";
 
 const toNumber = [
