@@ -92,17 +92,18 @@ const Element = props => {
 
   const dragHandler = useCallback(
     event => {
-      let dragIcon = icons[1] || icons[0];
+      let dragIcon = draggedIcon ? draggedIcon : icons[1] || icons[0];
       if (dragCurrent) dragIcon = icons[selected];
       const item = JSON.stringify({ icon: dragIcon });
       event.dataTransfer.setData("item", item);
     },
-    [dragCurrent, icons, selected],
+    [dragCurrent, icons, selected, draggedIcon],
   );
 
   const dropHandler = useCallback(
     event => {
       event.preventDefault();
+
       if (receiver) {
         const item = event.dataTransfer.getData("item");
         const { icon } = JSON.parse(item);
