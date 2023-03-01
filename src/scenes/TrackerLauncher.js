@@ -188,7 +188,7 @@ const TrackerLauncher = () => {
             </li>
             <li>Closed Deku and Closed Door of Time do not work for the reasons above.</li>
             <li>MQ does not work, as the tracker has no option to specify that a dungeon is MQ.</li>
-            <li>Trading sequences are not fully implemented.</li>
+            <li>Trade sequences and trade item shuffle are not fully implemented.</li>
             <li>
               The logic assumes that the initial value for a counter is zero. Click the counter to update it if not.
             </li>
