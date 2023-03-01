@@ -21,8 +21,7 @@ class LogicHelper {
       (this.renamedAttributes.shuffle_special_interior_entrances ||
         this.settings.shuffle_overworld_entrances ||
         this.settings.warp_songs ||
-        this.settings.spawn_positions ||
-        !_.isEqual(this.settings.shuffle_bosses, "off"))
+        this.settings.spawn_positions)
     ) {
       _.set(this.settings, "open_forest", "closed_deku");
     }
@@ -129,7 +128,7 @@ class LogicHelper {
       ["keysanity", "remove", "any_dungeon", "overworld", "regional"],
       this.settings.shuffle_smallkeys,
     );
-    const checkBeatableOnly = _.isEqual(this.settings.reachable_locations, "all");
+    const checkBeatableOnly = !_.isEqual(this.settings.reachable_locations, "all");
     const shuffleSpecialInteriorEntrances = _.isEqual(this.settings.shuffle_interior_entrances, "all");
     const shuffleInteriorEntrances = _.includes(["simple", "all"], this.settings.shuffle_interior_entrances);
     const shuffleSpecialDungeonEntrances = _.isEqual(this.settings.shuffle_dungeon_entrances, "all");
@@ -140,6 +139,7 @@ class LogicHelper {
       this.settings.shuffle_grotto_entrances ||
       shuffleDungeonEntrances ||
       this.settings.shuffle_overworld_entrances ||
+      this.settings.shuffle_gerudo_valley_river_exit ||
       this.settings.owl_drops ||
       this.settings.warp_songs ||
       this.settings.spawn_positions ||
@@ -147,7 +147,11 @@ class LogicHelper {
 
     const ensureTodAccess =
       shuffleInteriorEntrances || this.settings.shuffle_overworld_entrances || this.settings.spawn_positions;
-    const disable_trade_revert = shuffleInteriorEntrances || this.settings.shuffle_overworld_entrances;
+    const disableTradeRevert =
+      shuffleInteriorEntrances || this.settings.shuffle_overworld_entrances || this.settings.adult_trade_shuffle;
+    const skipChildZelda =
+      !_.includes(this.settings.shuffle_child_trade, "Zeldas Letter") &&
+      _.includes(this.settings.starting_items, "zeldas_letter");
 
     const triforceGoal = this.settings.triforce_goal_per_world * this.settings.world_count;
 
@@ -160,7 +164,8 @@ class LogicHelper {
       shuffle_dungeon_entrances: shuffleDungeonEntrances,
       entrance_shuffle: entranceShuffle,
       ensure_tod_access: ensureTodAccess,
-      disable_trade_revert: disable_trade_revert,
+      disable_trade_revert: disableTradeRevert,
+      skip_child_zelda: skipChildZelda,
       triforce_goal: triforceGoal,
     };
   }
