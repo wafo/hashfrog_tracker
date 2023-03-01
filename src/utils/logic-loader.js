@@ -2,7 +2,7 @@ import _ from "lodash";
 
 import DUNGEONS from "../data/dungeons.json";
 
-const LOGIC_BRANCH = process.env.REACT_APP_LOGIC_BRANCH
+const LOGIC_BRANCH = process.env.REACT_APP_LOGIC_BRANCH;
 
 class LogicLoader {
   static async loadLogicFiles() {

@@ -1,9 +1,12 @@
+import _ from "lodash";
 import { Fragment, useCallback, useMemo, useState } from "react";
+
 import { useItems } from "../context/trackerContext";
+
 // Base Icons
+import icon_check from "../assets/icons/check_16x16.png";
 import icon_hashfrog from "../assets/icons/hash_frog_bw_32x32.png";
 import icon_unknown from "../assets/icons/unknown_16x16.png";
-import icon_check from "../assets/icons/check_16x16.png";
 
 const nestedStyles = {
   position: "absolute",
@@ -79,12 +82,10 @@ const Element = props => {
       if (type !== "counter") return;
 
       const { deltaY } = event;
-      if (deltaY > 0) {
-        setCounter(prev => (prev === countConfig[1] ? prev : ++prev));
-        markCounter(counter, name);
-      } else if (deltaY < 0) {
-        setCounter(prev => (prev === countConfig[0] ? prev : --prev));
-        markCounter(counter, name);
+      if (deltaY != 0) {
+        let newVal = _.clamp(counter + (deltaY > 0 ? 1 : -1), countConfig[0], countConfig[1]);
+        setCounter(newVal);
+        markCounter(newVal, name);
       }
     },
     [type, countConfig, markCounter, counter, name],

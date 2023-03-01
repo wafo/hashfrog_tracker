@@ -1,14 +1,14 @@
-import { useEffect } from "react";
-import { Fragment, useCallback, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+
 import LayoutSelector from "../components/LayoutSelector";
 import { useLayout } from "../context/layoutContext";
 import { useSettingsString } from "../context/trackerContext";
-import useDebounce from "../hooks/useDebounce";
 import SettingStringsJSON from "../data/setting-strings.json";
+import useDebounce from "../hooks/useDebounce";
 
 const baseURL = process.env.PUBLIC_URL;
 const GENERATOR_VERSION = process.env.REACT_APP_GENERATOR_VERSION;
-const LOGIC_BRANCH = process.env.REACT_APP_LOGIC_BRANCH
+const LOGIC_BRANCH = process.env.REACT_APP_LOGIC_BRANCH;
 
 const TrackerLauncher = () => {
   const [checks, setChecks] = useState(false);
@@ -132,6 +132,22 @@ const TrackerLauncher = () => {
             <button
               type="button"
               className="btn btn-light btn-sm me-2"
+              onClick={() => updateString("tournament_s6")}
+              disabled={!checks}
+            >
+              Tournament S6
+            </button>
+            <button
+              type="button"
+              className="btn btn-light btn-sm me-2"
+              onClick={() => updateString("tfb_s2")}
+              disabled={!checks}
+            >
+              Triforce Blitz S2
+            </button>
+            <button
+              type="button"
+              className="btn btn-light btn-sm me-2"
               onClick={() => updateString("league_s3")}
               disabled={!checks}
             >
@@ -145,23 +161,19 @@ const TrackerLauncher = () => {
             >
               Scrubs S4
             </button>
-            <button
-              type="button"
-              className="btn btn-light btn-sm me-2"
-              onClick={() => updateString("tournament_s6")}
-              disabled={!checks}
-            >
-              Tournament S6
-            </button>
             {LOGIC_BRANCH === "release" && (
-              <p className="note">Note: Release logic files being used. <a href="https://hashfrog-dev.wafo.dev/">Go to dev logic</a></p>
+              <p className="note">
+                Note: Release logic files being used. <a href="https://hashfrog-dev.wafo.dev/">Go to dev logic</a>
+              </p>
             )}
             {LOGIC_BRANCH !== "release" && (
-              <p className="note">Note: Dev logic files being used and things may break. <a href="https://hashfrog.wafo.dev/">Go to release logic</a></p>
+              <p className="note">
+                Note: Dev logic files being used and things may break.{" "}
+                <a href="https://hashfrog.wafo.dev/">Go to release logic</a>
+              </p>
             )}
           </div>
-          <div className="mb-3">
-          </div>
+          <div className="mb-3"></div>
 
           <LayoutSelector />
         </div>
@@ -171,10 +183,12 @@ const TrackerLauncher = () => {
           <h3>Notes</h3>
           <p>* Check tracking requires a compatible layout configuration to work properly.</p>
           <ul style={{ fontSize: "0.8em" }}>
-            <li>The logic assumes: Access to both ages, vanilla spawns and that the player can let the time of day pass.</li>
+            <li>
+              The logic assumes: Access to both ages, vanilla spawns and that the player can let the time of day pass.
+            </li>
             <li>Closed Deku and Closed Door of Time do not work for the reasons above.</li>
             <li>MQ does not work, as the tracker has no option to specify that a dungeon is MQ.</li>
-            <li>Region shortcuts are not implemented. Trading sequences are not fully implemented.</li>
+            <li>Trading sequences are not fully implemented.</li>
             <li>
               The logic assumes that the initial value for a counter is zero. Click the counter to update it if not.
             </li>

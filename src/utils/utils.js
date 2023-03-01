@@ -1,7 +1,7 @@
-import { v4 as uuidv4 } from "uuid";
 import _ from "lodash";
-import HINT_REGIONS from "../data/hint-regions.json";
+import { v4 as uuidv4 } from "uuid";
 import HINT_REGIONS_KEYWORDS from "../data/hint-regions-keywords.json";
+import HINT_REGIONS from "../data/hint-regions.json";
 
 export async function readFileAsText(file) {
   let result = await new Promise(resolve => {
