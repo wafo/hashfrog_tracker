@@ -163,13 +163,13 @@ const TrackerLauncher = () => {
             </button>
             {LOGIC_BRANCH === "release" && (
               <p className="note">
-                Note: Release logic files being used. <a href="https://hashfrog-dev.wafo.dev/">Go to dev logic</a>
+                Note: Release logic files being used. <a href="https://dev.hashfrog-tracker.com/">Go to dev logic</a>
               </p>
             )}
             {LOGIC_BRANCH !== "release" && (
               <p className="note">
                 Note: Dev logic files being used and things may break.{" "}
-                <a href="https://hashfrog.wafo.dev/">Go to release logic</a>
+                <a href="https://hashfrog-tracker.com/">Go to release logic</a>
               </p>
             )}
           </div>
