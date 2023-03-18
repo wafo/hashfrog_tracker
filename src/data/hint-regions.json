@@ -1,6 +1,8 @@
 {
-  "Links Pocket": ["Root"],
-  "Kokiri Forest": [
+  "Links Pocket":[
+    "Root"
+  ],
+  "Kokiri Forest":[
     "Kokiri Forest",
     "KF Outside Deku Tree",
     "KF Links House",
@@ -11,7 +13,7 @@
     "KF Kokiri Shop",
     "KF Storms Grotto"
   ],
-  "Lost Woods": [
+  "Lost Woods":[
     "Lost Woods",
     "LW Beyond Mido",
     "LW Underwater Entrance",
@@ -20,8 +22,13 @@
     "Deku Theater",
     "LW Scrubs Grotto"
   ],
-  "Sacred Forest Meadow": ["Sacred Forest Meadow", "SFM Fairy Grotto", "SFM Storms Grotto", "SFM Wolfos Grotto"],
-  "Hyrule Field": [
+  "Sacred Forest Meadow":[
+    "Sacred Forest Meadow",
+    "SFM Fairy Grotto",
+    "SFM Storms Grotto",
+    "SFM Wolfos Grotto"
+  ],
+  "Hyrule Field":[
     "Hyrule Field",
     "HF Southeast Grotto",
     "HF Open Grotto",
@@ -32,8 +39,13 @@
     "HF Near Kak Grotto",
     "HF Tektite Grotto"
   ],
-  "Lake Hylia": ["Lake Hylia", "LH Lab", "LH Fishing Hole", "LH Grotto"],
-  "Gerudo Valley": [
+  "Lake Hylia":[
+    "Lake Hylia",
+    "LH Lab",
+    "LH Fishing Hole",
+    "LH Grotto"
+  ],
+  "Gerudo Valley":[
     "Gerudo Valley",
     "GV Upper Stream",
     "GV Crate Ledge",
@@ -41,7 +53,7 @@
     "GV Octorok Grotto",
     "GV Storms Grotto"
   ],
-  "Gerudo Fortress": [
+  "Gerudo Fortress":[
     "Gerudo Fortress",
     "GF Chest Roof",
     "GF Roof Gold Skulltula",
@@ -55,15 +67,20 @@
     "Hideout Hall to Balcony Lower",
     "GF Storms Grotto"
   ],
-  "Haunted Wasteland": ["Wasteland Near Fortress", "Haunted Wasteland", "Wasteland Near Crate"],
-  "Desert Colossus": [
+  "Haunted Wasteland":[
+    "Wasteland Near Fortress",
+    "Haunted Wasteland",
+    "Wasteland Near Crate"
+  ],
+  "Desert Colossus":[
     "Desert Colossus",
     "Desert Colossus From Spirit Lobby",
     "Colossus Great Fairy Fountain",
     "Colossus Grotto"
   ],
-  "Market": [
+  "Market":[
     "Market",
+    "ToT Entrance",
     "Market Guard House",
     "Market Bazaar",
     "Market Shooting Gallery",
@@ -74,10 +91,21 @@
     "Market Dog Lady House",
     "Market Man in Green House"
   ],
-  "Temple of Time": ["ToT Entrance", "Temple of Time", "Beyond Door of Time"],
-  "Hyrule Castle": ["Hyrule Castle Grounds", "HC Garden Locations", "HC Great Fairy Fountain", "HC Storms Grotto"],
-  "Outside Ganons Castle": ["Ganons Castle Grounds", "OGC Great Fairy Fountain"],
-  "Kakariko Village": [
+  "Temple of Time":[
+    "Temple of Time",
+    "Beyond Door of Time"
+  ],
+  "Hyrule Castle":[
+    "Hyrule Castle Grounds",
+    "HC Garden Locations",
+    "HC Great Fairy Fountain",
+    "HC Storms Grotto"
+  ],
+  "Outside Ganons Castle":[
+    "Ganons Castle Grounds",
+    "OGC Great Fairy Fountain"
+  ],
+  "Kakariko Village":[
     "Kakariko Village",
     "Kak Impas Rooftop",
     "Kak Odd Medicine Rooftop",
@@ -92,7 +120,7 @@
     "Kak Redead Grotto",
     "Kak Open Grotto"
   ],
-  "Graveyard": [
+  "Graveyard":[
     "Graveyard",
     "Graveyard Shield Grave",
     "Graveyard Heart Piece Grave",
@@ -101,15 +129,21 @@
     "Graveyard Dampes House",
     "Graveyard Warp Pad Region"
   ],
-  "Death Mountain Trail": [
+  "Death Mountain Trail":[
     "Death Mountain",
     "Death Mountain Summit",
     "DMT Great Fairy Fountain",
     "DMT Cow Grotto",
     "DMT Storms Grotto"
   ],
-  "Goron City": ["Goron City", "GC Darunias Chamber", "GC Spinning Pot", "GC Shop", "GC Grotto"],
-  "Death Mountain Crater": [
+  "Goron City":[
+    "Goron City",
+    "GC Darunias Chamber",
+    "GC Spinning Pot",
+    "GC Shop",
+    "GC Grotto"
+  ],
+  "Death Mountain Crater":[
     "DMC Upper Local",
     "DMC Pierre Platform",
     "DMC Ladder Area Nearby",
@@ -120,19 +154,46 @@
     "DMC Upper Grotto",
     "DMC Hammer Grotto"
   ],
-  "Zora River": ["ZR Front", "Zora River", "ZR Open Grotto", "ZR Fairy Grotto", "ZR Storms Grotto"],
-  "Zoras Domain": ["Zoras Domain", "ZD Behind King Zora", "ZD Shop", "ZD Storms Grotto"],
-  "Zoras Fountain": ["Zoras Fountain", "ZF Underwater", "ZF Hidden Cave", "ZF Great Fairy Fountain"],
-  "Lon Lon Ranch": ["Lon Lon Ranch", "LLR Talons House", "LLR Stables", "LLR Tower", "LLR Grotto"],
-  "Deku Tree": [
+  "Zora River":[
+    "ZR Front",
+    "Zora River",
+    "ZR Open Grotto",
+    "ZR Fairy Grotto",
+    "ZR Storms Grotto"
+  ],
+  "Zoras Domain":[
+    "Zoras Domain",
+    "ZD Behind King Zora",
+    "ZD Shop",
+    "ZD Storms Grotto"
+  ],
+  "Zoras Fountain":[
+    "Zoras Fountain",
+    "ZF Underwater",
+    "ZF Hidden Cave",
+    "ZF Great Fairy Fountain"
+  ],
+  "Lon Lon Ranch":[
+    "Lon Lon Ranch",
+    "LLR Talons House",
+    "LLR Stables",
+    "LLR Tower",
+    "LLR Grotto"
+  ],
+  "Deku Tree":[
     "Deku Tree Lobby",
     "Deku Tree Slingshot Room",
     "Deku Tree Basement",
     "Deku Tree Basement Back Room",
     "Deku Tree Before Boss",
+    "Deku Tree Near Compass Room",
+    "Deku Tree Compass Room",
+    "Deku Tree Basement Water Room Front",
+    "Deku Tree Basement Water Room Back",
+    "Deku Tree Basement Ledge",
     "Queen Gohma Boss Room"
   ],
-  "Dodongos Cavern": [
+  "Dodongos Cavern":[
     "Dodongos Cavern Lobby",
     "Dodongos Cavern Lower Right Side",
     "Dodongos Cavern Torch Room",
@@ -142,16 +203,25 @@
     "Dodongos Cavern Upper Lizalfos",
     "Dodongos Cavern Far Bridge",
     "Dodongos Cavern Before Boss",
+    "Dodongos Cavern Elevator",
+    "Dodongos Cavern Torch Puzzle Lower",
+    "Dodongos Cavern Larvae Room",
+    "Dodongos Cavern Torch Puzzle Upper",
+    "Dodongos Cavern Lower Lizalfos",
+    "Dodongos Cavern Poes Room",
+    "Dodongos Cavern Mouth",
     "King Dodongo Boss Room"
   ],
-  "Jabu Jabus Belly": [
+  "Jabu Jabus Belly":[
     "Jabu Jabus Belly Main",
     "Jabu Jabus Belly Depths",
     "Jabu Jabus Belly Past Big Octo",
     "Jabu Jabus Belly Before Boss",
+    "Jabu Jabus Belly Beginning",
+    "Jabu Jabus Belly Elevator Room",
     "Barinade Boss Room"
   ],
-  "Forest Temple": [
+  "Forest Temple":[
     "Forest Temple Lobby",
     "Forest Temple Central Area",
     "Forest Temple NW Outdoors",
@@ -164,9 +234,11 @@
     "Forest Temple Frozen Eye Switch Room",
     "Forest Temple Falling Room",
     "Forest Temple Before Boss",
+    "Forest Temple Before Block Puzzle",
+    "Forest Temple NE Outdoors Ledge",
     "Phantom Ganon Boss Room"
   ],
-  "Fire Temple": [
+  "Fire Temple":[
     "Fire Temple Lower",
     "Fire Temple Lower Locked Door",
     "Fire Temple Big Lava Room",
@@ -176,9 +248,16 @@
     "Fire Temple Boulder Maze Upper",
     "Fire Temple Flame Maze",
     "Fire Temple Upper",
+    "Fire Temple Near Boss",
+    "Fire Temple Lower Lizalfos Maze",
+    "Fire Temple Upper Lizalfos Maze",
+    "Fire Temple Shortcut",
+    "Fire Temple Block On Fire Room",
+    "Fire Temple Shoot Torch On Wall Room",
+    "Fire Temple Flame Maze Side Room",
     "Volvagia Boss Room"
   ],
-  "Water Temple": [
+  "Water Temple":[
     "Water Temple Lobby",
     "Water Temple Dive",
     "Water Temple Lowered Water Levels",
@@ -192,9 +271,16 @@
     "Water Temple Dark Link Region",
     "Water Temple River",
     "Water Temple Dragon Statue",
+    "Water Temple Below Central Pillar",
+    "Water Temple Storage Room",
+    "Water Temple Before Upper Water Switch",
+    "Water Temple Basement Gated Areas",
+    "Water Temple Freestanding Key Room",
+    "Water Temple Dodongo Room",
+    "Water Temple Triple Wall Torch",
     "Morpha Boss Room"
   ],
-  "Shadow Temple": [
+  "Shadow Temple":[
     "Shadow Temple Beginning",
     "Shadow Temple First Beamos",
     "Shadow Temple Huge Pit",
@@ -207,9 +293,14 @@
     "Shadow Temple Beyond Boat Scarecrow",
     "Shadow Temple Beyond Boat SoT Block",
     "Shadow Temple Before Boss",
+    "Shadow Temple Dead Hand Area",
+    "Shadow Temple Invisible Blades",
+    "Shadow Temple Falling Spikes",
+    "Shadow Temple Across Chasm",
+    "Shadow Temple Invisible Maze",
     "Bongo Bongo Boss Room"
   ],
-  "Spirit Temple": [
+  "Spirit Temple":[
     "Spirit Temple Lobby",
     "Child Spirit Temple",
     "Child Spirit Before Locked Door",
@@ -220,9 +311,16 @@
     "Spirit Temple Anubis Room",
     "Spirit Temple Beyond Anubis Room",
     "Spirit Temple Big Mirror Room",
+    "Adult Spirit Temple",
+    "Spirit Temple Shared",
+    "Lower Adult Spirit Temple",
+    "Spirit Temple Beamos Room",
+    "Spirit Temple Beyond Beamos Room",
+    "Spirit Temple Shifting Wall",
+    "Spirit Temple Mirror Puzzle",
     "Twinrova Boss Room"
   ],
-  "Ganons Castle": [
+  "Ganons Castle":[
     "Ganons Castle Forest Trial",
     "Ganons Castle Forest Trial Ending",
     "Ganons Castle Water Trial",
@@ -241,22 +339,27 @@
     "Ganons Castle Spirit Trial Second Room Back",
     "Ganons Castle Spirit Trial Ending",
     "Ganons Castle Deku Scrubs",
+    "Ganons Castle Spirit Trial Second Room",
     "Ganons Castle Tower",
     "Ganons Castle Tower Below Boss",
     "Ganondorf Boss Room"
   ],
-  "Ice Cavern": [
+  "Bottom of the Well":[
+    "Bottom of the Well Main Area",
+    "Bottom of the Well Behind Fake Walls",
+    "Bottom of the Well Behind Locked Doors",
+    "Bottom of the Well Perimeter",
+    "Bottom of the Well Middle"
+  ],
+  "Ice Cavern":[
     "Ice Cavern Beginning",
     "Ice Cavern Spinning Blades",
     "Ice Cavern Map Room",
-    "Ice Cavern Behind Ice Walls"
+    "Ice Cavern Behind Ice Walls",
+    "Ice Cavern Compass Room",
+    "Ice Cavern Iron Boots Region"
   ],
-  "Bottom of the Well": [
-    "Bottom of the Well Main Area",
-    "Bottom of the Well Behind Fake Walls",
-    "Bottom of the Well Behind Locked Doors"
-  ],
-  "Gerudo Training Ground": [
+  "Gerudo Training Ground":[
     "Gerudo Training Ground Lobby",
     "Gerudo Training Ground Lava Room",
     "Gerudo Training Ground Central Maze Right",
@@ -264,6 +367,11 @@
     "Gerudo Training Ground Eye Statue Upper",
     "Gerudo Training Ground Like Like Room",
     "Gerudo Training Ground Eye Statue Lower",
-    "Gerudo Training Ground Hammer Room"
+    "Gerudo Training Ground Hammer Room",
+    "Gerudo Training Ground Right Side",
+    "Gerudo Training Ground Underwater",
+    "Gerudo Training Ground Left Side",
+    "Gerudo Training Ground Stalfos Room",
+    "Gerudo Training Ground Back Areas"
   ]
 }
