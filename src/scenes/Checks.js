@@ -19,13 +19,16 @@ const Checks = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   useEffect(() => {
     if (!isInitialized) {
+      Locations.resetActiveLocations();
+
       _.forEach(Locations.mapLocationsToHintAreas(), (regionLocations, regionName) => {
         _.forEach(regionLocations, locationName => {
-          if (Locations.isProgressLocation(Locations.locations[locationName])) {
+          if (Locations.isProgressLocation(Locations.activeLocations[locationName])) {
             actions.addLocation(locationName, regionName);
           }
         });
       });
+
       LogicHelper.updateItems(items);
       setIsInitialized(true);
     }

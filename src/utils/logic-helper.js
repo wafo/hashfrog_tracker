@@ -108,8 +108,8 @@ class LogicHelper {
   }
 
   static isLocationAvailable(locationName, age) {
-    const parentRegion = Locations.locations[locationName].parentRegion;
-    const locationRule = Locations.locations[locationName].rule;
+    const parentRegion = Locations.activeLocations[locationName].parentRegion;
+    const locationRule = Locations.activeLocations[locationName].rule;
 
     if (_.isUndefined(age)) {
       return this.isLocationAvailable(locationName, "child") || this.isLocationAvailable(locationName, "adult");
@@ -119,7 +119,9 @@ class LogicHelper {
   }
 
   static countSkullsInLogic() {
-    return _.size(_.filter(Locations.skullsLocations, locationName => LogicHelper.isLocationAvailable(locationName)));
+    return _.size(
+      _.filter(Locations.activeSkullsLocations, locationName => LogicHelper.isLocationAvailable(locationName)),
+    );
   }
 
   static _initRenamedAttributes() {
@@ -168,7 +170,7 @@ class LogicHelper {
   static _recalculateAccessibleRegions(rootRegion, age) {
     let regionsToCheck = [];
 
-    _.forEach(Locations.exits[rootRegion], (exitRule, exitName) => {
+    _.forEach(Locations.activeExits[rootRegion], (exitRule, exitName) => {
       if (!_.includes(this.regions[age], exitName)) {
         if (this._evalNode(exitRule, age)) {
           this.regions[age] = _.union(this.regions[age], [exitName]);
@@ -321,7 +323,7 @@ class LogicHelper {
       return this._evalRuleAlias(name);
     }
     const escapedIdentifier = _.replace(name, /_/g, " ");
-    if (_.includes(_.keys(Locations.events), escapedIdentifier)) {
+    if (_.includes(_.keys(Locations.activeEvents), escapedIdentifier)) {
       return this._evalEvent(escapedIdentifier);
     }
 
@@ -340,9 +342,9 @@ class LogicHelper {
   }
 
   static _evalLiteral(value) {
-    if (_.includes(_.keys(Locations.dropLocations), value)) {
+    if (_.includes(_.keys(Locations.activeDropLocations), value)) {
       return this._canAccessDrop(value);
-    } else if (_.includes(_.keys(Locations.events), value)) {
+    } else if (_.includes(_.keys(Locations.activeEvents), value)) {
       return this._evalEvent(value);
     }
 
@@ -400,7 +402,7 @@ class LogicHelper {
   }
 
   static _canAccessDrop(dropName) {
-    return _.some(Locations.dropLocations[dropName], locationData => {
+    return _.some(Locations.activeDropLocations[dropName], locationData => {
       const parentRegion = locationData.parentRegion;
       const rule = locationData.rule;
 
@@ -518,7 +520,7 @@ class LogicHelper {
       return false;
     }
 
-    return _.some(Locations.events[eventName], eventData => {
+    return _.some(Locations.activeEvents[eventName], eventData => {
       const parentRegion = eventData.parentRegion;
       const rule = eventData.rule;
 
