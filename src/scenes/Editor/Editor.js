@@ -1,26 +1,12 @@
-import FileSaver from "file-saver";
-import { Fragment, useCallback, useState } from "react";
-
-import useDebounce from "../../hooks/useDebounce";
+import { useCallback, useMemo, useState } from "react";
+import baseLayout from "../../layouts/base.json";
 import { generateId, readFileAsText } from "../../utils/utils";
 import Layout from "../Layout";
+import FileSaver from "file-saver";
+import EditorLayoutConfig from "./EditorLayoutConfig";
 import EditorComponentsList from "./EditorComponentsList";
 import EditorElementsList from "./EditorElementsList";
-import EditorLayoutConfig from "./EditorLayoutConfig";
-
-const baseLayout = {
-  id: "",
-  layoutConfig: {
-    name: "",
-    backgroundColor: "#000000",
-    width: 300,
-    height: 500,
-    fontFamily: null,
-    fontSize: null,
-    fontColor: null,
-  },
-  components: [],
-};
+import useDebounce from "../../hooks/useDebounce";
 
 function prepareLayout(rawLayout) {
   const cleanedComponents = [
@@ -125,20 +111,12 @@ function prepareLayout(rawLayout) {
 
 const Editor = () => {
   const [tab, setTab] = useState(0);
-
   const [layout, setLayout] = useState({ ...baseLayout });
+  const [layoutKey, setLayoutKey] = useState(Math.random());
 
-  const debouncedLayout = useDebounce(layout, 300);
-
-  const setLayoutConfig = value => {
-    setLayout(prev => ({ ...prev, layoutConfig: value }));
-  };
-
-  const initializeNewLayout = () => {
+  const newLayout = () => {
     setLayout({ ...baseLayout, id: generateId() });
   };
-
-  const [layoutKey, setLayoutKey] = useState(Math.random());
 
   const handleLayoutOpen = async event => {
     const {
@@ -164,6 +142,58 @@ const Editor = () => {
     FileSaver.saveAs(jsonBlob, `${filename}.json`);
   }, [layout]);
 
+  const EditorComponents = useMemo(() => {
+    if (!layout.id) return null;
+
+    let TabComponent = null;
+    switch (tab) {
+      case 0:
+        TabComponent = <EditorLayoutConfig layoutConfig={layout.layoutConfig} setLayout={setLayout} />;
+        break;
+      case 1:
+        TabComponent = (
+          <EditorComponentsList customElements={layout.elements} components={layout.components} setLayout={setLayout} />
+        );
+        break;
+      case 2:
+        TabComponent = <EditorElementsList elements={layout.elements || []} setLayout={setLayout} />;
+        break;
+      default:
+        break;
+    }
+
+    return (
+      <>
+        <div className="btn-row mb-3">
+          <button
+            type="button"
+            className={`btn btn-sm ${tab === 0 ? "btn-light" : "btn-dark"}`}
+            onClick={() => setTab(0)}
+          >
+            Layout
+          </button>
+          <button
+            type="button"
+            className={`btn btn-sm ${tab === 1 ? "btn-light" : "btn-dark"}`}
+            onClick={() => setTab(1)}
+          >
+            Components
+          </button>
+          <button
+            type="button"
+            className={`btn btn-sm ${tab === 2 ? "btn-light" : "btn-dark"}`}
+            onClick={() => setTab(2)}
+          >
+            Elements
+          </button>
+        </div>
+        <>{TabComponent}</>
+      </>
+    );
+  }, [layout, tab]);
+
+  const debouncedLayout = useDebounce(layout, 350);
+
   return (
     <div className="container py-4">
       <div className="row">
@@ -171,65 +201,21 @@ const Editor = () => {
           <div className="editor card card-dark">
             <div className="card-body">
               <div className="btn-row">
-                <button type="button" className="btn btn-light btn-sm" onClick={initializeNewLayout}>
+                <button type="button" className="btn btn-light btn-sm" onClick={newLayout}>
                   New Layout
                 </button>
                 <div>
                   <label htmlFor="open" className="btn btn-light btn-sm">
                     Load JSON
                   </label>
-                  <input
-                    key={layoutKey}
-                    type="file"
-                    id="open"
-                    onChange={handleLayoutOpen}
-                    style={{ display: "none" }}
-                    accept=".json"
-                  />
+                  <input key={layoutKey} type="file" id="open" onChange={handleLayoutOpen} accept=".json" hidden />
                 </div>
                 <button type="button" className="btn btn-light btn-sm" onClick={handleLayoutSave}>
                   Export to JSON
                 </button>
               </div>
               <p className="uuid">Layout ID: {layout.id}</p>
-              {layout.id && (
-                <Fragment>
-                  <div className="btn-row mb-3">
-                    <button
-                      type="button"
-                      className={`btn btn-sm ${tab === 0 ? "btn-light" : "btn-dark"}`}
-                      onClick={() => setTab(0)}
-                    >
-                      Layout
-                    </button>
-                    <button
-                      type="button"
-                      className={`btn btn-sm ${tab === 1 ? "btn-light" : "btn-dark"}`}
-                      onClick={() => setTab(1)}
-                    >
-                      Components
-                    </button>
-                    <button
-                      type="button"
-                      className={`btn btn-sm ${tab === 2 ? "btn-light" : "btn-dark"}`}
-                      onClick={() => setTab(2)}
-                    >
-                      Elements
-                    </button>
-                  </div>
-                  {tab === 0 && (
-                    <EditorLayoutConfig layoutConfig={debouncedLayout.layoutConfig} setLayoutConfig={setLayoutConfig} />
-                  )}
-                  {tab === 1 && (
-                    <EditorComponentsList
-                      customElements={debouncedLayout.elements}
-                      components={debouncedLayout.components}
-                      setLayout={setLayout}
-                    />
-                  )}
-                  {tab === 2 && <EditorElementsList elements={debouncedLayout.elements || []} setLayout={setLayout} />}
-                </Fragment>
-              )}
+              {EditorComponents}
             </div>
           </div>
         </div>

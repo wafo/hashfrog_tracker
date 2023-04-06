@@ -132,6 +132,7 @@ body {
   padding: 0px;
   min-width: 100%;
   font-weight: 700;
+  cursor: pointer;
 }
 
 .element-counter {
@@ -180,6 +181,22 @@ body {
   padding: 0;
   padding-left: 2px;
   list-style: none;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  margin-bottom: 0;
+}
+
+
+.editor .card-body::-webkit-scrollbar,
+.check-tracker .check-list::-webkit-scrollbar {
+  background-color: transparent;
+  width: 4px;
+}
+
+.editor .card-body::-webkit-scrollbar-thumb,
+.check-tracker .check-list::-webkit-scrollbar-thumb {
+  background-color: rgba(255,255,255, 0.5);
+  border-radius: 0.5rem;
 }
 
 .check-tracker .check-list .check {

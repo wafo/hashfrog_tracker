@@ -16,6 +16,7 @@ const SometimesHint = props => {
     color = "#ffffff", // font color
     backgroundColor = "#333333", // background color for input
     inverted = false, // switch place of the icon/item
+    dual = false, // show two items
   } = props;
 
   const memoizedOptions = useMemo(() => {
@@ -36,6 +37,17 @@ const SometimesHint = props => {
         backgroundColor={backgroundColor}
       />
       {showIcon && (
+        <Element
+          id={`sometimes_item_${id}`}
+          name={`sometimes_item_${name}`}
+          type="simple"
+          size={[20, 20]}
+          icons={icons}
+          customStyle={inverted ? { marginRight: "0.25rem" } : { marginLeft: "0.25rem" }}
+          receiver
+        />
+      )}
+      {showIcon && dual && (
         <Element
           id={`sometimes_item_${id}`}
           name={`sometimes_item_${name}`}

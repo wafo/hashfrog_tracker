@@ -21,6 +21,7 @@ const Element = props => {
     name = "Item",
     label = "",
     labelStartingIndex = 0,
+    labelBackgroundColor,
     type = "simple", // simple, counter, label, nested
     size = [25, 25], // width, height
     customStyle = {},
@@ -135,7 +136,13 @@ const Element = props => {
       >
         <img className="element-icon" src={draggedIcon || icon || icon_hashfrog} alt={name} />
         {type === "counter" && <CounterLabel counter={counter} />}
-        {type === "label" && <ElementLabel label={label} labelStartingIndex={labelStartingIndex} />}
+        {type === "label" && (
+          <ElementLabel
+            label={label}
+            labelStartingIndex={labelStartingIndex}
+            labelBackgroundColor={labelBackgroundColor}
+          />
+        )}
         {type === "nested" && (
           <Element
             name={`${name}_nested`}
@@ -151,7 +158,7 @@ const Element = props => {
   );
 };
 
-const ElementLabel = ({ label, labelStartingIndex }) => {
+const ElementLabel = ({ label, labelStartingIndex, labelBackgroundColor }) => {
   const [index, setIndex] = useState(labelStartingIndex);
 
   const display = useMemo(() => {
@@ -195,10 +202,10 @@ const ElementLabel = ({ label, labelStartingIndex }) => {
     return (
       <label
         className="element-label"
-        style={{ cursor: "pointer" }}
         onWheel={handleOnWheel}
         onClick={handleOnClick}
         onContextMenu={handleOnClick}
+        style={labelBackgroundColor ? { backgroundColor: labelBackgroundColor } : {}}
       >
         {display}
       </label>

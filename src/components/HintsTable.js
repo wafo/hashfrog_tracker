@@ -20,6 +20,7 @@ const HintsTable = props => {
     // Sometimes only
     showIcon = true, // Hides the icon
     inverted = false, // switch place of the icon/item
+    dual = false, // Show 2 items
     // Location only
     showBoss = true, // Show or not the left boss icon
     showItems = true, // Show or not the right icons
@@ -39,6 +40,7 @@ const HintsTable = props => {
               icons={icons}
               showIcon={showIcon}
               inverted={inverted}
+              dual={dual}
             />
           </td>,
         );
@@ -79,6 +81,7 @@ const HintsTable = props => {
     inverted,
     showBoss,
     showItems,
+    dual,
   ]);
 
   return (
