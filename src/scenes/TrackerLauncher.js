@@ -148,10 +148,10 @@ const TrackerLauncher = () => {
             <button
               type="button"
               className="btn btn-light btn-sm me-2"
-              onClick={() => updateString("league_s3")}
+              onClick={() => updateString("league_s4")}
               disabled={!checks}
             >
-              League S3
+              League S4
             </button>
             <button
               type="button"
