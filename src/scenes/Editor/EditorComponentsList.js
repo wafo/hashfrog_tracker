@@ -8,12 +8,12 @@ const EditorComponentsList = ({ components, setLayout, customElements }) => {
   const [component, setComponent] = useState(null);
 
   const addComponent = () => {
-    setComponent({
+    setComponent(prev => ({
       id: generateId(),
       type: "",
-      displayName: "",
+      displayName: prev?.displayName || "",
       position: [0, 0],
-    });
+    }));
   };
 
   const deleteComponent = useCallback(() => {

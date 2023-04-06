@@ -91,7 +91,26 @@
       null,
       "7c3026558a6b49df97733d13ecc815c7",
       "ff67e2e04ce04aa8add77658ee932802",
-      "7c3026558a6b49df97733d13ecc815c7"
+      "ea2dfcbb008248e790b785941d54027d"
+    ]
+  },
+  {
+    "id": "27384adbbd254e6fbb479e69efe975f1",
+    "type": "simple",
+    "name": "fi_arrows",
+    "displayName": "Fire-Ice Arrows",
+    "size": [25, 25],
+    "icons": [
+      "fire_ice_arrows_bw_32x32.png",
+      "fire_arrows_32x32.png",
+      "ice_arrows_32x32.png",
+      "fire_ice_arrows_32x32.png"
+    ],
+    "items": [
+      null,
+      "7c3026558a6b49df97733d13ecc815c7",
+      "9bc4daf5728f4b158dc4c3d768df006e",
+      "4a3433d7792f408b80e2f07caae43da2"
     ]
   },
   {

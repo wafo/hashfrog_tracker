@@ -7,8 +7,10 @@ import LogicHelper from "../utils/logic-helper";
 
 import DUNGEONS from "../data/dungeons.json";
 import HINT_REGIONS_SHORT_NAMES from "../data/hint-regions-short-names.json";
+import { useLayout } from "../context/layoutContext";
 
 const Checks = () => {
+  const { state: layoutContext } = useLayout();
   const [actions] = useLocation();
   const { locations, items } = useChecks();
   const [type, setType] = useState("overworld");
@@ -64,7 +66,7 @@ const Checks = () => {
   }, [type]);
 
   return (
-    <div id="checks" className="check-tracker">
+    <div id="checks" className="check-tracker" style={{ backgroundColor: layoutContext.layoutConfig.backgroundColor }}>
       <Buttons type={type} setType={setType} />
       <LocationsList
         actions={actions}

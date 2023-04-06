@@ -87,14 +87,27 @@ function parseItems(items_list, counters) {
       case "7c3026558a6b49df97733d13ecc815c7":
         items.Fire_Arrows = 1;
         break;
-      // Ice_Arrows: 0,
+      case "9bc4daf5728f4b158dc4c3d768df006e":
+        items.Ice_Arrows = 1;
+        break;
+      case "4a3433d7792f408b80e2f07caae43da2":
+        items.Fire_Arrows = 1;
+        items.Ice_Arrows = 1;
+        break;
       case "ff67e2e04ce04aa8add77658ee932802":
+        items.Light_Arrows = 1;
+        break;
+      case "ea2dfcbb008248e790b785941d54027d":
+        items.Fire_Arrows = 1;
         items.Light_Arrows = 1;
         break;
       case "591d582f479140759fd6501caa23c2f9":
         items.Dins_Fire = 1;
         break;
-      // Nayrus_Love: 0,
+      case "aa4bc05fa49d4492bb8df02617ad1da4":
+        // Nayrus_Love: 0,
+        items.Nayrus_Love = 1;
+        break;
       case "0c3e8979165042f686357b4bcbaab8ec":
         items.Farores_Wind = 1;
         break;

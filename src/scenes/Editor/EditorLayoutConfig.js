@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 
-const EditorLayoutConfig = ({ layoutConfig, setLayoutConfig }) => {
+const EditorLayoutConfig = ({ layoutConfig, setLayout }) => {
   const { name, width, height, backgroundColor } = layoutConfig;
 
   const handleChange = event => {
@@ -13,10 +13,13 @@ const EditorLayoutConfig = ({ layoutConfig, setLayoutConfig }) => {
       value = parseInt(value, 10);
     }
 
-    setLayoutConfig({
-      ...layoutConfig,
-      [name]: value,
-    });
+    setLayout(prev => ({
+      ...prev,
+      layoutConfig: {
+        ...layoutConfig,
+        [name]: value,
+      },
+    }));
   };
 
   return (

@@ -27,9 +27,10 @@ const EditorComponent = ({ component, setComponent, combinedElements }) => {
 
       switch (value) {
         case "element":
-          setComponent({
+          setComponent(prev => ({
             id: component.id,
             type: "element",
+            displayName: prev?.displayName || "",
             elementId: "a081121b16f84366bf16e16ca90cd23f",
             position: component.position,
             size: [25, 25],
@@ -38,23 +39,25 @@ const EditorComponent = ({ component, setComponent, combinedElements }) => {
             selectedStartingIndex: 0,
             countConfig: [0, 5],
             labelStartingIndex: 0,
-          });
+          }));
           break;
         case "table":
-          setComponent({
+          setComponent(prev => ({
             id: component.id,
             type: "table",
+            displayName: prev?.displayName || "",
             position: component.position,
             columns: 3,
             padding: "2px",
             elements: [],
             elementsSize: [25, 25],
-          });
+          }));
           break;
         case "sometimeshint":
-          setComponent({
+          setComponent(prev => ({
             id: component.id,
             type: "sometimeshint",
+            displayName: prev?.displayName || "",
             elementId: "4c1b24c3e3954038b14f4daa3656e0b5",
             position: component.position,
             labels: "sometimes",
@@ -63,12 +66,14 @@ const EditorComponent = ({ component, setComponent, combinedElements }) => {
             backgroundColor: "#333333",
             showIcon: true,
             inverted: false,
-          });
+            dual: false,
+          }));
           break;
         case "locationhint":
-          setComponent({
+          setComponent(prev => ({
             id: component.id,
             type: "locationhint",
+            displayName: prev?.displayName || "",
             elementId: "4c1b24c3e3954038b14f4daa3656e0b5",
             position: component.position,
             labels: "locations",
@@ -77,13 +82,13 @@ const EditorComponent = ({ component, setComponent, combinedElements }) => {
             backgroundColor: "#4a8ab6",
             showBoss: true,
             showItems: true,
-          });
+          }));
           break;
-
         case "hinttable":
-          setComponent({
+          setComponent(prev => ({
             id: component.id,
             type: "hinttable",
+            displayName: prev?.displayName || "",
             elementId: "4c1b24c3e3954038b14f4daa3656e0b5",
             position: component.position,
             hintType: "sometimes",
@@ -98,19 +103,21 @@ const EditorComponent = ({ component, setComponent, combinedElements }) => {
             inverted: false,
             showBoss: true,
             showItems: true,
-          });
+            dual: false,
+          }));
           break;
         case "label":
-          setComponent({
+          setComponent(prev => ({
             id: component.id,
             type: "label",
+            displayName: prev?.displayName || "",
             position: component.position,
             color: "#ffffff",
             backgroundColor: "#000000",
             padding: "2px",
             text: "Label Text",
             fontSize: "12px",
-          });
+          }));
           break;
         default:
           break;
@@ -166,7 +173,8 @@ const EditorComponent = ({ component, setComponent, combinedElements }) => {
         case "showIcon":
         case "inverted":
         case "dragCurrent":
-        case "receiver": {
+        case "receiver":
+        case "dual": {
           setComponent(prev => ({
             ...prev,
             [name]: !prev[name],
@@ -706,6 +714,20 @@ const SometimeshintEditor = ({ component, handleChange, combinedElements }) => {
           Reverse Icon
         </label>
       </div>
+      <div className="form-check mb-2">
+        <input
+          type="checkbox"
+          className="form-check-input"
+          id="dual"
+          name="dual"
+          checked={component.dual}
+          value={component.dual}
+          onChange={handleChange}
+        />
+        <label htmlFor="dual" className="form-check-label">
+          Dual Hint
+        </label>
+      </div>
     </Fragment>
   );
 };
@@ -1009,6 +1031,20 @@ const HintTableEditor = ({ component, handleChange, combinedElements }) => {
             />
             <label htmlFor="inverted" className="form-check-label">
               Reverse Icon
+            </label>
+          </div>
+          <div className="form-check mb-2">
+            <input
+              type="checkbox"
+              className="form-check-input"
+              id="dual"
+              name="dual"
+              checked={component.dual}
+              value={component.dual}
+              onChange={handleChange}
+            />
+            <label htmlFor="dual" className="form-check-label">
+              Dual Hint
             </label>
           </div>
         </Fragment>

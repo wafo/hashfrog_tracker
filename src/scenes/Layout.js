@@ -20,6 +20,15 @@ const baseURL = process.env.PUBLIC_URL;
 const Layout = props => {
   const { state: layoutContext } = useLayout();
 
+  const renderLayout = useMemo(() => {
+    if (props.layout) return props.layout;
+    return layoutContext;
+  }, [props.layout, layoutContext]);
+
+  const layoutConfig = useMemo(() => {
+    return renderLayout.layoutConfig;
+  }, [renderLayout]);
+
   const elements = useMemo(() => {
     if (props.layout) {
       return [...elementsJSON, ...(props.layout.elements || [])];
@@ -27,9 +36,6 @@ const Layout = props => {
     return [...elementsJSON, ...(layoutContext?.elements || [])];
   }, [layoutContext, props.layout]);
 
-  /** ************************** */
-  /** CACHE FOR ICONS */
-  /** ************************** */
   const [cachedIcons, setCachedIcons] = useState(null);
 
   const getCacheIcons = useCallback(async () => {
@@ -82,27 +88,16 @@ const Layout = props => {
           }
           return cachedIcons[icon];
         });
+      if (layoutConfig?.backgroundColor) element.labelBackgroundColor = layoutConfig.backgroundColor;
       return element;
     },
-    [cachedIcons, elements],
+    [cachedIcons, elements, layoutConfig.backgroundColor],
   );
 
   useEffect(() => {
     document.title = "HashFrog - Tracker";
     getCacheIcons();
   }, [getCacheIcons]);
-
-  /** ************************** */
-  /** RENDERING LAYOUT */
-  /** ************************** */
-  const renderLayout = useMemo(() => {
-    if (props.layout) return props.layout;
-    return layoutContext;
-  }, [props.layout, layoutContext]);
-
-  const layoutConfig = useMemo(() => {
-    return renderLayout.layoutConfig;
-  }, [renderLayout]);
 
   const toRender = useMemo(() => {
     return renderLayout.components.map(component => {
@@ -154,6 +149,7 @@ const Layout = props => {
                 labels={component.labels}
                 showIcon={component.showIcon}
                 inverted={component.inverted}
+                dual={component.dual}
               />
             </div>
           );
@@ -200,6 +196,7 @@ const Layout = props => {
                 inverted={component.inverted}
                 showBoss={component.showBoss}
                 showItems={component.showItems}
+                dual={component.dual}
               />
             </div>
           );
@@ -238,7 +235,7 @@ const Layout = props => {
   }, [props.editing, layoutConfig]);
 
   return (
-    <div className="layout">
+    <div className="layout" style={props.editing ? {} : { backgroundColor: layoutConfig.backgroundColor }}>
       <div className="layout-content" style={layoutStyles}>
         {toRender}
       </div>

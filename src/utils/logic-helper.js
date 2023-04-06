@@ -297,6 +297,10 @@ class LogicHelper {
         return this.isLocationAvailable("Market Bombchu Bowling Bombchus");
       case "Bottle_with_Big_Poe":
         return false; // TODO: not on tracker yet
+      case "Blue_Fire":
+        // No need to check for setting because we already do on canUse
+        // TODO: Would also need to check for Blue_Fire as an item but its not on the tracker yet.
+        return this._canBuy("Buy_Blue_Fire") || this._canUse("Ice_Arrows", "adult");
       case "Deliver_Letter":
         return this.isLocationAvailable("Deliver Rutos Letter");
       case "Time_Travel":
