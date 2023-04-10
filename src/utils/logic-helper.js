@@ -3,6 +3,8 @@ import _ from "lodash";
 
 import Locations from "./locations";
 
+import DUNGEONS from "../data/dungeons.json";
+
 class LogicHelper {
   static async initialize(logicHelpersFile, settings) {
     this.settings = settings;
@@ -58,6 +60,11 @@ class LogicHelper {
       ]);
     }
 
+    // Add all dungeons to MQ-dungeons-specific list if all dungeons are set to MQ
+    if (_.isEqual(this.settings.mq_dungeons_mode, "mq")) {
+      _.set(this.settings, "mq_dungeons_specific", DUNGEONS);
+    }
+
     this.items = {};
     this.regions = { child: [], adult: [] };
 
@@ -65,11 +72,6 @@ class LogicHelper {
   }
 
   static updateItems(newItems) {
-    // don't update if items haven't changed
-    if (_.isEqual(this.items, newItems)) {
-      return;
-    }
-
     this.items = _.cloneDeep(newItems);
 
     this.regions = { child: [], adult: [] };

@@ -4,6 +4,7 @@ import { createContext, useContext, useMemo, useReducer } from "react";
 import DEFAULT_ITEMS from "../data/default-items.json";
 import ITEMS_JSON from "../data/items.json";
 import SettingStringsJSON from "../data/setting-strings.json";
+import Locations from "../utils/locations";
 import LogicHelper from "../utils/logic-helper";
 
 const GENERATOR_VERSION = process.env.REACT_APP_GENERATOR_VERSION;
@@ -245,8 +246,8 @@ function parseItems(items_list, counters) {
         items.Light_Medallion = 1;
         break;
 
-      // default:
-      //   console.log(item);
+      default:
+        console.warn(`Did not set unknown item: ${item}`);
     }
   });
 
@@ -281,8 +282,8 @@ function parseItems(items_list, counters) {
       // Small_Key_Thieves_Hideout: 4,
       // Small_Key_Ganons_Castle: 2,
 
-      // default:
-      //   console.log(counter, value);
+      default:
+        console.warn(`Did not set unknown counter with value ${value}: ${counter}`);
     }
   });
 
@@ -290,17 +291,19 @@ function parseItems(items_list, counters) {
 }
 
 function validateLocations(locations, parsedItems) {
-  locations = _.cloneDeep(locations);
-  if (!_.isEmpty(locations)) {
+  const clonedLocations = _.cloneDeep(locations);
+
+  if (!_.isEmpty(clonedLocations)) {
     LogicHelper.updateItems(parsedItems);
-    _.forEach(_.values(locations), regionLocations => {
+
+    _.forEach(_.values(clonedLocations), regionLocations => {
       _.forEach(regionLocations, (locationData, locationName) => {
-        const isAvailable = LogicHelper.isLocationAvailable(locationName);
-        _.set(locationData, "isAvailable", isAvailable);
+        _.set(locationData, "isAvailable", LogicHelper.isLocationAvailable(locationName));
       });
     });
   }
-  return locations;
+
+  return clonedLocations;
 }
 
 function getSettingsStringCache() {
@@ -335,52 +338,87 @@ function reducer(state, action) {
     case "LOCATION_ADD": {
       const { locationName, regionName } = payload;
 
-      const isAvailable = LogicHelper.isLocationAvailable(locationName);
-      const isChecked = false;
-
+      // Adds location to location list
       const locations = _.cloneDeep(state.locations);
-      _.set(locations, [regionName, locationName], { isAvailable: isAvailable, isChecked: isChecked });
+
+      if (_.isEmpty(locationName)) {
+        _.set(locations, regionName, {});
+      } else {
+        _.set(locations, [regionName, locationName], {
+          isAvailable: LogicHelper.isLocationAvailable(locationName),
+          isChecked: false,
+        });
+      }
 
       return {
         ...state,
-        locations,
+        locations: locations,
       };
     }
     case "LOCATION_MARK": {
       const { locationName, regionName } = payload;
 
-      // Finding check
-      if (
-        !_.includes(_.keys(state.locations), regionName) ||
-        !_.includes(_.keys(state.locations[regionName]), locationName)
-      ) {
+      // Toggles location in location list
+      if (!_.includes(_.keys(state.locations), regionName)) {
+        console.warn(`Unable to mark location "${locationName}": "${regionName}" is not in state.locations`);
         return state;
+      } else if (!_.includes(_.keys(state.locations[regionName]), locationName)) {
+        console.warn(`Unable to mark location "${locationName}": location is not in state.locations["${regionName}"]`);
+        return state;
+      } else {
+        const locations = _.cloneDeep(state.locations);
+        const isChecked = locations[regionName][locationName].isChecked;
+        _.set(locations, [regionName, locationName, "isChecked"], !isChecked);
+
+        return {
+          ...state,
+          locations: locations,
+        };
       }
+    }
+    case "MQ_TOGGLE": {
+      // payload = regionName
 
-      // Manipulating check
-      const location = state.locations[regionName][locationName];
-      location.isChecked = !location.isChecked;
+      // Reset Locations to use new set of MQ dungeons for logic
+      const dungeonsMQ = LogicHelper.settings["mq_dungeons_specific"];
+      if (!_.includes(dungeonsMQ, payload)) {
+        _.set(LogicHelper.settings, "mq_dungeons_specific", _.union(dungeonsMQ, [payload]));
+      } else {
+        _.remove(LogicHelper.settings.mq_dungeons_specific, dungeon => _.isEqual(dungeon, payload));
+      }
+      Locations.resetActiveLocations();
 
-      // Manipulating state
+      // Modify toggled dungeon to use MQ/non-MQ locations
       const locations = _.cloneDeep(state.locations);
-      _.set(locations, [regionName, locationName], location);
+      const locationKey = _.includes(LogicHelper.settings.mq_dungeons_specific, payload) ? "dungeon_mq" : "dungeon";
+      _.set(locations, payload, {});
+      _.forEach(Locations.locations[locationKey][payload], (locationData, locationName) => {
+        if (Locations.isProgressLocation(locationData)) {
+          _.set(locations, [payload, locationName], {
+            isAvailable: LogicHelper.isLocationAvailable(locationName),
+            isChecked: false,
+          });
+        }
+      });
+
+      // Validating checks based on items collected
+      const validatedLocations = validateLocations(locations, parseItems(state.items_list, state.counters));
 
       return {
         ...state,
-        locations,
+        locations: validatedLocations,
       };
     }
     case "REGION_TOGGLE": {
       // payload = regionName
+
+      // Toggles all locations in the region
+      // If at least one location is checked, then checks all locations. Otherwise, unchecks all locations.
       const locations = _.cloneDeep(state.locations);
-      const setTo = Object.entries(locations[payload]).every(([, value]) => value.isChecked);
-      locations[payload] = Object.entries(locations[payload]).reduce((accumulator, [key, value]) => {
-        accumulator[key] = {
-          ...value,
-          isChecked: !setTo,
-        };
-        return accumulator;
-      }, {});
+      const setTo = _.every(_.values(locations[payload]), value => value.isChecked);
+      _.forEach(_.values(locations[payload]), locationData => {
+        _.set(locationData, "isChecked", !setTo);
+      });
 
       return {
         ...state,
@@ -419,7 +457,7 @@ function reducer(state, action) {
       // Update changed counter value
       const counters = _.set(_.cloneDeep(state.counters), item, value);
 
-      // Preping collecting items with counters
+      // Prepping collecting items with counters
       const parsedItems = parseItems(state.items_list, counters);
 
       // Validating checks based on items collected
@@ -435,7 +473,7 @@ function reducer(state, action) {
     case "ITEM_MARK": {
       const { items, item } = payload;
 
-      // Preping collecting items
+      // Prepping collecting items
       const items_list = [...state.items_list.filter(x => !items.includes(x))];
       if (item) items_list.push(item);
       const parsedItems = parseItems(items_list, state.counters);
@@ -507,6 +545,7 @@ const useLocation = () => {
         dispatch({ type: "LOCATION_ADD", payload: { locationName, regionName, items } }),
       markLocation: (locationName, regionName) =>
         dispatch({ type: "LOCATION_MARK", payload: { locationName, regionName } }),
+      toggleMQ: regionName => dispatch({ type: "MQ_TOGGLE", payload: regionName }),
       toggleRegion: regionName => dispatch({ type: "REGION_TOGGLE", payload: regionName }),
     }),
     [dispatch],

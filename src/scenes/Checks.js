@@ -22,11 +22,34 @@ const Checks = () => {
       Locations.resetActiveLocations();
 
       _.forEach(Locations.mapLocationsToHintAreas(), (regionLocations, regionName) => {
+        let locationAddedForRegion = false;
+
         _.forEach(regionLocations, locationName => {
           if (Locations.isProgressLocation(Locations.activeLocations[locationName])) {
             actions.addLocation(locationName, regionName);
+            locationAddedForRegion = true;
           }
         });
+
+        // Even if regular dungeon has no checks, if the MQ variant does have checks, we need to still show the dungeon
+        // so that the user can toggle to MQ.
+        if (!locationAddedForRegion && _.includes(DUNGEONS, regionName)) {
+          const showMQToggle =
+            _.isEqual(LogicHelper.settings.mq_dungeons_mode, "random") ||
+            (_.isEqual(LogicHelper.settings.mq_dungeons_mode, "count") && LogicHelper.settings.mq_dungeons_count > 0);
+
+          const hasPossibleLocations =
+            _.some(_.values(Locations.locations.dungeon[regionName]), locationData => {
+              return Locations.isProgressLocation(locationData);
+            }) ||
+            _.some(_.values(Locations.locations.dungeon_mq[regionName]), locationData => {
+              return Locations.isProgressLocation(locationData);
+            });
+
+          if (showMQToggle && hasPossibleLocations) {
+            actions.addLocation("", regionName);
+          }
+        }
       });
 
       LogicHelper.updateItems(items);
@@ -36,10 +59,13 @@ const Checks = () => {
 
   const countLocations = (locationsList, counter) => {
     _.forEach(_.values(locationsList), locationData => {
-      if (locationData.isAvailable && !locationData.isChecked) counter.available += 1;
-      if (!locationData.isAvailable) counter.locked += 1;
-      if (locationData.isChecked) counter.checked += 1;
-      if (!locationData.isChecked) counter.remaining += 1;
+      const isAvailable = locationData.isAvailable;
+      const isChecked = locationData.isChecked;
+
+      if (isAvailable && !isChecked) counter.available += 1;
+      if (!isAvailable) counter.locked += 1;
+      if (isChecked) counter.checked += 1;
+      if (!isChecked) counter.remaining += 1;
     });
   };
 
@@ -130,6 +156,15 @@ const HintRegion = ({ actions, locations, selectedRegion, setSelectedRegion }) =
     );
   });
 
+  const toggleMQ = () => {
+    actions.toggleMQ(selectedRegion);
+  };
+  const showMQToggle =
+    _.includes(DUNGEONS, selectedRegion) &&
+    (_.isEqual(LogicHelper.settings.mq_dungeons_mode, "random") ||
+      (_.isEqual(LogicHelper.settings.mq_dungeons_mode, "count") && LogicHelper.settings.mq_dungeons_count > 0));
+  const isMQToggled = _.includes(LogicHelper.settings.mq_dungeons_specific, selectedRegion);
+
   const toggleRegion = () => {
     actions.toggleRegion(selectedRegion);
   };
@@ -139,9 +174,16 @@ const HintRegion = ({ actions, locations, selectedRegion, setSelectedRegion }) =
       <button type="button" className="btn btn-dark btn-sm py-0 mb-2 me-1" onClick={() => setSelectedRegion(null)}>
         Back
       </button>
-      <button type="button" className="btn btn-dark btn-sm py-0 mb-2" onClick={toggleRegion}>
+      <button type="button" className="btn btn-dark btn-sm py-0 mb-2 me-1" onClick={toggleRegion}>
         Toggle All
       </button>
+      {showMQToggle ? (
+        <button type="button" className="btn btn-dark btn-sm py-0 mb-2 me-1" onClick={toggleMQ}>
+          {isMQToggled ? "MQ: On" : "MQ: Off"}
+        </button>
+      ) : (
+        ""
+      )}
       <ul className="check-list">{locationsList}</ul>
     </div>
   );
