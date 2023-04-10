@@ -9,6 +9,7 @@ import { useLayout } from "../context/layoutContext";
 import DUNGEON_SHORTCUTS from "../data/dungeon-boss-shortcuts.json";
 import DUNGEONS from "../data/dungeons.json";
 import HINT_REGIONS_SHORT_NAMES from "../data/hint-regions-short-names.json";
+import { useLayout } from "../context/layoutContext";
 
 const Checks = () => {
   const { state: layoutContext } = useLayout();
