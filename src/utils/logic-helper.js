@@ -65,6 +65,11 @@ class LogicHelper {
       _.set(this.settings, "mq_dungeons_specific", DUNGEONS);
     }
 
+    // Ignore initial dungeon shortcuts choices when option is set to random
+    if (_.isEqual(this.settings.dungeon_shortcuts_choice, "random")) {
+      _.set(this.settings, "dungeon_shortcuts", []);
+    }
+
     this.items = {};
     this.regions = { child: [], adult: [] };
 

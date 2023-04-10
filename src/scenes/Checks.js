@@ -165,6 +165,13 @@ const HintRegion = ({ actions, locations, selectedRegion, setSelectedRegion }) =
       (_.isEqual(LogicHelper.settings.mq_dungeons_mode, "count") && LogicHelper.settings.mq_dungeons_count > 0));
   const isMQToggled = _.includes(LogicHelper.settings.mq_dungeons_specific, selectedRegion);
 
+  const toggleShortcut = () => {
+    actions.toggleShortcut(selectedRegion);
+  };
+  const showShortcutToggle =
+    _.includes(DUNGEONS, selectedRegion) && _.isEqual(LogicHelper.settings.dungeon_shortcuts_choice, "random");
+  const isShortcutToggled = _.includes(LogicHelper.settings.dungeon_shortcuts, selectedRegion);
+
   const toggleRegion = () => {
     actions.toggleRegion(selectedRegion);
   };
@@ -180,6 +187,13 @@ const HintRegion = ({ actions, locations, selectedRegion, setSelectedRegion }) =
       {showMQToggle ? (
         <button type="button" className="btn btn-dark btn-sm py-0 mb-2 me-1" onClick={toggleMQ}>
           {isMQToggled ? "MQ: On" : "MQ: Off"}
+        </button>
+      ) : (
+        ""
+      )}
+      {showShortcutToggle ? (
+        <button type="button" className="btn btn-dark btn-sm py-0 mb-2 me-1" onClick={toggleShortcut}>
+          {isShortcutToggled ? "Shortcut: On" : "Shortcut: Off"}
         </button>
       ) : (
         ""

@@ -409,6 +409,24 @@ function reducer(state, action) {
         locations: validatedLocations,
       };
     }
+    case "SHORTCUT_TOGGLE": {
+      // payload = regionName
+
+      // Modify toggled dungeon to use/not use dungeon boss shortcuts
+      if (!_.includes(LogicHelper.settings.dungeon_shortcuts, payload)) {
+        _.set(LogicHelper.settings, "dungeon_shortcuts", _.union(LogicHelper.settings.dungeon_shortcuts, [payload]));
+      } else {
+        _.remove(LogicHelper.settings.dungeon_shortcuts, dungeon => _.isEqual(dungeon, payload));
+      }
+
+      // Revalidate checks based on items collected
+      const validatedLocations = validateLocations(state.locations, parseItems(state.items_list, state.counters));
+
+      return {
+        ...state,
+        locations: validatedLocations,
+      };
+    }
     case "REGION_TOGGLE": {
       // payload = regionName
 
@@ -546,6 +564,7 @@ const useLocation = () => {
       markLocation: (locationName, regionName) =>
         dispatch({ type: "LOCATION_MARK", payload: { locationName, regionName } }),
       toggleMQ: regionName => dispatch({ type: "MQ_TOGGLE", payload: regionName }),
+      toggleShortcut: regionName => dispatch({ type: "SHORTCUT_TOGGLE", payload: regionName }),
       toggleRegion: regionName => dispatch({ type: "REGION_TOGGLE", payload: regionName }),
     }),
     [dispatch],
