@@ -289,21 +289,21 @@ class Locations {
   }
 
   static resetActiveLocations() {
-    const dungeonsMQ = LogicHelper.settings["mq_dungeons_specific"];
+    const dungeonsMQ = LogicHelper.settings.mq_dungeons_specific;
 
     this.activeLocations = new Map();
     _.forEach(DUNGEONS, dungeonName => {
       if (_.includes(dungeonsMQ, dungeonName)) {
-        _.forEach(this.locations["dungeon_mq"][dungeonName], (data, name) => {
+        _.forEach(this.locations.dungeon_mq[dungeonName], (data, name) => {
           _.set(this.activeLocations, name, data);
         });
       } else {
-        _.forEach(this.locations["dungeon"][dungeonName], (data, name) => {
+        _.forEach(this.locations.dungeon[dungeonName], (data, name) => {
           _.set(this.activeLocations, name, data);
         });
       }
     });
-    _.forEach(_.values(this.locations["overworld"]), location => {
+    _.forEach(_.values(this.locations.overworld), location => {
       _.forEach(location, (data, name) => {
         _.set(this.activeLocations, name, data);
       });
@@ -312,16 +312,16 @@ class Locations {
     this.activeDropLocations = new Map();
     _.forEach(DUNGEONS, dungeonName => {
       if (_.includes(dungeonsMQ, dungeonName)) {
-        _.forEach(this.dropLocations["dungeon_mq"][dungeonName], (data, name) => {
+        _.forEach(this.dropLocations.dungeon_mq[dungeonName], (data, name) => {
           _.set(this.activeDropLocations, name, _.union(this.activeDropLocations[name], data));
         });
       } else {
-        _.forEach(this.dropLocations["dungeon"][dungeonName], (data, name) => {
+        _.forEach(this.dropLocations.dungeon[dungeonName], (data, name) => {
           _.set(this.activeDropLocations, name, _.union(this.activeDropLocations[name], data));
         });
       }
     });
-    _.forEach(_.values(this.dropLocations["overworld"]), dropLocation => {
+    _.forEach(_.values(this.dropLocations.overworld), dropLocation => {
       _.forEach(dropLocation, (data, name) => {
         _.set(this.activeDropLocations, name, _.union(this.activeDropLocations[name], data));
       });
@@ -332,29 +332,29 @@ class Locations {
       if (_.includes(dungeonsMQ, dungeonName)) {
         this.activeSkullsLocations = _.union(
           this.activeSkullsLocations,
-          this.skullsLocations["dungeon_mq"][dungeonName],
+          this.skullsLocations.dungeon_mq[dungeonName],
         );
       } else {
-        this.activeSkullsLocations = _.union(this.activeSkullsLocations, this.skullsLocations["dungeon"][dungeonName]);
+        this.activeSkullsLocations = _.union(this.activeSkullsLocations, this.skullsLocations.dungeon[dungeonName]);
       }
     });
-    _.forEach(_.values(this.skullsLocations["overworld"]), skullsLocation => {
+    _.forEach(_.values(this.skullsLocations.overworld), skullsLocation => {
       this.activeSkullsLocations = _.union(this.activeSkullsLocations, skullsLocation);
     });
 
     this.activeEvents = new Map();
     _.forEach(DUNGEONS, dungeonName => {
       if (_.includes(dungeonsMQ, dungeonName)) {
-        _.forEach(this.events["dungeon_mq"][dungeonName], (data, name) => {
+        _.forEach(this.events.dungeon_mq[dungeonName], (data, name) => {
           _.set(this.activeEvents, name, data);
         });
       } else {
-        _.forEach(this.events["dungeon"][dungeonName], (data, name) => {
+        _.forEach(this.events.dungeon[dungeonName], (data, name) => {
           _.set(this.activeEvents, name, data);
         });
       }
     });
-    _.forEach(_.values(this.events["overworld"]), event => {
+    _.forEach(_.values(this.events.overworld), event => {
       _.forEach(event, (data, name) => {
         _.set(this.activeEvents, name, data);
       });
@@ -363,16 +363,16 @@ class Locations {
     this.activeExits = new Map();
     _.forEach(DUNGEONS, dungeonName => {
       if (_.includes(dungeonsMQ, dungeonName)) {
-        _.forEach(this.exits["dungeon_mq"][dungeonName], (data, name) => {
+        _.forEach(this.exits.dungeon_mq[dungeonName], (data, name) => {
           _.set(this.activeExits, name, data);
         });
       } else {
-        _.forEach(this.exits["dungeon"][dungeonName], (data, name) => {
+        _.forEach(this.exits.dungeon[dungeonName], (data, name) => {
           _.set(this.activeExits, name, data);
         });
       }
     });
-    _.forEach(_.values(this.exits["overworld"]), exit => {
+    _.forEach(_.values(this.exits.overworld), exit => {
       _.forEach(exit, (data, name) => {
         _.set(this.activeExits, name, data);
       });

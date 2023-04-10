@@ -194,9 +194,9 @@ class LogicHelper {
   static _isRegionAccessible(regionName, age) {
     switch (age) {
       case "child":
-        return _.includes(this.regions["child"], regionName);
+        return _.includes(this.regions.child, regionName);
       case "adult":
-        return _.includes(this.regions["adult"], regionName);
+        return _.includes(this.regions.adult, regionName);
       default:
         throw Error(`Invalid age ${age}`);
     }
