@@ -286,7 +286,7 @@ class LogicHelper {
         return this._evalNode(node.arguments[0], age);
       // Hardcoded (TODO: don't hardcode this)
       case "region_has_shortcuts":
-        return false;
+        return this._regionHasShortcuts(node.arguments[0].value);
       default:
         throw Error(`Unknown CallExpression: ${node.callee.name}`);
     }
@@ -620,6 +620,14 @@ class LogicHelper {
 
     const stonesCount = this.settings[count];
     return _.sum([this.items.Kokiri_Emerald, this.items.Goron_Ruby, this.items.Zora_Sapphire]) >= stonesCount;
+  }
+
+  static _regionHasShortcuts(regionName) {
+    if (!_.includes(_.keys(Locations.regionMap), regionName)) {
+      throw Error(`Bad argument to region_has_shortcuts: ${regionName}`);
+    }
+
+    return _.includes(this.settings.dungeon_shortcuts, Locations.regionMap[regionName]);
   }
 }
 
