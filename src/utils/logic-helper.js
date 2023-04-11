@@ -297,10 +297,6 @@ class LogicHelper {
         return this.isLocationAvailable("Market Bombchu Bowling Bombchus");
       case "Bottle_with_Big_Poe":
         return false; // TODO: not on tracker yet
-      case "Blue_Fire":
-        // No need to check for setting because we already do on canUse
-        // TODO: Would also need to check for Blue_Fire as an item but its not on the tracker yet.
-        return this._canBuy("Buy_Blue_Fire") || this._canUse("Ice_Arrows", "adult");
       case "Deliver_Letter":
         return this.isLocationAvailable("Deliver Rutos Letter");
       case "Time_Travel":
@@ -474,6 +470,9 @@ class LogicHelper {
     }
     if (_.isEqual(itemName, "Distant_Scarecrow")) {
       return this.items.Progressive_Hookshot > 1 && this._canPlay("Scarecrow_Song", age);
+    }
+    if (this.settings.blue_fire_arrows && _.isEqual(itemName, "Blue_Fire_Arrows")) {
+      itemName = "Ice_Arrows";
     }
 
     const isChildItem = _.includes(["Slingshot", "Boomerang", "Kokiri_Sword", "Sticks", "Deku_Shield"], itemName);
