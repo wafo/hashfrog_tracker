@@ -318,7 +318,18 @@ class LogicHelper {
     }
 
     if (_.includes(_.keys(this.items), name)) {
-      return this.items[name] > 0;
+      if (_.startsWith(name, "Boss_Key_")) {
+        // extra check for boss keysy modes
+        if (_.isEqual(name, "Boss_Key_Ganons_Castle")) {
+          // if Ganon's Boss Keys mode is Keysy, ignore Ganon's Boss Key requirements
+          return this.settings.shuffle_ganon_bosskey, "remove" || this.items[name] > 0;
+        } else {
+          // if Boss Keys mode is Keysy, ignore Boss Key requirements
+          return _.isEqual(this.settings.shuffle_bosskeys, "remove") || this.items[name] > 0;
+        }
+      } else {
+        return this.items[name] > 0;
+      }
     }
     if (_.includes(_.keys(this.renamedAttributes), name)) {
       return this.renamedAttributes[name];
@@ -381,6 +392,11 @@ class LogicHelper {
 
     const itemName = node.expressions[0].name;
     let itemCount = node.expressions[1].value;
+
+    // if Small Keys mode is Keysy, ignore small key requirements
+    if (_.isEqual(this.settings.shuffle_smallkeys, "remove") && _.startsWith(itemName, "Small_Key_")) {
+      return true;
+    }
 
     // account for removed locked door in Fire Temple when keysanity is off
     if (!this.renamedAttributes.keysanity && _.isEqual(itemName, "Small_Key_Fire_Temple")) {
