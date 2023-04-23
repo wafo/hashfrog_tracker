@@ -312,7 +312,7 @@
     "displayName": "Stone of Agony",
     "size": [25, 25],
     "icons": ["stone_of_agony_bw_32x32.png", "stone_of_agony_32x32.png"],
-    "items": [null, null]
+    "items": [null, "fd2404a34fb142eb9be49cee8f4d3a38"]
   },
   {
     "id": "973baa09459d468da633e9510bbdaa1f",

@@ -80,7 +80,9 @@ function parseItems(items_list, counters) {
       case "33f4bc4c632846bea5fb88573f2f95b2":
         items.Hover_Boots = 1;
         break;
-      // Stone_of_Agony: 0,
+      case "fd2404a34fb142eb9be49cee8f4d3a38":
+        items.Stone_of_Agony = 1;
+        break;
       case "7373656ec94f430f8fbf971e53930949":
         items.Gerudo_Membership_Card = 1;
         break;
