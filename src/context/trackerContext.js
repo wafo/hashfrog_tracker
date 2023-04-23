@@ -74,10 +74,18 @@ function parseItems(items_list, counters) {
       case "c562c7418d7141ffb70101509a52873e":
         items.Zora_Tunic = 1;
         break;
+      case "d9233a5054af4491924115b47e5730e4":
+        items.Goron_Tunic = 1;
+        items.Zora_Tunic = 1;
+        break;
       case "bad09131f88a440093087e11efc1c8b0":
         items.Iron_Boots = 1;
         break;
       case "33f4bc4c632846bea5fb88573f2f95b2":
+        items.Hover_Boots = 1;
+        break;
+      case "2c5c72812a6b49c68bb49773e6d3dd98":
+        items.Iron_Boots = 1;
         items.Hover_Boots = 1;
         break;
       case "fd2404a34fb142eb9be49cee8f4d3a38":
@@ -111,10 +119,13 @@ function parseItems(items_list, counters) {
         items.Dins_Fire = 1;
         break;
       case "aa4bc05fa49d4492bb8df02617ad1da4":
-        // Nayrus_Love: 0,
         items.Nayrus_Love = 1;
         break;
       case "0c3e8979165042f686357b4bcbaab8ec":
+        items.Farores_Wind = 1;
+        break;
+      case "76d769ba496e49ebb39fbfd836ce1db6":
+        items.Dins_Fire = 1;
         items.Farores_Wind = 1;
         break;
       case "29e0384c520a4e7dad505b48a2156097":

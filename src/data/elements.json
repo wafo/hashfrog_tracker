@@ -160,7 +160,7 @@
       null,
       "591d582f479140759fd6501caa23c2f9",
       "0c3e8979165042f686357b4bcbaab8ec",
-      "591d582f479140759fd6501caa23c2f9"
+      "76d769ba496e49ebb39fbfd836ce1db6"
     ]
   },
   {
@@ -471,7 +471,7 @@
     "displayName": "Goron-Zora Tunic",
     "size": [25, 25],
     "icons": ["tunics_bw_32x32.png", "tunic_goron_32x32.png", "tunic_zora_32x32.png", "tunics_32x32.png"],
-    "items": [null, "cd6a55f0253f45159521efb2b3b515e8", "c562c7418d7141ffb70101509a52873e", null]
+    "items": [null, "cd6a55f0253f45159521efb2b3b515e8", "c562c7418d7141ffb70101509a52873e", "d9233a5054af4491924115b47e5730e4"]
   },
   {
     "id": "1cb911ed9d5042f69c7a19fe2bb36538",
