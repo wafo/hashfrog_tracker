@@ -233,7 +233,8 @@ class Locations {
           shuffleSetting = LogicHelper.settings.shuffle_ganon_bosskey;
         }
         if (_.isEqual(shuffleSetting, "vanilla")) {
-          return false;
+          // show boss key location even if map/compass is vanilla
+          return true;
         } else {
           return true;
         }
@@ -242,7 +243,8 @@ class Locations {
       else if (_.startsWith(location.vanillaItem, "Map") || _.startsWith(location.vanillaItem, "Compass")) {
         shuffleSetting = LogicHelper.settings.shuffle_mapcompass;
         if (_.isEqual(shuffleSetting, "vanilla")) {
-          return false;
+          // show dungeon location even if map/compass is vanilla
+          return true;
         } else {
           return true;
         }
@@ -251,7 +253,8 @@ class Locations {
       else if (_.startsWith(location.vanillaItem, "Small Key")) {
         shuffleSetting = LogicHelper.settings.shuffle_smallkeys;
         if (_.isEqual(shuffleSetting, "vanilla")) {
-          return false;
+          // show dungeon location even if small key is vanilla
+          return true;
         } else {
           return true;
         }
