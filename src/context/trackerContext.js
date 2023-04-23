@@ -286,6 +286,10 @@ function parseItems(items_list, counters) {
         items.Gold_Skulltula_Token = value;
         break;
 
+      case "bottle_counter":
+        items.Bottle = value;
+        break;
+
       case "keys_forest":
         items.Small_Key_Forest_Temple = value;
         break;
