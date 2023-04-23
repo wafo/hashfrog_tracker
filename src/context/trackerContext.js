@@ -17,6 +17,9 @@ function parseItems(items_list, counters) {
   // Parse items
   _.forEach(items_list, item => {
     switch (item) {
+      case "c50e8543ab0c4bdaa8a23e6a80ae6d1c":
+        // ignore Master Sword
+        break;
       case "bc6099ef9091404e9b45aea12d4b6b65":
         items.Boomerang = 1;
         break;
