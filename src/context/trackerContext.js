@@ -172,12 +172,24 @@ function parseItems(items_list, counters) {
       case "6240defb8f6044d984476dc0b0467f74":
         items.Ocarina = 1;
         break;
-      // Boss_Key_Forest_Temple: 1,
-      // Boss_Key_Fire_Temple: 1,
-      // Boss_Key_Water_Temple: 1,
-      // Boss_Key_Spirit_Temple: 1,
-      // Boss_Key_Shadow_Temple: 1,
-      // Boss_Key_Ganons_Castle: 1,
+      case "d9ba09be6c3d41b8a46edc45bc42db2b":
+        items.Boss_Key_Forest_Temple = 1;
+        break;
+      case "4efe27490c3e4e0e887cd655bc818db0":
+        items.Boss_Key_Fire_Temple = 1;
+        break;
+      case "feb7580708c4419da14f42f81de8f6dd":
+        items.Boss_Key_Water_Temple = 1;
+        break;
+      case "38e3b507c53f4aba8f0157bb27bbe685":
+        items.Boss_Key_Spirit_Temple = 1;
+        break;
+      case "78387b1c5cbd463b97dadee3955a14d0":
+        items.Boss_Key_Shadow_Temple = 1;
+        break;
+      case "ab70ca77f5f2407aa50955b8a47e7339":
+        items.Boss_Key_Ganons_Castle = 1;
+        break;
       // Double_Defense: 0,
       // Zeldas_Letter: 0,
 
@@ -279,8 +291,12 @@ function parseItems(items_list, counters) {
       case "keys_gtg":
         items.Small_Key_Gerudo_Training_Ground = value;
         break;
-      // Small_Key_Thieves_Hideout: 4,
-      // Small_Key_Ganons_Castle: 2,
+      case "keys_th":
+        items.Small_Key_Thieves_Hideout = value;
+        break;
+      case "keys_ganons":
+        items.Small_Key_Ganons_Castle = value;
+        break;
 
       default:
         console.warn(`Did not set unknown counter with value ${value}: ${counter}`);

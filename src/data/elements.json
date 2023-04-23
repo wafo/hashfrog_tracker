@@ -916,10 +916,19 @@
     "icons": ["frogs_32x32.png"]
   },
   {
+    "id": "07dbe0d58da740ba8dffb1159eceb518",
+    "type": "counter",
+    "name": "keys_counter",
+    "displayName": "Small Keys",
+    "size": [20, 20],
+    "icons": ["key_32x32.png"],
+    "countConfig": [0, 10]
+  },
+  {
     "id": "34fb4c398a1e43ed99a40a6351ceed8b",
     "type": "counter",
     "name": "keys_forest",
-    "displayName": "Small keys Forest",
+    "displayName": "Small Keys Forest",
     "size": [20, 20],
     "icons": ["key_forest_32x32.png"],
     "countConfig": [0, 5]
@@ -943,15 +952,6 @@
     "countConfig": [0, 6]
   },
   {
-    "id": "f960cb2e268b47378c1fbd280a36b7ae",
-    "type": "counter",
-    "name": "keys_shadow",
-    "displayName": "Small Keys Shadow",
-    "size": [20, 20],
-    "icons": ["key_shadow_32x32.png"],
-    "countConfig": [0, 5]
-  },
-  {
     "id": "b1682f98da9547ec91364bec23522dbd",
     "type": "counter",
     "name": "keys_spirit",
@@ -961,12 +961,21 @@
     "countConfig": [0, 5]
   },
   {
+    "id": "f960cb2e268b47378c1fbd280a36b7ae",
+    "type": "counter",
+    "name": "keys_shadow",
+    "displayName": "Small Keys Shadow",
+    "size": [20, 20],
+    "icons": ["key_shadow_32x32.png"],
+    "countConfig": [0, 5]
+  },
+  {
     "id": "b974af3f77fd4f6da41aca226176ed35",
     "type": "counter",
     "name": "keys_botw",
     "displayName": "Small Keys BOTW",
     "size": [20, 20],
-    "icons": ["key_32x32.png"],
+    "icons": ["key_botw_32x32.png"],
     "countConfig": [0, 3]
   },
   {
@@ -975,8 +984,26 @@
     "name": "keys_gtg",
     "displayName": "Small Keys GTG",
     "size": [20, 20],
-    "icons": ["key_32x32.png"],
+    "icons": ["key_gtg_32x32.png"],
     "countConfig": [0, 9]
+  },
+  {
+    "id": "f505cd1a329947d584f48474ccbac96f",
+    "type": "counter",
+    "name": "keys_th",
+    "displayName": "Small Keys TH",
+    "size": [20, 20],
+    "icons": ["key_th_32x32.png"],
+    "countConfig": [0, 4]
+  },
+  {
+    "id": "6c7bef3844bc4be3bb220c947c059892",
+    "type": "counter",
+    "name": "keys_ganons",
+    "displayName": "Small Keys Ganons",
+    "size": [20, 20],
+    "icons": ["key_ganons_32x32.png"],
+    "countConfig": [0, 2]
   },
   {
     "id": "c23376c1af5943a6a9a5ee899ef27648",
@@ -984,7 +1011,61 @@
     "name": "bk_simple",
     "displayName": "Boss Key",
     "size": [20, 20],
-    "icons": ["bk_32x32.png"]
+    "icons": ["bk_bw_32x32.png", "bk_32x32.png"]
+  },
+  {
+    "id": "d9ba09be6c3d41b8a46edc45bc42db2b",
+    "type": "simple",
+    "name": "bk_forest",
+    "displayName": "Boss Key Forest",
+    "size": [20, 20],
+    "icons": ["bk_forest_bw_32x32.png", "bk_forest_32x32.png"],
+    "items": [null, "d9ba09be6c3d41b8a46edc45bc42db2b"]
+  },
+  {
+    "id": "4efe27490c3e4e0e887cd655bc818db0",
+    "type": "simple",
+    "name": "bk_fire",
+    "displayName": "Boss Key Fire",
+    "size": [20, 20],
+    "icons": ["bk_fire_bw_32x32.png", "bk_fire_32x32.png"],
+    "items": [null, "4efe27490c3e4e0e887cd655bc818db0"]
+  },
+  {
+    "id": "feb7580708c4419da14f42f81de8f6dd",
+    "type": "simple",
+    "name": "bk_water",
+    "displayName": "Boss Key Water",
+    "size": [20, 20],
+    "icons": ["bk_water_bw_32x32.png", "bk_water_32x32.png"],
+    "items": [null, "feb7580708c4419da14f42f81de8f6dd"]
+  },
+  {
+    "id": "78387b1c5cbd463b97dadee3955a14d0",
+    "type": "simple",
+    "name": "bk_shadow",
+    "displayName": "Boss Key Shadow",
+    "size": [20, 20],
+    "icons": ["bk_shadow_bw_32x32.png", "bk_shadow_32x32.png"],
+    "items": [null, "78387b1c5cbd463b97dadee3955a14d0"]
+  },
+  {
+    "id": "38e3b507c53f4aba8f0157bb27bbe685",
+    "type": "simple",
+    "name": "bk_spirit",
+    "displayName": "Boss Key Spirit",
+    "size": [20, 20],
+    "icons": ["bk_spirit_bw_32x32.png", "bk_spirit_32x32.png"],
+    "items": [null, "38e3b507c53f4aba8f0157bb27bbe685"]
+  },
+  {
+    "id": "ab70ca77f5f2407aa50955b8a47e7339",
+    "type": "simple",
+    "name": "bk_ganons",
+    "displayName": "Boss Key Ganons",
+    "size": [20, 20],
+    "icons": ["bk_ganons_bw_32x32.png", "bk_ganons_32x32.png"],
+    "items": [null, "ab70ca77f5f2407aa50955b8a47e7339"]
   },
   {
     "id": "4c1b24c3e3954038b14f4daa3656e0b5",
