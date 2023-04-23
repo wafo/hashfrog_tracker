@@ -1020,7 +1020,7 @@
     "displayName": "Boss Key Forest",
     "size": [20, 20],
     "icons": ["bk_forest_bw_32x32.png", "bk_forest_32x32.png"],
-    "items": [null, "d9ba09be6c3d41b8a46edc45bc42db2b"]
+    "items": [null, "7abace900d644493be25c03dddd9cb88"]
   },
   {
     "id": "4efe27490c3e4e0e887cd655bc818db0",
@@ -1029,7 +1029,7 @@
     "displayName": "Boss Key Fire",
     "size": [20, 20],
     "icons": ["bk_fire_bw_32x32.png", "bk_fire_32x32.png"],
-    "items": [null, "4efe27490c3e4e0e887cd655bc818db0"]
+    "items": [null, "d588b4fb40ed4e7faf65bca60d1cb37c"]
   },
   {
     "id": "feb7580708c4419da14f42f81de8f6dd",
@@ -1038,7 +1038,7 @@
     "displayName": "Boss Key Water",
     "size": [20, 20],
     "icons": ["bk_water_bw_32x32.png", "bk_water_32x32.png"],
-    "items": [null, "feb7580708c4419da14f42f81de8f6dd"]
+    "items": [null, "b4f7b0ee98ac47eaa0b13318444ba072"]
   },
   {
     "id": "78387b1c5cbd463b97dadee3955a14d0",
@@ -1047,7 +1047,7 @@
     "displayName": "Boss Key Shadow",
     "size": [20, 20],
     "icons": ["bk_shadow_bw_32x32.png", "bk_shadow_32x32.png"],
-    "items": [null, "78387b1c5cbd463b97dadee3955a14d0"]
+    "items": [null, "97b028f54e82473a9960f608a5789f18"]
   },
   {
     "id": "38e3b507c53f4aba8f0157bb27bbe685",
@@ -1056,7 +1056,7 @@
     "displayName": "Boss Key Spirit",
     "size": [20, 20],
     "icons": ["bk_spirit_bw_32x32.png", "bk_spirit_32x32.png"],
-    "items": [null, "38e3b507c53f4aba8f0157bb27bbe685"]
+    "items": [null, "a99ecea2404a4337b829e88e0907d13f"]
   },
   {
     "id": "ab70ca77f5f2407aa50955b8a47e7339",
@@ -1065,7 +1065,7 @@
     "displayName": "Boss Key Ganons",
     "size": [20, 20],
     "icons": ["bk_ganons_bw_32x32.png", "bk_ganons_32x32.png"],
-    "items": [null, "ab70ca77f5f2407aa50955b8a47e7339"]
+    "items": [null, "adbe6c6ffbd34a0f8eb3de9611edb8be"]
   },
   {
     "id": "4c1b24c3e3954038b14f4daa3656e0b5",

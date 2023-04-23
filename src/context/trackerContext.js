@@ -177,22 +177,22 @@ function parseItems(items_list, counters) {
       case "6240defb8f6044d984476dc0b0467f74":
         items.Ocarina = 1;
         break;
-      case "d9ba09be6c3d41b8a46edc45bc42db2b":
+      case "7abace900d644493be25c03dddd9cb88":
         items.Boss_Key_Forest_Temple = 1;
         break;
-      case "4efe27490c3e4e0e887cd655bc818db0":
+      case "d588b4fb40ed4e7faf65bca60d1cb37c":
         items.Boss_Key_Fire_Temple = 1;
         break;
-      case "feb7580708c4419da14f42f81de8f6dd":
+      case "b4f7b0ee98ac47eaa0b13318444ba072":
         items.Boss_Key_Water_Temple = 1;
         break;
-      case "38e3b507c53f4aba8f0157bb27bbe685":
+      case "a99ecea2404a4337b829e88e0907d13f":
         items.Boss_Key_Spirit_Temple = 1;
         break;
-      case "78387b1c5cbd463b97dadee3955a14d0":
+      case "97b028f54e82473a9960f608a5789f18":
         items.Boss_Key_Shadow_Temple = 1;
         break;
-      case "ab70ca77f5f2407aa50955b8a47e7339":
+      case "adbe6c6ffbd34a0f8eb3de9611edb8be":
         items.Boss_Key_Ganons_Castle = 1;
         break;
       // Double_Defense: 0,
