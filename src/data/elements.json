@@ -182,6 +182,15 @@
     "items": [null, "0c3e8979165042f686357b4bcbaab8ec"]
   },
   {
+    "id": "4eb2ff3e56984c75b09c02d1f4e85764",
+    "type": "simple",
+    "name": "nayrus",
+    "displayName": "Nayru's Love",
+    "size": [25, 25],
+    "icons": ["nayrus_love_bw_32x32.png", "nayrus_love_32x32.png"],
+    "items": [null, "aa4bc05fa49d4492bb8df02617ad1da4"]
+  },
+  {
     "id": "0f2e5a599a6645ae89ec3bd1b787a7b3",
     "type": "simple",
     "name": "boomerang",
