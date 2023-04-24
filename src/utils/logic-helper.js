@@ -1,5 +1,6 @@
 import { parse } from "acorn";
 import _ from "lodash";
+import memoize from "memoizee";
 
 import Locations from "./locations";
 
@@ -73,6 +74,8 @@ class LogicHelper {
     this.items = {};
     this.regions = { child: [], adult: [] };
 
+    this.memoizedFunctions = this._memoizeFunctions();
+
     return this.settings;
   }
 
@@ -131,6 +134,37 @@ class LogicHelper {
     );
   }
 
+  static _memoizeFunctions() {
+    return _.map(
+      [
+        "isLocationAvailable",
+        "_isRegionAccessible",
+        "_evalNode",
+        "_evalBinaryExpression",
+        "_evalCallExpression",
+        "_evalIdentifier",
+        "_evalLiteral",
+        "_evalLogicalExpression",
+        "_evalMemberExpression",
+        "_evalSequenceExpression",
+        "_evalUnaryExpression",
+      ],
+      funcName => {
+        const memoizedFunction = memoize(LogicHelper[funcName]);
+        _.set(LogicHelper, funcName, memoizedFunction);
+        return memoizedFunction;
+      },
+    );
+  }
+
+  static _invalidateMemoizedFunctions() {
+    _.forEach(this.memoizedFunctions, memoizedFunction => {
+      if (memoizedFunction.clear) {
+        memoizedFunction.clear();
+      }
+    });
+  }
+
   static _initRenamedAttributes() {
     // source: World.py __init__()
 
@@ -175,6 +209,8 @@ class LogicHelper {
   }
 
   static _recalculateAccessibleRegions(rootRegion, age) {
+    this._invalidateMemoizedFunctions();
+
     let regionsToCheck = [];
 
     _.forEach(Locations.activeExits[rootRegion], (exitRule, exitName) => {
