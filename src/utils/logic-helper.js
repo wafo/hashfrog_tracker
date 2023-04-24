@@ -481,9 +481,12 @@ class LogicHelper {
     }
   }
 
-  static _canPlay(songName) {
+  static _canPlay(songName, age) {
     if (_.isEqual(songName, "Scarecrow_Song")) {
-      return this.items.Ocarina > 0 && (this.settings.free_scarecrow || this.isLocationAvailable("Pierre"));
+      return (
+        this.items.Ocarina > 0 &&
+        (this.settings.free_scarecrow || (_.isEqual(age, "adult") && this._evalEvent("Bonooru")))
+      );
     } else {
       return this.items.Ocarina > 0 && this.items[songName] > 0;
     }
