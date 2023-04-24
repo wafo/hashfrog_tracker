@@ -327,7 +327,6 @@ function parseItems(items_list, counters) {
 }
 
 function validateLocations(locations, parsedItems) {
-  var startTime = performance.now();
   const clonedLocations = _.cloneDeep(locations);
 
   if (!_.isEmpty(clonedLocations)) {
@@ -339,8 +338,6 @@ function validateLocations(locations, parsedItems) {
       });
     });
   }
-  var endTime = performance.now();
-  console.log(`Call to doSomething took ${endTime - startTime} milliseconds`);
 
   return clonedLocations;
 }
