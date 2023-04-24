@@ -340,8 +340,6 @@ class LogicHelper {
         return this._canAccessDrop("Big Poe");
       case "Bombchu_Drop":
         return this.isLocationAvailable("Market Bombchu Bowling Bombchus");
-      case "Bottle_with_Big_Poe":
-        return false; // TODO: not on tracker yet
       case "Deliver_Letter":
         return this.isLocationAvailable("Deliver Rutos Letter");
       case "Time_Travel":
@@ -432,6 +430,11 @@ class LogicHelper {
     // if Small Keys mode is Keysy, ignore small key requirements
     if (_.isEqual(this.settings.shuffle_smallkeys, "remove") && _.startsWith(itemName, "Small_Key_")) {
       return true;
+    }
+
+    // case for Bottle_with_Big_Poe sequence expression
+    if (_.isEqual(itemName, "Bottle_with_Big_Poe")) {
+      itemCount = this.big_poe_count_random ? 10 : this.settings.big_poe_count;
     }
 
     // account for removed locked door in Fire Temple when keysanity is off
