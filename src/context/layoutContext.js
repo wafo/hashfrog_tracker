@@ -1,6 +1,6 @@
 import { createContext, useContext, useReducer } from "react";
 
-import defaultLayout from "../layouts/standard.json";
+import defaultLayout from "../layouts/hashfrog.json";
 
 function getInitialLayout() {
   let layout = localStorage.getItem("layout");
