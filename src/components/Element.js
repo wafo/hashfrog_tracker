@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { Fragment, useCallback, useMemo, useState } from "react";
 
-import { useItems } from "../context/trackerContext";
+import { useElement, useItems } from "../context/trackerContext";
 
 // Base Icons
 import icon_check from "../assets/icons/check_16x16.png";
@@ -33,7 +33,8 @@ const Element = props => {
     items = [],
   } = props;
 
-  const { markCounter, markItem, startingIndex: trackerContextStartingIndex } = useItems(items);
+  const { markCounter, markItem, startingIndex: trackerContextStartingIndex, startingItem } = useItems(items);
+  useElement(id, startingItem);
 
   const [selected, setSelected] = useState(trackerContextStartingIndex || selectedStartingIndex);
   const [counter, setCounter] = useState(0);
@@ -69,12 +70,12 @@ const Element = props => {
 
       // For context
       if (!isCounter) {
-        markItem(items, items[updated]);
+        markItem(items[updated], id);
       } else {
         markCounter(updated, name);
       }
     },
-    [icons, type, countConfig, selected, items, markCounter, markItem, counter, name],
+    [id, icons, type, countConfig, selected, items, markCounter, markItem, counter, name],
   );
 
   const wheelHandler = useCallback(

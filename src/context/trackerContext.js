@@ -15,7 +15,7 @@ function parseItems(items_list, counters) {
   const items = _.cloneDeep(DEFAULT_ITEMS);
 
   // Parse items
-  _.forEach(items_list, item => {
+  _.forEach(_.values(items_list), item => {
     switch (item) {
       case "c50e8543ab0c4bdaa8a23e6a80ae6d1c":
         // ignore Master Sword
@@ -187,6 +187,9 @@ function parseItems(items_list, counters) {
       case "7d8f399f6ef848e0bfba61d7ba31d1ff":
       case "6240defb8f6044d984476dc0b0467f74":
         items.Ocarina = 1;
+        break;
+      case "28bfbeeeaaf54dc99e66244bd8ba4aa3":
+        items.Bottle_with_Big_Poe = 1;
         break;
       case "7abace900d644493be25c03dddd9cb88":
         items.Boss_Key_Forest_Temple = 1;
@@ -388,7 +391,7 @@ function reducer(state, action) {
 
       return {
         ...state,
-        locations: locations,
+        locations,
       };
     }
     case "LOCATION_MARK": {
@@ -408,7 +411,7 @@ function reducer(state, action) {
 
         return {
           ...state,
-          locations: locations,
+          locations,
         };
       }
     }
@@ -483,16 +486,23 @@ function reducer(state, action) {
       const settings = payload;
       const items = [...settings.starting_equipment, ...settings.starting_items, ...settings.starting_songs];
 
-      const items_list = items.map(item => {
+      const starting_items = items.map(item => {
         return ITEMS_JSON[item];
       });
       if (settings.start_with_consumables) {
-        items_list.push("34b2ad3657e94b75b281cec30e617f37");
-        items_list.push("73a0f3f5688745a8bb4a0973d9858960");
+        starting_items.push("34b2ad3657e94b75b281cec30e617f37");
+        starting_items.push("73a0f3f5688745a8bb4a0973d9858960");
       }
       if (settings.open_door_of_time && settings.open_forest !== "closed") {
-        items_list.push("c50e8543ab0c4bdaa8a23e6a80ae6d1c");
+        starting_items.push("c50e8543ab0c4bdaa8a23e6a80ae6d1c");
       }
+
+      // `starting_items` will be properly set through `useElement` hook
+      const items_list = {};
+      for (let i = 0; i < starting_items.length; i++) {
+        _.set(items_list, i, starting_items[i]);
+      }
+
       const parsedItems = parseItems(items_list);
 
       // Validating checks based on items collected
@@ -500,9 +510,10 @@ function reducer(state, action) {
 
       return {
         ...state,
-        items_list,
-        items: parsedItems,
         locations,
+        items: parsedItems,
+        starting_items,
+        items_list: {},
       };
     }
     case "COUNTER_MARK": {
@@ -519,17 +530,22 @@ function reducer(state, action) {
 
       return {
         ...state,
-        counters,
-        items: parsedItems,
         locations,
+        items: parsedItems,
+        counters,
       };
     }
     case "ITEM_MARK": {
-      const { items, item } = payload;
+      const { item, parentID } = payload;
 
       // Prepping collecting items
-      const items_list = [...state.items_list.filter(x => !items.includes(x))];
-      if (item) items_list.push(item);
+      const items_list = _.cloneDeep(state.items_list);
+      if (_.isNull(item)) {
+        delete items_list[parentID];
+      } else {
+        _.set(items_list, parentID, item);
+      }
+
       const parsedItems = parseItems(items_list, state.counters);
 
       // Validating checks based on items collected
@@ -537,9 +553,9 @@ function reducer(state, action) {
 
       return {
         ...state,
-        items_list,
-        items: parsedItems,
         locations,
+        items: parsedItems,
+        items_list,
       };
     }
     case "STRING_SET": {
@@ -566,7 +582,9 @@ function TrackerProvider(props) {
     locations: {},
     items: _.cloneDeep(DEFAULT_ITEMS),
     counters: {},
-    items_list: [],
+    starting_items: [],
+    items_list: {},
+    layoutElements: [],
     settings_string: getSettingsStringCache(),
     generator_version: getGeneratorVersionCache(),
   };
@@ -588,6 +606,18 @@ const useChecks = () => {
     locations,
     items,
   };
+};
+
+const useElement = (id, startingItem) => {
+  const { state } = useTracker();
+
+  if (!_.includes(state.layoutElements, id)) {
+    state.layoutElements.push(id);
+
+    if (!_.isNull(startingItem)) {
+      _.set(state.items_list, id, startingItem);
+    }
+  }
 };
 
 const useLocation = () => {
@@ -615,13 +645,13 @@ const useItems = items => {
   const actions = useMemo(
     () => ({
       markCounter: (value, item) => dispatch({ type: "COUNTER_MARK", payload: { value, item } }),
-      markItem: (items, item) => dispatch({ type: "ITEM_MARK", payload: { items, item } }),
+      markItem: (item, parentID) => dispatch({ type: "ITEM_MARK", payload: { item, parentID } }),
       updateItemsFromLogic: settings => dispatch({ type: "ITEMS_UPDATE_FROM_LOGIC", payload: settings }),
     }),
     [dispatch],
   );
 
-  // IMPORTANT: Intentionally ignoring state.items_list on the dependency array.
+  // IMPORTANT: Intentionally ignoring state.starting_items on the dependency array.
   const startingIndex = useMemo(() => {
     // Loops through the items of the element,
     // searching for a match against the items in the tracker context.
@@ -629,7 +659,7 @@ const useItems = items => {
     let itemIndex = 0;
     if (!items || !items.length) return 0;
     for (let i = 0; i < items.length; i++) {
-      if (state.items_list.includes(items[i])) {
+      if (_.includes(state.starting_items, items[i])) {
         itemIndex = i;
         break;
       }
@@ -638,7 +668,20 @@ const useItems = items => {
     // eslint-disable-next-line
   }, [items]);
 
-  return { ...actions, startingIndex };
+  const startingItem = useMemo(() => {
+    let itemID = null;
+    if (!items || !items.length) return null;
+    for (let i = 0; i < items.length; i++) {
+      if (_.includes(state.starting_items, items[i])) {
+        itemID = items[i];
+        break;
+      }
+    }
+    return itemID;
+    // eslint-disable-next-line
+  }, [items]);
+
+  return { ...actions, startingIndex, startingItem };
 };
 
 const useSettingsString = () => {
@@ -662,6 +705,7 @@ export {
   TrackerProvider,
   useTracker,
   useChecks,
+  useElement,
   useLocation,
   useItems,
   useSettingsString,

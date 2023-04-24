@@ -13,6 +13,7 @@ import SometimesHint from "../components/SometimesHint";
 import HintsTable from "../components/HintsTable";
 import Label from "../components/Label";
 import elementsJSON from "../data/elements.json";
+import LayoutID from "../utils/layout-id";
 import { isBase64, splitNameBase64 } from "../utils/utils";
 
 const baseURL = process.env.PUBLIC_URL;
@@ -99,6 +100,7 @@ const Layout = props => {
     getCacheIcons();
   }, [getCacheIcons]);
 
+  LayoutID.reset();
   const toRender = useMemo(() => {
     return renderLayout.components.map(component => {
       switch (component.type) {
@@ -109,7 +111,7 @@ const Layout = props => {
             <div key={component.id} className="layout-component" style={{ top, left }}>
               <Element
                 {...element}
-                id={component.id}
+                id={LayoutID.getID()}
                 size={component.size}
                 receiver={component.receiver}
                 dragCurrent={component.dragCurrent}
