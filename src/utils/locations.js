@@ -109,6 +109,8 @@ class Locations {
     else if (_.isEqual(location.type, "Shop")) {
       if (_.isEqual(LogicHelper.settings.shopsanity, "off")) {
         return false;
+      } else if (_.isEqual(LogicHelper.settings.shopsanity, "random")) {
+        return 4 >= _.toInteger(_.slice(location.locationName, -1));
       } else {
         return _.toInteger(LogicHelper.settings.shopsanity) >= _.toInteger(_.slice(location.locationName, -1));
       }
