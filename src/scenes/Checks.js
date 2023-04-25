@@ -5,9 +5,10 @@ import { useChecks, useLocation } from "../context/trackerContext";
 import Locations from "../utils/locations";
 import LogicHelper from "../utils/logic-helper";
 
+import { useLayout } from "../context/layoutContext";
+import DUNGEON_SHORTCUTS from "../data/dungeon-boss-shortcuts.json";
 import DUNGEONS from "../data/dungeons.json";
 import HINT_REGIONS_SHORT_NAMES from "../data/hint-regions-short-names.json";
-import { useLayout } from "../context/layoutContext";
 
 const Checks = () => {
   const { state: layoutContext } = useLayout();
@@ -169,7 +170,7 @@ const HintRegion = ({ actions, locations, selectedRegion, setSelectedRegion }) =
     actions.toggleShortcut(selectedRegion);
   };
   const showShortcutToggle =
-    _.includes(DUNGEONS, selectedRegion) && _.isEqual(LogicHelper.settings.dungeon_shortcuts_choice, "random");
+    _.includes(DUNGEON_SHORTCUTS, selectedRegion) && _.isEqual(LogicHelper.settings.dungeon_shortcuts_choice, "random");
   const isShortcutToggled = _.includes(LogicHelper.settings.dungeon_shortcuts, selectedRegion);
 
   const toggleRegion = () => {
