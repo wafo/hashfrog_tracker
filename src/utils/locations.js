@@ -81,6 +81,14 @@ class Locations {
       return false;
     }
 
+    // Song from Impa
+    else if (_.isEqual(location.locationName, "Song from Impa")) {
+      return (
+        _.includes(LogicHelper.settings.starting_items, "Zeldas Letter") &&
+        !_.includes(LogicHelper.settings.shuffle_child_trade, "Zeldas Letter")
+      );
+    }
+
     // Disabled Locations
     else if (_.includes(LogicHelper.settings.disabled_locations, location.locationName)) {
       return false;
@@ -333,10 +341,7 @@ class Locations {
     this.activeSkullsLocations = [];
     _.forEach(DUNGEONS, dungeonName => {
       if (_.includes(dungeonsMQ, dungeonName)) {
-        this.activeSkullsLocations = _.union(
-          this.activeSkullsLocations,
-          this.skullsLocations.dungeon_mq[dungeonName],
-        );
+        this.activeSkullsLocations = _.union(this.activeSkullsLocations, this.skullsLocations.dungeon_mq[dungeonName]);
       } else {
         this.activeSkullsLocations = _.union(this.activeSkullsLocations, this.skullsLocations.dungeon[dungeonName]);
       }
