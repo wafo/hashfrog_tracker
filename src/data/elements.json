@@ -160,7 +160,7 @@
       null,
       "591d582f479140759fd6501caa23c2f9",
       "0c3e8979165042f686357b4bcbaab8ec",
-      "591d582f479140759fd6501caa23c2f9"
+      "76d769ba496e49ebb39fbfd836ce1db6"
     ]
   },
   {
@@ -180,6 +180,15 @@
     "size": [25, 25],
     "icons": ["farores_wind_bw_32x32.png", "farores_wind_32x32.png"],
     "items": [null, "0c3e8979165042f686357b4bcbaab8ec"]
+  },
+  {
+    "id": "4eb2ff3e56984c75b09c02d1f4e85764",
+    "type": "simple",
+    "name": "nayrus",
+    "displayName": "Nayru's Love",
+    "size": [25, 25],
+    "icons": ["nayrus_love_bw_32x32.png", "nayrus_love_32x32.png"],
+    "items": [null, "aa4bc05fa49d4492bb8df02617ad1da4"]
   },
   {
     "id": "0f2e5a599a6645ae89ec3bd1b787a7b3",
@@ -282,8 +291,8 @@
     "items": [
       null,
       "55f6bcc569c14f1293eb50fda76c812d",
-      "55f6bcc569c14f1293eb50fda76c812d",
-      "55f6bcc569c14f1293eb50fda76c812d",
+      "a391497285c34d56b762ca84b1450d5d",
+      "28bfbeeeaaf54dc99e66244bd8ba4aa3",
       "55f6bcc569c14f1293eb50fda76c812d",
       "55f6bcc569c14f1293eb50fda76c812d",
       "55f6bcc569c14f1293eb50fda76c812d",
@@ -312,7 +321,7 @@
     "displayName": "Stone of Agony",
     "size": [25, 25],
     "icons": ["stone_of_agony_bw_32x32.png", "stone_of_agony_32x32.png"],
-    "items": [null, null]
+    "items": [null, "fd2404a34fb142eb9be49cee8f4d3a38"]
   },
   {
     "id": "973baa09459d468da633e9510bbdaa1f",
@@ -471,7 +480,7 @@
     "displayName": "Goron-Zora Tunic",
     "size": [25, 25],
     "icons": ["tunics_bw_32x32.png", "tunic_goron_32x32.png", "tunic_zora_32x32.png", "tunics_32x32.png"],
-    "items": [null, "cd6a55f0253f45159521efb2b3b515e8", "c562c7418d7141ffb70101509a52873e", null]
+    "items": [null, "cd6a55f0253f45159521efb2b3b515e8", "c562c7418d7141ffb70101509a52873e", "d9233a5054af4491924115b47e5730e4"]
   },
   {
     "id": "1cb911ed9d5042f69c7a19fe2bb36538",
@@ -916,10 +925,19 @@
     "icons": ["frogs_32x32.png"]
   },
   {
+    "id": "07dbe0d58da740ba8dffb1159eceb518",
+    "type": "counter",
+    "name": "keys_counter",
+    "displayName": "Small Keys",
+    "size": [20, 20],
+    "icons": ["key_32x32.png"],
+    "countConfig": [0, 10]
+  },
+  {
     "id": "34fb4c398a1e43ed99a40a6351ceed8b",
     "type": "counter",
     "name": "keys_forest",
-    "displayName": "Small keys Forest",
+    "displayName": "Small Keys Forest",
     "size": [20, 20],
     "icons": ["key_forest_32x32.png"],
     "countConfig": [0, 5]
@@ -943,15 +961,6 @@
     "countConfig": [0, 6]
   },
   {
-    "id": "f960cb2e268b47378c1fbd280a36b7ae",
-    "type": "counter",
-    "name": "keys_shadow",
-    "displayName": "Small Keys Shadow",
-    "size": [20, 20],
-    "icons": ["key_shadow_32x32.png"],
-    "countConfig": [0, 5]
-  },
-  {
     "id": "b1682f98da9547ec91364bec23522dbd",
     "type": "counter",
     "name": "keys_spirit",
@@ -961,12 +970,21 @@
     "countConfig": [0, 5]
   },
   {
+    "id": "f960cb2e268b47378c1fbd280a36b7ae",
+    "type": "counter",
+    "name": "keys_shadow",
+    "displayName": "Small Keys Shadow",
+    "size": [20, 20],
+    "icons": ["key_shadow_32x32.png"],
+    "countConfig": [0, 5]
+  },
+  {
     "id": "b974af3f77fd4f6da41aca226176ed35",
     "type": "counter",
     "name": "keys_botw",
     "displayName": "Small Keys BOTW",
     "size": [20, 20],
-    "icons": ["key_32x32.png"],
+    "icons": ["key_botw_32x32.png"],
     "countConfig": [0, 3]
   },
   {
@@ -975,8 +993,26 @@
     "name": "keys_gtg",
     "displayName": "Small Keys GTG",
     "size": [20, 20],
-    "icons": ["key_32x32.png"],
+    "icons": ["key_gtg_32x32.png"],
     "countConfig": [0, 9]
+  },
+  {
+    "id": "f505cd1a329947d584f48474ccbac96f",
+    "type": "counter",
+    "name": "keys_th",
+    "displayName": "Small Keys TH",
+    "size": [20, 20],
+    "icons": ["key_th_32x32.png"],
+    "countConfig": [0, 4]
+  },
+  {
+    "id": "6c7bef3844bc4be3bb220c947c059892",
+    "type": "counter",
+    "name": "keys_ganons",
+    "displayName": "Small Keys Ganons",
+    "size": [20, 20],
+    "icons": ["key_ganons_32x32.png"],
+    "countConfig": [0, 2]
   },
   {
     "id": "c23376c1af5943a6a9a5ee899ef27648",
@@ -984,7 +1020,61 @@
     "name": "bk_simple",
     "displayName": "Boss Key",
     "size": [20, 20],
-    "icons": ["bk_32x32.png"]
+    "icons": ["bk_bw_32x32.png", "bk_32x32.png"]
+  },
+  {
+    "id": "d9ba09be6c3d41b8a46edc45bc42db2b",
+    "type": "simple",
+    "name": "bk_forest",
+    "displayName": "Boss Key Forest",
+    "size": [20, 20],
+    "icons": ["bk_forest_bw_32x32.png", "bk_forest_32x32.png"],
+    "items": [null, "7abace900d644493be25c03dddd9cb88"]
+  },
+  {
+    "id": "4efe27490c3e4e0e887cd655bc818db0",
+    "type": "simple",
+    "name": "bk_fire",
+    "displayName": "Boss Key Fire",
+    "size": [20, 20],
+    "icons": ["bk_fire_bw_32x32.png", "bk_fire_32x32.png"],
+    "items": [null, "d588b4fb40ed4e7faf65bca60d1cb37c"]
+  },
+  {
+    "id": "feb7580708c4419da14f42f81de8f6dd",
+    "type": "simple",
+    "name": "bk_water",
+    "displayName": "Boss Key Water",
+    "size": [20, 20],
+    "icons": ["bk_water_bw_32x32.png", "bk_water_32x32.png"],
+    "items": [null, "b4f7b0ee98ac47eaa0b13318444ba072"]
+  },
+  {
+    "id": "78387b1c5cbd463b97dadee3955a14d0",
+    "type": "simple",
+    "name": "bk_shadow",
+    "displayName": "Boss Key Shadow",
+    "size": [20, 20],
+    "icons": ["bk_shadow_bw_32x32.png", "bk_shadow_32x32.png"],
+    "items": [null, "97b028f54e82473a9960f608a5789f18"]
+  },
+  {
+    "id": "38e3b507c53f4aba8f0157bb27bbe685",
+    "type": "simple",
+    "name": "bk_spirit",
+    "displayName": "Boss Key Spirit",
+    "size": [20, 20],
+    "icons": ["bk_spirit_bw_32x32.png", "bk_spirit_32x32.png"],
+    "items": [null, "a99ecea2404a4337b829e88e0907d13f"]
+  },
+  {
+    "id": "ab70ca77f5f2407aa50955b8a47e7339",
+    "type": "simple",
+    "name": "bk_ganons",
+    "displayName": "Boss Key Ganons",
+    "size": [20, 20],
+    "icons": ["bk_ganons_bw_32x32.png", "bk_ganons_32x32.png"],
+    "items": [null, "adbe6c6ffbd34a0f8eb3de9611edb8be"]
   },
   {
     "id": "4c1b24c3e3954038b14f4daa3656e0b5",

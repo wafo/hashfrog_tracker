@@ -6,8 +6,8 @@ import { useLayout } from "../context/layoutContext";
 import { readFileAsText } from "../utils/utils";
 
 // Layouts
+import hashfrogJSON from "../layouts/hashfrog.json";
 import linsoJSON from "../layouts/linso.json";
-import standardJSON from "../layouts/standard.json";
 
 const LayoutSelector = () => {
   const [key, setKey] = useState(Math.random());
@@ -38,14 +38,14 @@ const LayoutSelector = () => {
   const downloadLayout = selected => {
     let layout = null;
     switch (selected) {
-      case "standard":
-        layout = standardJSON;
+      case "hashfrog":
+        layout = hashfrogJSON;
         break;
       case "linso":
         layout = linsoJSON;
         break;
       default:
-        layout = standardJSON;
+        layout = hashfrogJSON;
         break;
     }
     const jsonBlob = new Blob([JSON.stringify(layout)], { type: "text/plain" });
@@ -80,8 +80,8 @@ const LayoutSelector = () => {
       <h5>Layout Presets</h5>
       <ul className="list-unstyled list-horizontal">
         <li>
-          <button type="button" className="btn btn-link btm-sm p-0" onClick={() => downloadLayout("standard")}>
-            Standard
+          <button type="button" className="btn btn-link btm-sm p-0" onClick={() => downloadLayout("hashfrog")}>
+            HashFrog
           </button>
         </li>
         <li className="list-divider">|</li>

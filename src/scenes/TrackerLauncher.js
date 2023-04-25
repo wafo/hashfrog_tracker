@@ -186,8 +186,7 @@ const TrackerLauncher = () => {
             <li>
               The logic assumes: Access to both ages, vanilla spawns and that the player can let the time of day pass.
             </li>
-            <li>Closed Deku and Closed Door of Time do not work for the reasons above.</li>
-            <li>MQ does not work, as the tracker has no option to specify that a dungeon is MQ.</li>
+            <li>Closed Forest and Closed Door of Time do not work for the reasons above.</li>
             <li>Trading sequences are not fully implemented.</li>
             <li>
               The logic assumes that the initial value for a counter is zero. Click the counter to update it if not.

@@ -1,7 +1,10 @@
 import { parse } from "acorn";
 import _ from "lodash";
+import memoize from "memoizee";
 
 import Locations from "./locations";
+
+import DUNGEONS from "../data/dungeons.json";
 
 class LogicHelper {
   static async initialize(logicHelpersFile, settings) {
@@ -58,18 +61,25 @@ class LogicHelper {
       ]);
     }
 
+    // Add all dungeons to MQ-dungeons-specific list if all dungeons are set to MQ
+    if (_.isEqual(this.settings.mq_dungeons_mode, "mq")) {
+      _.set(this.settings, "mq_dungeons_specific", DUNGEONS);
+    }
+
+    // Ignore initial dungeon shortcuts choices when option is set to random
+    if (_.isEqual(this.settings.dungeon_shortcuts_choice, "random")) {
+      _.set(this.settings, "dungeon_shortcuts", []);
+    }
+
     this.items = {};
     this.regions = { child: [], adult: [] };
+
+    this.memoizedFunctions = this._memoizeFunctions();
 
     return this.settings;
   }
 
   static updateItems(newItems) {
-    // don't update if items haven't changed
-    if (_.isEqual(this.items, newItems)) {
-      return;
-    }
-
     this.items = _.cloneDeep(newItems);
 
     this.regions = { child: [], adult: [] };
@@ -108,8 +118,8 @@ class LogicHelper {
   }
 
   static isLocationAvailable(locationName, age) {
-    const parentRegion = Locations.locations[locationName].parentRegion;
-    const locationRule = Locations.locations[locationName].rule;
+    const parentRegion = Locations.activeLocations[locationName].parentRegion;
+    const locationRule = Locations.activeLocations[locationName].rule;
 
     if (_.isUndefined(age)) {
       return this.isLocationAvailable(locationName, "child") || this.isLocationAvailable(locationName, "adult");
@@ -119,7 +129,40 @@ class LogicHelper {
   }
 
   static countSkullsInLogic() {
-    return _.size(_.filter(Locations.skullsLocations, locationName => LogicHelper.isLocationAvailable(locationName)));
+    return _.size(
+      _.filter(Locations.activeSkullsLocations, locationName => LogicHelper.isLocationAvailable(locationName)),
+    );
+  }
+
+  static _memoizeFunctions() {
+    return _.map(
+      [
+        "isLocationAvailable",
+        "_isRegionAccessible",
+        "_evalNode",
+        "_evalBinaryExpression",
+        "_evalCallExpression",
+        "_evalIdentifier",
+        "_evalLiteral",
+        "_evalLogicalExpression",
+        "_evalMemberExpression",
+        "_evalSequenceExpression",
+        "_evalUnaryExpression",
+      ],
+      funcName => {
+        const memoizedFunction = memoize(LogicHelper[funcName]);
+        _.set(LogicHelper, funcName, memoizedFunction);
+        return memoizedFunction;
+      },
+    );
+  }
+
+  static _invalidateMemoizedFunctions() {
+    _.forEach(this.memoizedFunctions, memoizedFunction => {
+      if (memoizedFunction.clear) {
+        memoizedFunction.clear();
+      }
+    });
   }
 
   static _initRenamedAttributes() {
@@ -166,9 +209,11 @@ class LogicHelper {
   }
 
   static _recalculateAccessibleRegions(rootRegion, age) {
+    this._invalidateMemoizedFunctions();
+
     let regionsToCheck = [];
 
-    _.forEach(Locations.exits[rootRegion], (exitRule, exitName) => {
+    _.forEach(Locations.activeExits[rootRegion], (exitRule, exitName) => {
       if (!_.includes(this.regions[age], exitName)) {
         if (this._evalNode(exitRule, age)) {
           this.regions[age] = _.union(this.regions[age], [exitName]);
@@ -185,9 +230,9 @@ class LogicHelper {
   static _isRegionAccessible(regionName, age) {
     switch (age) {
       case "child":
-        return _.includes(this.regions["child"], regionName);
+        return _.includes(this.regions.child, regionName);
       case "adult":
-        return _.includes(this.regions["adult"], regionName);
+        return _.includes(this.regions.adult, regionName);
       default:
         throw Error(`Invalid age ${age}`);
     }
@@ -277,7 +322,7 @@ class LogicHelper {
         return this._evalNode(node.arguments[0], age);
       // Hardcoded (TODO: don't hardcode this)
       case "region_has_shortcuts":
-        return false;
+        return this._regionHasShortcuts(node.arguments[0].value);
       default:
         throw Error(`Unknown CallExpression: ${node.callee.name}`);
     }
@@ -295,8 +340,6 @@ class LogicHelper {
         return this._canAccessDrop("Big Poe");
       case "Bombchu_Drop":
         return this.isLocationAvailable("Market Bombchu Bowling Bombchus");
-      case "Bottle_with_Big_Poe":
-        return false; // TODO: not on tracker yet
       case "Deliver_Letter":
         return this.isLocationAvailable("Deliver Rutos Letter");
       case "Time_Travel":
@@ -309,7 +352,18 @@ class LogicHelper {
     }
 
     if (_.includes(_.keys(this.items), name)) {
-      return this.items[name] > 0;
+      if (_.startsWith(name, "Boss_Key_")) {
+        // extra check for boss keysy modes
+        if (_.isEqual(name, "Boss_Key_Ganons_Castle")) {
+          // if Ganon's Boss Keys mode is Keysy, ignore Ganon's Boss Key requirements
+          return this.settings.shuffle_ganon_bosskey, "remove" || this.items[name] > 0;
+        } else {
+          // if Boss Keys mode is Keysy, ignore Boss Key requirements
+          return _.isEqual(this.settings.shuffle_bosskeys, "remove") || this.items[name] > 0;
+        }
+      } else {
+        return this.items[name] > 0;
+      }
     }
     if (_.includes(_.keys(this.renamedAttributes), name)) {
       return this.renamedAttributes[name];
@@ -321,7 +375,7 @@ class LogicHelper {
       return this._evalRuleAlias(name);
     }
     const escapedIdentifier = _.replace(name, /_/g, " ");
-    if (_.includes(_.keys(Locations.events), escapedIdentifier)) {
+    if (_.includes(_.keys(Locations.activeEvents), escapedIdentifier)) {
       return this._evalEvent(escapedIdentifier);
     }
 
@@ -340,9 +394,9 @@ class LogicHelper {
   }
 
   static _evalLiteral(value) {
-    if (_.includes(_.keys(Locations.dropLocations), value)) {
+    if (_.includes(_.keys(Locations.activeDropLocations), value)) {
       return this._canAccessDrop(value);
-    } else if (_.includes(_.keys(Locations.events), value)) {
+    } else if (_.includes(_.keys(Locations.activeEvents), value)) {
       return this._evalEvent(value);
     }
 
@@ -373,6 +427,16 @@ class LogicHelper {
     const itemName = node.expressions[0].name;
     let itemCount = node.expressions[1].value;
 
+    // if Small Keys mode is Keysy, ignore small key requirements
+    if (_.isEqual(this.settings.shuffle_smallkeys, "remove") && _.startsWith(itemName, "Small_Key_")) {
+      return true;
+    }
+
+    // case for Bottle_with_Big_Poe sequence expression
+    if (_.isEqual(itemName, "Bottle_with_Big_Poe")) {
+      itemCount = this.big_poe_count_random ? 10 : this.settings.big_poe_count;
+    }
+
     // account for removed locked door in Fire Temple when keysanity is off
     if (!this.renamedAttributes.keysanity && _.isEqual(itemName, "Small_Key_Fire_Temple")) {
       itemCount -= 1;
@@ -400,7 +464,7 @@ class LogicHelper {
   }
 
   static _canAccessDrop(dropName) {
-    return _.some(Locations.dropLocations[dropName], locationData => {
+    return _.some(Locations.activeDropLocations[dropName], locationData => {
       const parentRegion = locationData.parentRegion;
       const rule = locationData.rule;
 
@@ -456,9 +520,12 @@ class LogicHelper {
     }
   }
 
-  static _canPlay(songName) {
+  static _canPlay(songName, age) {
     if (_.isEqual(songName, "Scarecrow_Song")) {
-      return this.items.Ocarina > 0 && (this.settings.free_scarecrow || this.isLocationAvailable("Pierre"));
+      return (
+        this.items.Ocarina > 0 &&
+        (this.settings.free_scarecrow || (_.isEqual(age, "adult") && this._evalEvent("Bonooru")))
+      );
     } else {
       return this.items.Ocarina > 0 && this.items[songName] > 0;
     }
@@ -518,7 +585,7 @@ class LogicHelper {
       return false;
     }
 
-    return _.some(Locations.events[eventName], eventData => {
+    return _.some(Locations.activeEvents[eventName], eventData => {
       const parentRegion = eventData.parentRegion;
       const rule = eventData.rule;
 
@@ -611,6 +678,14 @@ class LogicHelper {
 
     const stonesCount = this.settings[count];
     return _.sum([this.items.Kokiri_Emerald, this.items.Goron_Ruby, this.items.Zora_Sapphire]) >= stonesCount;
+  }
+
+  static _regionHasShortcuts(regionName) {
+    if (!_.includes(_.keys(Locations.regionMap), regionName)) {
+      throw Error(`Bad argument to region_has_shortcuts: ${regionName}`);
+    }
+
+    return _.includes(this.settings.dungeon_shortcuts, Locations.regionMap[regionName]);
   }
 }
 

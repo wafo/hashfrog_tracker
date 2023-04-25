@@ -1,5 +1,6 @@
 import { Fragment, useMemo } from "react";
 
+import LayoutID from "../utils/layout-id";
 import { splitIntoChunk } from "../utils/utils";
 import Element from "./Element";
 
@@ -14,7 +15,7 @@ const ElementsTable = props => {
   const rows = useMemo(() => {
     const itemComponents = elements.map((element, index) => (
       <td key={`${index}-${element.id}`} style={{ padding }}>
-        <Element {...element} size={elementsSize || element.size} />
+        <Element {...element} id={LayoutID.getID()} size={elementsSize || element.size} />
       </td>
     ));
 

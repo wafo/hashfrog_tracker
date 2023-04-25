@@ -14,9 +14,10 @@ const TrackerChecks = () => {
   const { updateItemsFromLogic } = useItems();
 
   const initializeLogic = useCallback(async () => {
-    const { logicHelpersFile, dungeonFiles, overworldFile } = await LogicLoader.loadLogicFiles();
+    const { logicHelpersFile, dungeonFiles, dungeonMQFiles, bossesFile, overworldFile } =
+      await LogicLoader.loadLogicFiles();
 
-    Locations.initialize(dungeonFiles, overworldFile);
+    Locations.initialize(dungeonFiles, dungeonMQFiles, bossesFile, overworldFile);
 
     // Getting settings from hashfrog backend instead of parsing them here.
     // Backend gets them from the generator endpoint and caches them.

@@ -4,6 +4,7 @@ import { createContext, useContext, useMemo, useReducer } from "react";
 import DEFAULT_ITEMS from "../data/default-items.json";
 import ITEMS_JSON from "../data/items.json";
 import SettingStringsJSON from "../data/setting-strings.json";
+import Locations from "../utils/locations";
 import LogicHelper from "../utils/logic-helper";
 
 const GENERATOR_VERSION = process.env.REACT_APP_GENERATOR_VERSION;
@@ -14,8 +15,11 @@ function parseItems(items_list, counters) {
   const items = _.cloneDeep(DEFAULT_ITEMS);
 
   // Parse items
-  _.forEach(items_list, item => {
+  _.forEach(_.values(items_list), item => {
     switch (item) {
+      case "c50e8543ab0c4bdaa8a23e6a80ae6d1c":
+        // ignore Master Sword
+        break;
       case "bc6099ef9091404e9b45aea12d4b6b65":
         items.Boomerang = 1;
         break;
@@ -70,13 +74,23 @@ function parseItems(items_list, counters) {
       case "c562c7418d7141ffb70101509a52873e":
         items.Zora_Tunic = 1;
         break;
+      case "d9233a5054af4491924115b47e5730e4":
+        items.Goron_Tunic = 1;
+        items.Zora_Tunic = 1;
+        break;
       case "bad09131f88a440093087e11efc1c8b0":
         items.Iron_Boots = 1;
         break;
       case "33f4bc4c632846bea5fb88573f2f95b2":
         items.Hover_Boots = 1;
         break;
-      // Stone_of_Agony: 0,
+      case "2c5c72812a6b49c68bb49773e6d3dd98":
+        items.Iron_Boots = 1;
+        items.Hover_Boots = 1;
+        break;
+      case "fd2404a34fb142eb9be49cee8f4d3a38":
+        items.Stone_of_Agony = 1;
+        break;
       case "7373656ec94f430f8fbf971e53930949":
         items.Gerudo_Membership_Card = 1;
         break;
@@ -105,10 +119,13 @@ function parseItems(items_list, counters) {
         items.Dins_Fire = 1;
         break;
       case "aa4bc05fa49d4492bb8df02617ad1da4":
-        // Nayrus_Love: 0,
         items.Nayrus_Love = 1;
         break;
       case "0c3e8979165042f686357b4bcbaab8ec":
+        items.Farores_Wind = 1;
+        break;
+      case "76d769ba496e49ebb39fbfd836ce1db6":
+        items.Dins_Fire = 1;
         items.Farores_Wind = 1;
         break;
       case "29e0384c520a4e7dad505b48a2156097":
@@ -171,12 +188,27 @@ function parseItems(items_list, counters) {
       case "6240defb8f6044d984476dc0b0467f74":
         items.Ocarina = 1;
         break;
-      // Boss_Key_Forest_Temple: 1,
-      // Boss_Key_Fire_Temple: 1,
-      // Boss_Key_Water_Temple: 1,
-      // Boss_Key_Spirit_Temple: 1,
-      // Boss_Key_Shadow_Temple: 1,
-      // Boss_Key_Ganons_Castle: 1,
+      case "28bfbeeeaaf54dc99e66244bd8ba4aa3":
+        items.Bottle_with_Big_Poe = 1;
+        break;
+      case "7abace900d644493be25c03dddd9cb88":
+        items.Boss_Key_Forest_Temple = 1;
+        break;
+      case "d588b4fb40ed4e7faf65bca60d1cb37c":
+        items.Boss_Key_Fire_Temple = 1;
+        break;
+      case "b4f7b0ee98ac47eaa0b13318444ba072":
+        items.Boss_Key_Water_Temple = 1;
+        break;
+      case "a99ecea2404a4337b829e88e0907d13f":
+        items.Boss_Key_Spirit_Temple = 1;
+        break;
+      case "97b028f54e82473a9960f608a5789f18":
+        items.Boss_Key_Shadow_Temple = 1;
+        break;
+      case "adbe6c6ffbd34a0f8eb3de9611edb8be":
+        items.Boss_Key_Ganons_Castle = 1;
+        break;
       // Double_Defense: 0,
       // Zeldas_Letter: 0,
 
@@ -245,8 +277,8 @@ function parseItems(items_list, counters) {
         items.Light_Medallion = 1;
         break;
 
-      // default:
-      //   console.log(item);
+      default:
+        console.warn(`Did not set unknown item: ${item}`);
     }
   });
 
@@ -255,6 +287,10 @@ function parseItems(items_list, counters) {
     switch (counter) {
       case "gold_skulls":
         items.Gold_Skulltula_Token = value;
+        break;
+
+      case "bottle_counter":
+        items.Bottle = value;
         break;
 
       case "keys_forest":
@@ -278,11 +314,15 @@ function parseItems(items_list, counters) {
       case "keys_gtg":
         items.Small_Key_Gerudo_Training_Ground = value;
         break;
-      // Small_Key_Thieves_Hideout: 4,
-      // Small_Key_Ganons_Castle: 2,
+      case "keys_th":
+        items.Small_Key_Thieves_Hideout = value;
+        break;
+      case "keys_ganons":
+        items.Small_Key_Ganons_Castle = value;
+        break;
 
-      // default:
-      //   console.log(counter, value);
+      default:
+        console.warn(`Did not set unknown counter with value ${value}: ${counter}`);
     }
   });
 
@@ -290,17 +330,19 @@ function parseItems(items_list, counters) {
 }
 
 function validateLocations(locations, parsedItems) {
-  locations = _.cloneDeep(locations);
-  if (!_.isEmpty(locations)) {
+  const clonedLocations = _.cloneDeep(locations);
+
+  if (!_.isEmpty(clonedLocations)) {
     LogicHelper.updateItems(parsedItems);
-    _.forEach(_.values(locations), regionLocations => {
+
+    _.forEach(_.values(clonedLocations), regionLocations => {
       _.forEach(regionLocations, (locationData, locationName) => {
-        const isAvailable = LogicHelper.isLocationAvailable(locationName);
-        _.set(locationData, "isAvailable", isAvailable);
+        _.set(locationData, "isAvailable", LogicHelper.isLocationAvailable(locationName));
       });
     });
   }
-  return locations;
+
+  return clonedLocations;
 }
 
 function getSettingsStringCache() {
@@ -335,11 +377,17 @@ function reducer(state, action) {
     case "LOCATION_ADD": {
       const { locationName, regionName } = payload;
 
-      const isAvailable = LogicHelper.isLocationAvailable(locationName);
-      const isChecked = false;
-
+      // Adds location to location list
       const locations = _.cloneDeep(state.locations);
-      _.set(locations, [regionName, locationName], { isAvailable: isAvailable, isChecked: isChecked });
+
+      if (_.isEmpty(locationName)) {
+        _.set(locations, regionName, {});
+      } else {
+        _.set(locations, [regionName, locationName], {
+          isAvailable: LogicHelper.isLocationAvailable(locationName),
+          isChecked: false,
+        });
+      }
 
       return {
         ...state,
@@ -349,38 +397,85 @@ function reducer(state, action) {
     case "LOCATION_MARK": {
       const { locationName, regionName } = payload;
 
-      // Finding check
-      if (
-        !_.includes(_.keys(state.locations), regionName) ||
-        !_.includes(_.keys(state.locations[regionName]), locationName)
-      ) {
+      // Toggles location in location list
+      if (!_.includes(_.keys(state.locations), regionName)) {
+        console.warn(`Unable to mark location "${locationName}": "${regionName}" is not in state.locations`);
         return state;
+      } else if (!_.includes(_.keys(state.locations[regionName]), locationName)) {
+        console.warn(`Unable to mark location "${locationName}": location is not in state.locations["${regionName}"]`);
+        return state;
+      } else {
+        const locations = _.cloneDeep(state.locations);
+        const isChecked = locations[regionName][locationName].isChecked;
+        _.set(locations, [regionName, locationName, "isChecked"], !isChecked);
+
+        return {
+          ...state,
+          locations,
+        };
       }
+    }
+    case "MQ_TOGGLE": {
+      // payload = regionName
 
-      // Manipulating check
-      const location = state.locations[regionName][locationName];
-      location.isChecked = !location.isChecked;
+      // Reset Locations to use new set of MQ dungeons for logic
+      const dungeonsMQ = LogicHelper.settings["mq_dungeons_specific"];
+      if (!_.includes(dungeonsMQ, payload)) {
+        _.set(LogicHelper.settings, "mq_dungeons_specific", _.union(dungeonsMQ, [payload]));
+      } else {
+        _.remove(LogicHelper.settings.mq_dungeons_specific, dungeon => _.isEqual(dungeon, payload));
+      }
+      Locations.resetActiveLocations();
 
-      // Manipulating state
+      // Modify toggled dungeon to use MQ/non-MQ locations
       const locations = _.cloneDeep(state.locations);
-      _.set(locations, [regionName, locationName], location);
+      const locationKey = _.includes(LogicHelper.settings.mq_dungeons_specific, payload) ? "dungeon_mq" : "dungeon";
+      _.set(locations, payload, {});
+      _.forEach(Locations.locations[locationKey][payload], (locationData, locationName) => {
+        if (Locations.isProgressLocation(locationData)) {
+          _.set(locations, [payload, locationName], {
+            isAvailable: LogicHelper.isLocationAvailable(locationName),
+            isChecked: false,
+          });
+        }
+      });
+
+      // Validating checks based on items collected
+      const validatedLocations = validateLocations(locations, parseItems(state.items_list, state.counters));
 
       return {
         ...state,
-        locations,
+        locations: validatedLocations,
+      };
+    }
+    case "SHORTCUT_TOGGLE": {
+      // payload = regionName
+
+      // Modify toggled dungeon to use/not use dungeon boss shortcuts
+      if (!_.includes(LogicHelper.settings.dungeon_shortcuts, payload)) {
+        _.set(LogicHelper.settings, "dungeon_shortcuts", _.union(LogicHelper.settings.dungeon_shortcuts, [payload]));
+      } else {
+        _.remove(LogicHelper.settings.dungeon_shortcuts, dungeon => _.isEqual(dungeon, payload));
+      }
+
+      // Revalidate checks based on items collected
+      const validatedLocations = validateLocations(state.locations, parseItems(state.items_list, state.counters));
+
+      return {
+        ...state,
+        locations: validatedLocations,
       };
     }
     case "REGION_TOGGLE": {
       // payload = regionName
+
+      // Toggles all locations in the region
+      // If at least one location is checked, then checks all locations. Otherwise, unchecks all locations.
       const locations = _.cloneDeep(state.locations);
-      const setTo = Object.entries(locations[payload]).every(([, value]) => value.isChecked);
-      locations[payload] = Object.entries(locations[payload]).reduce((accumulator, [key, value]) => {
-        accumulator[key] = {
-          ...value,
-          isChecked: !setTo,
-        };
-        return accumulator;
-      }, {});
+      const setTo = _.every(_.values(locations[payload]), value => value.isChecked);
+      _.forEach(_.values(locations[payload]), locationData => {
+        _.set(locationData, "isChecked", !setTo);
+      });
 
       return {
         ...state,
@@ -391,16 +486,23 @@ function reducer(state, action) {
       const settings = payload;
       const items = [...settings.starting_equipment, ...settings.starting_items, ...settings.starting_songs];
 
-      const items_list = items.map(item => {
+      const starting_items = items.map(item => {
         return ITEMS_JSON[item];
       });
       if (settings.start_with_consumables) {
-        items_list.push("34b2ad3657e94b75b281cec30e617f37");
-        items_list.push("73a0f3f5688745a8bb4a0973d9858960");
+        starting_items.push("34b2ad3657e94b75b281cec30e617f37");
+        starting_items.push("73a0f3f5688745a8bb4a0973d9858960");
       }
       if (settings.open_door_of_time && settings.open_forest !== "closed") {
-        items_list.push("c50e8543ab0c4bdaa8a23e6a80ae6d1c");
+        starting_items.push("c50e8543ab0c4bdaa8a23e6a80ae6d1c");
       }
+
+      // `starting_items` will be properly set through `useElement` hook
+      const items_list = {};
+      for (let i = 0; i < starting_items.length; i++) {
+        _.set(items_list, i, starting_items[i]);
+      }
+
       const parsedItems = parseItems(items_list);
 
       // Validating checks based on items collected
@@ -408,9 +510,10 @@ function reducer(state, action) {
 
       return {
         ...state,
-        items_list,
-        items: parsedItems,
         locations,
+        items: parsedItems,
+        starting_items,
+        items_list: {},
       };
     }
     case "COUNTER_MARK": {
@@ -419,7 +522,7 @@ function reducer(state, action) {
       // Update changed counter value
       const counters = _.set(_.cloneDeep(state.counters), item, value);
 
-      // Preping collecting items with counters
+      // Prepping collecting items with counters
       const parsedItems = parseItems(state.items_list, counters);
 
       // Validating checks based on items collected
@@ -427,17 +530,22 @@ function reducer(state, action) {
 
       return {
         ...state,
-        counters,
-        items: parsedItems,
         locations,
+        items: parsedItems,
+        counters,
       };
     }
     case "ITEM_MARK": {
-      const { items, item } = payload;
+      const { item, parentID } = payload;
 
-      // Preping collecting items
-      const items_list = [...state.items_list.filter(x => !items.includes(x))];
-      if (item) items_list.push(item);
+      // Prepping collecting items
+      const items_list = _.cloneDeep(state.items_list);
+      if (_.isNull(item)) {
+        delete items_list[parentID];
+      } else {
+        _.set(items_list, parentID, item);
+      }
+
       const parsedItems = parseItems(items_list, state.counters);
 
       // Validating checks based on items collected
@@ -445,9 +553,9 @@ function reducer(state, action) {
 
       return {
         ...state,
-        items_list,
-        items: parsedItems,
         locations,
+        items: parsedItems,
+        items_list,
       };
     }
     case "STRING_SET": {
@@ -474,7 +582,9 @@ function TrackerProvider(props) {
     locations: {},
     items: _.cloneDeep(DEFAULT_ITEMS),
     counters: {},
-    items_list: [],
+    starting_items: [],
+    items_list: {},
+    layoutElements: [],
     settings_string: getSettingsStringCache(),
     generator_version: getGeneratorVersionCache(),
   };
@@ -498,6 +608,18 @@ const useChecks = () => {
   };
 };
 
+const useElement = (id, startingItem) => {
+  const { state } = useTracker();
+
+  if (!_.includes(state.layoutElements, id)) {
+    state.layoutElements.push(id);
+
+    if (!_.isNull(startingItem)) {
+      _.set(state.items_list, id, startingItem);
+    }
+  }
+};
+
 const useLocation = () => {
   const { dispatch } = useTracker();
 
@@ -507,6 +629,8 @@ const useLocation = () => {
         dispatch({ type: "LOCATION_ADD", payload: { locationName, regionName, items } }),
       markLocation: (locationName, regionName) =>
         dispatch({ type: "LOCATION_MARK", payload: { locationName, regionName } }),
+      toggleMQ: regionName => dispatch({ type: "MQ_TOGGLE", payload: regionName }),
+      toggleShortcut: regionName => dispatch({ type: "SHORTCUT_TOGGLE", payload: regionName }),
       toggleRegion: regionName => dispatch({ type: "REGION_TOGGLE", payload: regionName }),
     }),
     [dispatch],
@@ -521,13 +645,13 @@ const useItems = items => {
   const actions = useMemo(
     () => ({
       markCounter: (value, item) => dispatch({ type: "COUNTER_MARK", payload: { value, item } }),
-      markItem: (items, item) => dispatch({ type: "ITEM_MARK", payload: { items, item } }),
+      markItem: (item, parentID) => dispatch({ type: "ITEM_MARK", payload: { item, parentID } }),
       updateItemsFromLogic: settings => dispatch({ type: "ITEMS_UPDATE_FROM_LOGIC", payload: settings }),
     }),
     [dispatch],
   );
 
-  // IMPORTANT: Intentionally ignoring state.items_list on the dependency array.
+  // IMPORTANT: Intentionally ignoring state.starting_items on the dependency array.
   const startingIndex = useMemo(() => {
     // Loops through the items of the element,
     // searching for a match against the items in the tracker context.
@@ -535,7 +659,7 @@ const useItems = items => {
     let itemIndex = 0;
     if (!items || !items.length) return 0;
     for (let i = 0; i < items.length; i++) {
-      if (state.items_list.includes(items[i])) {
+      if (_.includes(state.starting_items, items[i])) {
         itemIndex = i;
         break;
       }
@@ -544,7 +668,20 @@ const useItems = items => {
     // eslint-disable-next-line
   }, [items]);
 
-  return { ...actions, startingIndex };
+  const startingItem = useMemo(() => {
+    let itemID = null;
+    if (!items || !items.length) return null;
+    for (let i = 0; i < items.length; i++) {
+      if (_.includes(state.starting_items, items[i])) {
+        itemID = items[i];
+        break;
+      }
+    }
+    return itemID;
+    // eslint-disable-next-line
+  }, [items]);
+
+  return { ...actions, startingIndex, startingItem };
 };
 
 const useSettingsString = () => {
@@ -568,6 +705,7 @@ export {
   TrackerProvider,
   useTracker,
   useChecks,
+  useElement,
   useLocation,
   useItems,
   useSettingsString,
