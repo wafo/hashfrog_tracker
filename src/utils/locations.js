@@ -149,6 +149,11 @@ class Locations {
       return false;
     }
 
+    // Bombchu Bowling 3rd and 4th prizes (must be checked before Bombchu vanilla items!)
+    else if (_.includes(["Market Bombchu Bowling Bombchus", "Market Bombchu Bowling Bomb"], location.locationName)) {
+      return false;
+    }
+
     // Bombchus
     else if (_.includes(["Bombchus", "Bombchus (5)", "Bombchus (10)", "Bombchus (20)"], location.vanillaItem)) {
       return (
