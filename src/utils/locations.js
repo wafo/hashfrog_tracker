@@ -83,10 +83,7 @@ class Locations {
 
     // Song from Impa
     else if (_.isEqual(location.locationName, "Song from Impa")) {
-      return (
-        _.includes(LogicHelper.settings.starting_items, "Zeldas Letter") &&
-        !_.includes(LogicHelper.settings.shuffle_child_trade, "Zeldas Letter")
-      );
+      return !_.isEqual(LogicHelper.settings.shuffle_child_trade, "skip_child_zelda");
     }
 
     // Disabled Locations
