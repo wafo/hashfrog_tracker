@@ -212,7 +212,9 @@ function parseItems(items_list, counters, unchanged_starting_items) {
         items.Boss_Key_Ganons_Castle = 1;
         break;
       // Double_Defense: 0,
-      // Zeldas_Letter: 0,
+      case "c085e07008924d9383453da94570846f":
+        items.Zeldas_Letter = 1;
+        break;
 
       case "ce1f2799ff1a433ba0bb40fee47e49a1":
         items.Minuet_of_Forest = 1;
@@ -491,6 +493,7 @@ function reducer(state, action) {
       const starting_items = items.map(item => {
         return ITEMS_JSON[item];
       });
+
       if (settings.start_with_consumables) {
         starting_items.push("34b2ad3657e94b75b281cec30e617f37");
         starting_items.push("73a0f3f5688745a8bb4a0973d9858960");

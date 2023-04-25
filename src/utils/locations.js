@@ -1,9 +1,11 @@
 import _ from "lodash";
 
+import CHILD_TRADE_ITEMS from "../data/child-trade-items.json";
 import DUNGEONS from "../data/dungeons.json";
 import HINT_REGIONS_SHORT_NAMES from "../data/hint-regions-short-names.json";
 import HINT_REGIONS from "../data/hint-regions.json";
 import LOCATION_TABLE from "../data/location-table.json";
+import TRADE_ITEMS from "../data/trade-items.json";
 
 import LogicHelper from "./logic-helper";
 // import { updateHintRegionsJSON } from "./utils";
@@ -70,7 +72,7 @@ class Locations {
   static isAlwaysPlacedLocation(location) {
     return (
       _.includes(
-        ["Zeldas Letter", "Triforce", "Scarecrow Song", "Deliver Letter", "Time Travel", "Bombchu Drop"],
+        ["Triforce", "Scarecrow Song", "Deliver Letter", "Time Travel", "Bombchu Drop"],
         location.vanillaItem,
       ) || _.isEqual(location.type, "Drop")
     );
@@ -83,7 +85,7 @@ class Locations {
 
     // Song from Impa
     else if (_.isEqual(location.locationName, "Song from Impa")) {
-      return !_.isEqual(LogicHelper.settings.shuffle_child_trade, "skip_child_zelda");
+      return !LogicHelper.renamedAttributes.skip_child_zelda;
     }
 
     // Disabled Locations
@@ -132,15 +134,6 @@ class Locations {
       return LogicHelper.settings.shuffle_kokiri_sword;
     }
 
-    // Weird Egg
-    else if (_.isEqual(location.vanillaItem, "Weird Egg")) {
-      if (_.isEqual(LogicHelper.settings.shuffle_child_trade, "skip_child_zelda")) {
-        return false;
-      } else {
-        return !_.isEqual(LogicHelper.settings.shuffle_child_trade, "vanilla");
-      }
-    }
-
     // Ocarinas
     else if (_.isEqual(location.vanillaItem, "Ocarina")) {
       return LogicHelper.settings.shuffle_ocarinas;
@@ -151,12 +144,22 @@ class Locations {
       return LogicHelper.settings.shuffle_medigoron_carpet_salesman;
     }
 
+    // Bombchu Bowling 3rd and 4th prizes (must be checked before Bombchu vanilla items!)
+    else if (_.includes(["Market Bombchu Bowling Bombchus", "Market Bombchu Bowling Bomb"], location.locationName)) {
+      return false;
+    }
+
     // Bombchus
     else if (_.includes(["Bombchus", "Bombchus (5)", "Bombchus (10)", "Bombchus (20)"], location.vanillaItem)) {
       return (
         !_.isEqual(location.locationName, "Wasteland Bombchu Salesman") ||
-        LogicHelper.settings.shuffle_medigoron_carpet_salesman
+        LogicHelper.settings.shuffle_expensive_merchants
       );
+    }
+
+    // Blue Potion from Granny's Potion Shop
+    else if (_.isEqual(location.vanillaItem, "Blue Potion")) {
+      return LogicHelper.settings.shuffle_expensive_merchants;
     }
 
     // Cows
@@ -177,6 +180,36 @@ class Locations {
     // Frogs Purple Rupees
     else if (_.startsWith(location.locationName, "ZR Frogs ") && _.isEqual(location.vanillaItem, "Rupees (50)")) {
       return LogicHelper.settings.shuffle_frog_song_rupees;
+    }
+
+    // Adult Trade Quest Items
+    else if (_.includes(TRADE_ITEMS, location.vanillaItem)) {
+      if (!LogicHelper.settings.adult_trade_shuffle) {
+        return _.isEqual(location.vanillaItem, "Pocket Egg") && LogicHelper.settings.adult_trade_start;
+      } else if (_.includes(LogicHelper.settings.adult_trade_start, location.vanillaItem)) {
+        return true;
+      } else {
+        return (
+          _.isEqual(location.vanillaItem, "Pocket Egg") &&
+          _.includes(LogicHelper.settings.adult_trade_start, "Pocket Cucco")
+        );
+      }
+    }
+
+    // Child Trade Quest Items
+    else if (_.includes(CHILD_TRADE_ITEMS, location.vanillaItem)) {
+      if (_.isEqual(location.vanillaItem, "Weird Egg") && LogicHelper.renamedAttributes.skip_child_zelda) {
+        return false;
+      } else if (!LogicHelper.settings.shuffle_child_trade) {
+        return false;
+      } else if (_.includes(LogicHelper.settings.shuffle_child_trade, location.vanillaItem)) {
+        return true;
+      } else {
+        return (
+          _.isEqual(location.vanillaItem, "Weird Egg") &&
+          _.includes(LogicHelper.settings.shuffle_child_trade, "Chicken")
+        );
+      }
     }
 
     // Thieves' Hideout

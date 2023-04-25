@@ -348,7 +348,7 @@
     "displayName": "Child Trade Sequence - Simple",
     "size": [25, 25],
     "icons": ["zeldas_letter_32x32.png", "keaton_mask_32x32.png", "skull_mask_32x32.png", "sold_out_32x32.png"],
-    "items": [null, null, "a54955e5bcfd4fcd921062b5e298b137", null]
+    "items": ["c085e07008924d9383453da94570846f", null, "a54955e5bcfd4fcd921062b5e298b137", null]
   },
   {
     "id": "ffeaff7af954447e8dd2b56d8b06dfce",
@@ -368,7 +368,7 @@
       "gerudo_mask_32x32.png",
       "sold_out_32x32.png"
     ],
-    "items": [null, null, "a54955e5bcfd4fcd921062b5e298b137", null, null, null, null, null, null, null]
+    "items": ["c085e07008924d9383453da94570846f", null, "a54955e5bcfd4fcd921062b5e298b137", null, null, null, null, null, null, null]
   },
   {
     "id": "3bd2660084e04e13b0de10fd84b9dd22",
