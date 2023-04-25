@@ -38,7 +38,9 @@ function parseItems(items_list, counters) {
       case "2e7752ec3fbc4c03b68c5621f853cad3":
         items.Magic_Bean = 10;
         break;
-      // Skull_Mask: 1,
+      case "a54955e5bcfd4fcd921062b5e298b137":
+        items.Skull_Mask = 1;
+        break;
       // Spooky_Mask: 0,
       // Keaton_Mask: 0,
       // Bunny_Hood: 0,
