@@ -33,6 +33,10 @@ const Welcome = () => {
           </ul>
           <h3>Changelog</h3>
           <ul>
+            <li>
+              0.6.3 - Bug fixes, performance improvements and dungeon related logic changes (boss keys are now taken
+              into account and new key designs have been added).
+            </li>
             <li>0.6.0 - Separation of release and dev logic branches.</li>
             <li>0.5.x - Logic parsing from the generator including setting string parsing and counters.</li>
             {/* <li>0.5.5 - Counters (small keys & skulls) now hooked to the logic.</li>
