@@ -11,11 +11,11 @@ const GENERATOR_VERSION = process.env.REACT_APP_GENERATOR_VERSION;
 
 const TrackerContext = createContext();
 
-function parseItems(items_list, counters) {
+function parseItems(items_list, counters, unchanged_starting_items) {
   const items = _.cloneDeep(DEFAULT_ITEMS);
 
   // Parse items
-  _.forEach(_.values(items_list), item => {
+  _.forEach(_.union(_.values(items_list), unchanged_starting_items), item => {
     switch (item) {
       case "c50e8543ab0c4bdaa8a23e6a80ae6d1c":
         // ignore Master Sword
@@ -443,7 +443,7 @@ function reducer(state, action) {
       });
 
       // Validating checks based on items collected
-      const validatedLocations = validateLocations(locations, parseItems(state.items_list, state.counters));
+      const validatedLocations = validateLocations(locations, parseItems(state.items_list, state.counters, state.unchanged_starting_items));
 
       return {
         ...state,
@@ -461,7 +461,7 @@ function reducer(state, action) {
       }
 
       // Revalidate checks based on items collected
-      const validatedLocations = validateLocations(state.locations, parseItems(state.items_list, state.counters));
+      const validatedLocations = validateLocations(state.locations, parseItems(state.items_list, state.counters, state.unchanged_starting_items));
 
       return {
         ...state,
@@ -505,7 +505,7 @@ function reducer(state, action) {
         _.set(items_list, i, starting_items[i]);
       }
 
-      const parsedItems = parseItems(items_list);
+      const parsedItems = parseItems(items_list, [], starting_items);
 
       // Validating checks based on items collected
       const locations = validateLocations(state.locations, parsedItems);
@@ -515,6 +515,7 @@ function reducer(state, action) {
         locations,
         items: parsedItems,
         starting_items,
+        unchanged_starting_items: _.cloneDeep(starting_items),
         items_list: {},
       };
     }
@@ -525,7 +526,7 @@ function reducer(state, action) {
       const counters = _.set(_.cloneDeep(state.counters), item, value);
 
       // Prepping collecting items with counters
-      const parsedItems = parseItems(state.items_list, counters);
+      const parsedItems = parseItems(state.items_list, counters, state.unchanged_starting_items);
 
       // Validating checks based on items collected
       const locations = validateLocations(state.locations, parsedItems);
@@ -548,7 +549,7 @@ function reducer(state, action) {
         _.set(items_list, parentID, item);
       }
 
-      const parsedItems = parseItems(items_list, state.counters);
+      const parsedItems = parseItems(items_list, state.counters, state.unchanged_starting_items);
 
       // Validating checks based on items collected
       const locations = validateLocations(state.locations, parsedItems);
@@ -585,6 +586,7 @@ function TrackerProvider(props) {
     items: _.cloneDeep(DEFAULT_ITEMS),
     counters: {},
     starting_items: [],
+    unchanged_starting_items: [],
     items_list: {},
     layoutElements: [],
     settings_string: getSettingsStringCache(),
@@ -611,13 +613,20 @@ const useChecks = () => {
 };
 
 const useElement = (id, startingItem) => {
-  const { state } = useTracker();
+  const {
+    state: { layoutElements, unchanged_starting_items, items_list },
+  } = useTracker();
 
-  if (!_.includes(state.layoutElements, id)) {
-    state.layoutElements.push(id);
+  if (!_.includes(layoutElements, id)) {
+    layoutElements.push(id);
 
     if (!_.isNull(startingItem)) {
-      _.set(state.items_list, id, startingItem);
+      _.set(items_list, id, startingItem);
+
+      // Note that starting item appears on the tracker layout 
+      if (_.includes(unchanged_starting_items, startingItem)) {
+        unchanged_starting_items.splice(unchanged_starting_items.indexOf(startingItem), 1);
+      }
     }
   }
 };
