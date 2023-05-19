@@ -171,6 +171,7 @@ class LogicHelper {
       ["keysanity", "remove", "any_dungeon", "overworld", "regional"],
       this.settings.shuffle_smallkeys,
     );
+    const shuffleSilverRupees = !_.isEqual(this.settings.reachable_locations, "vanilla");
     const checkBeatableOnly = !_.isEqual(this.settings.reachable_locations, "all");
     const shuffleSpecialInteriorEntrances = _.isEqual(this.settings.shuffle_interior_entrances, "all");
     const shuffleInteriorEntrances = _.includes(["simple", "all"], this.settings.shuffle_interior_entrances);
@@ -188,6 +189,8 @@ class LogicHelper {
       this.settings.spawn_positions ||
       !_.isEqual(this.settings.shuffle_bosses, "off");
 
+    const mixedPoolsBosses = false;
+
     const ensureTodAccess =
       shuffleInteriorEntrances || this.settings.shuffle_overworld_entrances || this.settings.spawn_positions;
     const disableTradeRevert =
@@ -200,12 +203,14 @@ class LogicHelper {
 
     return {
       keysanity: keysanity,
+      shuffle_silver_rupees: shuffleSilverRupees,
       check_beatable_only: checkBeatableOnly,
       shuffle_special_interior_entrances: shuffleSpecialInteriorEntrances,
       shuffle_interior_entrances: shuffleInteriorEntrances,
       shuffle_special_dungeon_entrances: shuffleSpecialDungeonEntrances,
       shuffle_dungeon_entrances: shuffleDungeonEntrances,
       entrance_shuffle: entranceShuffle,
+      mixed_pools_bosses: mixedPoolsBosses,
       ensure_tod_access: ensureTodAccess,
       disable_trade_revert: disableTradeRevert,
       skip_child_zelda: skipChildZelda,

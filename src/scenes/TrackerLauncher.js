@@ -191,6 +191,7 @@ const TrackerLauncher = () => {
             <li>
               The logic assumes that the initial value for a counter is zero. Click the counter to update it if not.
             </li>
+            <li>Tracking Silver Rupees and Treasure Chest Game Small Keys is not yet implemented.</li>
           </ul>
         </div>
       </div>

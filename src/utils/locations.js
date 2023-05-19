@@ -79,6 +79,8 @@ class Locations {
   }
 
   static isProgressLocation(location) {
+    // source: ItemPool.py get_pool_core()
+
     if (_.isEqual(location.vanillaItem, "None")) {
       return false;
     }
@@ -122,10 +124,8 @@ class Locations {
     else if (_.includes(["Scrub", "GrottoScrub"], location.type)) {
       if (_.includes(["Piece of Heart", "Deku Stick Capacity", "Deku Nut Capacity"], location.vanillaItem)) {
         return true;
-      } else if (_.isEqual(LogicHelper.settings.shuffle_scrubs, "off")) {
-        return false;
       } else {
-        return true;
+        return !_.isEqual(LogicHelper.settings.shuffle_scrubs, "off");
       }
     }
 
@@ -141,7 +141,7 @@ class Locations {
 
     // Giant's Knife
     else if (_.isEqual(location.vanillaItem, "Giants Knife")) {
-      return LogicHelper.settings.shuffle_medigoron_carpet_salesman;
+      return LogicHelper.settings.shuffle_expensive_merchants;
     }
 
     // Bombchu Bowling 3rd and 4th prizes (must be checked before Bombchu vanilla items!)
@@ -182,6 +182,11 @@ class Locations {
       return LogicHelper.settings.shuffle_frog_song_rupees;
     }
 
+    // Hyrule Loach Reward
+    else if (_.isEqual(location.locationName, "LH Loach Fishing")) {
+      return !_.isEqual(LogicHelper.settings.shuffle_loach_reward, "off");
+    }
+
     // Adult Trade Quest Items
     else if (_.includes(TRADE_ITEMS, location.vanillaItem)) {
       if (!LogicHelper.settings.adult_trade_shuffle) {
@@ -214,7 +219,29 @@ class Locations {
 
     // Thieves' Hideout
     else if (_.isEqual(location.vanillaItem, "Small Key (Thieves Hideout)")) {
-      return _.includes(["any_dungeon", "overworld", "keysanity"], LogicHelper.settings.shuffle_hideoutkeys);
+      if (
+        _.isEqual(LogicHelper.settings.gerudo_fortress, "open") ||
+        (_.isEqual(LogicHelper.settings.gerudo_fortress, "fast") &&
+          _.isEqual(location.locationName, "Hideout 1 Torch Jail Gerudo Key"))
+      ) {
+        return false;
+      } else {
+        return !_.isEqual(LogicHelper.settings.shuffle_hideoutkeys, "vanilla");
+      }
+    }
+
+    // Treasure Chest Game Key Shuffle
+    else if (
+      _.startsWith(location.locationName, "Market Treasure Chest Game ") &&
+      !_.isEqual(location.vanillaItem, "Piece of Heart (Treasure Chest Game)")
+    ) {
+      if (_.includes(["regional", "overworld", "any_dungeon", "keysanity"], LogicHelper.settings.shuffle_tcgkeys)) {
+        return true;
+      } else if (_.isEqual(LogicHelper.settings.shuffle_tcgkeys, "remove")) {
+        return true;
+      } else {
+        return false;
+      }
     }
 
     // Freestanding Rupees and Hearts
@@ -295,6 +322,15 @@ class Locations {
         if (_.isEqual(shuffleSetting, "vanilla")) {
           // show dungeon location even if small key is vanilla
           return true;
+        } else {
+          return true;
+        }
+      }
+      // Silver Rupee
+      else if (_.isEqual(location.type, "SilverRupee")) {
+        shuffleSetting = LogicHelper.settings.shuffle_silver_rupees;
+        if (_.isEqual(shuffleSetting, "vanilla")) {
+          return false;
         } else {
           return true;
         }
