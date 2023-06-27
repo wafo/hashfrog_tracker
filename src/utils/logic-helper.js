@@ -197,7 +197,7 @@ class LogicHelper {
       shuffleInteriorEntrances || this.settings.shuffle_overworld_entrances || this.settings.adult_trade_shuffle;
     const skipChildZelda =
       !_.includes(this.settings.shuffle_child_trade, "Zeldas Letter") &&
-      _.includes(this.settings.starting_items, "zeldas_letter");
+      _.includes(this.settings.starting_inventory, "zeldas_letter");
 
     const triforceGoal = this.settings.triforce_goal_per_world * this.settings.world_count;
 
@@ -398,6 +398,10 @@ class LogicHelper {
     }
     if (_.startsWith(name, "Buy_")) {
       return this._canBuy(name, age);
+    }
+    // They added some checks for buttons of ocarina notes. Not sure why, but we can default to true for now
+    if (_.startsWith(name, "Ocarina_")) {
+      return true;
     }
 
     throw Error(`Unknown identifier: ${name}`);
