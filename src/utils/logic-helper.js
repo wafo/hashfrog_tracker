@@ -333,6 +333,9 @@ class LogicHelper {
       // Hardcoded (TODO: don't hardcode this)
       case "region_has_shortcuts":
         return this._regionHasShortcuts(node.arguments[0].value);
+      case "has_all_notes_for_song":
+        // TODO: this is hardcoded for now
+        return true;
       default:
         throw Error(`Unknown CallExpression: ${node.callee.name}`);
     }
