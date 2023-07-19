@@ -928,16 +928,25 @@
     "id": "07dbe0d58da740ba8dffb1159eceb518",
     "type": "counter",
     "name": "keys_counter",
-    "displayName": "Small Keys",
+    "displayName": "Small Key",
     "size": [20, 20],
     "icons": ["key_32x32.png"],
     "countConfig": [0, 10]
   },
   {
+    "id": "2aa8461e646e41349de6d1777b3bd942",
+    "type": "counter",
+    "name": "keys_tcg",
+    "displayName": "Small Key (Treasure Chest Game)",
+    "size": [20, 20],
+    "icons": ["key_tcg_32x32.png"],
+    "countConfig": [0, 6]
+  },
+  {
     "id": "34fb4c398a1e43ed99a40a6351ceed8b",
     "type": "counter",
     "name": "keys_forest",
-    "displayName": "Small Keys Forest",
+    "displayName": "Small Key (Forest Temple)",
     "size": [20, 20],
     "icons": ["key_forest_32x32.png"],
     "countConfig": [0, 5]
@@ -946,7 +955,7 @@
     "id": "e84c0569d7e546349565994885ca17c1",
     "type": "counter",
     "name": "keys_fire",
-    "displayName": "Small Keys Fire",
+    "displayName": "Small Key (Fire Temple)",
     "size": [20, 20],
     "icons": ["key_fire_32x32.png"],
     "countConfig": [0, 8]
@@ -955,7 +964,7 @@
     "id": "113c8c69a8d3410288eecc3efdcba9ac",
     "type": "counter",
     "name": "keys_water",
-    "displayName": "Small Keys Water",
+    "displayName": "Small Key (Water Temple)",
     "size": [20, 20],
     "icons": ["key_water_32x32.png"],
     "countConfig": [0, 6]
@@ -964,7 +973,7 @@
     "id": "b1682f98da9547ec91364bec23522dbd",
     "type": "counter",
     "name": "keys_spirit",
-    "displayName": "Small Keys Spirit",
+    "displayName": "Small Key (Spirit Temple)",
     "size": [20, 20],
     "icons": ["key_spirit_32x32.png"],
     "countConfig": [0, 5]
@@ -973,7 +982,7 @@
     "id": "f960cb2e268b47378c1fbd280a36b7ae",
     "type": "counter",
     "name": "keys_shadow",
-    "displayName": "Small Keys Shadow",
+    "displayName": "Small Key (Shadow Temple)",
     "size": [20, 20],
     "icons": ["key_shadow_32x32.png"],
     "countConfig": [0, 5]
@@ -982,7 +991,7 @@
     "id": "b974af3f77fd4f6da41aca226176ed35",
     "type": "counter",
     "name": "keys_botw",
-    "displayName": "Small Keys BOTW",
+    "displayName": "Small Key (Bottom of the Well)",
     "size": [20, 20],
     "icons": ["key_botw_32x32.png"],
     "countConfig": [0, 3]
@@ -991,7 +1000,7 @@
     "id": "d8cf98dc40d245bfb81f8c5ab339319e",
     "type": "counter",
     "name": "keys_gtg",
-    "displayName": "Small Keys GTG",
+    "displayName": "Small Key (Gerudo Training Ground)",
     "size": [20, 20],
     "icons": ["key_gtg_32x32.png"],
     "countConfig": [0, 9]
@@ -1000,7 +1009,7 @@
     "id": "f505cd1a329947d584f48474ccbac96f",
     "type": "counter",
     "name": "keys_th",
-    "displayName": "Small Keys TH",
+    "displayName": "Small Key (Thieves Hideout)",
     "size": [20, 20],
     "icons": ["key_th_32x32.png"],
     "countConfig": [0, 4]
@@ -1009,7 +1018,7 @@
     "id": "6c7bef3844bc4be3bb220c947c059892",
     "type": "counter",
     "name": "keys_ganons",
-    "displayName": "Small Keys Ganons",
+    "displayName": "Small Key (Ganons Castle)",
     "size": [20, 20],
     "icons": ["key_ganons_32x32.png"],
     "countConfig": [0, 2]
@@ -1026,7 +1035,7 @@
     "id": "d9ba09be6c3d41b8a46edc45bc42db2b",
     "type": "simple",
     "name": "bk_forest",
-    "displayName": "Boss Key Forest",
+    "displayName": "Boss Key (Forest Temple)",
     "size": [20, 20],
     "icons": ["bk_forest_bw_32x32.png", "bk_forest_32x32.png"],
     "items": [null, "7abace900d644493be25c03dddd9cb88"]
@@ -1035,7 +1044,7 @@
     "id": "4efe27490c3e4e0e887cd655bc818db0",
     "type": "simple",
     "name": "bk_fire",
-    "displayName": "Boss Key Fire",
+    "displayName": "Boss Key (Fire Temple)",
     "size": [20, 20],
     "icons": ["bk_fire_bw_32x32.png", "bk_fire_32x32.png"],
     "items": [null, "d588b4fb40ed4e7faf65bca60d1cb37c"]
@@ -1044,7 +1053,7 @@
     "id": "feb7580708c4419da14f42f81de8f6dd",
     "type": "simple",
     "name": "bk_water",
-    "displayName": "Boss Key Water",
+    "displayName": "Boss Key (Water Temple)",
     "size": [20, 20],
     "icons": ["bk_water_bw_32x32.png", "bk_water_32x32.png"],
     "items": [null, "b4f7b0ee98ac47eaa0b13318444ba072"]
@@ -1053,7 +1062,7 @@
     "id": "78387b1c5cbd463b97dadee3955a14d0",
     "type": "simple",
     "name": "bk_shadow",
-    "displayName": "Boss Key Shadow",
+    "displayName": "Boss Key (Shadow Temple)",
     "size": [20, 20],
     "icons": ["bk_shadow_bw_32x32.png", "bk_shadow_32x32.png"],
     "items": [null, "97b028f54e82473a9960f608a5789f18"]
@@ -1062,7 +1071,7 @@
     "id": "38e3b507c53f4aba8f0157bb27bbe685",
     "type": "simple",
     "name": "bk_spirit",
-    "displayName": "Boss Key Spirit",
+    "displayName": "Boss Key (Spirit Temple)",
     "size": [20, 20],
     "icons": ["bk_spirit_bw_32x32.png", "bk_spirit_32x32.png"],
     "items": [null, "a99ecea2404a4337b829e88e0907d13f"]
@@ -1071,10 +1080,208 @@
     "id": "ab70ca77f5f2407aa50955b8a47e7339",
     "type": "simple",
     "name": "bk_ganons",
-    "displayName": "Boss Key Ganons",
+    "displayName": "Boss Key (Ganons Castle)",
     "size": [20, 20],
     "icons": ["bk_ganons_bw_32x32.png", "bk_ganons_32x32.png"],
     "items": [null, "adbe6c6ffbd34a0f8eb3de9611edb8be"]
+  },
+  {
+    "id": "e87c63ec6b4943168211179eb24d25b5",
+    "type": "counter",
+    "name": "srup_dc",
+    "displayName": "Silver Rupee (Dodongos Cavern Staircase)",
+    "size": [20, 20],
+    "icons": ["srup_dc_32x32.png"],
+    "countConfig": [0, 5]
+  },
+  {
+    "id": "6da00de50b6046c7920ff80830d10cb7",
+    "type": "counter",
+    "name": "srup_ice_scythe",
+    "displayName": "Silver Rupee (Ice Cavern Spinning Scythe)",
+    "size": [20, 20],
+    "icons": ["srup_ice_scythe_32x32.png"],
+    "countConfig": [0, 5]
+  },
+  {
+    "id": "157144e0c5c644c1a9ff8073000cfa75",
+    "type": "counter",
+    "name": "srup_ice_block",
+    "displayName": "Silver Rupee (Ice Cavern Push Block)",
+    "size": [20, 20],
+    "icons": ["srup_ice_block_32x32.png"],
+    "countConfig": [0, 5]
+  },
+  {
+    "id": "7525acb494354b28845c5666e54b004b",
+    "type": "counter",
+    "name": "srup_botw",
+    "displayName": "Silver Rupee (Bottom of the Well Basement)",
+    "size": [20, 20],
+    "icons": ["srup_botw_32x32.png"],
+    "countConfig": [0, 5]
+  },
+  {
+    "id": "41bf37d7be604ea98512eef64dd94c06",
+    "type": "counter",
+    "name": "srup_shadow_scythe",
+    "displayName": "Silver Rupee (Shadow Temple Scythe Shortcut)",
+    "size": [20, 20],
+    "icons": ["srup_shadow_scythe_32x32.png"],
+    "countConfig": [0, 5]
+  },
+  {
+    "id": "0f3dafda3e584cff926643129a13dfda",
+    "type": "counter",
+    "name": "srup_shadow_blades",
+    "displayName": "Silver Rupee (Shadow Temple Invisible Blades)",
+    "size": [20, 20],
+    "icons": ["srup_shadow_blades_32x32.png"],
+    "countConfig": [0, 10]
+  },
+  {
+    "id": "7eb71bdc55814615a5112a1da64ba40d",
+    "type": "counter",
+    "name": "srup_shadow_pit",
+    "displayName": "Silver Rupee (Shadow Temple Huge Pit)",
+    "size": [20, 20],
+    "icons": ["srup_shadow_pit_32x32.png"],
+    "countConfig": [0, 5]
+  },
+  {
+    "id": "b346a7fabe974bb4a3aed102fa364c1d",
+    "type": "counter",
+    "name": "srup_shadow_spikes",
+    "displayName": "Silver Rupee (Shadow Temple Invisible Spikes)",
+    "size": [20, 20],
+    "icons": ["srup_shadow_spikes_32x32.png"],
+    "countConfig": [0, 5]
+  },
+  {
+    "id": "204b41105225467cb6056c30b139e21b",
+    "type": "counter",
+    "name": "srup_gtg_slopes",
+    "displayName": "Silver Rupee (Gerudo Training Ground Slopes)",
+    "size": [20, 20],
+    "icons": ["srup_gtg_slopes_32x32.png"],
+    "countConfig": [0, 5]
+  },
+  {
+    "id": "d84ec195d31541f0be05943cc90a8505",
+    "type": "counter",
+    "name": "srup_gtg_lava",
+    "displayName": "Silver Rupee (Gerudo Training Ground Lava)",
+    "size": [20, 20],
+    "icons": ["srup_gtg_lava_32x32.png"],
+    "countConfig": [0, 5]
+  },
+  {
+    "id": "b073e61eca584d04afc82a28dda4bf16",
+    "type": "counter",
+    "name": "srup_gtg_water",
+    "displayName": "Silver Rupee (Gerudo Training Ground Water)",
+    "size": [20, 20],
+    "icons": ["srup_gtg_water_32x32.png"],
+    "countConfig": [0, 5]
+  },
+  {
+    "id": "c22e2a6e5b124e699b82e0112de0ec0a",
+    "type": "counter",
+    "name": "srup_spirit_child",
+    "displayName": "Silver Rupee (Spirit Temple Child Early Torches)",
+    "size": [20, 20],
+    "icons": ["srup_spirit_child_32x32.png"],
+    "countConfig": [0, 5]
+  },
+  {
+    "id": "e3238f73a2354fe59fac7d8feaf51398",
+    "type": "counter",
+    "name": "srup_spirit_boulders",
+    "displayName": "Silver Rupee (Spirit Temple Adult Boulders)",
+    "size": [20, 20],
+    "icons": ["srup_spirit_boulders_32x32.png"],
+    "countConfig": [0, 5]
+  },
+  {
+    "id": "4de31d34822043f0b8ba3227528c84cf",
+    "type": "counter",
+    "name": "srup_spirit_lobby",
+    "displayName": "Silver Rupee (Spirit Temple Lobby and Lower Adult)",
+    "size": [20, 20],
+    "icons": ["srup_spirit_lobby_32x32.png"],
+    "countConfig": [0, 5]
+  },
+  {
+    "id": "538f2dcfe8a840fb80506bc1a8a90f42",
+    "type": "counter",
+    "name": "srup_spirit_sun",
+    "displayName": "Silver Rupee (Spirit Temple Sun Block)",
+    "size": [20, 20],
+    "icons": ["srup_spirit_sun_32x32.png"],
+    "countConfig": [0, 5]
+  },
+  {
+    "id": "088a31706bdc4c17b8f44ea87b6779a5",
+    "type": "counter",
+    "name": "srup_spirit_climb",
+    "displayName": "Silver Rupee (Spirit Temple Adult Climb)",
+    "size": [20, 20],
+    "icons": ["srup_spirit_climb_32x32.png"],
+    "countConfig": [0, 5]
+  },
+  {
+    "id": "4d4280e3d9ea4ac18fe6c0de52f6ef9f",
+    "type": "counter",
+    "name": "srup_ganons_spirit",
+    "displayName": "Silver Rupee (Ganons Castle Spirit Trial)",
+    "size": [20, 20],
+    "icons": ["srup_ganons_spirit_32x32.png"],
+    "countConfig": [0, 5]
+  },
+  {
+    "id": "0c7edd0beea446648512107a08fdc0e0",
+    "type": "counter",
+    "name": "srup_ganons_light",
+    "displayName": "Silver Rupee (Ganons Castle Light Trial)",
+    "size": [20, 20],
+    "icons": ["srup_ganons_light.png"],
+    "countConfig": [0, 5]
+  },
+  {
+    "id": "b5f865ac89934f1ca50c119b9cf61707",
+    "type": "counter",
+    "name": "srup_ganons_fire",
+    "displayName": "Silver Rupee (Ganons Castle Fire Trial)",
+    "size": [20, 20],
+    "icons": ["srup_ganons_fire_32x32.png"],
+    "countConfig": [0, 5]
+  },
+  {
+    "id": "2dc2aadb5734465bb9b5cf2fe7a914e7",
+    "type": "counter",
+    "name": "srup_ganons_shadow",
+    "displayName": "Silver Rupee (Ganons Castle Shadow Trial)",
+    "size": [20, 20],
+    "icons": ["srup_ganons_shadow_32x32.png"],
+    "countConfig": [0, 5]
+  },
+  {
+    "id": "94a5823b4d204f7c9e309cff27b508a8",
+    "type": "counter",
+    "name": "srup_ganons_water",
+    "displayName": "Silver Rupee (Ganons Castle Water Trial)",
+    "size": [20, 20],
+    "icons": ["srup_ganons_water_32x32.png"],
+    "countConfig": [0, 5]
+  },
+  {
+    "id": "d73c0f59be1a4893a27f05fbfbd441ff",
+    "type": "counter",
+    "name": "srup_ganons_forest",
+    "displayName": "Silver Rupee (Ganons Castle Forest Trial)",
+    "size": [20, 20],
+    "icons": ["srup_ganons_forest_32x32.png"],
+    "countConfig": [0, 5]
   },
   {
     "id": "4c1b24c3e3954038b14f4daa3656e0b5",

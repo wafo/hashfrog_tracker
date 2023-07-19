@@ -11,11 +11,11 @@ const GENERATOR_VERSION = process.env.REACT_APP_GENERATOR_VERSION;
 
 const TrackerContext = createContext();
 
-function parseItems(items_list, counters, unchanged_starting_items) {
+function parseItems(items_list, counters, unchanged_starting_inventory) {
   const items = _.cloneDeep(DEFAULT_ITEMS);
 
   // Parse items
-  _.forEach(_.union(_.values(items_list), unchanged_starting_items), item => {
+  _.forEach(_.union(_.values(items_list), unchanged_starting_inventory), item => {
     switch (item) {
       case "c50e8543ab0c4bdaa8a23e6a80ae6d1c":
         // ignore Master Sword
@@ -297,6 +297,9 @@ function parseItems(items_list, counters, unchanged_starting_items) {
         items.Bottle = value;
         break;
 
+      case "keys_tcg":
+        items.Small_Key_Treasure_Chest_Game = value;
+        break;
       case "keys_forest":
         items.Small_Key_Forest_Temple = value;
         break;
@@ -323,6 +326,73 @@ function parseItems(items_list, counters, unchanged_starting_items) {
         break;
       case "keys_ganons":
         items.Small_Key_Ganons_Castle = value;
+        break;
+
+      case "srup_dc":
+        items.Silver_Rupee_Dodongos_Cavern_Staircase = value;
+        break;
+      case "srup_ice_scythe":
+        items.Silver_Rupee_Ice_Cavern_Spinning_Scythe = value;
+        break;
+      case "srup_ice_block":
+        items.Silver_Rupee_Ice_Cavern_Push_Block = value;
+        break;
+      case "srup_botw":
+        items.Silver_Rupee_Bottom_of_the_Well_Basement = value;
+        break;
+      case "srup_shadow_scythe":
+        items.Silver_Rupee_Shadow_Temple_Scythe_Shortcut = value;
+        break;
+      case "srup_shadow_blades":
+        items.Silver_Rupee_Shadow_Temple_Invisible_Blades = value;
+        break;
+      case "srup_shadow_pit":
+        items.Silver_Rupee_Shadow_Temple_Huge_Pit = value;
+        break;
+      case "srup_shadow_spikes":
+        items.Silver_Rupee_Shadow_Temple_Invisible_Spikes = value;
+        break;
+      case "srup_gtg_slopes":
+        items.Silver_Rupee_Gerudo_Training_Ground_Slopes = value;
+        break;
+      case "srup_gtg_lava":
+        items.Silver_Rupee_Gerudo_Training_Ground_Lava = value;
+        break;
+      case "srup_gtg_water":
+        items.Silver_Rupee_Gerudo_Training_Ground_Water = value;
+        break;
+      case "srup_spirit_child":
+        items.Silver_Rupee_Spirit_Temple_Child_Early_Torches = value;
+        break;
+      case "srup_spirit_boulders":
+        items.Silver_Rupee_Spirit_Temple_Adult_Boulders = value;
+        break;
+      case "srup_spirit_lobby":
+        items.Silver_Rupee_Spirit_Temple_Lobby_and_Lower_Adult = value;
+        break;
+      case "srup_spirit_sun":
+        items.Silver_Rupee_Spirit_Temple_Sun_Block = value;
+        break;
+      case "srup_spirit_climb":
+        items.Silver_Rupee_Spirit_Temple_Adult_Climb = value;
+        break;
+      case "srup_ganons_spirit":
+        items.Silver_Rupee_Ganons_Castle_Spirit_Trial = value;
+        break;
+      case "srup_ganons_light":
+        items.Silver_Rupee_Ganons_Castle_Light_Trial = value;
+        break;
+      case "srup_ganons_fire":
+        items.Silver_Rupee_Ganons_Castle_Fire_Trial = value;
+        break;
+      case "srup_ganons_shadow":
+        items.Silver_Rupee_Ganons_Castle_Shadow_Trial = value;
+        break;
+      case "srup_ganons_water":
+        items.Silver_Rupee_Ganons_Castle_Water_Trial = value;
+        break;
+      case "srup_ganons_forest":
+        items.Silver_Rupee_Ganons_Castle_Forest_Trial = value;
         break;
 
       default:
@@ -445,7 +515,10 @@ function reducer(state, action) {
       });
 
       // Validating checks based on items collected
-      const validatedLocations = validateLocations(locations, parseItems(state.items_list, state.counters, state.unchanged_starting_items));
+      const validatedLocations = validateLocations(
+        locations,
+        parseItems(state.items_list, state.counters, state.unchanged_starting_inventory),
+      );
 
       return {
         ...state,
@@ -463,7 +536,10 @@ function reducer(state, action) {
       }
 
       // Revalidate checks based on items collected
-      const validatedLocations = validateLocations(state.locations, parseItems(state.items_list, state.counters, state.unchanged_starting_items));
+      const validatedLocations = validateLocations(
+        state.locations,
+        parseItems(state.items_list, state.counters, state.unchanged_starting_inventory),
+      );
 
       return {
         ...state,
@@ -490,25 +566,25 @@ function reducer(state, action) {
       const settings = payload;
       const items = [...settings.starting_equipment, ...settings.starting_inventory, ...settings.starting_songs];
 
-      const starting_items = items.map(item => {
+      const starting_inventory = items.map(item => {
         return ITEMS_JSON[item];
       });
 
       if (settings.start_with_consumables) {
-        starting_items.push("34b2ad3657e94b75b281cec30e617f37");
-        starting_items.push("73a0f3f5688745a8bb4a0973d9858960");
+        starting_inventory.push("34b2ad3657e94b75b281cec30e617f37");
+        starting_inventory.push("73a0f3f5688745a8bb4a0973d9858960");
       }
       if (settings.open_door_of_time && settings.open_forest !== "closed") {
-        starting_items.push("c50e8543ab0c4bdaa8a23e6a80ae6d1c");
+        starting_inventory.push("c50e8543ab0c4bdaa8a23e6a80ae6d1c");
       }
 
-      // `starting_items` will be properly set through `useElement` hook
+      // `starting_inventory` will be properly set through `useElement` hook
       const items_list = {};
-      for (let i = 0; i < starting_items.length; i++) {
-        _.set(items_list, i, starting_items[i]);
+      for (let i = 0; i < starting_inventory.length; i++) {
+        _.set(items_list, i, starting_inventory[i]);
       }
 
-      const parsedItems = parseItems(items_list, [], starting_items);
+      const parsedItems = parseItems(items_list, [], starting_inventory);
 
       // Validating checks based on items collected
       const locations = validateLocations(state.locations, parsedItems);
@@ -517,8 +593,8 @@ function reducer(state, action) {
         ...state,
         locations,
         items: parsedItems,
-        starting_items,
-        unchanged_starting_items: _.cloneDeep(starting_items),
+        starting_inventory,
+        unchanged_starting_inventory: _.cloneDeep(starting_inventory),
         items_list: {},
       };
     }
@@ -529,7 +605,7 @@ function reducer(state, action) {
       const counters = _.set(_.cloneDeep(state.counters), item, value);
 
       // Prepping collecting items with counters
-      const parsedItems = parseItems(state.items_list, counters, state.unchanged_starting_items);
+      const parsedItems = parseItems(state.items_list, counters, state.unchanged_starting_inventory);
 
       // Validating checks based on items collected
       const locations = validateLocations(state.locations, parsedItems);
@@ -552,7 +628,7 @@ function reducer(state, action) {
         _.set(items_list, parentID, item);
       }
 
-      const parsedItems = parseItems(items_list, state.counters, state.unchanged_starting_items);
+      const parsedItems = parseItems(items_list, state.counters, state.unchanged_starting_inventory);
 
       // Validating checks based on items collected
       const locations = validateLocations(state.locations, parsedItems);
@@ -588,8 +664,8 @@ function TrackerProvider(props) {
     locations: {},
     items: _.cloneDeep(DEFAULT_ITEMS),
     counters: {},
-    starting_items: [],
-    unchanged_starting_items: [],
+    starting_inventory: [],
+    unchanged_starting_inventory: [],
     items_list: {},
     layoutElements: [],
     settings_string: getSettingsStringCache(),
@@ -617,7 +693,7 @@ const useChecks = () => {
 
 const useElement = (id, startingItem) => {
   const {
-    state: { layoutElements, unchanged_starting_items, items_list },
+    state: { layoutElements, unchanged_starting_inventory, items_list },
   } = useTracker();
 
   if (!_.includes(layoutElements, id)) {
@@ -626,9 +702,9 @@ const useElement = (id, startingItem) => {
     if (!_.isNull(startingItem)) {
       _.set(items_list, id, startingItem);
 
-      // Note that starting item appears on the tracker layout 
-      if (_.includes(unchanged_starting_items, startingItem)) {
-        unchanged_starting_items.splice(unchanged_starting_items.indexOf(startingItem), 1);
+      // Note that starting item appears on the tracker layout
+      if (_.includes(unchanged_starting_inventory, startingItem)) {
+        unchanged_starting_inventory.splice(unchanged_starting_inventory.indexOf(startingItem), 1);
       }
     }
   }
@@ -665,7 +741,7 @@ const useItems = items => {
     [dispatch],
   );
 
-  // IMPORTANT: Intentionally ignoring state.starting_items on the dependency array.
+  // IMPORTANT: Intentionally ignoring state.starting_inventory on the dependency array.
   const startingIndex = useMemo(() => {
     // Loops through the items of the element,
     // searching for a match against the items in the tracker context.
@@ -673,7 +749,7 @@ const useItems = items => {
     let itemIndex = 0;
     if (!items || !items.length) return 0;
     for (let i = 0; i < items.length; i++) {
-      if (_.includes(state.starting_items, items[i])) {
+      if (_.includes(state.starting_inventory, items[i])) {
         itemIndex = i;
         break;
       }
@@ -686,7 +762,7 @@ const useItems = items => {
     let itemID = null;
     if (!items || !items.length) return null;
     for (let i = 0; i < items.length; i++) {
-      if (_.includes(state.starting_items, items[i])) {
+      if (_.includes(state.starting_inventory, items[i])) {
         itemID = items[i];
         break;
       }
