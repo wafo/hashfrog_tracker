@@ -1284,6 +1284,51 @@
     "countConfig": [0, 5]
   },
   {
+    "id": "6466793887f9475685558adbae2a4b3e",
+    "type": "simple",
+    "name": "ocarina_a_button",
+    "displayName": "Ocarina A Button",
+    "size": [25, 25],
+    "icons": ["ocarina_a_button_bw_32x32.png", "ocarina_a_button_32x32.png"],
+    "items": [null, "6466793887f9475685558adbae2a4b3e"]
+  },
+  {
+    "id": "5598cc877c91426ab4ec083fccb7c22b",
+    "type": "simple",
+    "name": "ocarina_c_up_button",
+    "displayName": "Ocarina C-up Button",
+    "size": [25, 25],
+    "icons": ["ocarina_c_up_button_bw_32x32.png", "ocarina_c_up_button_32x32.png"],
+    "items": [null, "5598cc877c91426ab4ec083fccb7c22b"]
+  },
+  {
+    "id": "506b5e53591b430cbf45855088bfae1b",
+    "type": "simple",
+    "name": "ocarina_c_down_button",
+    "displayName": "Ocarina C-down Button",
+    "size": [25, 25],
+    "icons": ["ocarina_c_down_button_bw_32x32.png", "ocarina_c_down_button_32x32.png"],
+    "items": [null, "506b5e53591b430cbf45855088bfae1b"]
+  },
+  {
+    "id": "9ffc29578f514202a80fa5278a3bd281",
+    "type": "simple",
+    "name": "ocarina_c_left_button",
+    "displayName": "Ocarina C-left Button",
+    "size": [25, 25],
+    "icons": ["ocarina_c_left_button_bw_32x32.png", "ocarina_c_left_button_32x32.png"],
+    "items": [null, "9ffc29578f514202a80fa5278a3bd281"]
+  },
+  {
+    "id": "2d85db579f3c4be49bf48d4853d112e7",
+    "type": "simple",
+    "name": "ocarina_c_right_button",
+    "displayName": "Ocarina C-right Button",
+    "size": [25, 25],
+    "icons": ["ocarina_c_right_button_bw_32x32.png", "ocarina_c_right_button_32x32.png"],
+    "items": [null, "2d85db579f3c4be49bf48d4853d112e7"]
+  },
+  {
     "id": "4c1b24c3e3954038b14f4daa3656e0b5",
     "type": "simple",
     "name": "sometimes",

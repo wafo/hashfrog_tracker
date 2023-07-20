@@ -216,6 +216,22 @@ function parseItems(items_list, counters, unchanged_starting_inventory) {
         items.Zeldas_Letter = 1;
         break;
 
+      case "6466793887f9475685558adbae2a4b3e":
+        items.Ocarina_A_Button = 1;
+        break;
+      case "5598cc877c91426ab4ec083fccb7c22b":
+        items.Ocarina_C_up_Button = 1;
+        break;
+      case "506b5e53591b430cbf45855088bfae1b":
+        items.Ocarina_C_down_Button = 1;
+        break;
+      case "9ffc29578f514202a80fa5278a3bd281":
+        items.Ocarina_C_left_Button = 1;
+        break;
+      case "2d85db579f3c4be49bf48d4853d112e7":
+        items.Ocarina_C_right_Button = 1;
+        break;
+
       case "ce1f2799ff1a433ba0bb40fee47e49a1":
         items.Minuet_of_Forest = 1;
         break;

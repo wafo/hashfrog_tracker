@@ -402,10 +402,6 @@ class LogicHelper {
     if (_.startsWith(name, "Buy_")) {
       return this._canBuy(name, age);
     }
-    // They added some checks for buttons of ocarina notes. Not sure why, but we can default to true for now
-    if (_.startsWith(name, "Ocarina_")) {
-      return true;
-    }
 
     throw Error(`Unknown identifier: ${name}`);
   }
@@ -541,10 +537,15 @@ class LogicHelper {
     if (_.isEqual(songName, "Scarecrow_Song")) {
       return (
         this.items.Ocarina > 0 &&
-        (this.settings.free_scarecrow || (_.isEqual(age, "adult") && this._evalEvent("Bonooru")))
+        (this.settings.free_scarecrow || (_.isEqual(age, "adult") && this._evalEvent("Bonooru"))) &&
+        (!this.settings.shuffle_individual_ocarina_notes || this._hasAllNotesForSong("Scarecrow_Song"))
       );
     } else {
-      return this.items.Ocarina > 0 && this.items[songName] > 0;
+      return (
+        this.items.Ocarina > 0 &&
+        this.items[songName] > 0 &&
+        (!this.settings.shuffle_individual_ocarina_notes || this._hasAllNotesForSong(songName))
+      );
     }
   }
 
@@ -686,6 +687,96 @@ class LogicHelper {
       (_.isEqual(forAge, "both") && canChildProjectile && canAdultProjectile) ||
       (_.isEqual(forAge, "either") && (canChildProjectile || canAdultProjectile))
     );
+  }
+
+  static _hasAllNotesForSong(songName) {
+    if (_.isEqual(songName, "Scarecrow Song")) {
+      return (
+        _.sum([
+          this.items.Ocarina_A_Button,
+          this.items.Ocarina_C_up_Button,
+          this.items.Ocarina_C_down_Button,
+          this.items.Ocarina_C_left_Button,
+          this.items.Ocarina_C_right_Button,
+        ]) >= 2
+      );
+    }
+
+    // TODO: Currently assuming default notes for songs.
+    // If shuffled, would need interface for user to specify notes for songs.
+    switch (songName) {
+      case "Minuet_of_Forest":
+        return (
+          this.items.Ocarina_A_Button > 0 &&
+          this.items.Ocarina_C_up_Button > 0 &&
+          this.items.Ocarina_C_left_Button > 0 &&
+          this.items.Ocarina_C_right_Button > 0
+        );
+      case "Bolero_of_Fire":
+        return (
+          this.items.Ocarina_A_Button > 0 &&
+          this.items.Ocarina_C_down_Button > 0 &&
+          this.items.Ocarina_C_right_Button > 0
+        );
+      case "Serenade_of_Water":
+        return (
+          this.items.Ocarina_A_Button > 0 &&
+          this.items.Ocarina_C_down_Button > 0 &&
+          this.items.Ocarina_C_left_Button > 0 &&
+          this.items.Ocarina_C_right_Button > 0
+        );
+      case "Requiem_of_Spirit":
+        return (
+          this.items.Ocarina_A_Button > 0 &&
+          this.items.Ocarina_C_down_Button > 0 &&
+          this.items.Ocarina_C_right_Button > 0
+        );
+      case "Nocturne_of_Shadow":
+        return (
+          this.items.Ocarina_A_Button > 0 &&
+          this.items.Ocarina_C_down_Button > 0 &&
+          this.items.Ocarina_C_left_Button > 0 &&
+          this.items.Ocarina_C_right_Button > 0
+        );
+      case "Prelude_of_Light":
+        return (
+          this.items.Ocarina_C_up_Button > 0 &&
+          this.items.Ocarina_C_left_Button > 0 &&
+          this.items.Ocarina_C_right_Button > 0
+        );
+      case "Zeldas_Lullaby":
+        return (
+          this.items.Ocarina_C_up_Button > 0 &&
+          this.items.Ocarina_C_left_Button > 0 &&
+          this.items.Ocarina_C_right_Button > 0
+        );
+      case "Eponas_Song":
+        return (
+          this.items.Ocarina_C_up_Button > 0 &&
+          this.items.Ocarina_C_left_Button > 0 &&
+          this.items.Ocarina_C_right_Button > 0
+        );
+      case "Sarias_Song":
+        return (
+          this.items.Ocarina_C_down_Button > 0 &&
+          this.items.Ocarina_C_left_Button > 0 &&
+          this.items.Ocarina_C_right_Button > 0
+        );
+      case "Suns_Song":
+        return (
+          this.items.Ocarina_C_up_Button > 0 &&
+          this.items.Ocarina_C_down_Button > 0 &&
+          this.items.Ocarina_C_right_Button > 0
+        );
+      case "Song_of_Time":
+        return (
+          this.items.Ocarina_A_Button > 0 && this.items.Ocarina_C_up_Button > 0 && this.items.Ocarina_C_right_Button > 0
+        );
+      case "Song_of_Storms":
+        return (
+          this.items.Ocarina_A_Button > 0 && this.items.Ocarina_C_up_Button > 0 && this.items.Ocarina_C_down_Button > 0
+        );
+    }
   }
 
   static _hasStones(count) {
