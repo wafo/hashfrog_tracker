@@ -1244,7 +1244,7 @@
     "name": "srup_ganons_light",
     "displayName": "Silver Rupee (Ganons Castle Light Trial)",
     "size": [20, 20],
-    "icons": ["srup_ganons_light.png"],
+    "icons": ["srup_ganons_light_32x32.png"],
     "countConfig": [0, 5]
   },
   {
