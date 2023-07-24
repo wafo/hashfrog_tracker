@@ -593,6 +593,13 @@ function reducer(state, action) {
       if (settings.open_door_of_time && settings.open_forest !== "closed") {
         starting_inventory.push("c50e8543ab0c4bdaa8a23e6a80ae6d1c");
       }
+      if (!settings.shuffle_individual_ocarina_notes) {
+        starting_inventory.push("6466793887f9475685558adbae2a4b3e");
+        starting_inventory.push("5598cc877c91426ab4ec083fccb7c22b");
+        starting_inventory.push("506b5e53591b430cbf45855088bfae1b");
+        starting_inventory.push("9ffc29578f514202a80fa5278a3bd281");
+        starting_inventory.push("2d85db579f3c4be49bf48d4853d112e7");
+      }
 
       // `starting_inventory` will be properly set through `useElement` hook
       const items_list = {};
