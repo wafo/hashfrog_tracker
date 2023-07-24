@@ -27,6 +27,11 @@ class Locations {
       dungeon_mq: new Map(),
       overworld: new Map(),
     };
+    this.keyLocations = {
+      dungeon: new Map(),
+      dungeon_mq: new Map(),
+      overworld: new Map(),
+    };
     this.events = {
       dungeon: new Map(),
       dungeon_mq: new Map(),
@@ -61,6 +66,7 @@ class Locations {
     this.activeLocations = new Map();
     this.activeDropLocations = new Map();
     this.activeSkullsLocations = [];
+    this.activeKeyLocations = new Map();
     this.activeEvents = new Map();
     this.activeExits = new Map();
 
@@ -75,6 +81,22 @@ class Locations {
         ["Triforce", "Scarecrow Song", "Deliver Letter", "Time Travel", "Bombchu Drop"],
         location.vanillaItem,
       ) || _.isEqual(location.type, "Drop")
+    );
+  }
+
+  static isGuaranteedKey(location) {
+    const itemName = location.vanillaItem;
+
+    return (
+      (_.isEqual(itemName, "Boss Key (Ganons Castle)") &&
+        _.isEqual(LogicHelper.settings.shuffle_ganon_bosskey, "vanilla")) ||
+      (_.startsWith(itemName, "Boss Key ") && _.isEqual(LogicHelper.settings.shuffle_bosskeys, "vanilla")) ||
+      (_.isEqual(itemName, "Small Key (Thieves Hideout)") &&
+        _.isEqual(LogicHelper.settings.shuffle_hideoutkeys, "vanilla")) ||
+      (_.startsWith(itemName, "Silver Rupee ") && _.isEqual(LogicHelper.settings.shuffle_silver_rupees, "vanilla")) ||
+      (_.startsWith(itemName, "Small Key ") && _.isEqual(LogicHelper.settings.shuffle_smallkeys, "vanilla")) ||
+      (_.isEqual(itemName, "Small Key (Treasure Chest Game)") &&
+        _.isEqual(LogicHelper.settings.shuffle_tcgkeys, "vanilla"))
     );
   }
 
@@ -418,6 +440,42 @@ class Locations {
       this.activeSkullsLocations = _.union(this.activeSkullsLocations, skullsLocation);
     });
 
+    this.activeKeyLocations = new Map();
+    _.forEach(DUNGEONS, dungeonName => {
+      if (_.includes(dungeonsMQ, dungeonName)) {
+        _.forEach(_.values(this.keyLocations.dungeon_mq[dungeonName]), data => {
+          if (Locations.isGuaranteedKey(data)) {
+            _.set(
+              this.activeKeyLocations,
+              data.parentRegion,
+              _.union(this.activeKeyLocations[data.parentRegion], [data]),
+            );
+          }
+        });
+      } else {
+        _.forEach(_.values(this.keyLocations.dungeon[dungeonName]), data => {
+          if (Locations.isGuaranteedKey(data)) {
+            _.set(
+              this.activeKeyLocations,
+              data.parentRegion,
+              _.union(this.activeKeyLocations[data.parentRegion], [data]),
+            );
+          }
+        });
+      }
+    });
+    _.forEach(_.values(this.keyLocations.overworld), keyLocation => {
+      _.forEach(_.values(keyLocation), data => {
+        if (Locations.isGuaranteedKey(data)) {
+          _.set(
+            this.activeKeyLocations,
+            data.parentRegion,
+            _.union(this.activeKeyLocations[data.parentRegion], [data]),
+          );
+        }
+      });
+    });
+
     this.activeEvents = new Map();
     _.forEach(DUNGEONS, dungeonName => {
       if (_.includes(dungeonsMQ, dungeonName)) {
@@ -525,6 +583,21 @@ class Locations {
                   [locationKey, hintRegion],
                   _.union(this.skullsLocations[locationKey][hintRegion], [locationName]),
                 );
+              }
+
+              // Additionally, if the location is assuredly a key or silver rupees, record that seperately
+              if (
+                _.startsWith(vanillaItem, "Small Key ") ||
+                _.startsWith(vanillaItem, "Boss Key ") ||
+                _.startsWith(vanillaItem, "Silver Rupee ")
+              ) {
+                const keyData = {
+                  locationName,
+                  parentRegion,
+                  rule: LogicHelper.parseRule(rule),
+                  vanillaItem,
+                };
+                _.set(this.keyLocations, [locationKey, hintRegion, locationName], keyData);
               }
             }
           } catch (error) {

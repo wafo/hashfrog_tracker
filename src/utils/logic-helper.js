@@ -89,7 +89,41 @@ class LogicHelper {
     let accessibleAdultRegions = [];
     let newAdultRegions = this._recalculateAccessibleRegions("Root", "adult");
 
+    const guaranteedKeys = {};
+    let updatedKeys = false;
+
     do {
+      updatedKeys = false;
+
+      _.forEach(this.regions.child, regionName => {
+        if (_.includes(_.keys(Locations.activeKeyLocations), regionName)) {
+          _.forEach(Locations.activeKeyLocations[regionName], keyLocation => {
+            if (
+              !_.includes(_.keys(guaranteedKeys), keyLocation.locationName) &&
+              this._evalNode(keyLocation.rule, "child")
+            ) {
+              _.set(guaranteedKeys, keyLocation.locationName, true);
+              _.update(this.items, LogicHelper._getItemName(keyLocation.vanillaItem), count => count + 1);
+              updatedKeys = true;
+            }
+          });
+        }
+      });
+      _.forEach(this.regions.adult, regionName => {
+        if (_.includes(_.keys(Locations.activeKeyLocations), regionName)) {
+          _.forEach(Locations.activeKeyLocations[regionName], keyLocation => {
+            if (
+              !_.includes(_.keys(guaranteedKeys), keyLocation.locationName) &&
+              this._evalNode(keyLocation.rule, "adult")
+            ) {
+              _.set(guaranteedKeys, keyLocation.locationName, true);
+              _.update(this.items, LogicHelper._getItemName(keyLocation.vanillaItem), count => count + 1);
+              updatedKeys = true;
+            }
+          });
+        }
+      });
+
       accessibleChildRegions = _.cloneDeep(newChildRegions);
       accessibleAdultRegions = _.cloneDeep(newAdultRegions);
 
@@ -100,6 +134,7 @@ class LogicHelper {
         newAdultRegions = _.union(newAdultRegions, this._recalculateAccessibleRegions(regionName, "adult"));
       });
     } while (
+      updatedKeys ||
       !_.isEqual(accessibleChildRegions, newChildRegions) ||
       !_.isEqual(accessibleAdultRegions, newAdultRegions)
     );
@@ -137,6 +172,7 @@ class LogicHelper {
     return _.map(
       [
         "isLocationAvailable",
+        "_getItemName",
         "_isRegionAccessible",
         "_evalNode",
         "_evalBinaryExpression",
@@ -216,6 +252,10 @@ class LogicHelper {
       skip_child_zelda: skipChildZelda,
       triforce_goal: triforceGoal,
     };
+  }
+
+  static _getItemName(itemName) {
+    return _.replace(itemName, /[() ]/g, match => (_.isEqual(match, " ") ? "_" : ""));
   }
 
   static _recalculateAccessibleRegions(rootRegion, age) {
