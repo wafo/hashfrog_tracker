@@ -187,7 +187,6 @@ const TrackerLauncher = () => {
               The logic assumes: access to both ages; no shuffled entrances, owl drops, warp song destinations, or spawns; and vanilla (default) ocarina melodies.
             </li>
             <li>Closed Forest and Closed Door of Time do not work for the reasons above.</li>
-            <li>Trading sequences are not fully implemented.</li>
             <li>
               The logic assumes that the initial value for a counter is zero. Click the counter to update it if not.
             </li>
