@@ -402,6 +402,80 @@ class LogicHelper {
         return _.isEqual(age, "child");
       case "is_adult":
         return _.isEqual(age, "adult");
+
+      case "Zeldas_Letter":
+        return (
+          this.items[name] > 0 ||
+          this.renamedAttributes.skip_child_zelda ||
+          this.isLocationAvailable("HC Zeldas Letter")
+        );
+      case "Keaton_Mask":
+        return this.items[name] > 0 || this.isLocationAvailable("Market Mask Shop Item 6");
+      case "Skull_Mask":
+        return this.items[name] > 0 || this.isLocationAvailable("Market Mask Shop Item 5");
+      case "Spooky_Mask":
+        return this.items[name] > 0 || this.isLocationAvailable("Market Mask Shop Item 8");
+      case "Bunny_Hood":
+        return this.items[name] > 0 || this.isLocationAvailable("Market Mask Shop Item 7");
+      case "Mask_of_Truth":
+        return this.items[name] > 0 || this.isLocationAvailable("Market Mask Shop Item 3");
+
+      case "Odd_Mushroom":
+        return (
+          this.items[name] > 0 ||
+          ((!LogicHelper.settings.adult_trade_shuffle ||
+            !_.includes(LogicHelper.settings.adult_trade_start, "Odd Mushroom")) &&
+            this.isLocationAvailable("LW Trade Cojiro", "adult"))
+        );
+      case "Odd_Potion":
+        return (
+          this.items[name] > 0 ||
+          ((!LogicHelper.settings.adult_trade_shuffle ||
+            !_.includes(LogicHelper.settings.adult_trade_start, "Odd Potion")) &&
+            this.isLocationAvailable("Kak Granny Trade Odd Mushroom", "adult"))
+        );
+      case "Poachers_Saw":
+        return (
+          this.items[name] > 0 ||
+          ((!LogicHelper.settings.adult_trade_shuffle ||
+            !_.includes(LogicHelper.settings.adult_trade_start, "Poachers Saw")) &&
+            this.isLocationAvailable("LW Trade Odd Potion", "adult"))
+        );
+      case "Broken_Sword":
+        return (
+          this.items[name] > 0 ||
+          ((!LogicHelper.settings.adult_trade_shuffle ||
+            !_.includes(LogicHelper.settings.adult_trade_start, "Broken Sword")) &&
+            this.isLocationAvailable("GV Trade Poachers Saw", "adult"))
+        );
+      case "Prescription":
+        return (
+          this.items[name] > 0 ||
+          ((!LogicHelper.settings.adult_trade_shuffle ||
+            !_.includes(LogicHelper.settings.adult_trade_start, "Prescription")) &&
+            this.isLocationAvailable("DMT Trade Broken Sword", "adult"))
+        );
+      case "Eyeball_Frog":
+        return (
+          this.items[name] > 0 ||
+          ((!LogicHelper.settings.adult_trade_shuffle ||
+            !_.includes(LogicHelper.settings.adult_trade_start, "Eyeball Frog")) &&
+            this.isLocationAvailable("ZD Trade Prescription", "adult"))
+        );
+      case "Eyedrops":
+        return (
+          this.items[name] > 0 ||
+          ((!LogicHelper.settings.adult_trade_shuffle ||
+            !_.includes(LogicHelper.settings.adult_trade_start, "Eyedrops")) &&
+            this.isLocationAvailable("LH Trade Eyeball Frog", "adult"))
+        );
+      case "Claim_Check":
+        return (
+          this.items[name] > 0 ||
+          ((!LogicHelper.settings.adult_trade_shuffle ||
+            !_.includes(LogicHelper.settings.adult_trade_start, "Claim Check")) &&
+            this.isLocationAvailable("DMT Trade Eyedrops", "adult"))
+        );
     }
 
     if (_.includes(_.keys(this.items), name)) {
@@ -638,9 +712,16 @@ class LogicHelper {
   }
 
   static _evalEvent(eventName) {
-    // TOOD: hardcode adult trade to start at Prescription
-    if (_.isEqual(eventName, "Broken Sword Access")) {
-      return false;
+    // manually implement event to prevent infinite recursion
+    if (_.isEqual(eventName, "Eyeball Frog Access")) {
+      return (
+        this._evalEvent("King Zora Thawed") &&
+        ((!this.renamedAttributes.disable_trade_revert && (this.items.Eyedrops > 0 || this.items.Eyeball_Frog > 0)) ||
+          this.items.Prescription > 0 ||
+          ((!LogicHelper.settings.adult_trade_shuffle ||
+            !_.includes(LogicHelper.settings.adult_trade_start, "Broken Sword")) &&
+            this._evalEvent("Prescription Access")))
+      );
     }
 
     return _.some(Locations.activeEvents[eventName], eventData => {

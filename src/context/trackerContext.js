@@ -29,6 +29,9 @@ function parseItems(items_list, counters, unchanged_starting_inventory) {
       case "0baa96ca7e344c86a7086dd11e2d8a74":
         items.Megaton_Hammer = 1;
         break;
+      case "1b500047752347a6a5675c7f7f5dc352":
+        items.Cojiro = 1;
+        break;
       case "55f6bcc569c14f1293eb50fda76c812d":
         items.Bottle = 1;
         break;
@@ -41,19 +44,57 @@ function parseItems(items_list, counters, unchanged_starting_inventory) {
       case "a54955e5bcfd4fcd921062b5e298b137":
         items.Skull_Mask = 1;
         break;
-      // Spooky_Mask: 0,
-      // Keaton_Mask: 0,
-      // Bunny_Hood: 0,
-      // Mask_of_Truth: 0,
-      // Pocket_Egg: 0,
-      // Pocket_Cucco: 0,
-      // Odd_Mushroom: 0,
-      // Odd_Potion: 0,
-      // Poachers_Saw: 0,
-      // Broken_Sword: 0,
-      // Prescription: 0,
-      // Eyeball_Frog: 0,
-      // Eyedrops: 0,
+      case "3c3f8cc5057c494c81a1a6a6d8cbad69":
+        items.Spooky_Mask = 1;
+        break;
+      case "f70b84c0c77842739a4b404ded43f08e":
+        items.Chicken = 1;
+        break;
+      case "55ff7506fe6946148db4f2146d19d206":
+        items.Keaton_Mask = 1;
+        break;
+      case "91c0e74f7a0a44499570e066c34bc3b1":
+        items.Bunny_Hood = 1;
+        break;
+      case "5e55c6f1509246d5b0ce2f706414b7fb":
+        items.Mask_of_Truth = 1;
+        break;
+      case "e9998fa630d848a0b43b5019ca04b4b5":
+        items.Pocket_Egg = 1;
+        break;
+      case "eaf5dcbff1324b4ba06e28b4342e71a5":
+        items.Pocket_Cucco = 1;
+        break;
+      case "78ca70e0262e4a45a448da43fdbd062c":
+        items.Odd_Mushroom = 1;
+        if (!LogicHelper.settings.adult_trade_shuffle && !LogicHelper.renamedAttributes.disable_trade_revert) {
+          items.Cojiro = 1;
+        }
+        break;
+      case "46558672403c480d8d8249fe4e78191b":
+        items.Odd_Potion = 1;
+        break;
+      case "430bd8f3a01a4b13afba2fcb669f5c5c":
+        items.Poachers_Saw = 1;
+        break;
+      case "a945ff82daee4843bedadbd2608e7885":
+        items.Broken_Sword = 1;
+        break;
+      case "72913d92b25a4a1383d1cfde97cdce1b":
+        items.Prescription = 1;
+        break;
+      case "46aa9ba34f4840ebbbce62b72cc14fef":
+        items.Eyeball_Frog = 1;
+        if (!LogicHelper.settings.adult_trade_shuffle && !LogicHelper.renamedAttributes.disable_trade_revert) {
+          items.Prescription = 1;
+        }
+        break;
+      case "cc986a5de7774d44b0ec003f1f488495":
+        items.Eyedrops = 1;
+        if (!LogicHelper.settings.adult_trade_shuffle && !LogicHelper.renamedAttributes.disable_trade_revert) {
+          items.Prescription = 1;
+        }
+        break;
       case "3b07b8868e7a4e438b5c874a1f0ae677":
         items.Claim_Check = 1;
         break;
@@ -96,7 +137,18 @@ function parseItems(items_list, counters, unchanged_starting_inventory) {
       case "7373656ec94f430f8fbf971e53930949":
         items.Gerudo_Membership_Card = 1;
         break;
-      // Weird_Egg: 0,
+      case "f6539faa333e4812b900486e38cc381e":
+        items.Weird_Egg = 1;
+        break;
+      case "cc2e89b4f08143a699f5bc4f5337a76a":
+        items.Goron_Mask = 1;
+        break;
+      case "edf25e1eaad846bc8924636a022c30d8":
+        items.Zora_Mask = 1;
+        break;
+      case "2b6d79d69dec421aa2f26a4c1f3ef6ec":
+        items.Gerudo_Mask = 1;
+        break;
       case "5196e02aafac4b39b12ff1dc7bd5cb1c":
         items.Biggoron_Sword = 1;
         break;
