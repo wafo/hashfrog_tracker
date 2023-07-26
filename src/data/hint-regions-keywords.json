@@ -1,33 +1,123 @@
 {
-  "Links Pocket": ["Root"],
-  "Kokiri Forest": ["Kokiri Forest", "KF"],
-  "Lost Woods": ["Lost Woods", "LW", "Deku Theater"],
-  "Sacred Forest Meadow": ["Sacred Forest Meadow", "SFM"],
-  "Hyrule Field": ["Hyrule Field", "HF"],
-  "Lake Hylia": ["Lake Hylia", "LH"],
-  "Gerudo Valley": ["Gerudo Valley", "GV"],
-  "Gerudo Fortress": ["Gerudo Fortress", "GF", "Hideout"],
-  "Haunted Wasteland": ["Haunted Wasteland", "HW", "Wasteland"],
-  "Desert Colossus": ["Desert Colossus", "Colossus"],
-  "Market": ["Market"],
-  "Temple of Time": ["Temple of Time", "ToT", "Time"],
-  "Hyrule Castle": ["Hyrule Castle", "Hyrule Castle Grounds", "HC"],
-  "Outside Ganons Castle": ["Outside Ganons Castle", "OGC", "Ganons Castle", "Ganons Castle Grounds"],
-  "Kakariko Village": ["Kakariko Village", "KAK", "Kak"],
-  "Graveyard": ["Graveyard"],
-  "Death Mountain Trail": ["Death Mountain", "DMT"],
-  "Goron City": ["Goron City", "GC"],
-  "Death Mountain Crater": ["Death Mountain Crater", "DMC"],
-  "Zora River": ["Zora River", "ZR"],
-  "Zoras Domain": ["Zoras Domain", "ZD"],
-  "Zoras Fountain": ["Zoras Fountain", "ZF"],
-  "Lon Lon Ranch": ["Lon Lon Ranch", "LLR"],
-  "Deku Tree": ["Queen Gohma"],
-  "Dodongos Cavern": ["King Dodongo"],
-  "Jabu Jabus Belly": ["Barinade"],
-  "Forest Temple": ["Phantom Ganon"],
-  "Fire Temple": ["Volvagia"],
-  "Water Temple": ["Morpha"],
-  "Shadow Temple": ["Bongo Bongo"],
-  "Spirit Temple": ["Twinrova"]
+  "Links Pocket":[
+     "Root"
+  ],
+  "Kokiri Forest":[
+     "Kokiri Forest",
+     "KF"
+  ],
+  "Lost Woods":[
+     "Lost Woods",
+     "LW",
+     "Deku Theater"
+  ],
+  "Sacred Forest Meadow":[
+     "Sacred Forest Meadow",
+     "SFM"
+  ],
+  "Hyrule Field":[
+     "Hyrule Field",
+     "HF"
+  ],
+  "Lake Hylia":[
+     "Lake Hylia",
+     "LH"
+  ],
+  "Gerudo Valley":[
+     "Gerudo Valley",
+     "GV"
+  ],
+  "Gerudo Fortress":[
+     "Gerudo Fortress",
+     "GF",
+     "Hideout"
+  ],
+  "Haunted Wasteland":[
+     "Haunted Wasteland",
+     "HW",
+     "Wasteland"
+  ],
+  "Desert Colossus":[
+     "Desert Colossus",
+     "Colossus"
+  ],
+  "Market":[
+     "Market"
+  ],
+  "Temple of Time":[
+     "Temple of Time",
+     "ToT",
+     "Time"
+  ],
+  "Hyrule Castle":[
+     "Hyrule Castle",
+     "Hyrule Castle Grounds",
+     "HC"
+  ],
+  "Outside Ganons Castle":[
+     "Outside Ganons Castle",
+     "OGC",
+     "Ganons Castle",
+     "Ganons Castle Grounds"
+  ],
+  "Kakariko Village":[
+     "Kakariko Village",
+     "KAK",
+     "Kak"
+  ],
+  "Graveyard":[
+     "Graveyard"
+  ],
+  "Death Mountain Trail":[
+     "Death Mountain",
+     "DMT"
+  ],
+  "Goron City":[
+     "Goron City",
+     "GC"
+  ],
+  "Death Mountain Crater":[
+     "Death Mountain Crater",
+     "DMC"
+  ],
+  "Zora River":[
+     "Zora River",
+     "ZR"
+  ],
+  "Zoras Domain":[
+     "Zoras Domain",
+     "ZD"
+  ],
+  "Zoras Fountain":[
+     "Zoras Fountain",
+     "ZF"
+  ],
+  "Lon Lon Ranch":[
+     "Lon Lon Ranch",
+     "LLR"
+  ],
+  "Deku Tree":[
+     "Queen Gohma"
+  ],
+  "Dodongos Cavern":[
+     "King Dodongo"
+  ],
+  "Jabu Jabus Belly":[
+     "Barinade"
+  ],
+  "Forest Temple":[
+     "Phantom Ganon"
+  ],
+  "Fire Temple":[
+     "Volvagia"
+  ],
+  "Water Temple":[
+     "Morpha"
+  ],
+  "Shadow Temple":[
+     "Bongo Bongo"
+  ],
+  "Spirit Temple":[
+     "Twinrova"
+  ]
 }

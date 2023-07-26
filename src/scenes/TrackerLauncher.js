@@ -184,14 +184,12 @@ const TrackerLauncher = () => {
           <p>* Check tracking requires a compatible layout configuration to work properly.</p>
           <ul style={{ fontSize: "0.8em" }}>
             <li>
-              The logic assumes: Access to both ages, vanilla spawns and that the player can let the time of day pass.
+              The logic assumes: access to both ages; no shuffled entrances, owl drops, warp song destinations, or spawns; and vanilla (default) ocarina melodies.
             </li>
             <li>Closed Forest and Closed Door of Time do not work for the reasons above.</li>
-            <li>Trading sequences are not fully implemented.</li>
             <li>
               The logic assumes that the initial value for a counter is zero. Click the counter to update it if not.
             </li>
-            <li>Tracking Silver Rupees and Treasure Chest Game Small Keys is not yet implemented.</li>
           </ul>
         </div>
       </div>

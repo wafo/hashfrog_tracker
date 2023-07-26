@@ -1,7 +1,7 @@
 import Footer from "../components/Footer";
 import TrackerLauncher from "./TrackerLauncher";
 
-import profile_tanjo3 from "../assets/contributors/tanjo3.jpeg";
+import profile_tanjo3 from "../assets/contributors/tanjo3.jpg";
 import profile_wafo from "../assets/contributors/wafo.png";
 
 const Welcome = () => {

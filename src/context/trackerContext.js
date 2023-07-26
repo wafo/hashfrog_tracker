@@ -11,11 +11,11 @@ const GENERATOR_VERSION = process.env.REACT_APP_GENERATOR_VERSION;
 
 const TrackerContext = createContext();
 
-function parseItems(items_list, counters, unchanged_starting_items) {
+function parseItems(items_list, counters, unchanged_starting_inventory) {
   const items = _.cloneDeep(DEFAULT_ITEMS);
 
   // Parse items
-  _.forEach(_.union(_.values(items_list), unchanged_starting_items), item => {
+  _.forEach(_.union(_.values(items_list), unchanged_starting_inventory), item => {
     switch (item) {
       case "c50e8543ab0c4bdaa8a23e6a80ae6d1c":
         // ignore Master Sword
@@ -29,6 +29,9 @@ function parseItems(items_list, counters, unchanged_starting_items) {
       case "0baa96ca7e344c86a7086dd11e2d8a74":
         items.Megaton_Hammer = 1;
         break;
+      case "1b500047752347a6a5675c7f7f5dc352":
+        items.Cojiro = 1;
+        break;
       case "55f6bcc569c14f1293eb50fda76c812d":
         items.Bottle = 1;
         break;
@@ -41,19 +44,57 @@ function parseItems(items_list, counters, unchanged_starting_items) {
       case "a54955e5bcfd4fcd921062b5e298b137":
         items.Skull_Mask = 1;
         break;
-      // Spooky_Mask: 0,
-      // Keaton_Mask: 0,
-      // Bunny_Hood: 0,
-      // Mask_of_Truth: 0,
-      // Pocket_Egg: 0,
-      // Pocket_Cucco: 0,
-      // Odd_Mushroom: 0,
-      // Odd_Potion: 0,
-      // Poachers_Saw: 0,
-      // Broken_Sword: 0,
-      // Prescription: 0,
-      // Eyeball_Frog: 0,
-      // Eyedrops: 0,
+      case "3c3f8cc5057c494c81a1a6a6d8cbad69":
+        items.Spooky_Mask = 1;
+        break;
+      case "f70b84c0c77842739a4b404ded43f08e":
+        items.Chicken = 1;
+        break;
+      case "55ff7506fe6946148db4f2146d19d206":
+        items.Keaton_Mask = 1;
+        break;
+      case "91c0e74f7a0a44499570e066c34bc3b1":
+        items.Bunny_Hood = 1;
+        break;
+      case "5e55c6f1509246d5b0ce2f706414b7fb":
+        items.Mask_of_Truth = 1;
+        break;
+      case "e9998fa630d848a0b43b5019ca04b4b5":
+        items.Pocket_Egg = 1;
+        break;
+      case "eaf5dcbff1324b4ba06e28b4342e71a5":
+        items.Pocket_Cucco = 1;
+        break;
+      case "78ca70e0262e4a45a448da43fdbd062c":
+        items.Odd_Mushroom = 1;
+        if (!LogicHelper.settings.adult_trade_shuffle && !LogicHelper.renamedAttributes.disable_trade_revert) {
+          items.Cojiro = 1;
+        }
+        break;
+      case "46558672403c480d8d8249fe4e78191b":
+        items.Odd_Potion = 1;
+        break;
+      case "430bd8f3a01a4b13afba2fcb669f5c5c":
+        items.Poachers_Saw = 1;
+        break;
+      case "a945ff82daee4843bedadbd2608e7885":
+        items.Broken_Sword = 1;
+        break;
+      case "72913d92b25a4a1383d1cfde97cdce1b":
+        items.Prescription = 1;
+        break;
+      case "46aa9ba34f4840ebbbce62b72cc14fef":
+        items.Eyeball_Frog = 1;
+        if (!LogicHelper.settings.adult_trade_shuffle && !LogicHelper.renamedAttributes.disable_trade_revert) {
+          items.Prescription = 1;
+        }
+        break;
+      case "cc986a5de7774d44b0ec003f1f488495":
+        items.Eyedrops = 1;
+        if (!LogicHelper.settings.adult_trade_shuffle && !LogicHelper.renamedAttributes.disable_trade_revert) {
+          items.Prescription = 1;
+        }
+        break;
       case "3b07b8868e7a4e438b5c874a1f0ae677":
         items.Claim_Check = 1;
         break;
@@ -96,7 +137,18 @@ function parseItems(items_list, counters, unchanged_starting_items) {
       case "7373656ec94f430f8fbf971e53930949":
         items.Gerudo_Membership_Card = 1;
         break;
-      // Weird_Egg: 0,
+      case "f6539faa333e4812b900486e38cc381e":
+        items.Weird_Egg = 1;
+        break;
+      case "cc2e89b4f08143a699f5bc4f5337a76a":
+        items.Goron_Mask = 1;
+        break;
+      case "edf25e1eaad846bc8924636a022c30d8":
+        items.Zora_Mask = 1;
+        break;
+      case "2b6d79d69dec421aa2f26a4c1f3ef6ec":
+        items.Gerudo_Mask = 1;
+        break;
       case "5196e02aafac4b39b12ff1dc7bd5cb1c":
         items.Biggoron_Sword = 1;
         break;
@@ -216,6 +268,22 @@ function parseItems(items_list, counters, unchanged_starting_items) {
         items.Zeldas_Letter = 1;
         break;
 
+      case "6466793887f9475685558adbae2a4b3e":
+        items.Ocarina_A_Button = 1;
+        break;
+      case "5598cc877c91426ab4ec083fccb7c22b":
+        items.Ocarina_C_up_Button = 1;
+        break;
+      case "506b5e53591b430cbf45855088bfae1b":
+        items.Ocarina_C_down_Button = 1;
+        break;
+      case "9ffc29578f514202a80fa5278a3bd281":
+        items.Ocarina_C_left_Button = 1;
+        break;
+      case "2d85db579f3c4be49bf48d4853d112e7":
+        items.Ocarina_C_right_Button = 1;
+        break;
+
       case "ce1f2799ff1a433ba0bb40fee47e49a1":
         items.Minuet_of_Forest = 1;
         break;
@@ -297,6 +365,9 @@ function parseItems(items_list, counters, unchanged_starting_items) {
         items.Bottle = value;
         break;
 
+      case "keys_tcg":
+        items.Small_Key_Treasure_Chest_Game = value;
+        break;
       case "keys_forest":
         items.Small_Key_Forest_Temple = value;
         break;
@@ -323,6 +394,73 @@ function parseItems(items_list, counters, unchanged_starting_items) {
         break;
       case "keys_ganons":
         items.Small_Key_Ganons_Castle = value;
+        break;
+
+      case "srup_dc":
+        items.Silver_Rupee_Dodongos_Cavern_Staircase = value;
+        break;
+      case "srup_ice_scythe":
+        items.Silver_Rupee_Ice_Cavern_Spinning_Scythe = value;
+        break;
+      case "srup_ice_block":
+        items.Silver_Rupee_Ice_Cavern_Push_Block = value;
+        break;
+      case "srup_botw":
+        items.Silver_Rupee_Bottom_of_the_Well_Basement = value;
+        break;
+      case "srup_shadow_scythe":
+        items.Silver_Rupee_Shadow_Temple_Scythe_Shortcut = value;
+        break;
+      case "srup_shadow_blades":
+        items.Silver_Rupee_Shadow_Temple_Invisible_Blades = value;
+        break;
+      case "srup_shadow_pit":
+        items.Silver_Rupee_Shadow_Temple_Huge_Pit = value;
+        break;
+      case "srup_shadow_spikes":
+        items.Silver_Rupee_Shadow_Temple_Invisible_Spikes = value;
+        break;
+      case "srup_gtg_slopes":
+        items.Silver_Rupee_Gerudo_Training_Ground_Slopes = value;
+        break;
+      case "srup_gtg_lava":
+        items.Silver_Rupee_Gerudo_Training_Ground_Lava = value;
+        break;
+      case "srup_gtg_water":
+        items.Silver_Rupee_Gerudo_Training_Ground_Water = value;
+        break;
+      case "srup_spirit_child":
+        items.Silver_Rupee_Spirit_Temple_Child_Early_Torches = value;
+        break;
+      case "srup_spirit_boulders":
+        items.Silver_Rupee_Spirit_Temple_Adult_Boulders = value;
+        break;
+      case "srup_spirit_lobby":
+        items.Silver_Rupee_Spirit_Temple_Lobby_and_Lower_Adult = value;
+        break;
+      case "srup_spirit_sun":
+        items.Silver_Rupee_Spirit_Temple_Sun_Block = value;
+        break;
+      case "srup_spirit_climb":
+        items.Silver_Rupee_Spirit_Temple_Adult_Climb = value;
+        break;
+      case "srup_ganons_spirit":
+        items.Silver_Rupee_Ganons_Castle_Spirit_Trial = value;
+        break;
+      case "srup_ganons_light":
+        items.Silver_Rupee_Ganons_Castle_Light_Trial = value;
+        break;
+      case "srup_ganons_fire":
+        items.Silver_Rupee_Ganons_Castle_Fire_Trial = value;
+        break;
+      case "srup_ganons_shadow":
+        items.Silver_Rupee_Ganons_Castle_Shadow_Trial = value;
+        break;
+      case "srup_ganons_water":
+        items.Silver_Rupee_Ganons_Castle_Water_Trial = value;
+        break;
+      case "srup_ganons_forest":
+        items.Silver_Rupee_Ganons_Castle_Forest_Trial = value;
         break;
 
       default:
@@ -445,7 +583,10 @@ function reducer(state, action) {
       });
 
       // Validating checks based on items collected
-      const validatedLocations = validateLocations(locations, parseItems(state.items_list, state.counters, state.unchanged_starting_items));
+      const validatedLocations = validateLocations(
+        locations,
+        parseItems(state.items_list, state.counters, state.unchanged_starting_inventory),
+      );
 
       return {
         ...state,
@@ -463,7 +604,10 @@ function reducer(state, action) {
       }
 
       // Revalidate checks based on items collected
-      const validatedLocations = validateLocations(state.locations, parseItems(state.items_list, state.counters, state.unchanged_starting_items));
+      const validatedLocations = validateLocations(
+        state.locations,
+        parseItems(state.items_list, state.counters, state.unchanged_starting_inventory),
+      );
 
       return {
         ...state,
@@ -490,25 +634,32 @@ function reducer(state, action) {
       const settings = payload;
       const items = [...settings.starting_equipment, ...settings.starting_inventory, ...settings.starting_songs];
 
-      const starting_items = items.map(item => {
+      const starting_inventory = items.map(item => {
         return ITEMS_JSON[item];
       });
 
       if (settings.start_with_consumables) {
-        starting_items.push("34b2ad3657e94b75b281cec30e617f37");
-        starting_items.push("73a0f3f5688745a8bb4a0973d9858960");
+        starting_inventory.push("34b2ad3657e94b75b281cec30e617f37");
+        starting_inventory.push("73a0f3f5688745a8bb4a0973d9858960");
       }
       if (settings.open_door_of_time && settings.open_forest !== "closed") {
-        starting_items.push("c50e8543ab0c4bdaa8a23e6a80ae6d1c");
+        starting_inventory.push("c50e8543ab0c4bdaa8a23e6a80ae6d1c");
+      }
+      if (!settings.shuffle_individual_ocarina_notes) {
+        starting_inventory.push("6466793887f9475685558adbae2a4b3e");
+        starting_inventory.push("5598cc877c91426ab4ec083fccb7c22b");
+        starting_inventory.push("506b5e53591b430cbf45855088bfae1b");
+        starting_inventory.push("9ffc29578f514202a80fa5278a3bd281");
+        starting_inventory.push("2d85db579f3c4be49bf48d4853d112e7");
       }
 
-      // `starting_items` will be properly set through `useElement` hook
+      // `starting_inventory` will be properly set through `useElement` hook
       const items_list = {};
-      for (let i = 0; i < starting_items.length; i++) {
-        _.set(items_list, i, starting_items[i]);
+      for (let i = 0; i < starting_inventory.length; i++) {
+        _.set(items_list, i, starting_inventory[i]);
       }
 
-      const parsedItems = parseItems(items_list, [], starting_items);
+      const parsedItems = parseItems(items_list, [], starting_inventory);
 
       // Validating checks based on items collected
       const locations = validateLocations(state.locations, parsedItems);
@@ -517,8 +668,8 @@ function reducer(state, action) {
         ...state,
         locations,
         items: parsedItems,
-        starting_items,
-        unchanged_starting_items: _.cloneDeep(starting_items),
+        starting_inventory,
+        unchanged_starting_inventory: _.cloneDeep(starting_inventory),
         items_list: {},
       };
     }
@@ -529,7 +680,7 @@ function reducer(state, action) {
       const counters = _.set(_.cloneDeep(state.counters), item, value);
 
       // Prepping collecting items with counters
-      const parsedItems = parseItems(state.items_list, counters, state.unchanged_starting_items);
+      const parsedItems = parseItems(state.items_list, counters, state.unchanged_starting_inventory);
 
       // Validating checks based on items collected
       const locations = validateLocations(state.locations, parsedItems);
@@ -552,7 +703,7 @@ function reducer(state, action) {
         _.set(items_list, parentID, item);
       }
 
-      const parsedItems = parseItems(items_list, state.counters, state.unchanged_starting_items);
+      const parsedItems = parseItems(items_list, state.counters, state.unchanged_starting_inventory);
 
       // Validating checks based on items collected
       const locations = validateLocations(state.locations, parsedItems);
@@ -588,8 +739,8 @@ function TrackerProvider(props) {
     locations: {},
     items: _.cloneDeep(DEFAULT_ITEMS),
     counters: {},
-    starting_items: [],
-    unchanged_starting_items: [],
+    starting_inventory: [],
+    unchanged_starting_inventory: [],
     items_list: {},
     layoutElements: [],
     settings_string: getSettingsStringCache(),
@@ -617,7 +768,7 @@ const useChecks = () => {
 
 const useElement = (id, startingItem) => {
   const {
-    state: { layoutElements, unchanged_starting_items, items_list },
+    state: { layoutElements, unchanged_starting_inventory, items_list },
   } = useTracker();
 
   if (!_.includes(layoutElements, id)) {
@@ -626,9 +777,9 @@ const useElement = (id, startingItem) => {
     if (!_.isNull(startingItem)) {
       _.set(items_list, id, startingItem);
 
-      // Note that starting item appears on the tracker layout 
-      if (_.includes(unchanged_starting_items, startingItem)) {
-        unchanged_starting_items.splice(unchanged_starting_items.indexOf(startingItem), 1);
+      // Note that starting item appears on the tracker layout
+      if (_.includes(unchanged_starting_inventory, startingItem)) {
+        unchanged_starting_inventory.splice(unchanged_starting_inventory.indexOf(startingItem), 1);
       }
     }
   }
@@ -665,7 +816,7 @@ const useItems = items => {
     [dispatch],
   );
 
-  // IMPORTANT: Intentionally ignoring state.starting_items on the dependency array.
+  // IMPORTANT: Intentionally ignoring state.starting_inventory on the dependency array.
   const startingIndex = useMemo(() => {
     // Loops through the items of the element,
     // searching for a match against the items in the tracker context.
@@ -673,7 +824,7 @@ const useItems = items => {
     let itemIndex = 0;
     if (!items || !items.length) return 0;
     for (let i = 0; i < items.length; i++) {
-      if (_.includes(state.starting_items, items[i])) {
+      if (_.includes(state.starting_inventory, items[i])) {
         itemIndex = i;
         break;
       }
@@ -686,7 +837,7 @@ const useItems = items => {
     let itemID = null;
     if (!items || !items.length) return null;
     for (let i = 0; i < items.length; i++) {
-      if (_.includes(state.starting_items, items[i])) {
+      if (_.includes(state.starting_inventory, items[i])) {
         itemID = items[i];
         break;
       }

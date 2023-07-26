@@ -89,7 +89,41 @@ class LogicHelper {
     let accessibleAdultRegions = [];
     let newAdultRegions = this._recalculateAccessibleRegions("Root", "adult");
 
+    const guaranteedKeys = {};
+    let updatedKeys = false;
+
     do {
+      updatedKeys = false;
+
+      _.forEach(this.regions.child, regionName => {
+        if (_.includes(_.keys(Locations.activeKeyLocations), regionName)) {
+          _.forEach(Locations.activeKeyLocations[regionName], keyLocation => {
+            if (
+              !_.includes(_.keys(guaranteedKeys), keyLocation.locationName) &&
+              this._evalNode(keyLocation.rule, "child")
+            ) {
+              _.set(guaranteedKeys, keyLocation.locationName, true);
+              _.update(this.items, LogicHelper._getItemName(keyLocation.vanillaItem), count => count + 1);
+              updatedKeys = true;
+            }
+          });
+        }
+      });
+      _.forEach(this.regions.adult, regionName => {
+        if (_.includes(_.keys(Locations.activeKeyLocations), regionName)) {
+          _.forEach(Locations.activeKeyLocations[regionName], keyLocation => {
+            if (
+              !_.includes(_.keys(guaranteedKeys), keyLocation.locationName) &&
+              this._evalNode(keyLocation.rule, "adult")
+            ) {
+              _.set(guaranteedKeys, keyLocation.locationName, true);
+              _.update(this.items, LogicHelper._getItemName(keyLocation.vanillaItem), count => count + 1);
+              updatedKeys = true;
+            }
+          });
+        }
+      });
+
       accessibleChildRegions = _.cloneDeep(newChildRegions);
       accessibleAdultRegions = _.cloneDeep(newAdultRegions);
 
@@ -100,6 +134,7 @@ class LogicHelper {
         newAdultRegions = _.union(newAdultRegions, this._recalculateAccessibleRegions(regionName, "adult"));
       });
     } while (
+      updatedKeys ||
       !_.isEqual(accessibleChildRegions, newChildRegions) ||
       !_.isEqual(accessibleAdultRegions, newAdultRegions)
     );
@@ -137,6 +172,7 @@ class LogicHelper {
     return _.map(
       [
         "isLocationAvailable",
+        "_getItemName",
         "_isRegionAccessible",
         "_evalNode",
         "_evalBinaryExpression",
@@ -216,6 +252,10 @@ class LogicHelper {
       skip_child_zelda: skipChildZelda,
       triforce_goal: triforceGoal,
     };
+  }
+
+  static _getItemName(itemName) {
+    return _.replace(itemName, /[() ]/g, match => (_.isEqual(match, " ") ? "_" : ""));
   }
 
   static _recalculateAccessibleRegions(rootRegion, age) {
@@ -362,6 +402,80 @@ class LogicHelper {
         return _.isEqual(age, "child");
       case "is_adult":
         return _.isEqual(age, "adult");
+
+      case "Zeldas_Letter":
+        return (
+          this.items[name] > 0 ||
+          this.renamedAttributes.skip_child_zelda ||
+          this.isLocationAvailable("HC Zeldas Letter")
+        );
+      case "Keaton_Mask":
+        return this.items[name] > 0 || this.isLocationAvailable("Market Mask Shop Item 6");
+      case "Skull_Mask":
+        return this.items[name] > 0 || this.isLocationAvailable("Market Mask Shop Item 5");
+      case "Spooky_Mask":
+        return this.items[name] > 0 || this.isLocationAvailable("Market Mask Shop Item 8");
+      case "Bunny_Hood":
+        return this.items[name] > 0 || this.isLocationAvailable("Market Mask Shop Item 7");
+      case "Mask_of_Truth":
+        return this.items[name] > 0 || this.isLocationAvailable("Market Mask Shop Item 3");
+
+      case "Odd_Mushroom":
+        return (
+          this.items[name] > 0 ||
+          ((!LogicHelper.settings.adult_trade_shuffle ||
+            !_.includes(LogicHelper.settings.adult_trade_start, "Odd Mushroom")) &&
+            this.isLocationAvailable("LW Trade Cojiro", "adult"))
+        );
+      case "Odd_Potion":
+        return (
+          this.items[name] > 0 ||
+          ((!LogicHelper.settings.adult_trade_shuffle ||
+            !_.includes(LogicHelper.settings.adult_trade_start, "Odd Potion")) &&
+            this.isLocationAvailable("Kak Granny Trade Odd Mushroom", "adult"))
+        );
+      case "Poachers_Saw":
+        return (
+          this.items[name] > 0 ||
+          ((!LogicHelper.settings.adult_trade_shuffle ||
+            !_.includes(LogicHelper.settings.adult_trade_start, "Poachers Saw")) &&
+            this.isLocationAvailable("LW Trade Odd Potion", "adult"))
+        );
+      case "Broken_Sword":
+        return (
+          this.items[name] > 0 ||
+          ((!LogicHelper.settings.adult_trade_shuffle ||
+            !_.includes(LogicHelper.settings.adult_trade_start, "Broken Sword")) &&
+            this.isLocationAvailable("GV Trade Poachers Saw", "adult"))
+        );
+      case "Prescription":
+        return (
+          this.items[name] > 0 ||
+          ((!LogicHelper.settings.adult_trade_shuffle ||
+            !_.includes(LogicHelper.settings.adult_trade_start, "Prescription")) &&
+            this.isLocationAvailable("DMT Trade Broken Sword", "adult"))
+        );
+      case "Eyeball_Frog":
+        return (
+          this.items[name] > 0 ||
+          ((!LogicHelper.settings.adult_trade_shuffle ||
+            !_.includes(LogicHelper.settings.adult_trade_start, "Eyeball Frog")) &&
+            this.isLocationAvailable("ZD Trade Prescription", "adult"))
+        );
+      case "Eyedrops":
+        return (
+          this.items[name] > 0 ||
+          ((!LogicHelper.settings.adult_trade_shuffle ||
+            !_.includes(LogicHelper.settings.adult_trade_start, "Eyedrops")) &&
+            this.isLocationAvailable("LH Trade Eyeball Frog", "adult"))
+        );
+      case "Claim_Check":
+        return (
+          this.items[name] > 0 ||
+          ((!LogicHelper.settings.adult_trade_shuffle ||
+            !_.includes(LogicHelper.settings.adult_trade_start, "Claim Check")) &&
+            this.isLocationAvailable("DMT Trade Eyedrops", "adult"))
+        );
     }
 
     if (_.includes(_.keys(this.items), name)) {
@@ -401,10 +515,6 @@ class LogicHelper {
     }
     if (_.startsWith(name, "Buy_")) {
       return this._canBuy(name, age);
-    }
-    // They added some checks for buttons of ocarina notes. Not sure why, but we can default to true for now
-    if (_.startsWith(name, "Ocarina_")) {
-      return true;
     }
 
     throw Error(`Unknown identifier: ${name}`);
@@ -541,10 +651,15 @@ class LogicHelper {
     if (_.isEqual(songName, "Scarecrow_Song")) {
       return (
         this.items.Ocarina > 0 &&
-        (this.settings.free_scarecrow || (_.isEqual(age, "adult") && this._evalEvent("Bonooru")))
+        (this.settings.free_scarecrow || (_.isEqual(age, "adult") && this._evalEvent("Bonooru"))) &&
+        (!this.settings.shuffle_individual_ocarina_notes || this._hasAllNotesForSong("Scarecrow_Song"))
       );
     } else {
-      return this.items.Ocarina > 0 && this.items[songName] > 0;
+      return (
+        this.items.Ocarina > 0 &&
+        this.items[songName] > 0 &&
+        (!this.settings.shuffle_individual_ocarina_notes || this._hasAllNotesForSong(songName))
+      );
     }
   }
 
@@ -597,9 +712,16 @@ class LogicHelper {
   }
 
   static _evalEvent(eventName) {
-    // TOOD: hardcode adult trade to start at Prescription
-    if (_.isEqual(eventName, "Broken Sword Access")) {
-      return false;
+    // manually implement event to prevent infinite recursion
+    if (_.isEqual(eventName, "Eyeball Frog Access")) {
+      return (
+        this._evalEvent("King Zora Thawed") &&
+        ((!this.renamedAttributes.disable_trade_revert && (this.items.Eyedrops > 0 || this.items.Eyeball_Frog > 0)) ||
+          this.items.Prescription > 0 ||
+          ((!LogicHelper.settings.adult_trade_shuffle ||
+            !_.includes(LogicHelper.settings.adult_trade_start, "Broken Sword")) &&
+            this._evalEvent("Prescription Access")))
+      );
     }
 
     return _.some(Locations.activeEvents[eventName], eventData => {
@@ -686,6 +808,96 @@ class LogicHelper {
       (_.isEqual(forAge, "both") && canChildProjectile && canAdultProjectile) ||
       (_.isEqual(forAge, "either") && (canChildProjectile || canAdultProjectile))
     );
+  }
+
+  static _hasAllNotesForSong(songName) {
+    if (_.isEqual(songName, "Scarecrow Song")) {
+      return (
+        _.sum([
+          this.items.Ocarina_A_Button,
+          this.items.Ocarina_C_up_Button,
+          this.items.Ocarina_C_down_Button,
+          this.items.Ocarina_C_left_Button,
+          this.items.Ocarina_C_right_Button,
+        ]) >= 2
+      );
+    }
+
+    // TODO: Currently assuming default notes for songs.
+    // If shuffled, would need interface for user to specify notes for songs.
+    switch (songName) {
+      case "Minuet_of_Forest":
+        return (
+          this.items.Ocarina_A_Button > 0 &&
+          this.items.Ocarina_C_up_Button > 0 &&
+          this.items.Ocarina_C_left_Button > 0 &&
+          this.items.Ocarina_C_right_Button > 0
+        );
+      case "Bolero_of_Fire":
+        return (
+          this.items.Ocarina_A_Button > 0 &&
+          this.items.Ocarina_C_down_Button > 0 &&
+          this.items.Ocarina_C_right_Button > 0
+        );
+      case "Serenade_of_Water":
+        return (
+          this.items.Ocarina_A_Button > 0 &&
+          this.items.Ocarina_C_down_Button > 0 &&
+          this.items.Ocarina_C_left_Button > 0 &&
+          this.items.Ocarina_C_right_Button > 0
+        );
+      case "Requiem_of_Spirit":
+        return (
+          this.items.Ocarina_A_Button > 0 &&
+          this.items.Ocarina_C_down_Button > 0 &&
+          this.items.Ocarina_C_right_Button > 0
+        );
+      case "Nocturne_of_Shadow":
+        return (
+          this.items.Ocarina_A_Button > 0 &&
+          this.items.Ocarina_C_down_Button > 0 &&
+          this.items.Ocarina_C_left_Button > 0 &&
+          this.items.Ocarina_C_right_Button > 0
+        );
+      case "Prelude_of_Light":
+        return (
+          this.items.Ocarina_C_up_Button > 0 &&
+          this.items.Ocarina_C_left_Button > 0 &&
+          this.items.Ocarina_C_right_Button > 0
+        );
+      case "Zeldas_Lullaby":
+        return (
+          this.items.Ocarina_C_up_Button > 0 &&
+          this.items.Ocarina_C_left_Button > 0 &&
+          this.items.Ocarina_C_right_Button > 0
+        );
+      case "Eponas_Song":
+        return (
+          this.items.Ocarina_C_up_Button > 0 &&
+          this.items.Ocarina_C_left_Button > 0 &&
+          this.items.Ocarina_C_right_Button > 0
+        );
+      case "Sarias_Song":
+        return (
+          this.items.Ocarina_C_down_Button > 0 &&
+          this.items.Ocarina_C_left_Button > 0 &&
+          this.items.Ocarina_C_right_Button > 0
+        );
+      case "Suns_Song":
+        return (
+          this.items.Ocarina_C_up_Button > 0 &&
+          this.items.Ocarina_C_down_Button > 0 &&
+          this.items.Ocarina_C_right_Button > 0
+        );
+      case "Song_of_Time":
+        return (
+          this.items.Ocarina_A_Button > 0 && this.items.Ocarina_C_up_Button > 0 && this.items.Ocarina_C_right_Button > 0
+        );
+      case "Song_of_Storms":
+        return (
+          this.items.Ocarina_A_Button > 0 && this.items.Ocarina_C_up_Button > 0 && this.items.Ocarina_C_down_Button > 0
+        );
+    }
   }
 
   static _hasStones(count) {
