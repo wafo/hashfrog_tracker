@@ -140,26 +140,34 @@ const TrackerLauncher = () => {
             <button
               type="button"
               className="btn btn-light btn-sm me-2"
+              onClick={() => updateString("sgl_2023")}
+              disabled={!checks}
+            >
+              SGL 2023
+            </button>
+            <button
+              type="button"
+              className="btn btn-light btn-sm me-2"
+              onClick={() => updateString("league_s5")}
+              disabled={!checks}
+            >
+              League S5
+            </button>
+            <button
+              type="button"
+              className="btn btn-light btn-sm me-2"
+              onClick={() => updateString("scrubs_s5")}
+              disabled={!checks}
+            >
+              Scrubs S5
+            </button>
+            <button
+              type="button"
+              className="btn btn-light btn-sm me-2"
               onClick={() => updateString("tfb_s2")}
               disabled={!checks}
             >
               Triforce Blitz S2
-            </button>
-            <button
-              type="button"
-              className="btn btn-light btn-sm me-2"
-              onClick={() => updateString("league_s4")}
-              disabled={!checks}
-            >
-              League S4
-            </button>
-            <button
-              type="button"
-              className="btn btn-light btn-sm me-2"
-              onClick={() => updateString("scrubs_s4")}
-              disabled={!checks}
-            >
-              Scrubs S4
             </button>
             {LOGIC_BRANCH === "release" && (
               <p className="note">
