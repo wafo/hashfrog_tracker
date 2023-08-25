@@ -17,6 +17,7 @@ const LocationHint = props => {
     bossIcons = [], // to override the boss icons
     showItems = true, // Show or not the right icons
     itemsIcons = [], //
+    hidden = false
   } = props;
 
   const [hasValue, setHasValue] = useState(false);
@@ -38,7 +39,7 @@ const LocationHint = props => {
   }, [options, labels]);
 
   return (
-    <div style={{ width, display: "flex" }}>
+    <div style={{ width, display: "flex" }} hidden={hidden}>
       {showBoss && hasValue && (
         <Element
           id={`locations_boss_${id}`}

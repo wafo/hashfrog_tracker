@@ -31,6 +31,7 @@ const Element = props => {
     dragCurrent = false, // if dragging should default or drag the current selected
     selectedStartingIndex = 0, // on which of the icons we start
     items = [],
+    hidden = false
   } = props;
 
   const { markCounter, markItem, startingIndex: trackerContextStartingIndex, startingItem } = useItems(items);
@@ -134,6 +135,7 @@ const Element = props => {
         onDragOver={e => e.preventDefault()}
         onDrop={dropHandler}
         draggable
+        hidden={hidden}
       >
         <img className="element-icon" src={draggedIcon || icon || icon_hashfrog} alt={name} />
         {type === "counter" && <CounterLabel counter={counter} />}

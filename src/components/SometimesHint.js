@@ -17,6 +17,7 @@ const SometimesHint = props => {
     backgroundColor = "#333333", // background color for input
     inverted = false, // switch place of the icon/item
     dual = false, // show two items
+    hidden = false
   } = props;
 
   const memoizedOptions = useMemo(() => {
@@ -28,7 +29,7 @@ const SometimesHint = props => {
   }, [options, labels]);
 
   return (
-    <div style={{ width, display: "flex", flexDirection: inverted ? "row-reverse" : "row" }}>
+    <div style={{ width, display: "flex", flexDirection: inverted ? "row-reverse" : "row" }} hidden={hidden}>
       <CustomReactSelect
         id={`sometimes_input_${id}`}
         name={`sometimes_input_${name}`}
