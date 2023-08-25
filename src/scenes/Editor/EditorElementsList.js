@@ -83,7 +83,7 @@ const EditorElementsList = ({ elements, setLayout }) => {
       </div>
       {element && ( // Preview of the element
         <div className="d-flex justify-content-center p-3" style={{ backgroundColor: "#000" }}>
-          <Element {...element} icons={icons} />
+          <Element {...element} hidden={false} icons={icons} />
         </div>
       )}
       {element && <EditorElement element={element} setElement={setElement} />}
