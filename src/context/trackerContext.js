@@ -13,6 +13,10 @@ const TrackerContext = createContext();
 
 function parseItems(items_list, counters, unchanged_starting_inventory) {
   const items = _.cloneDeep(DEFAULT_ITEMS);
+  const tradeRevert =
+    LogicHelper.settings &&
+    !LogicHelper.settings.adult_trade_shuffle &&
+    !LogicHelper.renamedAttributes.disable_trade_revert;
 
   // Parse items
   _.forEach(_.union(_.values(items_list), unchanged_starting_inventory), item => {
@@ -67,7 +71,7 @@ function parseItems(items_list, counters, unchanged_starting_inventory) {
         break;
       case "78ca70e0262e4a45a448da43fdbd062c":
         items.Odd_Mushroom = 1;
-        if (!LogicHelper.settings.adult_trade_shuffle && !LogicHelper.renamedAttributes.disable_trade_revert) {
+        if (tradeRevert) {
           items.Cojiro = 1;
         }
         break;
@@ -85,13 +89,13 @@ function parseItems(items_list, counters, unchanged_starting_inventory) {
         break;
       case "46aa9ba34f4840ebbbce62b72cc14fef":
         items.Eyeball_Frog = 1;
-        if (!LogicHelper.settings.adult_trade_shuffle && !LogicHelper.renamedAttributes.disable_trade_revert) {
+        if (tradeRevert) {
           items.Prescription = 1;
         }
         break;
       case "cc986a5de7774d44b0ec003f1f488495":
         items.Eyedrops = 1;
-        if (!LogicHelper.settings.adult_trade_shuffle && !LogicHelper.renamedAttributes.disable_trade_revert) {
+        if (tradeRevert) {
           items.Prescription = 1;
         }
         break;
