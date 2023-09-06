@@ -24,6 +24,8 @@ const HintsTable = props => {
     // Location only
     showBoss = true, // Show or not the left boss icon
     showItems = true, // Show or not the right icons
+    bossReceiver = false,
+    bossElementsIcons = [] // Elements that the user has chosen to appear in the boss selection. Would overwrite the default bossElement.icons cache
   } = props;
 
   const rows = useMemo(() => {
@@ -56,6 +58,8 @@ const HintsTable = props => {
               bossIcons={bossIcons}
               showBoss={showBoss}
               showItems={showItems}
+              bossReceiver={bossReceiver}
+              bossElementsIcons={bossElementsIcons}
             />
           </td>,
         );
@@ -82,6 +86,8 @@ const HintsTable = props => {
     showBoss,
     showItems,
     dual,
+    bossReceiver,
+    bossElementsIcons
   ]);
 
   return (
