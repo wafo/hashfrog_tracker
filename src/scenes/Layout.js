@@ -95,6 +95,12 @@ const Layout = props => {
     [cachedIcons, elements, layoutConfig.backgroundColor],
   );
 
+  const getUserBossElementIcons = userBossElements => ({...(userBossElements && {bossElementsIcons: userBossElements.reduce((acc, element) => {
+    acc.push(...element.icons);
+
+    return acc;
+  }, [])})})
+
   useEffect(() => {
     document.title = "HashFrog - Tracker";
     getCacheIcons();
@@ -162,6 +168,9 @@ const Layout = props => {
         case "locationhint": {
           const element = getCacheElement(component.elementId);
           const bossElement = getCacheElement("9e6f493869f84c19b23081bdb92bc621");
+
+          const userBossElements = component.bossElements ? component.bossElements.map(x => getCacheElement(x)) : null;
+
           const [top, left] = component.position;
           return (
             <div key={component.id} className="layout-component" style={{ top, left }}>
@@ -173,6 +182,8 @@ const Layout = props => {
                 showBoss={component.showBoss}
                 showItems={component.showItems}
                 labels={component.labels}
+                bossReceiver={component.bossReceiver}
+                {...getUserBossElementIcons(userBossElements)}
                 hidden={component.hidden}
                 {...(bossElement && bossElement.icons && { bossIcons: bossElement.icons })}
                 {...(element && element.icons && { itemsIcons: element.icons })}
@@ -184,6 +195,9 @@ const Layout = props => {
           const element = getCacheElement(component.elementId);
           const bossElement = getCacheElement("9e6f493869f84c19b23081bdb92bc621");
           const [top, left] = component.position;
+
+          const userBossElements = component.bossElements ? component.bossElements.map(x => getCacheElement(x)) : null;
+
           return (
             <div key={component.id} className="layout-component" style={{ top, left }}>
               <HintsTable
@@ -202,7 +216,9 @@ const Layout = props => {
                 inverted={component.inverted}
                 showBoss={component.showBoss}
                 showItems={component.showItems}
+                bossReceiver={component.bossReceiver}
                 dual={component.dual}
+                {...getUserBossElementIcons(userBossElements)}
                 hidden={component.hidden}
               />
             </div>

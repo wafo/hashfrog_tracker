@@ -85,6 +85,7 @@ const EditorComponent = ({ component, setComponent, combinedElements }) => {
             backgroundColor: "#4a8ab6",
             showBoss: true,
             showItems: true,
+            bossElements: [],
             hidden: false
           }));
           break;
@@ -180,6 +181,7 @@ const EditorComponent = ({ component, setComponent, combinedElements }) => {
         case "inverted":
         case "dragCurrent":
         case "receiver":
+        case "bossReceiver":
         case "dual":
         case "hidden": {
           setComponent(prev => ({
@@ -457,64 +459,6 @@ const ElementEditor = ({ component, handleChange, combinedElements }) => {
 };
 
 const TableEditor = ({ component, handleChange, combinedElements }) => {
-  const [elements, setElements] = useState([...component.elements.map(x => ({ id: generateId(), value: x }))]);
-  const [element, setElement] = useState("default_hashfrog");
-  const [draggedElement, setDraggedElement] = useState(null);
-
-  const handleElementChange = event => {
-    const { value } = event.target;
-    setElement(value);
-  };
-
-  useEffect(() => {
-    handleChange({
-      target: {
-        name: "elements",
-        value: elements.map(x => x.value),
-      },
-    });
-  }, [elements, handleChange]);
-
-  const addToTable = useCallback(() => {
-    const newElement = {
-      id: generateId(),
-      value: element,
-    };
-    setElements(prev => [...prev, newElement]);
-    // setElement("a081121b16f84366bf16e16ca90cd23f");
-  }, [element]);
-
-  const removeFromTable = (e, element) => {
-    e.preventDefault();
-    setElements(prev => [...prev.filter(x => x.id !== element.id)]);
-  };
-
-  const onDragStart = (event, element) => {
-    setDraggedElement(element);
-    event.dataTransfer.effectAllowed = "move";
-    // event.dataTransfer.setDragImage(event.target, 50, 50);
-  };
-
-  const onDragEnd = () => {
-    setDraggedElement(null);
-  };
-
-  const onDragOver = useCallback(
-    index => {
-      const draggedOverElement = elements[index];
-      // Ignore if dragged over itself
-      if (draggedOverElement.id === draggedElement.id) return;
-      // filter out the currently dragged item
-      // add the dragged item after the dragged over item
-      setElements(prev => {
-        let elements = [...prev.filter(element => element.id !== draggedElement.id)];
-        elements.splice(index, 0, draggedElement);
-        return elements;
-      });
-    },
-    [draggedElement, elements],
-  );
-
   return (
     <Fragment>
       <div className="col mb-2">
@@ -576,49 +520,14 @@ const TableEditor = ({ component, handleChange, combinedElements }) => {
         <div className="col-12">
           <p className="uuid">In CSS Padding format</p>
         </div>
+        <ElementSelector
+          hintElements={component.elements}
+          combinedElements={combinedElements}
+          handleChange={handleChange}
+          componentTargetName='elements'
+          id='boss'
+        />
       </div>
-      <div className="mb-2">
-        <label htmlFor="elementId" className="form-label">
-          Add Elements to Table
-        </label>
-        <div className="input-group input-group-sm">
-          <select
-            className="form-select"
-            id="elementId"
-            name="elementId"
-            value={element}
-            onChange={handleElementChange}
-          >
-            {combinedElements.map(element => (
-              <option key={element.id} value={element.name}>
-                {element.displayName}
-              </option>
-            ))}
-          </select>
-          <button className="btn btn-light btn-sm" type="button" onClick={addToTable}>
-            Add
-          </button>
-        </div>
-      </div>
-      {elements.length > 0 && (
-        <Fragment>
-          <p style={{ fontSize: "0.75em", margin: 0, opacity: 0.5 }}>Right click to remove. Drag to re-order.</p>
-          <ul className="list-unstyled table-list">
-            {elements.map((element, index) => (
-              <li
-                key={element.id}
-                onContextMenu={e => removeFromTable(e, element)}
-                onDragStart={e => onDragStart(e, element)}
-                onDragEnd={onDragEnd}
-                onDragOver={() => onDragOver(index)}
-                draggable
-              >
-                {element.value}
-              </li>
-            ))}
-          </ul>
-        </Fragment>
-      )}
     </Fragment>
   );
 };
@@ -851,6 +760,29 @@ const LocationhintEditor = ({ component, handleChange, combinedElements }) => {
         />
         <label htmlFor="showBoss" className="form-check-label">
           Show Boss
+        </label>
+      </div>
+      {component.showBoss && (
+        <ElementSelector
+          hintElements={component.bossElements}
+          combinedElements={combinedElements}
+          handleChange={handleChange}
+          componentTargetName='bossElements'
+          id='bossElements'
+        />
+      )}
+      <div className="form-check mb-2">
+        <input
+          type="checkbox"
+          className="form-check-input"
+          id="bossReceiver"
+          name="bossReceiver"
+          checked={component.bossReceiver}
+          value={component.bossReceiver}
+          onChange={handleChange}
+        />
+        <label htmlFor="bossReceiver" className="form-check-label">
+          Allow Boss Receiver
         </label>
       </div>
       <div className="form-check mb-2">
@@ -1087,6 +1019,29 @@ const HintTableEditor = ({ component, handleChange, combinedElements }) => {
               Show Boss
             </label>
           </div>
+          {component.showBoss && (
+            <ElementSelector
+              hintElements={component.bossElements}
+              combinedElements={combinedElements}
+              handleChange={handleChange}
+              componentTargetName='bossElements'
+              id='hintTableBossElements'
+            />
+          )}
+          <div className="form-check mb-2">
+            <input
+              type="checkbox"
+              className="form-check-input"
+              id="bossReceiver"
+              name="bossReceiver"
+              checked={component.bossReceiver}
+              value={component.bossReceiver}
+              onChange={handleChange}
+            />
+            <label htmlFor="bossReceiver" className="form-check-label">
+              Allow Boss Receiver
+            </label>
+          </div>
           <div className="form-check mb-2">
             <input
               type="checkbox"
@@ -1189,5 +1144,115 @@ const LabelEditor = ({ component, handleChange }) => {
     </Fragment>
   );
 };
+
+const ElementSelector = ({hintElements = [], combinedElements, handleChange, componentTargetName, id = generateId()}) => {
+  const [elements, setElements] = useState([...hintElements.map(x => ({ id: generateId(), value: x }))]);
+  const [element, setElement] = useState("default_hashfrog");
+  const [draggedElement, setDraggedElement] = useState(null);
+
+  const onDragStart = (event, element) => {
+    setDraggedElement(element);
+    event.dataTransfer.effectAllowed = "move";
+    // event.dataTransfer.setDragImage(event.target, 50, 50);
+  };
+  
+  const removeFromTable = (e, element) => {
+    e.preventDefault();
+    setElements(prev => [...prev.filter(x => x.id !== element.id)]);
+  };
+
+  const onDragEnd = () => {
+    setDraggedElement(null);
+  };
+
+  const onDragOver = useCallback(
+    index => {
+      const draggedOverElement = elements[index];
+      // Ignore if dragged over itself
+      if (draggedOverElement.id === draggedElement.id) return;
+      // filter out the currently dragged item
+      // add the dragged item after the dragged over item
+      setElements(prev => {
+        let elements = [...prev.filter(element => element.id !== draggedElement.id)];
+        elements.splice(index, 0, draggedElement);
+        return elements;
+      });
+    },
+    [draggedElement, elements],
+  );
+
+  const handleElementChange = event => {
+    const { value } = event.target;
+    setElement(value);
+  };
+
+  const addToTable = useCallback(() => {
+    const newElement = {
+      id: generateId(),
+      value: element,
+    };
+    setElements(prev => [...prev, newElement]);
+    // setElement("a081121b16f84366bf16e16ca90cd23f");
+  }, [element]);
+
+  const elementId = `elementId_${id}`;
+
+  useEffect(() => {
+    handleChange({
+      target: {
+        name: componentTargetName,
+        value: elements.map(x => x.value),
+      },
+    });
+  }, [elements, handleChange, componentTargetName]);
+  
+  return (
+    <Fragment>
+      <div className="mb-2">
+        <label htmlFor={elementId} className="form-label">
+          Add Elements to Table
+        </label>
+        <div className="input-group input-group-sm">
+          <select
+            className="form-select"
+            id={elementId}
+            name={elementId}
+            value={element}
+            onChange={handleElementChange}
+          >
+            {combinedElements.map(element => (
+              <option key={element.id} value={element.name}>
+                {element.displayName}
+              </option>
+            ))}
+          </select>
+          <button className="btn btn-light btn-sm" type="button" onClick={addToTable}>
+            Add
+          </button>
+        </div>
+      </div>
+      {elements.length > 0 && (
+        <Fragment>
+          <p style={{ fontSize: "0.75em", margin: 0, opacity: 0.5 }}>Right click to remove. Drag to re-order.</p>
+          <ul className="list-unstyled table-list">
+            {elements.map((element, index) => (
+              <li
+                key={element.id}
+                onContextMenu={e => removeFromTable(e, element)}
+                onDragStart={e => onDragStart(e, element)}
+                onDragEnd={onDragEnd}
+                onDragOver={() => onDragOver(index)}
+                draggable
+              >
+                {element.value}
+              </li>
+            ))}
+          </ul>
+        </Fragment>
+      )}
+    </Fragment>
+  );
+}
+
 
 export default EditorComponent;

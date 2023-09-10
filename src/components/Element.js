@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { Fragment, useCallback, useMemo, useState } from "react";
+import { Fragment, useCallback, useMemo, useState, useEffect } from "react";
 
 import { useElement, useItems } from "../context/trackerContext";
 
@@ -41,6 +41,11 @@ const Element = props => {
   const [counter, setCounter] = useState(0);
   const [draggedIcon, setDraggedIcon] = useState(null);
 
+  //whenever a change in icon list is detected, start the selection over
+  useEffect(() => {
+    setSelected(0)
+  }, [icons])
+    
   const icon = useMemo(() => {
     return icons[selected];
   }, [icons, selected]);
@@ -112,6 +117,7 @@ const Element = props => {
         const item = event.dataTransfer.getData("item");
         const { icon } = JSON.parse(item);
         setDraggedIcon(icon);
+        setSelected(0) //reset selected so if the dragged item gets cleared, the user will see the hashfrog
       }
     },
     [receiver],
