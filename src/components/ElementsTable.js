@@ -10,6 +10,7 @@ const ElementsTable = props => {
     elements = [], // array of elements from elements.json it will fill the table by rows
     elementsSize = null, // [0, 0] optional
     padding = 1, // for td
+    hidden = false
   } = props;
 
   const rows = useMemo(() => {
@@ -26,7 +27,7 @@ const ElementsTable = props => {
 
   return (
     <Fragment>
-      <table style={{ borderSpacing: 0 }}>
+      <table style={{ borderSpacing: 0 }} hidden={hidden}>
         <tbody>{rows}</tbody>
       </table>
     </Fragment>
