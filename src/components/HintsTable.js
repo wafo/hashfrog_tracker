@@ -25,7 +25,8 @@ const HintsTable = props => {
     showBoss = true, // Show or not the left boss icon
     showItems = true, // Show or not the right icons
     bossReceiver = false,
-    bossElementsIcons = [] // Elements that the user has chosen to appear in the boss selection. Would overwrite the default bossElement.icons cache
+    bossElementsIcons = [], // Elements that the user has chosen to appear in the boss selection. Would overwrite the default bossElement.icons cache
+    hidden = false
   } = props;
 
   const rows = useMemo(() => {
@@ -92,7 +93,7 @@ const HintsTable = props => {
 
   return (
     <Fragment>
-      <table style={{ borderSpacing: 0 }}>
+      <table style={{ borderSpacing: 0 }} hidden={hidden}>
         <tbody>{rows}</tbody>
       </table>
     </Fragment>

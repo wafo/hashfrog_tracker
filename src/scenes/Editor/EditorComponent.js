@@ -39,6 +39,7 @@ const EditorComponent = ({ component, setComponent, combinedElements }) => {
             selectedStartingIndex: 0,
             countConfig: [0, 5],
             labelStartingIndex: 0,
+            hidden: false
           }));
           break;
         case "table":
@@ -51,6 +52,7 @@ const EditorComponent = ({ component, setComponent, combinedElements }) => {
             padding: "2px",
             elements: [],
             elementsSize: [25, 25],
+            hidden: false
           }));
           break;
         case "sometimeshint":
@@ -67,6 +69,7 @@ const EditorComponent = ({ component, setComponent, combinedElements }) => {
             showIcon: true,
             inverted: false,
             dual: false,
+            hidden: false
           }));
           break;
         case "locationhint":
@@ -82,7 +85,8 @@ const EditorComponent = ({ component, setComponent, combinedElements }) => {
             backgroundColor: "#4a8ab6",
             showBoss: true,
             showItems: true,
-            bossElements: []
+            bossElements: [],
+            hidden: false
           }));
           break;
         case "hinttable":
@@ -105,6 +109,7 @@ const EditorComponent = ({ component, setComponent, combinedElements }) => {
             showBoss: true,
             showItems: true,
             dual: false,
+            hidden: false
           }));
           break;
         case "label":
@@ -118,6 +123,7 @@ const EditorComponent = ({ component, setComponent, combinedElements }) => {
             padding: "2px",
             text: "Label Text",
             fontSize: "12px",
+            hidden: false
           }));
           break;
         default:
@@ -176,7 +182,8 @@ const EditorComponent = ({ component, setComponent, combinedElements }) => {
         case "dragCurrent":
         case "receiver":
         case "bossReceiver":
-        case "dual": {
+        case "dual":
+        case "hidden": {
           setComponent(prev => ({
             ...prev,
             [name]: !prev[name],
@@ -282,6 +289,21 @@ const EditorComponent = ({ component, setComponent, combinedElements }) => {
         <HintTableEditor component={component} handleChange={handleChange} combinedElements={combinedElements} />
       )}
       {type === "label" && <LabelEditor component={component} handleChange={handleChange} />}
+
+      <div className="form-check mb-2">
+        <input
+          type="checkbox"
+          className="form-check-input"
+          id="hidden"
+          name="hidden"
+          checked={component.hidden}
+          value={component.hidden}
+          onChange={handleChange}
+        />
+        <label htmlFor="hidden" className="form-check-label">
+          Hide Component
+        </label>
+      </div>
     </Fragment>
   );
 };

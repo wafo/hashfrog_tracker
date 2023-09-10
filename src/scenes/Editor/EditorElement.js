@@ -49,7 +49,8 @@ const EditorElement = ({ element, setElement }) => {
         }
         // Checkbox
         case "dragCurrent":
-        case "receiver": {
+        case "receiver":
+        case "hidden": {
           setElement(prev => ({
             ...prev,
             [name]: !prev[name],
@@ -347,6 +348,20 @@ const EditorElement = ({ element, setElement }) => {
         />
         <label htmlFor="dragCurrent" className="form-check-label">
           Drag currently selected
+        </label>
+      </div>
+      <div className="form-check mb-2">
+        <input
+          type="checkbox"
+          className="form-check-input"
+          id="hidden"
+          name="hidden"
+          checked={element.hidden}
+          value={element.hidden}
+          onChange={handleChange}
+        />
+        <label htmlFor="hidden" className="form-check-label">
+          Hide Element
         </label>
       </div>
 

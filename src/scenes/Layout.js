@@ -124,6 +124,7 @@ const Layout = props => {
                 selectedStartingIndex={component.selectedStartingIndex}
                 countConfig={component.countConfig}
                 labelStartingIndex={component.labelStartingIndex}
+                hidden={component.hidden}
               />
             </div>
           );
@@ -139,6 +140,7 @@ const Layout = props => {
                 elementsSize={component.elementsSize}
                 columns={component.columns}
                 padding={component.padding}
+                hidden={component.hidden}
               />
             </div>
           );
@@ -158,6 +160,7 @@ const Layout = props => {
                 showIcon={component.showIcon}
                 inverted={component.inverted}
                 dual={component.dual}
+                hidden={component.hidden}
               />
             </div>
           );
@@ -181,6 +184,7 @@ const Layout = props => {
                 labels={component.labels}
                 bossReceiver={component.bossReceiver}
                 {...getUserBossElementIcons(userBossElements)}
+                hidden={component.hidden}
                 {...(bossElement && bossElement.icons && { bossIcons: bossElement.icons })}
                 {...(element && element.icons && { itemsIcons: element.icons })}
               />
@@ -215,6 +219,7 @@ const Layout = props => {
                 bossReceiver={component.bossReceiver}
                 dual={component.dual}
                 {...getUserBossElementIcons(userBossElements)}
+                hidden={component.hidden}
               />
             </div>
           );
@@ -230,6 +235,7 @@ const Layout = props => {
                 padding={component.padding}
                 text={component.text}
                 fontSize={component.fontSize}
+                hidden={component.hidden}
               />
             </div>
           );

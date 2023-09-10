@@ -18,7 +18,8 @@ const LocationHint = props => {
     showItems = true, // Show or not the right icons
     itemsIcons = [], //
     bossReceiver = false, // Allow the boss name to be dragged on,
-    bossElementsIcons = [] // Elements that the user has chosen to appear in the boss selection. Would overwrite the default bossElement.icons cache
+    bossElementsIcons = [], // Elements that the user has chosen to appear in the boss selection. Would overwrite the default bossElement.icons cache
+    hidden = false
   } = props;
 
   const [hasValue, setHasValue] = useState(false);
@@ -40,7 +41,7 @@ const LocationHint = props => {
   }, [options, labels]);
 
   return (
-    <div style={{ width, display: "flex" }}>
+    <div style={{ width, display: "flex" }} hidden={hidden}>
       {showBoss && hasValue && (
         <Element
           id={`locations_boss_${id}`}
