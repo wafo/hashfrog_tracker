@@ -63,3 +63,12 @@ export function updateHintRegionsJSON(files) {
 
   return regions;
 }
+
+export function duplicate(component, components, setComponent) {
+  if (!component) return;
+
+  setComponent({
+    ...component,
+    id: generateId()
+  });
+}

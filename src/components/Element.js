@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { Fragment, useCallback, useMemo, useState } from "react";
+import { Fragment, useCallback, useMemo, useState, useEffect } from "react";
 
 import { useElement, useItems } from "../context/trackerContext";
 
@@ -31,6 +31,7 @@ const Element = props => {
     dragCurrent = false, // if dragging should default or drag the current selected
     selectedStartingIndex = 0, // on which of the icons we start
     items = [],
+    hidden = false
   } = props;
 
   const { markCounter, markItem, startingIndex: trackerContextStartingIndex, startingItem } = useItems(items);
@@ -40,6 +41,11 @@ const Element = props => {
   const [counter, setCounter] = useState(0);
   const [draggedIcon, setDraggedIcon] = useState(null);
 
+  //whenever a change in icon list is detected, start the selection over
+  useEffect(() => {
+    setSelected(0)
+  }, [icons])
+    
   const icon = useMemo(() => {
     return icons[selected];
   }, [icons, selected]);
@@ -111,6 +117,7 @@ const Element = props => {
         const item = event.dataTransfer.getData("item");
         const { icon } = JSON.parse(item);
         setDraggedIcon(icon);
+        setSelected(0) //reset selected so if the dragged item gets cleared, the user will see the hashfrog
       }
     },
     [receiver],
@@ -134,6 +141,7 @@ const Element = props => {
         onDragOver={e => e.preventDefault()}
         onDrop={dropHandler}
         draggable
+        hidden={hidden}
       >
         <img className="element-icon" src={draggedIcon || icon || icon_hashfrog} alt={name} />
         {type === "counter" && <CounterLabel counter={counter} />}
