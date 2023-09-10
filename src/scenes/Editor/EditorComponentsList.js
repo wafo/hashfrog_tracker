@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import elementsJSON from "../../data/elements.json";
-import { generateId } from "../../utils/utils";
+import { generateId, duplicate } from "../../utils/utils";
 import EditorComponent from "./EditorComponent";
 
 const EditorComponentsList = ({ components, setLayout, customElements }) => {
@@ -52,6 +52,8 @@ const EditorComponentsList = ({ components, setLayout, customElements }) => {
     return [...elementsJSON, ...(customElements || [])];
   }, [customElements]);
 
+  const duplicateComponent = useCallback(() => duplicate(component, components, setComponent), [component, components]);
+
   return (
     <div className="component-list">
       <h5>Components</h5>
@@ -64,6 +66,9 @@ const EditorComponentsList = ({ components, setLayout, customElements }) => {
         </button>
         <button type="button" className="btn btn-light btn-sm" onClick={() => setComponent(null)} disabled={!component}>
           Save
+        </button>
+        <button type="button" className="btn btn-light btn-sm" onClick={duplicateComponent} disabled={!component}>
+          Duplicate
         </button>
       </div>
       {component && (

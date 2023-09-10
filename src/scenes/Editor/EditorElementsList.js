@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import Element from "../../components/Element";
-import { generateId, isBase64, splitNameBase64 } from "../../utils/utils";
+import { generateId, isBase64, splitNameBase64, duplicate } from "../../utils/utils";
 import EditorElement from "./EditorElement";
 
 const baseURL = process.env.PUBLIC_URL;
@@ -35,6 +35,8 @@ const EditorElementsList = ({ elements, setLayout }) => {
     });
     setElement(null);
   }, [element, setLayout]);
+
+  const duplicateElements = useCallback(() => duplicate(element, elements, setElement), [element, elements]);
 
   useEffect(() => {
     if (!element) return;
@@ -74,6 +76,9 @@ const EditorElementsList = ({ elements, setLayout }) => {
         </button>
         <button type="button" className="btn btn-light btn-sm" onClick={() => setElement(null)} disabled={!element}>
           Save
+        </button>
+        <button type="button" className="btn btn-light btn-sm" onClick={duplicateElements} disabled={!element}>
+          Duplicate
         </button>
       </div>
       {element && ( // Preview of the element
