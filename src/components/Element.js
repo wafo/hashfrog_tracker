@@ -39,12 +39,21 @@ const Element = props => {
 
   const [selected, setSelected] = useState(trackerContextStartingIndex || selectedStartingIndex);
   const [counter, setCounter] = useState(0);
+  const [iconHash, setIconHash] = useState(null);
   const [draggedIcon, setDraggedIcon] = useState(null);
 
   //whenever a change in icon list is detected, start the selection over
-  // useEffect(() => {
-  //   setSelected(0)
-  // }, [icons])
+  useEffect(() => {
+      const hash = icons.reduce((acc, cv) => {
+        return acc += cv;
+      }, '')
+
+      if(hash !== iconHash) {
+        setSelected(0);
+      }
+
+      setIconHash(hash);
+  }, [icons, iconHash, name])
     
   const icon = useMemo(() => {
     return icons[selected];
