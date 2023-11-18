@@ -132,18 +132,18 @@ const TrackerLauncher = () => {
             <button
               type="button"
               className="btn btn-light btn-sm me-2"
-              onClick={() => updateString("tournament_s6")}
+              onClick={() => updateString("tournament_s7")}
               disabled={!checks}
             >
-              Tournament S6
+              Tournament S7
             </button>
             <button
               type="button"
               className="btn btn-light btn-sm me-2"
-              onClick={() => updateString("sgl_2023")}
+              onClick={() => updateString("mw_s4")}
               disabled={!checks}
             >
-              SGL 2023
+              Multiworld S4
             </button>
             <button
               type="button"

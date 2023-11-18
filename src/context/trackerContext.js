@@ -494,8 +494,8 @@ function validateLocations(locations, parsedItems) {
 function getSettingsStringCache() {
   let string = localStorage.getItem("settings_string");
   if (!string) {
-    // Taking the Tournament S6 as default
-    string = SettingStringsJSON.tournament_s6;
+    // Taking the Tournament S7 base as default
+    string = SettingStringsJSON.tournament_s7;
   }
   return string;
 }
