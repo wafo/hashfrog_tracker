@@ -42,9 +42,9 @@ const Element = props => {
   const [draggedIcon, setDraggedIcon] = useState(null);
 
   //whenever a change in icon list is detected, start the selection over
-  useEffect(() => {
-    setSelected(0)
-  }, [icons])
+  // useEffect(() => {
+  //   setSelected(0)
+  // }, [icons])
     
   const icon = useMemo(() => {
     return icons[selected];
