@@ -310,6 +310,11 @@ class Locations {
       return LogicHelper.settings.shuffle_beehives;
     }
 
+    // Wonderitems
+    else if (_.isEqual(location.type, "Wonderitem")) {
+      return LogicHelper.settings.shuffle_wonderitems;
+    }
+
     // Dungeon Items
     else if (location.isDungeon) {
       let shuffleSetting = null;
