@@ -161,14 +161,6 @@ const TrackerLauncher = () => {
             >
               Scrubs S5
             </button>
-            <button
-              type="button"
-              className="btn btn-light btn-sm me-2"
-              onClick={() => updateString("tfb_s2")}
-              disabled={!checks}
-            >
-              Triforce Blitz S2
-            </button>
             {LOGIC_BRANCH === "release" && (
               <p className="note">
                 Note: Release logic files being used. <a href="https://dev.hashfrog-tracker.com/">Go to dev logic</a>
