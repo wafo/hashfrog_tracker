@@ -316,7 +316,6 @@ class LogicHelper {
   static _evalBinaryExpression(node) {
     const leftSide = _.isEqual(node.left.type, "Identifier") ? node.left.name : node.left.value;
     const rightSide = _.isEqual(node.right.type, "Identifier") ? node.right.name : node.right.value;
-
     switch (node.operator) {
       case "==":
         if (_.includes(_.keys(this.settings), leftSide)) {
@@ -326,7 +325,9 @@ class LogicHelper {
         } else if (_.isEqual(leftSide, "age") && _.isEqual(rightSide, "starting_age")) {
           return true; //TODO: don't hardcode this
         }
-        break;
+        else {
+          return false;
+        }
       case "!=":
         if (_.includes(_.keys(this.settings), leftSide)) {
           return !_.isEqual(this.settings[leftSide], rightSide);
