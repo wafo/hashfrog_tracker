@@ -358,6 +358,7 @@ class LogicHelper {
         // TODO: this is hardcoded for now
         return true;
       case "can_play":
+      case "can_play_ocarina":
         return this._canPlay(arg);
       case "can_use":
         return this._canUse(arg, age);

@@ -27,7 +27,8 @@ const TrackerChecks = () => {
           version: getGeneratorVersionCache(),
           settingsString: getSettingsStringCache(),
         }),
-    ).then(response => response.json());
+    ).then(response => response.json())
+    .catch(error => console.error(error));
 
     LogicHelper.initialize(logicHelpersFile, settings);
     updateItemsFromLogic(settings); // Starting items.
