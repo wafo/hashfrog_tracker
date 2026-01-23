@@ -5,10 +5,37 @@ import { useLayout } from "../context/layoutContext";
 import { useSettingsString } from "../context/trackerContext";
 import SettingStringsJSON from "../data/setting-strings.json";
 import useDebounce from "../hooks/useDebounce";
+import Button from "react-bootstrap/Button";
+import InputGroup from "react-bootstrap/InputGroup";
+import Form from "react-bootstrap/Form";
+import DropdownButton from "react-bootstrap/DropdownButton";
+import Dropdown from "react-bootstrap/Dropdown";
+import Card from "react-bootstrap/Card";
+import Alert from "react-bootstrap/Alert";
 
 const baseURL = process.env.PUBLIC_URL;
-const GENERATOR_VERSION = process.env.REACT_APP_GENERATOR_VERSION;
 const LOGIC_BRANCH = process.env.REACT_APP_LOGIC_BRANCH;
+
+const isLogicBranchRelease = LOGIC_BRANCH === "release";
+
+const PRESETS = [
+  { label: "Tournament S9", value: "tournament_s9" },
+  { label: "Tournament S8", value: "tournament_s8" }, 
+  { label: "Tournament S7", value: "tournament_s7" },
+  { label: "Multiworld S4", value: "mw_s4" },
+  { label: "League S5", value: "league_s5" },
+  { label: "Scrubs S5", value: "scrubs_s5" },
+  { label: "Triforce Blitz S2", value: "tfb_s2" },
+];
+
+const GENERATOR_VERSIONS = [
+  "9.0.0", "8.3.0", "8.2.0", "8.1.0", "8.0.0",
+  "7.1.0", "7.0.0",
+  "6.2.0", "6.1.0", "6.0.0",
+  "5.2.0", "5.1.0", "5.0.0",
+  "4.0.0",
+  "3.0.0",
+];
 
 const TrackerLauncher = () => {
   const [checks, setChecks] = useState(false);
@@ -42,7 +69,7 @@ const TrackerLauncher = () => {
     window.open(
       url,
       "HashFrog Tracker",
-      `toolbar=0,location=0,status=0,menubar=0,scrollbars=0,resizable=0,width=${width},height=${height}`,
+      `toolbar=0,location=0,status=0,menubar=0,scrollbars=0,resizable=0,width=${width},height=${height}`
     );
   }, [checks, layoutSize]);
 
@@ -53,154 +80,210 @@ const TrackerLauncher = () => {
     generator_version: cachedGeneratorVersion,
   } = useSettingsString();
 
-  const [settingsString, setSettingsString] = useState(() => cachedSettingsString || "");
+  const [settingsString, setSettingsString] = useState(
+    () => cachedSettingsString || ""
+  );
   const debouncedString = useDebounce(settingsString, 300);
 
   useEffect(() => {
     setSettingsStringCache(debouncedString);
   }, [debouncedString, setSettingsStringCache]);
 
-  const [generatorVersion, setGeneratorVersion] = useState(() => cachedGeneratorVersion || "");
+  const [generatorVersion, setGeneratorVersion] = useState(
+    () => cachedGeneratorVersion || "9.0.0"
+  );
   const debouncedVersion = useDebounce(generatorVersion, 300);
 
   useEffect(() => {
     setGeneratorVersionCache(debouncedVersion);
   }, [debouncedVersion, setGeneratorVersionCache]);
 
-  const updateString = preset => {
-    setSettingsString(SettingStringsJSON[preset]);
-    setGeneratorVersion(GENERATOR_VERSION); // coming from .env
+  const updateString = (preset) => {
+    setSettingsString(SettingStringsJSON[preset.value]);
+    setGeneratorVersion("9.0.0");
   };
+
+  // Check if current settings match any preset
+  const activePreset = useMemo(() => {
+    return PRESETS.find(
+      (preset) => SettingStringsJSON[preset.value] === settingsString
+    );
+  }, [settingsString]);
 
   return (
     <Fragment>
-      <div className="row">
-        <div className="col">
-          <h3>Layout Configuration</h3>
-          <button type="button" className="btn btn-light btn-sm mb-3" onClick={launchTracker}>
-            Launch tracker
-          </button>
-          <div className="form-check">
-            <input
-              type="checkbox"
-              className="form-check-input"
-              id="checks"
-              name="checks"
-              value={checks}
-              onChange={() => setChecks(prev => !prev)}
-            />
-            <label htmlFor="checks" className="form-check-label">
-              Use check tracking *
-            </label>
-          </div>
-          <div className="row m-0 w-75">
-            <div className="col-4 ps-0">
-              <label htmlFor="generator_version" className="form-label">
-                Generator version
-              </label>
-              <input
-                type="text"
-                className="form-control form-control-sm"
-                id="generator_version"
-                name="generator_version"
-                placeholder="Generator version" // League S3
-                value={generatorVersion}
-                onChange={({ target: { value } }) => setGeneratorVersion(value)}
-                disabled={!checks}
-              />
-            </div>
-            <div className="col-8 pe-0">
-              <label htmlFor="setting_string" className="form-label">
-                Settings String
-              </label>
-              <input
-                type="text"
-                className="form-control form-control-sm"
-                id="setting_string"
-                name="setting_string"
-                placeholder="Settings String same as the generator" // League S3
-                value={settingsString}
-                onChange={({ target: { value } }) => setSettingsString(value)}
-                disabled={!checks}
-              />
-            </div>
-          </div>
-          <div className="mb-3">
-            <label htmlFor="" className="form-label w-100">
-              Common Presets
-            </label>
-            <button
-              type="button"
-              className="btn btn-light btn-sm me-2"
-              onClick={() => updateString("tournament_s7")}
-              disabled={!checks}
-            >
-              Tournament S7
-            </button>
-            <button
-              type="button"
-              className="btn btn-light btn-sm me-2"
-              onClick={() => updateString("mw_s4")}
-              disabled={!checks}
-            >
-              Multiworld S4
-            </button>
-            <button
-              type="button"
-              className="btn btn-light btn-sm me-2"
-              onClick={() => updateString("league_s5")}
-              disabled={!checks}
-            >
-              League S5
-            </button>
-            <button
-              type="button"
-              className="btn btn-light btn-sm me-2"
-              onClick={() => updateString("scrubs_s5")}
-              disabled={!checks}
-            >
-              Scrubs S5
-            </button>
-            <button
-              type="button"
-              className="btn btn-light btn-sm me-2"
-              onClick={() => updateString("tfb_s2")}
-              disabled={!checks}
-            >
-              Triforce Blitz S2
-            </button>
-            {LOGIC_BRANCH === "release" && (
-              <p className="note">
-                Note: Release logic files being used. <a href="https://dev.hashfrog-tracker.com/">Go to dev logic</a>
-              </p>
-            )}
-            {LOGIC_BRANCH !== "release" && (
-              <p className="note">
-                Note: Dev logic files being used and things may break.{" "}
-                <a href="https://hashfrog-tracker.com/">Go to release logic</a>
-              </p>
-            )}
-          </div>
-          <div className="mb-3"></div>
+      {/* Main Launcher Card */}
+      <Card className="bg-dark border-secondary text-white mb-4">
+        <Card.Body>
+          <h5
+            className="card-title text-uppercase fw-bold text-white mb-4"
+            style={{ letterSpacing: "0.05em" }}
+          >
+            Tracker Settings
+          </h5>
 
+          <div className="d-grid mb-4">
+            <Button
+              type="button"
+              variant="success"
+              size="lg"
+              onClick={launchTracker}
+              className="fw-semibold"
+            >
+              🚀 Launch Tracker
+            </Button>
+          </div>
+
+          <Form.Check
+            type="switch"
+            id="checks"
+            label="Enable check tracking"
+            checked={checks}
+            onChange={() => setChecks((prev) => !prev)}
+            className="mb-3 text-light"
+          />
+
+          {checks && (
+            <div className="border-top border-secondary pt-3 mt-3">
+              <p className="small text-secondary mb-2">
+                Configure logic settings for check tracking
+              </p>
+              {activePreset && (
+                <p className="mb-3">
+                  <span className="badge bg-success d-inline-flex align-items-center gap-1">
+                    ⭐ Using {activePreset.label} Preset
+                  </span>
+                </p>
+              )}
+
+              <div className="row g-3 mb-3">
+                <div className="col-4">
+                  <Form.Label
+                    htmlFor="generator_version"
+                    className="text-secondary"
+                  >
+                    Generator Version
+                  </Form.Label>
+                  <Form.Select
+                    size="sm"
+                    id="generator_version"
+                    name="generator_version"
+                    value={generatorVersion}
+                    onChange={({ target: { value } }) =>
+                      setGeneratorVersion(value)
+                    }
+                  >
+                    <option value="">Select version</option>
+                    {GENERATOR_VERSIONS.map((version) => (
+                      <option key={version} value={version}>
+                        {version}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </div>
+                <div className="col-8">
+                  <Form.Label htmlFor="setting_string" className="text-secondary">
+                    Settings String
+                  </Form.Label>
+                  <InputGroup size="sm">
+                    <Form.Control
+                      type="text"
+                      id="setting_string"
+                      name="setting_string"
+                      placeholder="Paste settings string here"
+                      value={settingsString}
+                      onChange={({ target: { value } }) =>
+                        setSettingsString(value)
+                      }
+                    />
+                  </InputGroup>
+                </div>
+              </div>
+
+              <div className="d-flex align-items-center gap-2 flex-wrap">
+                <Form.Label className="text-secondary mb-0 small">
+                  Quick Presets:
+                </Form.Label>
+                <DropdownButton
+                  id="presets-dropdown"
+                  title="Select Preset"
+                  variant="outline-light"
+                  size="sm"
+                >
+                  {PRESETS.map((preset) => (
+                    <Dropdown.Item
+                      key={preset.value}
+                      onClick={() => updateString(preset)}
+                    >
+                      {preset.label}
+                    </Dropdown.Item>
+                  ))}
+                </DropdownButton>
+              </div>
+
+              {isLogicBranchRelease && (
+                <Alert variant="info" className="mt-3 mb-0 py-2 small">
+                  📦 Using <strong>release</strong> logic files.{" "}
+                  <Alert.Link href="https://dev.hashfrog-tracker.com/">
+                    Switch to dev
+                  </Alert.Link>
+                </Alert>
+              )}
+              {!isLogicBranchRelease && (
+                <Alert variant="warning" className="mt-3 mb-0 py-2 small">
+                  ⚠️ Using <strong>dev</strong> logic files — things may break.{" "}
+                  <Alert.Link href="https://hashfrog-tracker.com/">
+                    Switch to release
+                  </Alert.Link>
+                </Alert>
+              )}
+            </div>
+          )}
+        </Card.Body>
+      </Card>
+
+      {/* Layout Configuration Card */}
+      <Card className="bg-dark border-secondary text-white mb-4">
+        <Card.Body>
+          <h5
+            className="card-title text-uppercase fw-bold text-white mb-3"
+            style={{ letterSpacing: "0.05em" }}
+          >
+            Layout Configuration
+          </h5>
           <LayoutSelector />
-        </div>
-      </div>
-      <div className="row">
-        <div className="col">
-          <h3>Notes</h3>
-          <p>* Check tracking requires a compatible layout configuration to work properly.</p>
-          <ul style={{ fontSize: "0.8em" }}>
-            <li>
-              The logic assumes: access to both ages; no shuffled entrances, owl drops, warp song destinations, or spawns; and vanilla (default) ocarina melodies.
+        </Card.Body>
+      </Card>
+
+      {/* Notes Card */}
+      <Card className="bg-dark border-secondary text-white">
+        <Card.Body>
+          <h6
+            className="text-uppercase fw-bold text-white mb-3"
+            style={{ letterSpacing: "0.05em" }}
+          >
+            Notes
+          </h6>
+          <p className="small text-warning mb-2">
+            * Check tracking requires a compatible layout configuration.
+          </p>
+          <ul className="small text-secondary mb-0 ps-3">
+            <li className="mb-1">
+              The logic assumes: access to both ages; no shuffled entrances, owl
+              drops, warp song destinations, or spawns; and vanilla (default)
+              ocarina melodies.
             </li>
-            <li>Closed Forest and Closed Door of Time do not work for the reasons above.</li>
+            <li className="mb-1">
+              Closed Forest and Closed Door of Time do not work for the reasons
+              above.
+            </li>
             <li>
-              The logic assumes that the initial value for a counter is zero. Click the counter to update it if not.
+              The logic assumes that the initial value for a counter is zero.
+              Click the counter to update it if not.
             </li>
           </ul>
-        </div>
-      </div>
+        </Card.Body>
+      </Card>
     </Fragment>
   );
 };
