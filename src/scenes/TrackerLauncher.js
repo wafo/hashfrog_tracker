@@ -15,6 +15,7 @@ import Alert from "react-bootstrap/Alert";
 
 const baseURL = process.env.PUBLIC_URL;
 const LOGIC_BRANCH = process.env.REACT_APP_LOGIC_BRANCH;
+const GENERATOR_VERSION = process.env.REACT_APP_GENERATOR_VERSION;
 
 const isLogicBranchRelease = LOGIC_BRANCH === "release";
 
@@ -28,6 +29,7 @@ const PRESETS = [
   { label: "Triforce Blitz S2", value: "tfb_s2" },
 ];
 
+// https://ootrandomizer.com/api/version?branch=master
 const GENERATOR_VERSIONS = [
   "9.0.0", "8.3.0", "8.2.0", "8.1.0", "8.0.0",
   "7.1.0", "7.0.0",
@@ -100,7 +102,7 @@ const TrackerLauncher = () => {
 
   const updateString = (preset) => {
     setSettingsString(SettingStringsJSON[preset.value]);
-    setGeneratorVersion("9.0.0");
+    setGeneratorVersion(GENERATOR_VERSION || "9.0.0");
   };
 
   // Check if current settings match any preset

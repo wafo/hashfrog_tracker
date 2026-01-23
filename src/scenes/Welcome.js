@@ -77,10 +77,29 @@ const Welcome = () => {
                     <Badge bg="secondary" className="me-2">0.5.x</Badge>
                     <span className="small">Logic parsing from the generator including setting string parsing and counters.</span>
                   </li>
+                  {
+                  /*
+                    <li>0.5.5 - Counters (small keys & skulls) now hooked to the logic.</li>
+                    <li>0.5.3 - Skulls available counter.</li>
+                    <li>0.5.2 - Settings string parsing directly from the generator. General bug fixes.</li>
+                    <li>0.5.1 - Starting items from settings. General bug fixes.</li>
+                    <li>0.5.0 - Logic funtionality parsing logic from the randomizer generator.</li>
+                  */
+                  }
                   <li>
                     <Badge bg="secondary" className="me-2">0.4.x</Badge>
                     <span className="small">Layout based of JSON file and editor UI. Custom Elements in Layout and Editor. Cached icons for improved performance.</span>
                   </li>
+                  {
+                  /*
+                    <li>0.4.4 - Custom Elements in Layout and Editor.</li>
+                    <li>0.4.3 - Cached icons for improved performance. No more lag when clicking icons for the first time.</li>
+                    <li>0.4.2 - QoL improvements for Layout Editor. New QoL functionalities.</li>
+                    <li>0.4.1 - Styling</li>
+                    <li>0.4.0 - Layout based of JSON file and editor UI (beta).</li>
+                    <li>0.3.4 - All check tracking logic changed to standard glitchless logic.</li>
+                  */
+                  }
                 </ul>
               </Accordion.Body>
             </Accordion.Item>
