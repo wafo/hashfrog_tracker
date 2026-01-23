@@ -30,13 +30,16 @@ const PRESETS = [
 ];
 
 // https://ootrandomizer.com/api/version?branch=master
+const CURRENT_ACTIVE_VERSION = "9.0.0";
 const GENERATOR_VERSIONS = [
-  "9.0.0", "8.3.0", "8.2.0", "8.1.0", "8.0.0",
-  "7.1.0", "7.0.0",
-  "6.2.0", "6.1.0", "6.0.0",
-  "5.2.0", "5.1.0", "5.0.0",
-  "4.0.0",
-  "3.0.0",
+  "9.0.0",
+  "8.3.0",
+  "7.1.0",
+  "7.0.0",
+  "6.2.0",
+  "6.0.0",
+  "5.2.0",
+  "5.1.0",
 ];
 
 const TrackerLauncher = () => {
@@ -92,7 +95,7 @@ const TrackerLauncher = () => {
   }, [debouncedString, setSettingsStringCache]);
 
   const [generatorVersion, setGeneratorVersion] = useState(
-    () => cachedGeneratorVersion || "9.0.0"
+    () => cachedGeneratorVersion || CURRENT_ACTIVE_VERSION
   );
   const debouncedVersion = useDebounce(generatorVersion, 300);
 
@@ -102,7 +105,7 @@ const TrackerLauncher = () => {
 
   const updateString = (preset) => {
     setSettingsString(SettingStringsJSON[preset.value]);
-    setGeneratorVersion(GENERATOR_VERSION || "9.0.0");
+    setGeneratorVersion(GENERATOR_VERSION || CURRENT_ACTIVE_VERSION);
   };
 
   // Check if current settings match any preset
@@ -150,10 +153,16 @@ const TrackerLauncher = () => {
               <p className="small text-secondary mb-2">
                 Configure logic settings for check tracking
               </p>
-              {activePreset && (
+              {activePreset ? (
                 <p className="mb-3">
                   <span className="badge bg-success d-inline-flex align-items-center gap-1">
                     ⭐ Using {activePreset.label} Preset
+                  </span>
+                </p>
+              ) : settingsString && (
+                <p className="mb-3">
+                  <span className="badge bg-warning text-dark d-inline-flex align-items-center gap-1">
+                    ⚙️ Using Custom Settings String
                   </span>
                 </p>
               )}
