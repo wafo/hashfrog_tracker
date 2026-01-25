@@ -78,7 +78,7 @@ const TrackerLauncher = () => {
   } = useSettingsString();
 
   const [settingsString, setSettingsString] = useState(
-    () => cachedSettingsString || SettingStringsJSON.tournament_s9
+    () => cachedSettingsString || SettingStringsJSON.presets.find(preset => preset.value === "tournament_s9")
   );
   const debouncedString = useDebounce(settingsString, 300);
 
