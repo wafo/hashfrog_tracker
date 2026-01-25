@@ -494,8 +494,15 @@ function validateLocations(locations, parsedItems) {
 function getSettingsStringCache() {
   let string = localStorage.getItem("settings_string");
   if (!string) {
-    // Taking the Tournament S7 base as default
-    string = SettingStringsJSON.tournament_s7;
+    var preset = SettingStringsJSON.presets.find(preset => preset.value === "tournament_s9");
+
+    // We should always find a preset. If not, just make it blank to be safe.
+    if (preset) {
+      string = preset.settingsString;
+    } else {
+      string = ""
+    }
+    
   }
   return string;
 }

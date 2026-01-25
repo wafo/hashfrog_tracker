@@ -19,15 +19,7 @@ const GENERATOR_VERSION = process.env.REACT_APP_GENERATOR_VERSION;
 
 const isLogicBranchRelease = LOGIC_BRANCH === "release";
 
-const PRESETS = [
-  { label: "Tournament S9", value: "tournament_s9" },
-  { label: "Tournament S8", value: "tournament_s8" }, 
-  { label: "Tournament S7", value: "tournament_s7" },
-  { label: "Multiworld S4", value: "mw_s4" },
-  { label: "League S5", value: "league_s5" },
-  { label: "Scrubs S5", value: "scrubs_s5" },
-  { label: "Triforce Blitz S2", value: "tfb_s2" },
-];
+const PRESETS = SettingStringsJSON.presets || [];
 
 // https://ootrandomizer.com/api/version?branch=master
 const CURRENT_ACTIVE_VERSION = "9.0.0";
@@ -97,7 +89,20 @@ const TrackerLauncher = () => {
   const [generatorVersion, setGeneratorVersion] = useState(
     () => cachedGeneratorVersion || CURRENT_ACTIVE_VERSION
   );
+  const [isCustomVersion, setIsCustomVersion] = useState(
+    () => {
+      const version = cachedGeneratorVersion || CURRENT_ACTIVE_VERSION;
+      return version && !GENERATOR_VERSIONS.includes(version);
+    }
+  );
   const debouncedVersion = useDebounce(generatorVersion, 300);
+
+  // Auto-detect if version is custom when it changes
+  useEffect(() => {
+    if (generatorVersion && !GENERATOR_VERSIONS.includes(generatorVersion)) {
+      setIsCustomVersion(true);
+    }
+  }, [generatorVersion]);
 
   useEffect(() => {
     setGeneratorVersionCache(debouncedVersion);
@@ -105,7 +110,15 @@ const TrackerLauncher = () => {
 
   const updateString = (preset) => {
     setSettingsString(SettingStringsJSON[preset.value]);
-    setGeneratorVersion(GENERATOR_VERSION || CURRENT_ACTIVE_VERSION);
+
+    // Use the mapped generator version. If not, use .env, if not, use the current active hardcoded version. (9.0.0 as of 1/25/2026)
+    if (preset.generatorVersion) {
+      setGeneratorVersion(preset.generatorVersion);
+    } else if (GENERATOR_VERSION) {
+      setGeneratorVersion(GENERATOR_VERSION);
+    } else {
+      setGeneratorVersion(CURRENT_ACTIVE_VERSION);
+    }
   };
 
   // Check if current settings match any preset
@@ -175,22 +188,53 @@ const TrackerLauncher = () => {
                   >
                     Generator Version
                   </Form.Label>
-                  <Form.Select
-                    size="sm"
-                    id="generator_version"
-                    name="generator_version"
-                    value={generatorVersion}
-                    onChange={({ target: { value } }) =>
-                      setGeneratorVersion(value)
-                    }
-                  >
-                    <option value="">Select version</option>
-                    {GENERATOR_VERSIONS.map((version) => (
-                      <option key={version} value={version}>
-                        {version}
-                      </option>
-                    ))}
-                  </Form.Select>
+                  {isCustomVersion ? (
+                    <InputGroup size="sm">
+                      <Form.Control
+                        type="text"
+                        id="generator_version"
+                        name="generator_version"
+                        placeholder="Enter custom version"
+                        value={generatorVersion}
+                        onChange={({ target: { value } }) =>
+                          setGeneratorVersion(value)
+                        }
+                      />
+                      <Button
+                        variant="outline-secondary"
+                        size="sm"
+                        onClick={() => {
+                          setIsCustomVersion(false);
+                          setGeneratorVersion(CURRENT_ACTIVE_VERSION);
+                        }}
+                      >
+                        ×
+                      </Button>
+                    </InputGroup>
+                  ) : (
+                    <Form.Select
+                      size="sm"
+                      id="generator_version"
+                      name="generator_version"
+                      value={generatorVersion}
+                      onChange={({ target: { value } }) => {
+                        if (value === "__other__") {
+                          setIsCustomVersion(true);
+                          setGeneratorVersion("");
+                        } else {
+                          setGeneratorVersion(value);
+                        }
+                      }}
+                    >
+                      <option value="">Select version</option>
+                      {GENERATOR_VERSIONS.map((version) => (
+                        <option key={version} value={version}>
+                          {version}
+                        </option>
+                      ))}
+                      <option value="__other__">Other...</option>
+                    </Form.Select>
+                  )}
                 </div>
                 <div className="col-8">
                   <Form.Label htmlFor="setting_string" className="text-secondary">
