@@ -130,7 +130,7 @@ const TrackerLauncher = () => {
   // Check if current settings match any preset
   const activePreset = useMemo(() => {
     return PRESETS.find(
-      (preset) => SettingStringsJSON[preset.value] === settingsString
+      (preset) => preset.settingsString === settingsString
     );
   }, [settingsString]);
 
