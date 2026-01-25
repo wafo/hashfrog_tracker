@@ -99,8 +99,8 @@ const TrackerLauncher = () => {
 
   // Auto-detect if version is custom when it changes
   useEffect(() => {
-    if (generatorVersion && !GENERATOR_VERSIONS.includes(generatorVersion)) {
-      setIsCustomVersion(true);
+    if (generatorVersion) {
+      setIsCustomVersion(!GENERATOR_VERSIONS.includes(generatorVersion));
     }
   }, [generatorVersion]);
 
