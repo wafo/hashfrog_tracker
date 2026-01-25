@@ -109,7 +109,13 @@ const TrackerLauncher = () => {
   }, [debouncedVersion, setGeneratorVersionCache]);
 
   const updateString = (preset) => {
-    setSettingsString(SettingStringsJSON[preset.value]);
+
+    if (preset.settingsString) {
+      setSettingsString(preset.settingsString);
+    } else {
+      // This should never happen. if it does, a preset has no settingString.
+      setSettingsString("UNKNOWN_SETTINGS_STRING");
+    }
 
     // Use the mapped generator version. If not, use .env, if not, use the current active hardcoded version. (9.0.0 as of 1/25/2026)
     if (preset.generatorVersion) {
