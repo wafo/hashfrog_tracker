@@ -96,10 +96,10 @@ class LogicHelper {
       updatedKeys = false;
 
       _.forEach(this.regions.child, regionName => {
-        if (_.includes(_.keys(Locations.activeKeyLocations), regionName)) {
+        if (regionName in Locations.activeKeyLocations) {
           _.forEach(Locations.activeKeyLocations[regionName], keyLocation => {
             if (
-              !_.includes(_.keys(guaranteedKeys), keyLocation.locationName) &&
+              !(keyLocation.locationName in guaranteedKeys) &&
               this._evalNode(keyLocation.rule, "child")
             ) {
               _.set(guaranteedKeys, keyLocation.locationName, true);
@@ -110,10 +110,10 @@ class LogicHelper {
         }
       });
       _.forEach(this.regions.adult, regionName => {
-        if (_.includes(_.keys(Locations.activeKeyLocations), regionName)) {
+        if (regionName in Locations.activeKeyLocations) {
           _.forEach(Locations.activeKeyLocations[regionName], keyLocation => {
             if (
-              !_.includes(_.keys(guaranteedKeys), keyLocation.locationName) &&
+              !(keyLocation.locationName in guaranteedKeys) &&
               this._evalNode(keyLocation.rule, "adult")
             ) {
               _.set(guaranteedKeys, keyLocation.locationName, true);
@@ -318,7 +318,7 @@ class LogicHelper {
     const rightSide = _.isEqual(node.right.type, "Identifier") ? node.right.name : node.right.value;
     switch (node.operator) {
       case "==":
-        if (_.includes(_.keys(this.settings), leftSide)) {
+        if (leftSide in this.settings) {
           return _.isEqual(this.settings[leftSide], rightSide);
         } else if (_.isEqual(leftSide, "selected_adult_trade_item")) {
           return _.includes(this.items, rightSide);
@@ -329,17 +329,17 @@ class LogicHelper {
           return false;
         }
       case "!=":
-        if (_.includes(_.keys(this.settings), leftSide)) {
+        if (leftSide in this.settings) {
           return !_.isEqual(this.settings[leftSide], rightSide);
         }
         break;
       case "<":
-        if (_.includes(_.keys(this.settings), leftSide)) {
+        if (leftSide in this.settings) {
           return this.settings[leftSide] < rightSide;
         }
         break;
       case "in":
-        if (_.includes(_.keys(this.settings), rightSide)) {
+        if (rightSide in this.settings) {
           return _.includes(this.settings[rightSide], leftSide);
         } else {
           return false;
@@ -482,7 +482,7 @@ class LogicHelper {
         );
     }
 
-    if (_.includes(_.keys(this.items), name)) {
+    if (name in this.items) {
       if (_.startsWith(name, "Boss_Key_")) {
         // extra check for boss keysy modes
         if (_.isEqual(name, "Boss_Key_Ganons_Castle")) {
@@ -496,17 +496,17 @@ class LogicHelper {
         return this.items[name] > 0;
       }
     }
-    if (_.includes(_.keys(this.renamedAttributes), name)) {
+    if (name in this.renamedAttributes) {
       return this.renamedAttributes[name];
     }
-    if (_.includes(_.keys(this.settings), name)) {
+    if (name in this.settings) {
       return this.settings[name];
     }
-    if (_.includes(_.keys(this.ruleAliases), name)) {
+    if (name in this.ruleAliases) {
       return this._evalRuleAlias(name);
     }
     const escapedIdentifier = _.replace(name, /_/g, " ");
-    if (_.includes(_.keys(Locations.activeEvents), escapedIdentifier)) {
+    if (escapedIdentifier in Locations.activeEvents) {
       return this._evalEvent(escapedIdentifier);
     }
 
@@ -525,9 +525,9 @@ class LogicHelper {
   }
 
   static _evalLiteral(value) {
-    if (_.includes(_.keys(Locations.activeDropLocations), value)) {
+    if (value in Locations.activeDropLocations) {
       return this._canAccessDrop(value);
-    } else if (_.includes(_.keys(Locations.activeEvents), value)) {
+    } else if (value in Locations.activeEvents) {
       return this._evalEvent(value);
     }
 
@@ -760,7 +760,7 @@ class LogicHelper {
   }
 
   static _hasDungeonRewards(count) {
-    if (!_.includes(_.keys(this.settings), count)) {
+    if (!(count in this.settings)) {
       throw Error(`Bad argument to has_dungeon_rewards: ${count}`);
     }
 
@@ -786,7 +786,7 @@ class LogicHelper {
   }
 
   static _hasMedallions(count) {
-    if (!_.includes(_.keys(this.settings), count)) {
+    if (!(count in this.settings)) {
       throw Error(`Bad argument to has_medallions: ${count}`);
     }
 
@@ -907,7 +907,7 @@ class LogicHelper {
   }
 
   static _hasStones(count) {
-    if (!_.includes(_.keys(this.settings), count)) {
+    if (!(count in this.settings)) {
       throw Error(`Bad argument to has_stones: ${count}`);
     }
 
@@ -916,7 +916,7 @@ class LogicHelper {
   }
 
   static _regionHasShortcuts(regionName) {
-    if (!_.includes(_.keys(Locations.regionMap), regionName)) {
+    if (!(regionName in Locations.regionMap)) {
       throw Error(`Bad argument to region_has_shortcuts: ${regionName}`);
     }
 
