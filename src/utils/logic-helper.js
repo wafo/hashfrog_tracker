@@ -655,7 +655,7 @@ class LogicHelper {
     if (_.isEqual(songName, "Scarecrow_Song")) {
       return (
         this.items.Ocarina > 0 &&
-        (this.settings.free_scarecrow || (_.isEqual(age, "adult") && this._evalEvent("Bonooru"))) &&
+        (this.settings.scarecrow_behavior === "free" || this.settings.scarecrow_behavior === "fast" || (_.isEqual(age, "adult") && this._evalEvent("Bonooru"))) &&
         (!this.settings.shuffle_individual_ocarina_notes || this._hasAllNotesForSong("Scarecrow_Song"))
       );
     } else {
