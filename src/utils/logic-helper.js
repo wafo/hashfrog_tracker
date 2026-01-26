@@ -487,7 +487,7 @@ class LogicHelper {
         // extra check for boss keysy modes
         if (_.isEqual(name, "Boss_Key_Ganons_Castle")) {
           // if Ganon's Boss Keys mode is Keysy, ignore Ganon's Boss Key requirements
-          return this.settings.shuffle_ganon_bosskey, "remove" || this.items[name] > 0;
+          return _.isEqual(this.settings.shuffle_ganon_bosskey, "remove") || this.items[name] > 0;
         } else {
           // if Boss Keys mode is Keysy, ignore Boss Key requirements
           return _.isEqual(this.settings.shuffle_bosskeys, "remove") || this.items[name] > 0;
