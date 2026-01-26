@@ -307,6 +307,7 @@
   "Kak 30 Gold Skulltula Reward":                                     ["NPC",          "Progressive Wallet"],
   "Kak 40 Gold Skulltula Reward":                                     ["NPC",          "Bombchus (10)"],
   "Kak 50 Gold Skulltula Reward":                                     ["NPC",          "Piece of Heart"],
+  "Kak 100 Gold Skulltula Reward":                                    ["NPC",          "Huge Rupee"],
   "Kak Impas House Cow":                                              ["NPC",          "Milk"],
   "Kak GS Tree":                                                      ["GS Token",     "Gold Skulltula Token"],
   "Kak GS Near Gate Guard":                                           ["GS Token",     "Gold Skulltula Token"],
@@ -2055,6 +2056,7 @@
   "30 Skulltulas Reward Hint":                                        ["Hint",         "None"],
   "40 Skulltulas Reward Hint":                                        ["Hint",         "None"],
   "50 Skulltulas Reward Hint":                                        ["Hint",         "None"],
+  "100 Skulltulas Reward Hint":                                       ["Hint",         "None"],
   "ZR Frogs Ocarina Minigame Hint":                                   ["Hint",         "None"],
   "Ganondorf Hint":                                                   ["Hint",         "None"]
 }
