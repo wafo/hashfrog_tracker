@@ -701,10 +701,12 @@ class LogicHelper {
       (this.settings.blue_fire_arrows && _.isEqual(itemName, "Ice_Arrows"));
 
     if (_.isUndefined(age)) {
-      (isChildItem && this._evalNode(this.parseRule(`${itemName}`), age)) ||
+      return (
+        (isChildItem && this._evalNode(this.parseRule(`${itemName}`), age)) ||
         (isAdultItem && this._evalNode(this.parseRule(`${itemName}`), age)) ||
         (isMagicItem && this._evalNode(this.parseRule(`${itemName} and Magic_Meter`), age)) ||
-        (isMagicArrow && this._evalNode(this.parseRule(`${itemName} and Bow and Magic_Meter`), age));
+        (isMagicArrow && this._evalNode(this.parseRule(`${itemName} and Bow and Magic_Meter`), age))
+      );
     } else {
       return (
         (isChildItem && this._evalNode(this.parseRule(`is_child and ${itemName}`), age)) ||
