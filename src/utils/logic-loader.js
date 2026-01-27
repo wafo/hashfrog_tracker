@@ -1,30 +1,29 @@
-import _ from "lodash";
-
 import DUNGEONS from "../data/dungeons.json";
 
 const LOGIC_BRANCH = process.env.REACT_APP_LOGIC_BRANCH;
 
 class LogicLoader {
   static async loadLogicFiles() {
-    // Load the LogicHelpers.json file, which defines macros and item aliases for convenience
-    const logicHelpersFile = await this._loadLogicFile(this._logicHelpersFileUrl());
+    // Load all logic files in parallel
+    const [logicHelpersFile, bossesFile, overworldFile, ...dungeonResults] = await Promise.all([
+      this._loadLogicFile(this._logicHelpersFileUrl()),
+      this._loadLogicFile(this._logicFileUrl("Bosses.json")),
+      this._loadLogicFile(this._logicFileUrl("Overworld.json")),
+      ...DUNGEONS.flatMap(dungeonName => [
+        this._loadLogicFile(this._logicFileUrl(`${dungeonName}.json`)).then(data => ({ type: "normal", name: dungeonName, data })),
+        this._loadLogicFile(this._logicFileUrl(`${dungeonName} MQ.json`)).then(data => ({ type: "mq", name: `${dungeonName} MQ`, data })),
+      ]),
+    ]);
 
-    // Load in the logic files for each dungeon
-    const dungeonFiles = new Map();
-    const dungeonMQFiles = new Map();
-    for await (let dungeonName of DUNGEONS) {
-      _.set(dungeonFiles, dungeonName, await this._loadLogicFile(this._logicFileUrl(`${dungeonName}.json`)));
-
-      // Include the logic files for the Master Quest dungeons as well
-      dungeonName = dungeonName + " MQ";
-      _.set(dungeonMQFiles, dungeonName, await this._loadLogicFile(this._logicFileUrl(`${dungeonName}.json`)));
-    }
-
-    // Load in the logic file for boss rooms
-    const bossesFile = await this._loadLogicFile(this._logicFileUrl("Bosses.json"));
-
-    // Load in the logic file for overworld locations
-    const overworldFile = await this._loadLogicFile(this._logicFileUrl("Overworld.json"));
+    const dungeonFiles = {};
+    const dungeonMQFiles = {};
+    dungeonResults.forEach(result => {
+      if (result.type === "normal") {
+        dungeonFiles[result.name] = result.data;
+      } else {
+        dungeonMQFiles[result.name] = result.data;
+      }
+    });
 
     return {
       logicHelpersFile,
