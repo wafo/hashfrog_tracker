@@ -7,9 +7,8 @@ import HINT_REGIONS from "../data/hint-regions.json";
 import LOCATION_TABLE from "../data/location-table.json";
 import TRADE_ITEMS from "../data/trade-items.json";
 
-import LogicHelper from "./logic-helper";
 import { parseRule } from "./rule-parser";
-// import { updateHintRegionsJSON } from "./utils";
+import { getRenamedAttribute, getSetting } from "./settings-helper";
 
 class Locations {
   static initialize(dungeonFiles, dungeonMQFiles, bossesFile, overworldFile) {
@@ -89,15 +88,12 @@ class Locations {
     const itemName = location.vanillaItem;
 
     return (
-      (_.isEqual(itemName, "Boss Key (Ganons Castle)") &&
-        _.isEqual(LogicHelper.settings.shuffle_ganon_bosskey, "vanilla")) ||
-      (_.startsWith(itemName, "Boss Key ") && _.isEqual(LogicHelper.settings.shuffle_bosskeys, "vanilla")) ||
-      (_.isEqual(itemName, "Small Key (Thieves Hideout)") &&
-        _.isEqual(LogicHelper.settings.shuffle_hideoutkeys, "vanilla")) ||
-      (_.startsWith(itemName, "Silver Rupee ") && _.isEqual(LogicHelper.settings.shuffle_silver_rupees, "vanilla")) ||
-      (_.startsWith(itemName, "Small Key ") && _.isEqual(LogicHelper.settings.shuffle_smallkeys, "vanilla")) ||
-      (_.isEqual(itemName, "Small Key (Treasure Chest Game)") &&
-        _.isEqual(LogicHelper.settings.shuffle_tcgkeys, "vanilla"))
+      (_.isEqual(itemName, "Boss Key (Ganons Castle)") && _.isEqual(getSetting("shuffle_ganon_bosskey"), "vanilla")) ||
+      (_.startsWith(itemName, "Boss Key ") && _.isEqual(getSetting("shuffle_bosskeys"), "vanilla")) ||
+      (_.isEqual(itemName, "Small Key (Thieves Hideout)") && _.isEqual(getSetting("shuffle_hideoutkeys"), "vanilla")) ||
+      (_.startsWith(itemName, "Silver Rupee ") && _.isEqual(getSetting("shuffle_silver_rupees"), "vanilla")) ||
+      (_.startsWith(itemName, "Small Key ") && _.isEqual(getSetting("shuffle_smallkeys"), "vanilla")) ||
+      (_.isEqual(itemName, "Small Key (Treasure Chest Game)") && _.isEqual(getSetting("shuffle_tcgkeys"), "vanilla"))
     );
   }
 
@@ -110,11 +106,11 @@ class Locations {
 
     // Song from Impa
     else if (_.isEqual(location.locationName, "Song from Impa")) {
-      return !LogicHelper.renamedAttributes.skip_child_zelda;
+      return !getRenamedAttribute("skip_child_zelda");
     }
 
     // Disabled Locations
-    else if (_.includes(LogicHelper.settings.disabled_locations, location.locationName)) {
+    else if (_.includes(getSetting("disabled_locations"), location.locationName)) {
       return false;
     }
 
@@ -125,21 +121,23 @@ class Locations {
 
     // Gold Skulltula Tokens
     else if (_.isEqual(location.vanillaItem, "Gold Skulltula Token")) {
+      const tokensanity = getSetting("tokensanity");
       return (
-        _.isEqual(LogicHelper.settings.tokensanity, "all") ||
-        (_.isEqual(LogicHelper.settings.tokensanity, "dungeons") && location.isDungeon) ||
-        (_.isEqual(LogicHelper.settings.tokensanity, "overworld") && !location.isDungeon)
+        _.isEqual(tokensanity, "all") ||
+        (_.isEqual(tokensanity, "dungeons") && location.isDungeon) ||
+        (_.isEqual(tokensanity, "overworld") && !location.isDungeon)
       );
     }
 
     // Shops
     else if (_.isEqual(location.type, "Shop")) {
-      if (_.isEqual(LogicHelper.settings.shopsanity, "off")) {
+      const shopsanity = getSetting("shopsanity");
+      if (_.isEqual(shopsanity, "off")) {
         return false;
-      } else if (_.isEqual(LogicHelper.settings.shopsanity, "random")) {
+      } else if (_.isEqual(shopsanity, "random")) {
         return 4 >= _.toInteger(_.slice(location.locationName, -1));
       } else {
-        return _.toInteger(LogicHelper.settings.shopsanity) >= _.toInteger(_.slice(location.locationName, -1));
+        return _.toInteger(shopsanity) >= _.toInteger(_.slice(location.locationName, -1));
       }
     }
 
@@ -148,23 +146,23 @@ class Locations {
       if (_.includes(["Piece of Heart", "Deku Stick Capacity", "Deku Nut Capacity"], location.vanillaItem)) {
         return true;
       } else {
-        return !_.isEqual(LogicHelper.settings.shuffle_scrubs, "off");
+        return !_.isEqual(getSetting("shuffle_scrubs"), "off");
       }
     }
 
     // Kokiri Sword
     else if (_.isEqual(location.vanillaItem, "Kokiri Sword")) {
-      return LogicHelper.settings.shuffle_kokiri_sword;
+      return getSetting("shuffle_kokiri_sword");
     }
 
     // Ocarinas
     else if (_.isEqual(location.vanillaItem, "Ocarina")) {
-      return LogicHelper.settings.shuffle_ocarinas;
+      return getSetting("shuffle_ocarinas");
     }
 
     // Giant's Knife
     else if (_.isEqual(location.vanillaItem, "Giants Knife")) {
-      return LogicHelper.settings.shuffle_expensive_merchants;
+      return getSetting("shuffle_expensive_merchants");
     }
 
     // Bombchu Bowling 3rd and 4th prizes (must be checked before Bombchu vanilla items!)
@@ -175,81 +173,87 @@ class Locations {
     // Bombchus
     else if (_.includes(["Bombchus", "Bombchus (5)", "Bombchus (10)", "Bombchus (20)"], location.vanillaItem)) {
       return (
-        !_.isEqual(location.locationName, "Wasteland Bombchu Salesman") ||
-        LogicHelper.settings.shuffle_expensive_merchants
+        !_.isEqual(location.locationName, "Wasteland Bombchu Salesman") || getSetting("shuffle_expensive_merchants")
       );
     }
 
     // Blue Potion from Granny's Potion Shop
     else if (_.isEqual(location.vanillaItem, "Blue Potion")) {
-      return LogicHelper.settings.shuffle_expensive_merchants;
+      return getSetting("shuffle_expensive_merchants");
     }
 
     // Cows
     else if (_.isEqual(location.vanillaItem, "Milk")) {
-      return LogicHelper.settings.shuffle_cows;
+      return getSetting("shuffle_cows");
     }
 
     // Gerudo Card
     else if (_.isEqual(location.vanillaItem, "Gerudo Membership Card")) {
-      return LogicHelper.settings.shuffle_gerudo_card && !_.isEqual(LogicHelper.settings.gerudo_fortress, "open");
+      return getSetting("shuffle_gerudo_card") && !_.isEqual(getSetting("gerudo_fortress"), "open");
     }
 
     // Magic Beans
     else if (_.isEqual(location.vanillaItem, "Buy Magic Bean")) {
-      return LogicHelper.settings.shuffle_beans;
+      return getSetting("shuffle_beans");
     }
 
     // Frogs Purple Rupees
     else if (_.startsWith(location.locationName, "ZR Frogs ") && _.isEqual(location.vanillaItem, "Rupees (50)")) {
-      return LogicHelper.settings.shuffle_frog_song_rupees;
+      return getSetting("shuffle_frog_song_rupees");
+    }
+
+    // 100 Gold Skulltula Reward
+    else if (_.isEqual(location.locationName, "Kak 100 Gold Skulltula Reward")) {
+      return getSetting("shuffle_100_skulltula_rupee");
     }
 
     // Hyrule Loach Reward
     else if (_.isEqual(location.locationName, "LH Loach Fishing")) {
-      return !_.isEqual(LogicHelper.settings.shuffle_loach_reward, "off");
+      return !_.isEqual(getSetting("shuffle_loach_reward"), "off");
     }
 
     // Adult Trade Quest Items
     else if (_.includes(TRADE_ITEMS, location.vanillaItem)) {
-      if (!LogicHelper.settings.adult_trade_shuffle) {
-        return _.isEqual(location.vanillaItem, "Pocket Egg") && LogicHelper.settings.adult_trade_start;
-      } else if (_.includes(LogicHelper.settings.adult_trade_start, location.vanillaItem)) {
+      const adultTradeShuffle = getSetting("adult_trade_shuffle");
+      const adultTradeStart = getSetting("adult_trade_start");
+      if (!adultTradeShuffle) {
+        return _.isEqual(location.vanillaItem, "Pocket Egg") && adultTradeStart;
+      } else if (_.includes(adultTradeStart, location.vanillaItem)) {
         return true;
       } else {
-        return (
-          _.isEqual(location.vanillaItem, "Pocket Egg") &&
-          _.includes(LogicHelper.settings.adult_trade_start, "Pocket Cucco")
-        );
+        return _.isEqual(location.vanillaItem, "Pocket Egg") && _.includes(adultTradeStart, "Pocket Cucco");
       }
     }
 
     // Child Trade Quest Items
     else if (_.includes(CHILD_TRADE_ITEMS, location.vanillaItem)) {
-      if (_.isEqual(location.vanillaItem, "Weird Egg") && LogicHelper.renamedAttributes.skip_child_zelda) {
+      const shuffleChildTrade = getSetting("shuffle_child_trade");
+      if (_.isEqual(location.vanillaItem, "Weird Egg") && getRenamedAttribute("skip_child_zelda")) {
         return false;
-      } else if (!LogicHelper.settings.shuffle_child_trade) {
+      } else if (!shuffleChildTrade) {
         return false;
-      } else if (_.includes(LogicHelper.settings.shuffle_child_trade, location.vanillaItem)) {
+      } else if (_.includes(shuffleChildTrade, location.vanillaItem)) {
         return true;
       } else {
-        return (
-          _.isEqual(location.vanillaItem, "Weird Egg") &&
-          _.includes(LogicHelper.settings.shuffle_child_trade, "Chicken")
-        );
+        return _.isEqual(location.vanillaItem, "Weird Egg") && _.includes(shuffleChildTrade, "Chicken");
       }
+    }
+
+    // Gerudo Fortress Freestanding Heart Piece
+    else if (_.isEqual(location.vanillaItem, "Piece of Heart (Out of Logic)")) {
+      return _.isEqual(getSetting("shuffle_gerudo_fortress_heart_piece"), "shuffle");
     }
 
     // Thieves' Hideout
     else if (_.isEqual(location.vanillaItem, "Small Key (Thieves Hideout)")) {
+      const gerudoFortress = getSetting("gerudo_fortress");
       if (
-        _.isEqual(LogicHelper.settings.gerudo_fortress, "open") ||
-        (_.isEqual(LogicHelper.settings.gerudo_fortress, "fast") &&
-          _.isEqual(location.locationName, "Hideout 1 Torch Jail Gerudo Key"))
+        _.isEqual(gerudoFortress, "open") ||
+        (_.isEqual(gerudoFortress, "fast") && !_.isEqual(location.locationName, "Hideout 1 Torch Jail Gerudo Key"))
       ) {
         return false;
       } else {
-        return !_.isEqual(LogicHelper.settings.shuffle_hideoutkeys, "vanilla");
+        return !_.isEqual(getSetting("shuffle_hideoutkeys"), "vanilla");
       }
     }
 
@@ -258,9 +262,10 @@ class Locations {
       _.startsWith(location.locationName, "Market Treasure Chest Game ") &&
       !_.isEqual(location.vanillaItem, "Piece of Heart (Treasure Chest Game)")
     ) {
-      if (_.includes(["regional", "overworld", "any_dungeon", "keysanity"], LogicHelper.settings.shuffle_tcgkeys)) {
+      const shuffleTcgkeys = getSetting("shuffle_tcgkeys");
+      if (_.includes(["regional", "overworld", "any_dungeon", "keysanity"], shuffleTcgkeys)) {
         return true;
-      } else if (_.isEqual(LogicHelper.settings.shuffle_tcgkeys, "remove")) {
+      } else if (_.isEqual(shuffleTcgkeys, "remove")) {
         return true;
       } else {
         return false;
@@ -269,11 +274,12 @@ class Locations {
 
     // Freestanding Rupees and Hearts
     else if (_.includes(["ActorOverride", "Freestanding", "RupeeTower"], location.type)) {
-      if (_.isEqual(LogicHelper.settings.shuffle_freestanding_items, "all")) {
+      const shuffleFreestanding = getSetting("shuffle_freestanding_items");
+      if (_.isEqual(shuffleFreestanding, "all")) {
         return true;
-      } else if (_.isEqual(LogicHelper.settings.shuffle_freestanding_items, "dungeons") && location.isDungeon) {
+      } else if (_.isEqual(shuffleFreestanding, "dungeons") && location.isDungeon) {
         return true;
-      } else if (_.isEqual(LogicHelper.settings.shuffle_freestanding_items, "overworld") && !location.isDungeon) {
+      } else if (_.isEqual(shuffleFreestanding, "overworld") && !location.isDungeon) {
         return true;
       } else {
         return false;
@@ -282,11 +288,12 @@ class Locations {
 
     // Pots
     else if (_.includes(["Pot", "FlyingPot"], location.type)) {
-      if (_.isEqual(LogicHelper.settings.shuffle_pots, "all")) {
+      const shufflePots = getSetting("shuffle_pots");
+      if (_.isEqual(shufflePots, "all")) {
         return true;
-      } else if (_.isEqual(LogicHelper.settings.shuffle_pots, "dungeons") && location.isDungeon) {
+      } else if (_.isEqual(shufflePots, "dungeons") && location.isDungeon) {
         return true;
-      } else if (_.isEqual(LogicHelper.settings.shuffle_pots, "overworld") && !location.isDungeon) {
+      } else if (_.isEqual(shufflePots, "overworld") && !location.isDungeon) {
         return true;
       } else {
         return false;
@@ -295,11 +302,12 @@ class Locations {
 
     // Crates
     else if (_.includes(["Crate", "SmallCrate"], location.type)) {
-      if (_.isEqual(LogicHelper.settings.shuffle_crates, "all")) {
+      const shuffleCrates = getSetting("shuffle_crates");
+      if (_.isEqual(shuffleCrates, "all")) {
         return true;
-      } else if (_.isEqual(LogicHelper.settings.shuffle_crates, "dungeons") && location.isDungeon) {
+      } else if (_.isEqual(shuffleCrates, "dungeons") && location.isDungeon) {
         return true;
-      } else if (_.isEqual(LogicHelper.settings.shuffle_crates, "overworld") && !location.isDungeon) {
+      } else if (_.isEqual(shuffleCrates, "overworld") && !location.isDungeon) {
         return true;
       } else {
         return false;
@@ -308,51 +316,51 @@ class Locations {
 
     // Beehives
     else if (_.isEqual(location.type, "Beehive")) {
-      return LogicHelper.settings.shuffle_beehives;
+      return getSetting("shuffle_beehives");
+    }
+
+    // Wonderitems
+    else if (_.isEqual(location.type, "Wonderitem")) {
+      return getSetting("shuffle_wonderitems");
+    }
+
+    // Dungeon Rewards
+    else if (_.isEqual(location.locationName, "ToT Reward from Rauru")) {
+      return _.isEqual(getSetting("shuffle_dungeon_rewards"), "vanilla");
+    } else if (_.isEqual(location.type, "Boss")) {
+      return _.includes(["any_dungeon", "overworld", "regional", "anywhere"], getSetting("shuffle_dungeon_rewards"));
+    }
+
+    // Ganon boss key
+    else if (_.isEqual(location.vanillaItem, "Boss Key (Ganons Castle)")) {
+      const shuffleGanonBosskey = getSetting("shuffle_ganon_bosskey");
+      if (_.isEqual(shuffleGanonBosskey, "vanilla")) {
+        return false;
+      }
+      return _.includes(["remove", "any_dungeon", "overworld", "keysanity", "regional"], shuffleGanonBosskey);
     }
 
     // Dungeon Items
     else if (location.isDungeon) {
-      let shuffleSetting = null;
-
       // Boss Key
       if (_.startsWith(location.vanillaItem, "Boss Key")) {
-        if (!_.startsWith(location, "Ganons Tower")) {
-          shuffleSetting = LogicHelper.settings.shuffle_bosskeys;
-        } else {
-          shuffleSetting = LogicHelper.settings.shuffle_ganon_bosskey;
-        }
-        if (_.isEqual(shuffleSetting, "vanilla")) {
-          // show boss key location even if map/compass is vanilla
-          return true;
-        } else {
-          return true;
-        }
+        // Boss Key chests always show as progress locations, even if vanilla
+        return true;
       }
       // Map or Compass
       else if (_.startsWith(location.vanillaItem, "Map") || _.startsWith(location.vanillaItem, "Compass")) {
-        shuffleSetting = LogicHelper.settings.shuffle_mapcompass;
-        if (_.isEqual(shuffleSetting, "vanilla")) {
-          // show dungeon location even if map/compass is vanilla
-          return true;
-        } else {
-          return true;
-        }
+        // Map and Compass chests always show as progress locations, even if vanilla
+        return true;
       }
       // Small Key
       else if (_.startsWith(location.vanillaItem, "Small Key")) {
-        shuffleSetting = LogicHelper.settings.shuffle_smallkeys;
-        if (_.isEqual(shuffleSetting, "vanilla")) {
-          // show dungeon location even if small key is vanilla
-          return true;
-        } else {
-          return true;
-        }
+        // Small Key chests always show as progress locations, even if vanilla
+        return true;
       }
       // Silver Rupee
       else if (_.isEqual(location.type, "SilverRupee")) {
-        shuffleSetting = LogicHelper.settings.shuffle_silver_rupees;
-        if (_.isEqual(shuffleSetting, "vanilla")) {
+        const shuffleSilverRupees = getSetting("shuffle_silver_rupees");
+        if (_.isEqual(shuffleSilverRupees, "vanilla")) {
           return false;
         } else {
           return true;
@@ -414,7 +422,7 @@ class Locations {
   }
 
   static resetActiveLocations() {
-    const dungeonsMQ = LogicHelper.settings.mq_dungeons_specific;
+    const dungeonsMQ = getSetting("mq_dungeons_specific");
 
     const simpleCopy = (activeMap, name, data) => _.set(activeMap, name, data);
     const unionCopy = (activeMap, name, data) => _.set(activeMap, name, _.union(activeMap[name], data));
