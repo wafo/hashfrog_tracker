@@ -1,8 +1,8 @@
-import { parse } from "acorn";
 import _ from "lodash";
 import memoize from "memoizee";
 
 import Locations from "./locations";
+import { parseRule } from "./rule-parser";
 
 import DUNGEONS from "../data/dungeons.json";
 import DUNGEON_CONFIG from "../data/dungeon-config.json";
@@ -127,14 +127,7 @@ class LogicHelper {
   }
 
   static parseRule(ruleString) {
-    const rule = _.flow(
-      _.trim,
-      str => _.replace(str, / and /g, " && "),
-      str => _.replace(str, / or /g, " || "),
-      str => _.replace(str, /not /g, "! "),
-    )(ruleString);
-
-    return parse(rule, { ecmaVersion: 2020 }).body[0];
+    return parseRule(ruleString);
   }
 
   static isLocationAvailable(locationName, age) {

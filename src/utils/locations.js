@@ -8,6 +8,7 @@ import LOCATION_TABLE from "../data/location-table.json";
 import TRADE_ITEMS from "../data/trade-items.json";
 
 import LogicHelper from "./logic-helper";
+import { parseRule } from "./rule-parser";
 // import { updateHintRegionsJSON } from "./utils";
 
 class Locations {
@@ -551,7 +552,7 @@ class Locations {
               // Accessibility of drops is important for logic, but are stored separately from locations
               const dropData = {
                 parentRegion,
-                rule: LogicHelper.parseRule(rule),
+                rule: parseRule(rule),
               };
               if (hintRegion in this.dropLocations[locationKey]) {
                 // Append new drop location
@@ -570,7 +571,7 @@ class Locations {
                 isDungeon,
                 locationName,
                 parentRegion,
-                rule: LogicHelper.parseRule(rule),
+                rule: parseRule(rule),
                 type,
                 vanillaItem,
               };
@@ -594,7 +595,7 @@ class Locations {
                 const keyData = {
                   locationName,
                   parentRegion,
-                  rule: LogicHelper.parseRule(rule),
+                  rule: parseRule(rule),
                   vanillaItem,
                 };
                 _.set(this.keyLocations, [locationKey, hintRegion, locationName], keyData);
@@ -619,7 +620,7 @@ class Locations {
         _.forEach(region.events, (rule, eventName) => {
           const eventData = {
             parentRegion,
-            rule: LogicHelper.parseRule(rule),
+            rule: parseRule(rule),
           };
           if (hintRegion in this.events[locationKey]) {
             _.set(
@@ -636,7 +637,7 @@ class Locations {
       // Record exits as they are relevant to logic
       if (_.includes(_.keys(region), "exits")) {
         _.forEach(region.exits, (rule, exitName) => {
-          _.set(this.exits, [locationKey, hintRegion, parentRegion, exitName], LogicHelper.parseRule(rule));
+          _.set(this.exits, [locationKey, hintRegion, parentRegion, exitName], parseRule(rule));
         });
       }
     });
