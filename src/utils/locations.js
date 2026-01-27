@@ -390,127 +390,71 @@ class Locations {
     return newLocations;
   }
 
+  static _getDungeonSource(sourceMap, dungeonName, dungeonsMQ) {
+    return _.includes(dungeonsMQ, dungeonName)
+      ? sourceMap.dungeon_mq[dungeonName]
+      : sourceMap.dungeon[dungeonName];
+  }
+
+  static _buildActiveMap(sourceMap, dungeonsMQ, copyFn) {
+    const activeMap = new Map();
+
+    // Copy dungeon data (MQ or non-MQ based on settings)
+    _.forEach(DUNGEONS, dungeonName => {
+      const source = this._getDungeonSource(sourceMap, dungeonName, dungeonsMQ);
+      _.forEach(source, (data, name) => copyFn(activeMap, name, data));
+    });
+
+    // Copy overworld data
+    _.forEach(_.values(sourceMap.overworld), regionData => {
+      _.forEach(regionData, (data, name) => copyFn(activeMap, name, data));
+    });
+
+    return activeMap;
+  }
+
   static resetActiveLocations() {
     const dungeonsMQ = LogicHelper.settings.mq_dungeons_specific;
 
-    this.activeLocations = new Map();
-    _.forEach(DUNGEONS, dungeonName => {
-      if (_.includes(dungeonsMQ, dungeonName)) {
-        _.forEach(this.locations.dungeon_mq[dungeonName], (data, name) => {
-          _.set(this.activeLocations, name, data);
-        });
-      } else {
-        _.forEach(this.locations.dungeon[dungeonName], (data, name) => {
-          _.set(this.activeLocations, name, data);
-        });
-      }
-    });
-    _.forEach(_.values(this.locations.overworld), location => {
-      _.forEach(location, (data, name) => {
-        _.set(this.activeLocations, name, data);
-      });
-    });
+    const simpleCopy = (activeMap, name, data) => _.set(activeMap, name, data);
+    const unionCopy = (activeMap, name, data) => _.set(activeMap, name, _.union(activeMap[name], data));
 
-    this.activeDropLocations = new Map();
-    _.forEach(DUNGEONS, dungeonName => {
-      if (_.includes(dungeonsMQ, dungeonName)) {
-        _.forEach(this.dropLocations.dungeon_mq[dungeonName], (data, name) => {
-          _.set(this.activeDropLocations, name, _.union(this.activeDropLocations[name], data));
-        });
-      } else {
-        _.forEach(this.dropLocations.dungeon[dungeonName], (data, name) => {
-          _.set(this.activeDropLocations, name, _.union(this.activeDropLocations[name], data));
-        });
-      }
-    });
-    _.forEach(_.values(this.dropLocations.overworld), dropLocation => {
-      _.forEach(dropLocation, (data, name) => {
-        _.set(this.activeDropLocations, name, _.union(this.activeDropLocations[name], data));
-      });
-    });
+    // Locations, Events, Exits
+    this.activeLocations = this._buildActiveMap(this.locations, dungeonsMQ, simpleCopy);
+    this.activeEvents = this._buildActiveMap(this.events, dungeonsMQ, simpleCopy);
+    this.activeExits = this._buildActiveMap(this.exits, dungeonsMQ, simpleCopy);
 
+    // Drop locations
+    this.activeDropLocations = this._buildActiveMap(this.dropLocations, dungeonsMQ, unionCopy);
+
+    // Skulls locations
     this.activeSkullsLocations = [];
     _.forEach(DUNGEONS, dungeonName => {
-      if (_.includes(dungeonsMQ, dungeonName)) {
-        this.activeSkullsLocations = _.union(this.activeSkullsLocations, this.skullsLocations.dungeon_mq[dungeonName]);
-      } else {
-        this.activeSkullsLocations = _.union(this.activeSkullsLocations, this.skullsLocations.dungeon[dungeonName]);
-      }
+      const source = this._getDungeonSource(this.skullsLocations, dungeonName, dungeonsMQ);
+      this.activeSkullsLocations = _.union(this.activeSkullsLocations, source);
     });
     _.forEach(_.values(this.skullsLocations.overworld), skullsLocation => {
       this.activeSkullsLocations = _.union(this.activeSkullsLocations, skullsLocation);
     });
 
+    // Key locations
     this.activeKeyLocations = new Map();
-    _.forEach(DUNGEONS, dungeonName => {
-      if (_.includes(dungeonsMQ, dungeonName)) {
-        _.forEach(_.values(this.keyLocations.dungeon_mq[dungeonName]), data => {
-          if (Locations.isGuaranteedKey(data)) {
-            _.set(
-              this.activeKeyLocations,
-              data.parentRegion,
-              _.union(this.activeKeyLocations[data.parentRegion], [data]),
-            );
-          }
-        });
-      } else {
-        _.forEach(_.values(this.keyLocations.dungeon[dungeonName]), data => {
-          if (Locations.isGuaranteedKey(data)) {
-            _.set(
-              this.activeKeyLocations,
-              data.parentRegion,
-              _.union(this.activeKeyLocations[data.parentRegion], [data]),
-            );
-          }
-        });
+    const addKeyLocation = data => {
+      if (Locations.isGuaranteedKey(data)) {
+        _.set(
+          this.activeKeyLocations,
+          data.parentRegion,
+          _.union(this.activeKeyLocations[data.parentRegion], [data]),
+        );
       }
+    };
+
+    _.forEach(DUNGEONS, dungeonName => {
+      const source = this._getDungeonSource(this.keyLocations, dungeonName, dungeonsMQ);
+      _.forEach(_.values(source), addKeyLocation);
     });
     _.forEach(_.values(this.keyLocations.overworld), keyLocation => {
-      _.forEach(_.values(keyLocation), data => {
-        if (Locations.isGuaranteedKey(data)) {
-          _.set(
-            this.activeKeyLocations,
-            data.parentRegion,
-            _.union(this.activeKeyLocations[data.parentRegion], [data]),
-          );
-        }
-      });
-    });
-
-    this.activeEvents = new Map();
-    _.forEach(DUNGEONS, dungeonName => {
-      if (_.includes(dungeonsMQ, dungeonName)) {
-        _.forEach(this.events.dungeon_mq[dungeonName], (data, name) => {
-          _.set(this.activeEvents, name, data);
-        });
-      } else {
-        _.forEach(this.events.dungeon[dungeonName], (data, name) => {
-          _.set(this.activeEvents, name, data);
-        });
-      }
-    });
-    _.forEach(_.values(this.events.overworld), event => {
-      _.forEach(event, (data, name) => {
-        _.set(this.activeEvents, name, data);
-      });
-    });
-
-    this.activeExits = new Map();
-    _.forEach(DUNGEONS, dungeonName => {
-      if (_.includes(dungeonsMQ, dungeonName)) {
-        _.forEach(this.exits.dungeon_mq[dungeonName], (data, name) => {
-          _.set(this.activeExits, name, data);
-        });
-      } else {
-        _.forEach(this.exits.dungeon[dungeonName], (data, name) => {
-          _.set(this.activeExits, name, data);
-        });
-      }
-    });
-    _.forEach(_.values(this.exits.overworld), exit => {
-      _.forEach(exit, (data, name) => {
-        _.set(this.activeExits, name, data);
-      });
+      _.forEach(_.values(keyLocation), addKeyLocation);
     });
   }
 
