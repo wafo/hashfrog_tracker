@@ -1,17 +1,43 @@
 import DUNGEONS from "../data/dungeons.json";
-
-const LOGIC_BRANCH = process.env.REACT_APP_LOGIC_BRANCH;
+import VersionConfig from "../versions/version-config";
 
 class LogicLoader {
-  static async loadLogicFiles() {
+  static async loadLogicFiles(version) {
+    const normalizedVersion = VersionConfig.normalizeVersion(version);
+
+    // Check for bundled logic files
+    if (VersionConfig.isBundled(normalizedVersion)) {
+      return await VersionConfig.getBundledLogicFiles(normalizedVersion);
+    }
+
+    // If none are found, try to fetch them from GitHub
+    const { owner, tag } = VersionConfig.parseVersion(normalizedVersion);
+
+    try {
+      return await this._fetchLogicFiles(owner, tag);
+    } catch (error) {
+      // If unable to fetch logic files, fall back to bundled version
+      return await VersionConfig.getFallbackLogicFiles();
+    }
+  }
+
+  static async _fetchLogicFiles(owner, tag) {
     // Load all logic files in parallel
     const [logicHelpersFile, bossesFile, overworldFile, ...dungeonResults] = await Promise.all([
-      this._loadLogicFile(this._logicHelpersFileUrl()),
-      this._loadLogicFile(this._logicFileUrl("Bosses.json")),
-      this._loadLogicFile(this._logicFileUrl("Overworld.json")),
+      this._loadLogicFile(this._logicHelpersFileUrl(owner, tag)),
+      this._loadLogicFile(this._logicFileUrl(owner, tag, "Bosses.json")),
+      this._loadLogicFile(this._logicFileUrl(owner, tag, "Overworld.json")),
       ...DUNGEONS.flatMap(dungeonName => [
-        this._loadLogicFile(this._logicFileUrl(`${dungeonName}.json`)).then(data => ({ type: "normal", name: dungeonName, data })),
-        this._loadLogicFile(this._logicFileUrl(`${dungeonName} MQ.json`)).then(data => ({ type: "mq", name: `${dungeonName} MQ`, data })),
+        this._loadLogicFile(this._logicFileUrl(owner, tag, `${dungeonName}.json`)).then(data => ({
+          type: "normal",
+          name: dungeonName,
+          data,
+        })),
+        this._loadLogicFile(this._logicFileUrl(owner, tag, `${dungeonName} MQ.json`)).then(data => ({
+          type: "mq",
+          name: `${dungeonName} MQ`,
+          data,
+        })),
       ]),
     ]);
 
@@ -54,12 +80,12 @@ class LogicLoader {
     return removedMultilines;
   }
 
-  static _logicHelpersFileUrl() {
-    return `https://raw.githubusercontent.com/OoTRandomizer/OoT-Randomizer/${LOGIC_BRANCH}/data/LogicHelpers.json`;
+  static _logicHelpersFileUrl(owner, tag) {
+    return `https://raw.githubusercontent.com/${owner}/OoT-Randomizer/${tag}/data/LogicHelpers.json`;
   }
 
-  static _logicFileUrl(fileName) {
-    return `https://raw.githubusercontent.com/OoTRandomizer/OoT-Randomizer/${LOGIC_BRANCH}/data/World/${fileName}`;
+  static _logicFileUrl(owner, tag, fileName) {
+    return `https://raw.githubusercontent.com/${owner}/OoT-Randomizer/${tag}/data/World/${fileName}`;
   }
 }
 

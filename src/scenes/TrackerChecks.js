@@ -14,8 +14,11 @@ const TrackerChecks = () => {
   const { updateItemsFromLogic } = useItems();
 
   const initializeLogic = useCallback(async () => {
+    const generatorVersion = getGeneratorVersionCache();
+
+    // Load logic files for the specific generator version
     const { logicHelpersFile, dungeonFiles, dungeonMQFiles, bossesFile, overworldFile } =
-      await LogicLoader.loadLogicFiles();
+      await LogicLoader.loadLogicFiles(generatorVersion);
 
     Locations.initialize(dungeonFiles, dungeonMQFiles, bossesFile, overworldFile);
 
@@ -23,12 +26,12 @@ const TrackerChecks = () => {
     // Backend gets them from the generator endpoint and caches them.
     const { settings } = await fetch(
       `${process.env.REACT_APP_API_URL}/settings/string?` +
-        new URLSearchParams({
-          version: getGeneratorVersionCache(),
-          settingsString: getSettingsStringCache(),
-        }),
+      new URLSearchParams({
+        version: generatorVersion,
+        settingsString: getSettingsStringCache(),
+      }),
     ).then(response => response.json())
-    .catch(error => console.error(error));
+      .catch(error => console.error(error));
 
     LogicHelper.initialize(logicHelpersFile, settings);
     updateItemsFromLogic(settings); // Starting items.
