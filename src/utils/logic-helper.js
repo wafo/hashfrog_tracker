@@ -57,7 +57,7 @@ class LogicHelper {
     }
 
     this.items = {};
-    this.regions = { child: [], adult: [] };
+    this.regions = { child: new Set(), adult: new Set() };
 
     this.memoizedFunctions = this._memoizeFunctions();
 
@@ -67,7 +67,7 @@ class LogicHelper {
   static updateItems(newItems) {
     this.items = _.cloneDeep(newItems);
 
-    this.regions = { child: [], adult: [] };
+    this.regions = { child: new Set(), adult: new Set() };
 
     let accessibleChildRegions = [];
     let newChildRegions = this._recalculateAccessibleRegions("Root", "child");
@@ -250,9 +250,9 @@ class LogicHelper {
     let regionsToCheck = [];
 
     _.forEach(Locations.activeExits[rootRegion], (exitRule, exitName) => {
-      if (!_.includes(this.regions[age], exitName)) {
+      if (!this.regions[age].has(exitName)) {
         if (this._evalNode(exitRule, age)) {
-          this.regions[age] = _.union(this.regions[age], [exitName]);
+          this.regions[age].add(exitName);
           regionsToCheck = _.union(regionsToCheck, this._recalculateAccessibleRegions(exitName, age));
         } else {
           regionsToCheck = _.union(regionsToCheck, [rootRegion]);
@@ -266,9 +266,9 @@ class LogicHelper {
   static _isRegionAccessible(regionName, age) {
     switch (age) {
       case "child":
-        return _.includes(this.regions.child, regionName);
+        return this.regions.child.has(regionName);
       case "adult":
-        return _.includes(this.regions.adult, regionName);
+        return this.regions.adult.has(regionName);
       default:
         throw Error(`Invalid age ${age}`);
     }
