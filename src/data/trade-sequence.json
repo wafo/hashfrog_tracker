@@ -1,0 +1,34 @@
+{
+  "Odd_Mushroom": {
+    "tradeStartName": "Odd Mushroom",
+    "location": "LW Trade Cojiro"
+  },
+  "Odd_Potion": {
+    "tradeStartName": "Odd Potion",
+    "location": "Kak Granny Trade Odd Mushroom"
+  },
+  "Poachers_Saw": {
+    "tradeStartName": "Poachers Saw",
+    "location": "LW Trade Odd Potion"
+  },
+  "Broken_Sword": {
+    "tradeStartName": "Broken Sword",
+    "location": "GV Trade Poachers Saw"
+  },
+  "Prescription": {
+    "tradeStartName": "Prescription",
+    "location": "DMT Trade Broken Sword"
+  },
+  "Eyeball_Frog": {
+    "tradeStartName": "Eyeball Frog",
+    "location": "ZD Trade Prescription"
+  },
+  "Eyedrops": {
+    "tradeStartName": "Eyedrops",
+    "location": "LH Trade Eyeball Frog"
+  },
+  "Claim_Check": {
+    "tradeStartName": "Claim Check",
+    "location": "DMT Trade Eyedrops"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "Minuet_of_Forest": ["Ocarina_A_Button", "Ocarina_C_up_Button", "Ocarina_C_left_Button", "Ocarina_C_right_Button"],
+  "Bolero_of_Fire": ["Ocarina_A_Button", "Ocarina_C_down_Button", "Ocarina_C_right_Button"],
+  "Serenade_of_Water": ["Ocarina_A_Button", "Ocarina_C_down_Button", "Ocarina_C_left_Button", "Ocarina_C_right_Button"],
+  "Requiem_of_Spirit": ["Ocarina_A_Button", "Ocarina_C_down_Button", "Ocarina_C_right_Button"],
+  "Nocturne_of_Shadow": ["Ocarina_A_Button", "Ocarina_C_down_Button", "Ocarina_C_left_Button", "Ocarina_C_right_Button"],
+  "Prelude_of_Light": ["Ocarina_C_up_Button", "Ocarina_C_left_Button", "Ocarina_C_right_Button"],
+  "Zeldas_Lullaby": ["Ocarina_C_up_Button", "Ocarina_C_left_Button", "Ocarina_C_right_Button"],
+  "Eponas_Song": ["Ocarina_C_up_Button", "Ocarina_C_left_Button", "Ocarina_C_right_Button"],
+  "Sarias_Song": ["Ocarina_C_down_Button", "Ocarina_C_left_Button", "Ocarina_C_right_Button"],
+  "Suns_Song": ["Ocarina_C_up_Button", "Ocarina_C_down_Button", "Ocarina_C_right_Button"],
+  "Song_of_Time": ["Ocarina_A_Button", "Ocarina_C_up_Button", "Ocarina_C_right_Button"],
+  "Song_of_Storms": ["Ocarina_A_Button", "Ocarina_C_up_Button", "Ocarina_C_down_Button"]
+}

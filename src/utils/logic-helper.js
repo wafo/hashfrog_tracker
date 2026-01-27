@@ -5,6 +5,11 @@ import memoize from "memoizee";
 import Locations from "./locations";
 
 import DUNGEONS from "../data/dungeons.json";
+import DUNGEON_CONFIG from "../data/dungeon-config.json";
+import MASK_LOCATIONS from "../data/mask-locations.json";
+import TRADE_SEQUENCE from "../data/trade-sequence.json";
+import SONG_NOTES from "../data/song-notes.json";
+import SHOP_RULES from "../data/shop-rules.json";
 
 class LogicHelper {
   static async initialize(logicHelpersFile, settings) {
@@ -34,30 +39,11 @@ class LogicHelper {
     }
 
     if (_.isEqual(this.settings.dungeon_shortcuts_choice, "all")) {
-      _.set(this.settings, "dungeon_shortcuts", [
-        "Deku Tree",
-        "Dodongos Cavern",
-        "Jabu Jabus Belly",
-        "Forest Temple",
-        "Fire Temple",
-        "Water Temple",
-        "Shadow Temple",
-        "Spirit Temple",
-      ]);
+      _.set(this.settings, "dungeon_shortcuts", DUNGEON_CONFIG.dungeonShortcuts);
     }
 
     if (_.isEqual(this.settings.key_rings_choice, "all")) {
-      _.set(this.settings, "key_rings", [
-        "Thieves Hideout",
-        "Forest Temple",
-        "Fire Temple",
-        "Water Temple",
-        "Shadow Temple",
-        "Spirit Temple",
-        "Bottom of the Well",
-        "Gerudo Training Ground",
-        "Ganons Castle",
-      ]);
+      _.set(this.settings, "key_rings", DUNGEON_CONFIG.keyRings);
     }
 
     // Add all dungeons to MQ-dungeons-specific list if all dungeons are set to MQ
@@ -413,73 +399,20 @@ class LogicHelper {
           this.renamedAttributes.skip_child_zelda ||
           this.isLocationAvailable("HC Zeldas Letter")
         );
-      case "Keaton_Mask":
-        return this.items[name] > 0 || this.isLocationAvailable("Market Mask Shop Item 6");
-      case "Skull_Mask":
-        return this.items[name] > 0 || this.isLocationAvailable("Market Mask Shop Item 5");
-      case "Spooky_Mask":
-        return this.items[name] > 0 || this.isLocationAvailable("Market Mask Shop Item 8");
-      case "Bunny_Hood":
-        return this.items[name] > 0 || this.isLocationAvailable("Market Mask Shop Item 7");
-      case "Mask_of_Truth":
-        return this.items[name] > 0 || this.isLocationAvailable("Market Mask Shop Item 3");
+    }
 
-      case "Odd_Mushroom":
-        return (
-          this.items[name] > 0 ||
-          ((!LogicHelper.settings.adult_trade_shuffle ||
-            !_.includes(LogicHelper.settings.adult_trade_start, "Odd Mushroom")) &&
-            this.isLocationAvailable("LW Trade Cojiro", "adult"))
-        );
-      case "Odd_Potion":
-        return (
-          this.items[name] > 0 ||
-          ((!LogicHelper.settings.adult_trade_shuffle ||
-            !_.includes(LogicHelper.settings.adult_trade_start, "Odd Potion")) &&
-            this.isLocationAvailable("Kak Granny Trade Odd Mushroom", "adult"))
-        );
-      case "Poachers_Saw":
-        return (
-          this.items[name] > 0 ||
-          ((!LogicHelper.settings.adult_trade_shuffle ||
-            !_.includes(LogicHelper.settings.adult_trade_start, "Poachers Saw")) &&
-            this.isLocationAvailable("LW Trade Odd Potion", "adult"))
-        );
-      case "Broken_Sword":
-        return (
-          this.items[name] > 0 ||
-          ((!LogicHelper.settings.adult_trade_shuffle ||
-            !_.includes(LogicHelper.settings.adult_trade_start, "Broken Sword")) &&
-            this.isLocationAvailable("GV Trade Poachers Saw", "adult"))
-        );
-      case "Prescription":
-        return (
-          this.items[name] > 0 ||
-          ((!LogicHelper.settings.adult_trade_shuffle ||
-            !_.includes(LogicHelper.settings.adult_trade_start, "Prescription")) &&
-            this.isLocationAvailable("DMT Trade Broken Sword", "adult"))
-        );
-      case "Eyeball_Frog":
-        return (
-          this.items[name] > 0 ||
-          ((!LogicHelper.settings.adult_trade_shuffle ||
-            !_.includes(LogicHelper.settings.adult_trade_start, "Eyeball Frog")) &&
-            this.isLocationAvailable("ZD Trade Prescription", "adult"))
-        );
-      case "Eyedrops":
-        return (
-          this.items[name] > 0 ||
-          ((!LogicHelper.settings.adult_trade_shuffle ||
-            !_.includes(LogicHelper.settings.adult_trade_start, "Eyedrops")) &&
-            this.isLocationAvailable("LH Trade Eyeball Frog", "adult"))
-        );
-      case "Claim_Check":
-        return (
-          this.items[name] > 0 ||
-          ((!LogicHelper.settings.adult_trade_shuffle ||
-            !_.includes(LogicHelper.settings.adult_trade_start, "Claim Check")) &&
-            this.isLocationAvailable("DMT Trade Eyedrops", "adult"))
-        );
+    if (name in MASK_LOCATIONS) {
+      return this.items[name] > 0 || this.isLocationAvailable(MASK_LOCATIONS[name]);
+    }
+
+    if (name in TRADE_SEQUENCE) {
+      const trade = TRADE_SEQUENCE[name];
+      return (
+        this.items[name] > 0 ||
+        ((!LogicHelper.settings.adult_trade_shuffle ||
+          !_.includes(LogicHelper.settings.adult_trade_start, trade.tradeStartName)) &&
+          this.isLocationAvailable(trade.location, "adult"))
+      );
     }
 
     if (name in this.items) {
@@ -609,37 +542,21 @@ class LogicHelper {
   static _canBuy(itemName, age) {
     const rules = [];
 
-    if (_.includes(["Buy_Arrows_50", "Buy_Fish", "Buy_Goron_Tunic", "Buy_Bombchu_20", "Buy_Bombs_30"], itemName)) {
+    if (_.includes(SHOP_RULES.walletRequired, itemName)) {
       rules.push("Progressive_Wallet");
-    } else if (_.includes(["Buy_Zora_Tunic", "Buy_Blue_Fire"], itemName)) {
+    } else if (_.includes(SHOP_RULES.wallet2Required, itemName)) {
       rules.push("(Progressive_Wallet, 2)");
     }
 
-    if (_.includes(["Buy_Zora_Tunic", "Buy_Blue_Fire"], itemName)) {
+    if (_.includes(SHOP_RULES.adultRequired, itemName)) {
       rules.push("is_adult");
     }
 
-    if (
-      _.includes(
-        [
-          "Buy_Blue_Fire",
-          "Buy_Blue_Potion",
-          "Buy_Bottle_Bug",
-          "Buy_Fish",
-          "Buy_Green_Potion",
-          "Buy_Poe",
-          "Buy_Red_Potion_for_30_Rupees",
-          "Buy_Red_Potion_for_40_Rupees",
-          "Buy_Red_Potion_for_50_Rupees",
-          "Buy_Fairy's_Spirit",
-        ],
-        itemName,
-      )
-    ) {
+    if (_.includes(SHOP_RULES.bottleRequired, itemName)) {
       rules.push("has_bottle");
     }
 
-    if (_.includes(["Buy_Bombchu_10", "Buy_Bombchu_20", "Buy_Bombchu_5"], itemName)) {
+    if (_.includes(SHOP_RULES.bombchusRequired, itemName)) {
       rules.push("found_bombchus");
     }
 
@@ -829,81 +746,11 @@ class LogicHelper {
       );
     }
 
-    // TODO: Currently assuming default notes for songs.
-    // If shuffled, would need interface for user to specify notes for songs.
-    switch (songName) {
-      case "Minuet_of_Forest":
-        return (
-          this.items.Ocarina_A_Button > 0 &&
-          this.items.Ocarina_C_up_Button > 0 &&
-          this.items.Ocarina_C_left_Button > 0 &&
-          this.items.Ocarina_C_right_Button > 0
-        );
-      case "Bolero_of_Fire":
-        return (
-          this.items.Ocarina_A_Button > 0 &&
-          this.items.Ocarina_C_down_Button > 0 &&
-          this.items.Ocarina_C_right_Button > 0
-        );
-      case "Serenade_of_Water":
-        return (
-          this.items.Ocarina_A_Button > 0 &&
-          this.items.Ocarina_C_down_Button > 0 &&
-          this.items.Ocarina_C_left_Button > 0 &&
-          this.items.Ocarina_C_right_Button > 0
-        );
-      case "Requiem_of_Spirit":
-        return (
-          this.items.Ocarina_A_Button > 0 &&
-          this.items.Ocarina_C_down_Button > 0 &&
-          this.items.Ocarina_C_right_Button > 0
-        );
-      case "Nocturne_of_Shadow":
-        return (
-          this.items.Ocarina_A_Button > 0 &&
-          this.items.Ocarina_C_down_Button > 0 &&
-          this.items.Ocarina_C_left_Button > 0 &&
-          this.items.Ocarina_C_right_Button > 0
-        );
-      case "Prelude_of_Light":
-        return (
-          this.items.Ocarina_C_up_Button > 0 &&
-          this.items.Ocarina_C_left_Button > 0 &&
-          this.items.Ocarina_C_right_Button > 0
-        );
-      case "Zeldas_Lullaby":
-        return (
-          this.items.Ocarina_C_up_Button > 0 &&
-          this.items.Ocarina_C_left_Button > 0 &&
-          this.items.Ocarina_C_right_Button > 0
-        );
-      case "Eponas_Song":
-        return (
-          this.items.Ocarina_C_up_Button > 0 &&
-          this.items.Ocarina_C_left_Button > 0 &&
-          this.items.Ocarina_C_right_Button > 0
-        );
-      case "Sarias_Song":
-        return (
-          this.items.Ocarina_C_down_Button > 0 &&
-          this.items.Ocarina_C_left_Button > 0 &&
-          this.items.Ocarina_C_right_Button > 0
-        );
-      case "Suns_Song":
-        return (
-          this.items.Ocarina_C_up_Button > 0 &&
-          this.items.Ocarina_C_down_Button > 0 &&
-          this.items.Ocarina_C_right_Button > 0
-        );
-      case "Song_of_Time":
-        return (
-          this.items.Ocarina_A_Button > 0 && this.items.Ocarina_C_up_Button > 0 && this.items.Ocarina_C_right_Button > 0
-        );
-      case "Song_of_Storms":
-        return (
-          this.items.Ocarina_A_Button > 0 && this.items.Ocarina_C_up_Button > 0 && this.items.Ocarina_C_down_Button > 0
-        );
+    if (songName in SONG_NOTES) {
+      return SONG_NOTES[songName].every(button => this.items[button] > 0);
     }
+
+    return false;
   }
 
   static _hasStones(count) {
