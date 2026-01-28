@@ -446,7 +446,7 @@ class Locations {
     });
 
     // Key locations
-    this.activeKeyLocations = new Map();
+    this.activeKeyLocations = {};
     const addKeyLocation = data => {
       if (Locations.isGuaranteedKey(data)) {
         _.set(

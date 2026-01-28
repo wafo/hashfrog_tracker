@@ -81,7 +81,8 @@ class LogicHelper {
     do {
       updatedKeys = false;
 
-      _.forEach(this.regions.child, regionName => {
+      // NOTE: Must use native forEach for Sets
+      this.regions.child.forEach(regionName => {
         if (regionName in Locations.activeKeyLocations) {
           _.forEach(Locations.activeKeyLocations[regionName], keyLocation => {
             if (
@@ -95,7 +96,7 @@ class LogicHelper {
           });
         }
       });
-      _.forEach(this.regions.adult, regionName => {
+      this.regions.adult.forEach(regionName => {
         if (regionName in Locations.activeKeyLocations) {
           _.forEach(Locations.activeKeyLocations[regionName], keyLocation => {
             if (
@@ -186,7 +187,7 @@ class LogicHelper {
       ["keysanity", "remove", "any_dungeon", "overworld", "regional"],
       this.settings.shuffle_smallkeys,
     );
-    const shuffleSilverRupees = !_.isEqual(this.settings.reachable_locations, "vanilla");
+    const shuffleSilverRupees = !_.isEqual(this.settings.shuffle_silver_rupees, "vanilla");
     const checkBeatableOnly = !_.isEqual(this.settings.reachable_locations, "all");
     const shuffleSpecialInteriorEntrances = _.isEqual(this.settings.shuffle_interior_entrances, "all");
     const shuffleInteriorEntrances = _.includes(["simple", "all"], this.settings.shuffle_interior_entrances);
@@ -486,6 +487,11 @@ class LogicHelper {
 
     // if Small Keys mode is Keysy, ignore small key requirements
     if (_.isEqual(this.settings.shuffle_smallkeys, "remove") && _.startsWith(itemName, "Small_Key_")) {
+      return true;
+    }
+
+    // if Silver Rupees mode is Silver Rupeesy, ignore silver rupee requirements
+    if (_.isEqual(this.settings.shuffle_silver_rupees, "remove") && _.startsWith(itemName, "Silver_Rupee_")) {
       return true;
     }
 
