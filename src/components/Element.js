@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useElement, useItems } from "../context/trackerContext";
 
@@ -34,13 +34,14 @@ const Element = props => {
     hidden = false
   } = props;
 
-  const { markCounter, markItem, startingIndex: trackerContextStartingIndex, startingItem } = useItems(items);
+  const { markCounter, markItem, startingIndex: trackerContextStartingIndex, startingItem } = useItems(items, id);
   useElement(id, startingItem);
 
   const [selected, setSelected] = useState(trackerContextStartingIndex || selectedStartingIndex);
   const [counter, setCounter] = useState(0);
   const [iconHash, setIconHash] = useState(null);
   const [draggedIcon, setDraggedIcon] = useState(null);
+  const hasUserInteracted = useRef(false);
 
   // Whenever a change in icon list is detected, reset the selection.
   // Only reset if icons actually changed AND we don't have a starting item.
@@ -59,7 +60,11 @@ const Element = props => {
   // Sync selected state when starting items change
   useEffect(() => {
     if (trackerContextStartingIndex > 0) {
+      // This element should claim the starting item
       setSelected(trackerContextStartingIndex);
+    } else if (!hasUserInteracted.current) {
+      // Another element claimed the item and user hasn't interacted - reset to uncollected
+      setSelected(0);
     }
   }, [trackerContextStartingIndex]);
 
@@ -71,6 +76,9 @@ const Element = props => {
     event => {
       event.preventDefault();
       event.stopPropagation();
+
+      // Track that user has interacted with this element
+      hasUserInteracted.current = true;
 
       const isCounter = !["simple", "nested", "label"].includes(type);
       let updated = isCounter ? counter : selected;

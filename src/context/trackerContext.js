@@ -270,6 +270,7 @@ function reducer(state, action) {
         starting_inventory,
         unchanged_starting_inventory: _.cloneDeep(starting_inventory),
         items_list: {},
+        starting_item_claims: {},
       };
     }
     case "COUNTER_MARK": {
@@ -339,6 +340,7 @@ function reducer(state, action) {
       const newLayoutElements = [...state.layoutElements, id];
       let newItemsList = { ...state.items_list };
       let newUnchangedStartingInventory = [...state.unchanged_starting_inventory];
+      let newStartingItemClaims = { ...state.starting_item_claims };
 
       if (startingItem !== null) {
         newItemsList[id] = startingItem;
@@ -350,6 +352,9 @@ function reducer(state, action) {
             ...newUnchangedStartingInventory.slice(0, idx),
             ...newUnchangedStartingInventory.slice(idx + 1),
           ];
+
+          // Track that this element claimed this starting item
+          newStartingItemClaims[id] = startingItem;
         }
       }
 
@@ -358,6 +363,7 @@ function reducer(state, action) {
         layoutElements: newLayoutElements,
         items_list: newItemsList,
         unchanged_starting_inventory: newUnchangedStartingInventory,
+        starting_item_claims: newStartingItemClaims,
       };
     }
     default:
@@ -374,6 +380,7 @@ function TrackerProvider(props) {
     unchanged_starting_inventory: [],
     items_list: {},
     layoutElements: [],
+    starting_item_claims: {}, // { elementId: uuid } - tracks which element claimed which starting item
     settings_string: getSettingsStringCache(),
     generator_version: getGeneratorVersionCache(),
   };
@@ -429,7 +436,7 @@ const useLocation = () => {
   return [actions];
 };
 
-const useItems = items => {
+const useItems = (items, elementId = null) => {
   const { state, dispatch } = useTracker();
 
   const actions = useMemo(
@@ -448,25 +455,43 @@ const useItems = items => {
     let itemIndex = 0;
     if (!items || !items.length) return 0;
     for (let i = 0; i < items.length; i++) {
-      if (_.includes(state.starting_inventory, items[i])) {
+      const itemUuid = items[i];
+      if (!itemUuid) continue;
+
+      // Check if this element already claimed this starting item
+      const elementClaimedItem = elementId && state.starting_item_claims[elementId] === itemUuid;
+
+      // Check if the item is still available to claim
+      const itemAvailableToClaim = _.includes(state.unchanged_starting_inventory, itemUuid);
+
+      if (elementClaimedItem || itemAvailableToClaim) {
         itemIndex = i;
         break;
       }
     }
     return itemIndex;
-  }, [items, state.starting_inventory]);
+  }, [items, state.unchanged_starting_inventory, state.starting_item_claims, elementId]);
 
   const startingItem = useMemo(() => {
     let itemID = null;
     if (!items || !items.length) return null;
     for (let i = 0; i < items.length; i++) {
-      if (_.includes(state.starting_inventory, items[i])) {
-        itemID = items[i];
+      const itemUuid = items[i];
+      if (!itemUuid) continue;
+
+      // Check if this element already claimed this starting item
+      const elementClaimedItem = elementId && state.starting_item_claims[elementId] === itemUuid;
+
+      // Check if the item is still available to claim
+      const itemAvailableToClaim = _.includes(state.unchanged_starting_inventory, itemUuid);
+
+      if (elementClaimedItem || itemAvailableToClaim) {
+        itemID = itemUuid;
         break;
       }
     }
     return itemID;
-  }, [items, state.starting_inventory]);
+  }, [items, state.unchanged_starting_inventory, state.starting_item_claims, elementId]);
 
   return { ...actions, startingIndex, startingItem };
 };
