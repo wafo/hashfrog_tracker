@@ -1,5 +1,5 @@
 {
-  "Links Pocket":[
+  "Root":[
      "Root",
      "Root Exits",
      "Child Spawn",
@@ -83,6 +83,7 @@
      "GF Roof Gold Skulltula",
      "GF Break Room Entrance",
      "GF Balcony",
+     "GF Above Jail Child Locations",
      "GF Outside Gate",
      "GF Storms Grotto"
   ],
@@ -135,7 +136,7 @@
     "Castle Grounds",
      "Hyrule Castle Grounds",
      "HC Garden",
-     "HC Garden Locations",
+     "HC Garden Skippable Locations",
      "HC Great Fairy Fountain",
      "HC Storms Grotto"
   ],
