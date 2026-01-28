@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { Fragment, useCallback, useMemo, useState, useEffect } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 
 import { useElement, useItems } from "../context/trackerContext";
 
@@ -42,19 +42,27 @@ const Element = props => {
   const [iconHash, setIconHash] = useState(null);
   const [draggedIcon, setDraggedIcon] = useState(null);
 
-  //whenever a change in icon list is detected, start the selection over
+  // Whenever a change in icon list is detected, reset the selection.
+  // Only reset if icons actually changed AND we don't have a starting item.
   useEffect(() => {
-      const hash = icons.reduce((acc, cv) => {
-        return acc += cv;
-      }, '')
+    const hash = icons.reduce((acc, cv) => {
+      return (acc += cv);
+    }, "");
 
-      if(hash !== iconHash) {
-        setSelected(0);
-      }
+    if (iconHash !== null && hash !== iconHash && trackerContextStartingIndex === 0) {
+      setSelected(0);
+    }
 
-      setIconHash(hash);
-  }, [icons, iconHash, name])
-    
+    setIconHash(hash);
+  }, [icons, iconHash, name, trackerContextStartingIndex]);
+
+  // Sync selected state when starting items change
+  useEffect(() => {
+    if (trackerContextStartingIndex > 0) {
+      setSelected(trackerContextStartingIndex);
+    }
+  }, [trackerContextStartingIndex]);
+
   const icon = useMemo(() => {
     return icons[selected];
   }, [icons, selected]);

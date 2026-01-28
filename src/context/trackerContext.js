@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { createContext, useContext, useMemo, useReducer } from "react";
+import { createContext, useContext, useEffect, useMemo, useReducer } from "react";
 
 import COUNTER_TO_ITEM from "../data/counter-to-item.json";
 import DEFAULT_ITEMS from "../data/default-items.json";
@@ -328,6 +328,38 @@ function reducer(state, action) {
         generator_version: payload,
       };
     }
+    case "ELEMENT_REGISTER": {
+      const { id, startingItem } = payload;
+
+      // Skip if already registered
+      if (state.layoutElements.includes(id)) {
+        return state;
+      }
+
+      const newLayoutElements = [...state.layoutElements, id];
+      let newItemsList = { ...state.items_list };
+      let newUnchangedStartingInventory = [...state.unchanged_starting_inventory];
+
+      if (startingItem !== null) {
+        newItemsList[id] = startingItem;
+
+        // Note that starting item appears on the tracker layout
+        const idx = newUnchangedStartingInventory.indexOf(startingItem);
+        if (idx !== -1) {
+          newUnchangedStartingInventory = [
+            ...newUnchangedStartingInventory.slice(0, idx),
+            ...newUnchangedStartingInventory.slice(idx + 1),
+          ];
+        }
+      }
+
+      return {
+        ...state,
+        layoutElements: newLayoutElements,
+        items_list: newItemsList,
+        unchanged_starting_inventory: newUnchangedStartingInventory,
+      };
+    }
     default:
       throw new Error();
   }
@@ -367,21 +399,15 @@ const useChecks = () => {
 
 const useElement = (id, startingItem) => {
   const {
-    state: { layoutElements, unchanged_starting_inventory, items_list },
+    state: { layoutElements },
+    dispatch,
   } = useTracker();
 
-  if (!_.includes(layoutElements, id)) {
-    layoutElements.push(id);
-
-    if (!_.isNull(startingItem)) {
-      _.set(items_list, id, startingItem);
-
-      // Note that starting item appears on the tracker layout
-      if (_.includes(unchanged_starting_inventory, startingItem)) {
-        unchanged_starting_inventory.splice(unchanged_starting_inventory.indexOf(startingItem), 1);
-      }
+  useEffect(() => {
+    if (!layoutElements.includes(id)) {
+      dispatch({ type: "ELEMENT_REGISTER", payload: { id, startingItem } });
     }
-  }
+  }, [id, startingItem, layoutElements, dispatch]);
 };
 
 const useLocation = () => {
@@ -415,7 +441,6 @@ const useItems = items => {
     [dispatch],
   );
 
-  // IMPORTANT: Intentionally ignoring state.starting_inventory on the dependency array.
   const startingIndex = useMemo(() => {
     // Loops through the items of the element,
     // searching for a match against the items in the tracker context.
@@ -429,8 +454,7 @@ const useItems = items => {
       }
     }
     return itemIndex;
-    // eslint-disable-next-line
-  }, [items]);
+  }, [items, state.starting_inventory]);
 
   const startingItem = useMemo(() => {
     let itemID = null;
@@ -442,8 +466,7 @@ const useItems = items => {
       }
     }
     return itemID;
-    // eslint-disable-next-line
-  }, [items]);
+  }, [items, state.starting_inventory]);
 
   return { ...actions, startingIndex, startingItem };
 };
