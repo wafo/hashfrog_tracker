@@ -22,16 +22,16 @@ const isLogicBranchRelease = LOGIC_BRANCH === "release";
 const PRESETS = SettingStringsJSON.presets || [];
 
 // https://ootrandomizer.com/api/version?branch=master
-const CURRENT_ACTIVE_VERSION = "9.0.0";
+const CURRENT_ACTIVE_VERSION = "v9.0";
 const GENERATOR_VERSIONS = [
-  "9.0.0",
-  "8.3.0",
-  "7.1.0",
-  "7.0.0",
-  "6.2.0",
-  "6.0.0",
-  "5.2.0",
-  "5.1.0",
+  "v9.0",
+  "v8.3",
+  "v7.1.0",
+  "v7.0",
+  "v6.2.0",
+  "v6.0.0",
+  "v5.2.0",
+  "v5.1.0",
 ];
 
 const TrackerLauncher = () => {
@@ -117,7 +117,7 @@ const TrackerLauncher = () => {
       setSettingsString("UNKNOWN_SETTINGS_STRING");
     }
 
-    // Use the mapped generator version. If not, use .env, if not, use the current active hardcoded version. (9.0.0 as of 1/25/2026)
+    // Use the mapped generator version. If not, use .env, if not, use the current active hardcoded version. (v9.0 as of 1/25/2026)
     if (preset.generatorVersion) {
       setGeneratorVersion(preset.generatorVersion);
     } else if (GENERATOR_VERSION) {
