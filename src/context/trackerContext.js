@@ -69,7 +69,7 @@ function parseItems(items_list, counters, unchanged_starting_inventory) {
 
     // Handle single item
     const value = mapping.value ?? 1;
-    items[mapping.item] = value;
+    items[mapping.item] = Math.max(items[mapping.item] || 0, value);
 
     // Handle trade revert special cases
     if (tradeRevert && mapping.tradeRevert) {
