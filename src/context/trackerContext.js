@@ -12,6 +12,34 @@ import { getRenamedAttribute, getSetting } from "../utils/settings-helper";
 
 const GENERATOR_VERSION = process.env.REACT_APP_GENERATOR_VERSION;
 
+const COMBO_DERIVATIONS = [
+  {
+    // Goron Tunic + Zora Tunic -> Both Tunics
+    components: ["cd6a55f0253f45159521efb2b3b515e8", "c562c7418d7141ffb70101509a52873e"],
+    combo: "d9233a5054af4491924115b47e5730e4",
+  },
+  {
+    // Iron Boots + Hover Boots -> Both Boots
+    components: ["bad09131f88a440093087e11efc1c8b0", "33f4bc4c632846bea5fb88573f2f95b2"],
+    combo: "2c5c72812a6b49c68bb49773e6d3dd98",
+  },
+  {
+    // Fire Arrows + Ice Arrows -> Fire-Ice Arrows
+    components: ["7c3026558a6b49df97733d13ecc815c7", "9bc4daf5728f4b158dc4c3d768df006e"],
+    combo: "4a3433d7792f408b80e2f07caae43da2",
+  },
+  {
+    // Fire Arrows + Light Arrows -> Fire-Light Arrows
+    components: ["7c3026558a6b49df97733d13ecc815c7", "ff67e2e04ce04aa8add77658ee932802"],
+    combo: "ea2dfcbb008248e790b785941d54027d",
+  },
+  {
+    // Din's Fire + Farore's Wind -> Dins-Farores
+    components: ["591d582f479140759fd6501caa23c2f9", "0c3e8979165042f686357b4bcbaab8ec"],
+    combo: "76d769ba496e49ebb39fbfd836ce1db6",
+  },
+];
+
 const TrackerContext = createContext();
 
 function parseItems(items_list, counters, unchanged_starting_inventory) {
@@ -252,6 +280,15 @@ function reducer(state, action) {
         starting_inventory.push("2d85db579f3c4be49bf48d4853d112e7");
       }
 
+      // Derive combo UUIDs when all component items are present to
+      // allow combo elements to display the combined state
+      COMBO_DERIVATIONS.forEach(({ components, combo }) => {
+        const hasAllComponents = components.every(uuid => starting_inventory.includes(uuid));
+        if (hasAllComponents && !starting_inventory.includes(combo)) {
+          starting_inventory.push(combo);
+        }
+      });
+
       // `starting_inventory` will be properly set through `useElement` hook
       const items_list = {};
       for (let i = 0; i < starting_inventory.length; i++) {
@@ -451,7 +488,7 @@ const useItems = (items, elementId = null) => {
   const startingIndex = useMemo(() => {
     // Loops through the items of the element,
     // searching for a match against the items in the tracker context.
-    // Returns the index that matched, otherwise defaults to 0.
+    // Returns the highest matching index to prefer combo states.
     let itemIndex = 0;
     if (!items || !items.length) return 0;
     for (let i = 0; i < items.length; i++) {
@@ -466,7 +503,6 @@ const useItems = (items, elementId = null) => {
 
       if (elementClaimedItem || itemAvailableToClaim) {
         itemIndex = i;
-        break;
       }
     }
     return itemIndex;
@@ -487,7 +523,6 @@ const useItems = (items, elementId = null) => {
 
       if (elementClaimedItem || itemAvailableToClaim) {
         itemID = itemUuid;
-        break;
       }
     }
     return itemID;
