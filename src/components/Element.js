@@ -84,11 +84,11 @@ const Element = props => {
       let updated = isCounter ? counter : selected;
 
       if (event.nativeEvent.type === "click") {
-        if (!isCounter) updated = updated < icons.length - 1 ? ++updated : updated;
-        if (isCounter) updated = updated === countConfig[1] ? updated : ++updated;
+        if (!isCounter) { updated = updated < icons.length - 1 ? ++updated : updated; }
+        if (isCounter) { updated = updated === countConfig[1] ? updated : ++updated; }
       } else if (event.nativeEvent.type === "contextmenu") {
-        if (!isCounter) updated = updated > 0 ? --updated : updated;
-        if (isCounter) updated === countConfig[0] ? updated : --updated;
+        if (!isCounter) { updated = updated > 0 ? --updated : updated; }
+        if (isCounter) { updated === countConfig[0] ? updated : --updated; }
       }
 
       // Canceling draggedIcon
@@ -112,11 +112,11 @@ const Element = props => {
   const wheelHandler = useCallback(
     event => {
       // event.preventDefault();
-      if (type !== "counter") return;
+      if (type !== "counter") { return; }
 
       const { deltaY } = event;
-      if (deltaY != 0) {
-        let newVal = _.clamp(counter + (deltaY > 0 ? 1 : -1), countConfig[0], countConfig[1]);
+      if (deltaY !== 0) {
+        const newVal = _.clamp(counter + (deltaY > 0 ? 1 : -1), countConfig[0], countConfig[1]);
         setCounter(newVal);
         markCounter(newVal, name);
       }
@@ -127,7 +127,7 @@ const Element = props => {
   const dragHandler = useCallback(
     event => {
       let dragIcon = draggedIcon ? draggedIcon : icons[1] || icons[0];
-      if (dragCurrent) dragIcon = icons[selected];
+      if (dragCurrent) { dragIcon = icons[selected]; }
       const item = JSON.stringify({ icon: dragIcon });
       event.dataTransfer.setData("item", item);
     },
@@ -140,8 +140,8 @@ const Element = props => {
 
       if (receiver) {
         const item = event.dataTransfer.getData("item");
-        const { icon } = JSON.parse(item);
-        setDraggedIcon(icon);
+        const { icon: droppedIcon } = JSON.parse(item);
+        setDraggedIcon(droppedIcon);
         setSelected(0) //reset selected so if the dragged item gets cleared, the user will see the hashfrog
       }
     },
@@ -229,7 +229,7 @@ const ElementLabel = ({ label, labelStartingIndex, labelBackgroundColor }) => {
     [label],
   );
 
-  if (!label) return null;
+  if (!label) { return null; }
   if (typeof label === "string") {
     return <label className="element-label">{label}</label>;
   } else if (Array.isArray(label)) {

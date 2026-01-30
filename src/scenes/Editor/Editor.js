@@ -1,12 +1,12 @@
+import FileSaver from "file-saver";
 import { useCallback, useMemo, useState } from "react";
+import useDebounce from "../../hooks/useDebounce";
 import baseLayout from "../../layouts/base.json";
 import { generateId, readFileAsText } from "../../utils/utils";
 import Layout from "../Layout";
-import FileSaver from "file-saver";
-import EditorLayoutConfig from "./EditorLayoutConfig";
 import EditorComponentsList from "./EditorComponentsList";
 import EditorElementsList from "./EditorElementsList";
-import useDebounce from "../../hooks/useDebounce";
+import EditorLayoutConfig from "./EditorLayoutConfig";
 
 function prepareLayout(rawLayout) {
   const cleanedComponents = [
@@ -143,7 +143,7 @@ const Editor = () => {
   }, [layout]);
 
   const EditorComponents = useMemo(() => {
-    if (!layout.id) return null;
+    if (!layout.id) { return null; }
 
     let TabComponent = null;
     switch (tab) {

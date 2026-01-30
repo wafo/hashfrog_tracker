@@ -22,7 +22,7 @@ const Layout = props => {
   const { state: layoutContext } = useLayout();
 
   const renderLayout = useMemo(() => {
-    if (props.layout) return props.layout;
+    if (props.layout) { return props.layout; }
     return layoutContext;
   }, [props.layout, layoutContext]);
 
@@ -76,11 +76,11 @@ const Layout = props => {
       // Destructuring to create new element,
       // otherwise on repeated elements it rips
       // because on next search it will loop through already cached icons.
-      let element = elements.find(element => element.name === id || element.id === id);
-      if (!element) element = elements[0]; // Fallback to hashfrog
+      let element = elements.find(el => el.name === id || el.id === id);
+      if (!element) { element = elements[0]; } // Fallback to hashfrog
       element = { ...element };
-      if (!cachedIcons) element.icons = [];
-      if (cachedIcons)
+      if (!cachedIcons) { element.icons = []; }
+      if (cachedIcons) {
         element.icons = element.icons.map(icon => {
           // Checking for base64 coming from the json
           if (isBase64(icon)) {
@@ -89,17 +89,22 @@ const Layout = props => {
           }
           return cachedIcons[icon];
         });
-      if (layoutConfig?.backgroundColor) element.labelBackgroundColor = layoutConfig.backgroundColor;
+      }
+      if (layoutConfig?.backgroundColor) { element.labelBackgroundColor = layoutConfig.backgroundColor; }
       return element;
     },
     [cachedIcons, elements, layoutConfig.backgroundColor],
   );
 
-  const getUserBossElementIcons = userBossElements => ({...(userBossElements && {bossElementsIcons: userBossElements.reduce((acc, element) => {
-    acc.push(...element.icons);
+  const getUserBossElementIcons = userBossElements => ({
+    ...(userBossElements && {
+      bossElementsIcons: userBossElements.reduce((acc, element) => {
+        acc.push(...element.icons);
 
-    return acc;
-  }, [])})})
+        return acc;
+      }, [])
+    })
+  })
 
   useEffect(() => {
     document.title = "HashFrog - Tracker";
@@ -130,13 +135,13 @@ const Layout = props => {
           );
         }
         case "table": {
-          const elements = component.elements.map(x => getCacheElement(x));
+          const tableElements = component.elements.map(x => getCacheElement(x));
           const [top, left] = component.position;
           return (
             <div key={component.id} className="layout-component" style={{ top, left }}>
               <ElementsTable
                 id={component.id}
-                elements={elements}
+                elements={tableElements}
                 elementsSize={component.elementsSize}
                 columns={component.columns}
                 padding={component.padding}

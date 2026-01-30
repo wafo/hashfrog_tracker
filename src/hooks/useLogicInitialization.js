@@ -14,7 +14,7 @@ const useLogicInitialization = (options = {}) => {
   const { updateItemsFromLogic } = useItems();
 
   const initializeLogic = useCallback(async () => {
-    if (skip) return;
+    if (skip) { return; }
 
     try {
       setIsLoading(true);
@@ -49,7 +49,6 @@ const useLogicInitialization = (options = {}) => {
       updateItemsFromLogic(settings); // Starting items.
       setIsInitialized(true);
     } catch (err) {
-      console.error(err);
       setError(err);
     } finally {
       setIsLoading(false);

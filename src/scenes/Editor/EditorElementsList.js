@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import Element from "../../components/Element";
-import { generateId, isBase64, splitNameBase64, duplicate } from "../../utils/utils";
+import { duplicate, generateId, isBase64, splitNameBase64 } from "../../utils/utils";
 import EditorElement from "./EditorElement";
 
 const baseURL = process.env.PUBLIC_URL;
@@ -27,10 +27,10 @@ const EditorElementsList = ({ elements, setLayout }) => {
 
   const deleteElement = useCallback(() => {
     setLayout(prev => {
-      let elements = prev.elements ? [...prev.elements.filter(x => x.id !== element.id)] : [];
+      const filtered = prev.elements ? [...prev.elements.filter(x => x.id !== element.id)] : [];
       return {
         ...prev,
-        elements: elements,
+        elements: filtered,
       };
     });
     setElement(null);
@@ -39,18 +39,18 @@ const EditorElementsList = ({ elements, setLayout }) => {
   const duplicateElements = useCallback(() => duplicate(element, elements, setElement), [element, elements]);
 
   useEffect(() => {
-    if (!element) return;
+    if (!element) { return; }
     setLayout(prev => {
-      let elements = prev.elements ? [...prev.elements] : [];
-      const index = elements.findIndex(x => x.id === element.id);
+      let updated = prev.elements ? [...prev.elements] : [];
+      const index = updated.findIndex(x => x.id === element.id);
       if (index !== -1) {
-        elements[index] = { ...element };
+        updated[index] = { ...element };
       } else {
-        elements = [...elements, element];
+        updated = [...updated, element];
       }
       return {
         ...prev,
-        elements: elements,
+        elements: updated,
       };
     });
   }, [element, setLayout]);
@@ -92,10 +92,10 @@ const EditorElementsList = ({ elements, setLayout }) => {
         <ul className="list-unstyled mb-0">
           {!element &&
             elements.length > 0 &&
-            elements.map(element => (
-              <li key={element.id}>
-                <button type="button" className="btn btn-dark btn-sm" onClick={() => setElement(element)}>
-                  {element.type || "undefined"} - {element.displayName || element.id.substring(0, 12)}
+            elements.map(el => (
+              <li key={el.id}>
+                <button type="button" className="btn btn-dark btn-sm" onClick={() => setElement(el)}>
+                  {el.type || "undefined"} - {el.displayName || el.id.substring(0, 12)}
                 </button>
               </li>
             ))}

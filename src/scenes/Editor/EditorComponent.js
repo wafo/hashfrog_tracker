@@ -18,8 +18,8 @@ const toNumber = [
 ];
 
 const EditorComponent = ({ component, setComponent, combinedElements }) => {
-  let { position, type, displayName = "" } = component;
-  let [coordX, coordY] = position;
+  const { position, type, displayName = "" } = component;
+  const [coordX, coordY] = position;
 
   const handleTypeChange = useCallback(
     event => {
@@ -138,7 +138,7 @@ const EditorComponent = ({ component, setComponent, combinedElements }) => {
       let { value } = event.target;
       const { name } = event.target;
 
-      if (toNumber.includes(name)) value = parseInt(value, 10);
+      if (toNumber.includes(name)) { value = parseInt(value, 10); }
 
       switch (name) {
         // Coords specific
@@ -155,9 +155,9 @@ const EditorComponent = ({ component, setComponent, combinedElements }) => {
         case "size_height": {
           setComponent(prev => {
             let property = "";
-            if (prev.type === "element") property = "size";
-            if (prev.type === "table") property = "elementsSize";
-            let propertyValue = prev[property];
+            if (prev.type === "element") { property = "size"; }
+            if (prev.type === "table") { property = "elementsSize"; }
+            const propertyValue = prev[property];
             return {
               ...prev,
               [property]: name === "size_width" ? [value, propertyValue[1]] : [propertyValue[0], value],
@@ -313,7 +313,7 @@ const ElementEditor = ({ component, handleChange, combinedElements }) => {
     return combinedElements.find(x => x.id === component.elementId);
   }, [combinedElements, component.elementId]);
 
-  if (!element) return null;
+  if (!element) { return null; }
 
   return (
     <Fragment>
@@ -328,9 +328,9 @@ const ElementEditor = ({ component, handleChange, combinedElements }) => {
           value={component.elementId}
           onChange={handleChange}
         >
-          {combinedElements.map(element => (
-            <option key={element.id} value={element.id}>
-              {element.displayName}
+          {combinedElements.map(el => (
+            <option key={el.id} value={el.id}>
+              {el.displayName}
             </option>
           ))}
         </select>
@@ -1145,20 +1145,20 @@ const LabelEditor = ({ component, handleChange }) => {
   );
 };
 
-const ElementSelector = ({hintElements = [], combinedElements, handleChange, componentTargetName, id = generateId()}) => {
+const ElementSelector = ({ hintElements = [], combinedElements, handleChange, componentTargetName, id = generateId() }) => {
   const [elements, setElements] = useState([...hintElements.map(x => ({ id: generateId(), value: x }))]);
   const [element, setElement] = useState("default_hashfrog");
   const [draggedElement, setDraggedElement] = useState(null);
 
-  const onDragStart = (event, element) => {
-    setDraggedElement(element);
+  const onDragStart = (event, el) => {
+    setDraggedElement(el);
     event.dataTransfer.effectAllowed = "move";
     // event.dataTransfer.setDragImage(event.target, 50, 50);
   };
-  
-  const removeFromTable = (e, element) => {
+
+  const removeFromTable = (e, el) => {
     e.preventDefault();
-    setElements(prev => [...prev.filter(x => x.id !== element.id)]);
+    setElements(prev => [...prev.filter(x => x.id !== el.id)]);
   };
 
   const onDragEnd = () => {
@@ -1169,13 +1169,13 @@ const ElementSelector = ({hintElements = [], combinedElements, handleChange, com
     index => {
       const draggedOverElement = elements[index];
       // Ignore if dragged over itself
-      if (draggedOverElement.id === draggedElement.id) return;
+      if (draggedOverElement.id === draggedElement.id) { return; }
       // filter out the currently dragged item
       // add the dragged item after the dragged over item
       setElements(prev => {
-        let elements = [...prev.filter(element => element.id !== draggedElement.id)];
-        elements.splice(index, 0, draggedElement);
-        return elements;
+        const filtered = [...prev.filter(el => el.id !== draggedElement.id)];
+        filtered.splice(index, 0, draggedElement);
+        return filtered;
       });
     },
     [draggedElement, elements],
@@ -1205,7 +1205,7 @@ const ElementSelector = ({hintElements = [], combinedElements, handleChange, com
       },
     });
   }, [elements, handleChange, componentTargetName]);
-  
+
   return (
     <Fragment>
       <div className="mb-2">
@@ -1220,9 +1220,9 @@ const ElementSelector = ({hintElements = [], combinedElements, handleChange, com
             value={element}
             onChange={handleElementChange}
           >
-            {combinedElements.map(element => (
-              <option key={element.id} value={element.name}>
-                {element.displayName}
+            {combinedElements.map(el => (
+              <option key={el.id} value={el.name}>
+                {el.displayName}
               </option>
             ))}
           </select>
@@ -1235,16 +1235,16 @@ const ElementSelector = ({hintElements = [], combinedElements, handleChange, com
         <Fragment>
           <p style={{ fontSize: "0.75em", margin: 0, opacity: 0.5 }}>Right click to remove. Drag to re-order.</p>
           <ul className="list-unstyled table-list">
-            {elements.map((element, index) => (
+            {elements.map((el, index) => (
               <li
-                key={element.id}
-                onContextMenu={e => removeFromTable(e, element)}
-                onDragStart={e => onDragStart(e, element)}
+                key={el.id}
+                onContextMenu={e => removeFromTable(e, el)}
+                onDragStart={e => onDragStart(e, el)}
                 onDragEnd={onDragEnd}
                 onDragOver={() => onDragOver(index)}
                 draggable
               >
-                {element.value}
+                {el.value}
               </li>
             ))}
           </ul>

@@ -110,7 +110,7 @@ function validateLocations(locations, parsedItems) {
 function getSettingsStringCache() {
   let string = localStorage.getItem("settings_string");
   if (!string) {
-    var preset = SettingStringsJSON.presets.find(preset => preset.value === "tournament_s9");
+    const preset = SettingStringsJSON.presets.find(p => p.value === "tournament_s9");
 
     // We should always find a preset. If not, just make it blank to be safe.
     if (preset) {
@@ -375,9 +375,9 @@ function reducer(state, action) {
       }
 
       const newLayoutElements = [...state.layoutElements, id];
-      let newItemsList = { ...state.items_list };
+      const newItemsList = { ...state.items_list };
       let newUnchangedStartingInventory = [...state.unchanged_starting_inventory];
-      let newStartingItemClaims = { ...state.starting_item_claims };
+      const newStartingItemClaims = { ...state.starting_item_claims };
 
       if (startingItem !== null) {
         newItemsList[id] = startingItem;
@@ -490,10 +490,10 @@ const useItems = (items, elementId = null) => {
     // searching for a match against the items in the tracker context.
     // Returns the highest matching index to prefer combo states.
     let itemIndex = 0;
-    if (!items || !items.length) return 0;
+    if (!items || !items.length) { return 0; }
     for (let i = 0; i < items.length; i++) {
       const itemUuid = items[i];
-      if (!itemUuid) continue;
+      if (!itemUuid) { continue; }
 
       // Check if this element already claimed this starting item
       const elementClaimedItem = elementId && state.starting_item_claims[elementId] === itemUuid;
@@ -510,10 +510,10 @@ const useItems = (items, elementId = null) => {
 
   const startingItem = useMemo(() => {
     let itemID = null;
-    if (!items || !items.length) return null;
+    if (!items || !items.length) { return null; }
     for (let i = 0; i < items.length; i++) {
       const itemUuid = items[i];
-      if (!itemUuid) continue;
+      if (!itemUuid) { continue; }
 
       // Check if this element already claimed this starting item
       const elementClaimedItem = elementId && state.starting_item_claims[elementId] === itemUuid;

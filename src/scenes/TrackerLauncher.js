@@ -60,7 +60,7 @@ const TrackerLauncher = () => {
 
   const launchTracker = useCallback(() => {
     let url = `${baseURL}/tracker`;
-    if (checks) url = `${baseURL}/tracker/checks`;
+    if (checks) { url = `${baseURL}/tracker/checks`; }
 
     const { width, height } = layoutSize;
 

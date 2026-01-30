@@ -36,20 +36,20 @@ const LayoutSelector = () => {
   }, [dispatch]);
 
   const downloadLayout = selected => {
-    let layout = null;
+    let selectedLayout = null;
     switch (selected) {
       case "hashfrog":
-        layout = hashfrogJSON;
+        selectedLayout = hashfrogJSON;
         break;
       case "linso":
-        layout = linsoJSON;
+        selectedLayout = linsoJSON;
         break;
       default:
-        layout = hashfrogJSON;
+        selectedLayout = hashfrogJSON;
         break;
     }
-    const jsonBlob = new Blob([JSON.stringify(layout)], { type: "text/plain" });
-    FileSaver.saveAs(jsonBlob, `${layout.layoutConfig.name.replace(/ /g, "_")}.json`);
+    const jsonBlob = new Blob([JSON.stringify(selectedLayout)], { type: "text/plain" });
+    FileSaver.saveAs(jsonBlob, `${selectedLayout.layoutConfig.name.replace(/ /g, "_")}.json`);
   };
 
   return (

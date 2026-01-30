@@ -3,7 +3,7 @@ import { createContext, useContext, useReducer } from "react";
 import defaultLayout from "../layouts/hashfrog.json";
 
 function getInitialLayout() {
-  let layout = localStorage.getItem("layout");
+  const layout = localStorage.getItem("layout");
   return layout ? JSON.parse(layout) : { ...defaultLayout };
 }
 

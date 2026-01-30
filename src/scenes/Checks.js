@@ -63,10 +63,10 @@ const Checks = () => {
       const isAvailable = locationData.isAvailable;
       const isChecked = locationData.isChecked;
 
-      if (isAvailable && !isChecked) counter.available += 1;
-      if (!isAvailable) counter.locked += 1;
-      if (isChecked) counter.checked += 1;
-      if (!isChecked) counter.remaining += 1;
+      if (isAvailable && !isChecked) { counter.available += 1; }
+      if (!isAvailable) { counter.locked += 1; }
+      if (isChecked) { counter.checked += 1; }
+      if (!isChecked) { counter.remaining += 1; }
     });
   };
 
@@ -138,8 +138,8 @@ const Buttons = ({ type, setType }) => {
 const HintRegion = ({ actions, locations, selectedRegion, setSelectedRegion }) => {
   const locationsList = _.map(locations[selectedRegion], (locationData, locationName) => {
     const style = {};
-    if (locationData.isChecked) style.textDecoration = "line-through";
-    if (!locationData.isAvailable) style.opacity = "0.5";
+    if (locationData.isChecked) { style.textDecoration = "line-through"; }
+    if (!locationData.isAvailable) { style.opacity = "0.5"; }
     return (
       <li key={locationName} className="check">
         <button
