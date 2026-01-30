@@ -5,13 +5,24 @@ import Locations from "./locations";
 import { parseRule } from "./rule-parser";
 import SettingsHelper from "./settings-helper";
 
+import ADULT_TRADE_SEQUENCE from "../data/adult-trade-sequence.json";
+import CHILD_TRADE_ITEMS from "../data/child-trade-items.json";
 import DUNGEON_CONFIG from "../data/dungeon-config.json";
 import DUNGEONS from "../data/dungeons.json";
 import GAME_REWARDS from "../data/game-rewards.json";
 import MASK_LOCATIONS from "../data/mask-locations.json";
 import SHOP_RULES from "../data/shop-rules.json";
 import SONG_NOTES from "../data/song-notes.json";
-import TRADE_SEQUENCE from "../data/trade-sequence.json";
+
+const CHILD_TRADE_SEQUENCE = CHILD_TRADE_ITEMS.map((item) => item.replace(/ /g, "_"));
+
+const ADULT_TRADE_ITEMS = ADULT_TRADE_SEQUENCE.map((trade) => trade.item);
+const ADULT_TRADE_LOOKUP = Object.fromEntries(
+  ADULT_TRADE_SEQUENCE.filter((trade) => trade.location).map((trade) => [
+    trade.item,
+    { displayName: trade.displayName, location: trade.location },
+  ])
+);
 
 class LogicHelper {
   static BUILTIN_FUNCTIONS = {
@@ -461,7 +472,8 @@ class LogicHelper {
           return false;
         }
         else if (leftValue === "selected_adult_trade_item") {
-          return _.includes(this.items, rightValue);
+          const itemKey = rightValue.replace(/ /g, "_");
+          return this.items[itemKey] > 0;
         }
         return false;
 
@@ -599,6 +611,53 @@ class LogicHelper {
     return asChild || asAdult;
   }
 
+  static _hasLaterAdultTradeItem(itemName) {
+    // If adult trade is shuffled, we can't assume sequence progression
+    if (this.settings.adult_trade_shuffle) {
+      return false;
+    }
+
+    // Find the index of this item in the sequence
+    const itemIndex = ADULT_TRADE_ITEMS.indexOf(itemName);
+    if (itemIndex === -1) {
+      return false;
+    }
+
+    // Check if any later item in the sequence is tracked
+    for (let i = itemIndex + 1; i < ADULT_TRADE_ITEMS.length; i++) {
+      const laterItem = ADULT_TRADE_ITEMS[i];
+      if (this.items[laterItem] > 0) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  static _hasLaterChildTradeItem(itemName) {
+    // If child trade is shuffled, we can't assume sequence progression
+    const itemWithSpaces = itemName.replace(/_/g, " ");
+    if (_.includes(this.settings.shuffle_child_trade, itemWithSpaces)) {
+      return false;
+    }
+
+    // Find the index of this item in the sequence
+    const itemIndex = CHILD_TRADE_SEQUENCE.indexOf(itemName);
+    if (itemIndex === -1) {
+      return false;
+    }
+
+    // Check if any later item in the sequence is tracked
+    for (let i = itemIndex + 1; i < CHILD_TRADE_SEQUENCE.length; i++) {
+      const laterItem = CHILD_TRADE_SEQUENCE[i];
+      if (this.items[laterItem] > 0) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   static _hadNightStart() {
     const stod = this.settings.starting_tod;
     return _.includes(["sunset", "evening", "midnight", "witching-hour"], stod);
@@ -628,6 +687,10 @@ class LogicHelper {
         return this.settings.blue_fire_arrows && this.items.Ice_Arrows > 0;
       case "Bombchu_Drop":
         return this.isLocationAvailable("Market Bombchu Bowling Bombchus");
+      case "Chicken":
+        return this.items[name] > 0 || this._hasLaterChildTradeItem("Chicken");
+      case "Cojiro":
+        return this.items[name] > 0 || this._hasLaterAdultTradeItem("Cojiro");
       case "Deku_Nut_Drop":
         return this._canAccessDrop("Deku Nut Drop");
       case "Deku_Shield_Drop":
@@ -636,6 +699,10 @@ class LogicHelper {
         return this._canAccessDrop("Deku Stick Drop");
       case "Deliver_Letter":
         return this.isLocationAvailable("Deliver Rutos Letter");
+      case "Pocket_Cucco":
+        return this.items[name] > 0 || this._hasLaterAdultTradeItem("Pocket_Cucco");
+      case "Pocket_Egg":
+        return this.items[name] > 0 || this._hasLaterAdultTradeItem("Pocket_Egg");
       case "Scarecrow_Song":
         return (
           this.settings.scarecrow_behavior === "free" ||
@@ -644,6 +711,8 @@ class LogicHelper {
         );
       case "Time_Travel":
         return this.isLocationAvailable("Master Sword Pedestal");
+      case "Weird_Egg":
+        return this.items[name] > 0 || this._hasLaterChildTradeItem("Weird_Egg");
       case "Zeldas_Letter":
         return (
           this.items[name] > 0 ||
@@ -656,12 +725,12 @@ class LogicHelper {
       return this.items[name] > 0 || this.isLocationAvailable(MASK_LOCATIONS[name]);
     }
 
-    if (name in TRADE_SEQUENCE) {
-      const trade = TRADE_SEQUENCE[name];
+    if (name in ADULT_TRADE_LOOKUP) {
+      const trade = ADULT_TRADE_LOOKUP[name];
       return (
         this.items[name] > 0 ||
         ((!this.settings.adult_trade_shuffle ||
-          !_.includes(this.settings.adult_trade_start, trade.tradeStartName)) &&
+          !_.includes(this.settings.adult_trade_start, trade.displayName)) &&
           this.isLocationAvailable(trade.location, "adult"))
       );
     }

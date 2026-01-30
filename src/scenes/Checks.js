@@ -22,6 +22,8 @@ const Checks = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   useEffect(() => {
     if (!isInitialized) {
+      LogicHelper.updateItems(items);
+
       _.forEach(Locations.mapLocationsToHintAreas(), (regionLocations, regionName) => {
         let locationAddedForRegion = false;
 
@@ -54,7 +56,6 @@ const Checks = () => {
         }
       });
 
-      LogicHelper.updateItems(items);
       setIsInitialized(true);
     }
   }, [actions, isInitialized, items]);

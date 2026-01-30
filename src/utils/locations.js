@@ -1,11 +1,13 @@
 import _ from "lodash";
 
+import ADULT_TRADE_SEQUENCE from "../data/adult-trade-sequence.json";
 import CHILD_TRADE_ITEMS from "../data/child-trade-items.json";
 import DUNGEONS from "../data/dungeons.json";
 import HINT_REGIONS_SHORT_NAMES from "../data/hint-regions-short-names.json";
 import HINT_REGIONS from "../data/hint-regions.json";
 import LOCATION_TABLE from "../data/location-table.json";
-import TRADE_ITEMS from "../data/trade-items.json";
+
+const ADULT_TRADE_ITEMS = ADULT_TRADE_SEQUENCE.map((trade) => trade.displayName);
 
 import { parseRule } from "./rule-parser";
 import SettingsHelper from "./settings-helper";
@@ -482,7 +484,7 @@ class Locations {
     }
 
     // Adult Trade Quest Items
-    else if (_.includes(TRADE_ITEMS, location.vanillaItem)) {
+    else if (_.includes(ADULT_TRADE_ITEMS, location.vanillaItem)) {
       const adultTradeShuffle = SettingsHelper.getSetting("adult_trade_shuffle");
       const adultTradeStart = SettingsHelper.getSetting("adult_trade_start");
       if (!adultTradeShuffle) {
