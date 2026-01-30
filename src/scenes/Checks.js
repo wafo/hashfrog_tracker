@@ -20,13 +20,12 @@ const Checks = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   useEffect(() => {
     if (!isInitialized) {
-      Locations.resetActiveLocations();
-
       _.forEach(Locations.mapLocationsToHintAreas(), (regionLocations, regionName) => {
         let locationAddedForRegion = false;
 
         _.forEach(regionLocations, locationName => {
-          if (Locations.isProgressLocation(Locations.activeLocations[locationName])) {
+          const location = Locations.getLocation(locationName);
+          if (location && Locations.isProgressLocation(location)) {
             actions.addLocation(locationName, regionName);
             locationAddedForRegion = true;
           }

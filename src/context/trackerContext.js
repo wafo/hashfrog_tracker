@@ -187,14 +187,16 @@ function reducer(state, action) {
     case "MQ_TOGGLE": {
       // payload = regionName
 
-      // Reset Locations to use new set of MQ dungeons for logic
+      // Update MQ dungeons setting in both LogicHelper and SettingsHelper
       const dungeonsMQ = LogicHelper.settings["mq_dungeons_specific"];
+      let newDungeonsMQ;
       if (!_.includes(dungeonsMQ, payload)) {
-        _.set(LogicHelper.settings, "mq_dungeons_specific", _.union(dungeonsMQ, [payload]));
+        newDungeonsMQ = _.union(dungeonsMQ, [payload]);
       } else {
-        _.remove(LogicHelper.settings.mq_dungeons_specific, dungeon => _.isEqual(dungeon, payload));
+        newDungeonsMQ = _.filter(dungeonsMQ, dungeon => !_.isEqual(dungeon, payload));
       }
-      Locations.resetActiveLocations();
+      _.set(LogicHelper.settings, "mq_dungeons_specific", newDungeonsMQ);
+      SettingsHelper.settings["mq_dungeons_specific"] = newDungeonsMQ;
 
       // Modify toggled dungeon to use MQ/non-MQ locations
       const locations = _.cloneDeep(state.locations);
@@ -223,12 +225,16 @@ function reducer(state, action) {
     case "SHORTCUT_TOGGLE": {
       // payload = regionName
 
-      // Modify toggled dungeon to use/not use dungeon boss shortcuts
-      if (!_.includes(LogicHelper.settings.dungeon_shortcuts, payload)) {
-        _.set(LogicHelper.settings, "dungeon_shortcuts", _.union(LogicHelper.settings.dungeon_shortcuts, [payload]));
+      // Update dungeon shortcuts setting in both LogicHelper and SettingsHelper
+      const shortcuts = LogicHelper.settings.dungeon_shortcuts;
+      let newShortcuts;
+      if (!_.includes(shortcuts, payload)) {
+        newShortcuts = _.union(shortcuts, [payload]);
       } else {
-        _.remove(LogicHelper.settings.dungeon_shortcuts, dungeon => _.isEqual(dungeon, payload));
+        newShortcuts = _.filter(shortcuts, dungeon => !_.isEqual(dungeon, payload));
       }
+      _.set(LogicHelper.settings, "dungeon_shortcuts", newShortcuts);
+      SettingsHelper.settings["dungeon_shortcuts"] = newShortcuts;
 
       // Revalidate checks based on items collected
       const validatedLocations = validateLocations(

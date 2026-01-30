@@ -63,28 +63,196 @@ class Locations {
 
     this._parseLogicFile(overworldFile, false, false);
 
-    this.activeLocations = new Map();
-    this.activeDropLocations = new Map();
-    this.activeSkullsLocations = [];
-    this.activeKeyLocations = new Map();
-    this.activeEvents = new Map();
-    this.activeExits = new Map();
-
     // TODO: Include this in the normal flow to always have a regions object up to date ?
     // Not really optimized, so leaving it out for now.
     // updateHintRegionsJSON(_.set(dungeonFiles, "Overworld", overworldFile));
   }
 
-  static isAlwaysPlacedLocation(location) {
-    return (
-      _.includes(
-        ["Triforce", "Scarecrow Song", "Deliver Letter", "Time Travel", "Bombchu Drop"],
-        location.vanillaItem,
-      ) || _.isEqual(location.type, "Drop")
-    );
+  static _parseLogicFile(logicFile, isDungeon, isMQ) {
+    const locationKey = isDungeon ? (isMQ ? "dungeon_mq" : "dungeon") : "overworld";
+
+    _.forEach(logicFile, region => {
+      const parentRegion = region.region_name;
+      const hintRegion = this.regionMap[parentRegion];
+
+      if (_.includes(_.keys(region), "locations")) {
+        const missingLocations = [];
+        _.forEach(region.locations, (rule, locationName) => {
+          try {
+            const [type, vanillaItem] = LOCATION_TABLE[locationName];
+
+            if (_.startsWith(type, "Hint")) {
+              // Ignore hint locations
+              return;
+            } else if (_.isEqual(type, "Drop")) {
+              // Accessibility of drops is important for logic, but are stored separately from locations
+              const dropData = {
+                parentRegion,
+                rule: parseRule(rule),
+              };
+              if (hintRegion in this.dropLocations[locationKey]) {
+                // Append new drop location
+                _.set(
+                  this.dropLocations,
+                  [locationKey, hintRegion, vanillaItem],
+                  _.union(this.dropLocations[locationKey][hintRegion][vanillaItem], [dropData]),
+                );
+              } else {
+                // Initialize list of drops
+                _.set(this.dropLocations, [locationKey, hintRegion, vanillaItem], [dropData]);
+              }
+            } else {
+              // Record the location, along with pertinent information to that location
+              const locationData = {
+                isDungeon,
+                locationName,
+                parentRegion,
+                rule: parseRule(rule),
+                type,
+                vanillaItem,
+              };
+              _.set(this.locations, [locationKey, hintRegion, locationName], locationData);
+
+              // Additionally, if the location contains a skulltula token, record that seperately
+              if (_.isEqual(type, "GS Token")) {
+                _.set(
+                  this.skullsLocations,
+                  [locationKey, hintRegion],
+                  _.union(this.skullsLocations[locationKey][hintRegion], [locationName]),
+                );
+              }
+
+              // Additionally, if the location is assuredly a key or silver rupees, record that seperately
+              if (
+                _.startsWith(vanillaItem, "Small Key ") ||
+                _.startsWith(vanillaItem, "Boss Key ") ||
+                _.startsWith(vanillaItem, "Silver Rupee ")
+              ) {
+                const keyData = {
+                  locationName,
+                  parentRegion,
+                  rule: parseRule(rule),
+                  vanillaItem,
+                };
+                _.set(this.keyLocations, [locationKey, hintRegion, locationName], keyData);
+              }
+            }
+          } catch (error) {
+            // Don't stop if an unknown location pops up
+            // console.warn(`Location [${locationName}] missing from location-table.json`); // Alert that a location is missing.
+            missingLocations.push(locationName);
+          }
+        });
+
+        // Alert when there are unknown locations
+        if (missingLocations.length) {
+          console.warn(`[${region.region_name}]: ${missingLocations.length} locations missing from locations table.`);
+        }
+      }
+
+      // Record events as they are relevant to logic
+      if (_.includes(_.keys(region), "events")) {
+        _.forEach(region.events, (rule, eventName) => {
+          const eventData = {
+            parentRegion,
+            rule: parseRule(rule),
+          };
+          if (hintRegion in this.events[locationKey]) {
+            _.set(
+              this.events,
+              [locationKey, hintRegion, eventName],
+              _.union(this.events[locationKey][hintRegion][eventName], [eventData]),
+            );
+          } else {
+            _.set(this.events, [locationKey, hintRegion, eventName], [eventData]);
+          }
+        });
+      }
+
+      // Record exits as they are relevant to logic
+      if (_.includes(_.keys(region), "exits")) {
+        _.forEach(region.exits, (rule, exitName) => {
+          _.set(this.exits, [locationKey, hintRegion, parentRegion, exitName], parseRule(rule));
+        });
+      }
+    });
   }
 
-  static isGuaranteedKey(location) {
+  static getDropLocations(dropName) {
+    const dungeonsMQ = SettingsHelper.getSetting("mq_dungeons_specific") || [];
+    const results = [];
+
+    // Check overworld
+    for (const regionData of Object.values(this.dropLocations.overworld)) {
+      if (dropName in regionData) {
+        results.push(...regionData[dropName]);
+      }
+    }
+
+    // Check dungeons based on MQ settings
+    for (const dungeonName of DUNGEONS) {
+      const source = _.includes(dungeonsMQ, dungeonName)
+        ? this.dropLocations.dungeon_mq[dungeonName]
+        : this.dropLocations.dungeon[dungeonName];
+
+      if (source && dropName in source) {
+        results.push(...source[dropName]);
+      }
+    }
+
+    return results.length > 0 ? results : null;
+  }
+
+  static getEvent(eventName) {
+    const dungeonsMQ = SettingsHelper.getSetting("mq_dungeons_specific") || [];
+    const results = [];
+
+    // Check overworld
+    for (const regionData of Object.values(this.events.overworld)) {
+      if (eventName in regionData) {
+        results.push(...regionData[eventName]);
+      }
+    }
+
+    // Check dungeons based on MQ settings
+    for (const dungeonName of DUNGEONS) {
+      const source = _.includes(dungeonsMQ, dungeonName)
+        ? this.events.dungeon_mq[dungeonName]
+        : this.events.dungeon[dungeonName];
+
+      if (source && eventName in source) {
+        results.push(...source[eventName]);
+      }
+    }
+
+    return results.length > 0 ? results : null;
+  }
+
+  static getExitsForRegion(regionName) {
+    const dungeonsMQ = SettingsHelper.getSetting("mq_dungeons_specific") || [];
+
+    // Check overworld
+    for (const regionExits of Object.values(this.exits.overworld)) {
+      if (regionName in regionExits) {
+        return regionExits[regionName];
+      }
+    }
+
+    // Check dungeons based on MQ settings
+    for (const dungeonName of DUNGEONS) {
+      const source = _.includes(dungeonsMQ, dungeonName)
+        ? this.exits.dungeon_mq[dungeonName]
+        : this.exits.dungeon[dungeonName];
+
+      if (source && regionName in source) {
+        return source[regionName];
+      }
+    }
+
+    return null;
+  }
+
+  static _isGuaranteedKey(location) {
     const itemName = location.vanillaItem;
 
     return (
@@ -94,6 +262,107 @@ class Locations {
       (_.startsWith(itemName, "Silver Rupee ") && _.isEqual(SettingsHelper.getSetting("shuffle_silver_rupees"), "vanilla")) ||
       (_.startsWith(itemName, "Small Key ") && _.isEqual(SettingsHelper.getSetting("shuffle_smallkeys"), "vanilla")) ||
       (_.isEqual(itemName, "Small Key (Treasure Chest Game)") && _.isEqual(SettingsHelper.getSetting("shuffle_tcgkeys"), "vanilla"))
+    );
+  }
+
+  static getKeyLocationsForRegion(regionName) {
+    const dungeonsMQ = SettingsHelper.getSetting("mq_dungeons_specific") || [];
+    const results = [];
+
+    const addIfGuaranteed = data => {
+      if (this._isGuaranteedKey(data)) {
+        results.push(data);
+      }
+    };
+
+    // Check overworld
+    for (const regionData of Object.values(this.keyLocations.overworld)) {
+      for (const keyData of Object.values(regionData)) {
+        if (keyData.parentRegion === regionName) {
+          addIfGuaranteed(keyData);
+        }
+      }
+    }
+
+    // Check dungeons based on MQ settings
+    for (const dungeonName of DUNGEONS) {
+      const source = _.includes(dungeonsMQ, dungeonName)
+        ? this.keyLocations.dungeon_mq[dungeonName]
+        : this.keyLocations.dungeon[dungeonName];
+
+      if (source) {
+        for (const keyData of Object.values(source)) {
+          if (keyData.parentRegion === regionName) {
+            addIfGuaranteed(keyData);
+          }
+        }
+      }
+    }
+
+    return results;
+  }
+
+  static getLocation(locationName) {
+    const dungeonsMQ = SettingsHelper.getSetting("mq_dungeons_specific") || [];
+
+    // Check overworld first (most common case)
+    for (const regionData of Object.values(this.locations.overworld)) {
+      if (locationName in regionData) {
+        return regionData[locationName];
+      }
+    }
+
+    // Check dungeons based on MQ settings
+    for (const dungeonName of DUNGEONS) {
+      const source = _.includes(dungeonsMQ, dungeonName)
+        ? this.locations.dungeon_mq[dungeonName]
+        : this.locations.dungeon[dungeonName];
+
+      if (source && locationName in source) {
+        return source[locationName];
+      }
+    }
+
+    return null;
+  }
+
+  static getSkullsLocations() {
+    const dungeonsMQ = SettingsHelper.getSetting("mq_dungeons_specific") || [];
+    let results = [];
+
+    // Add overworld skulls
+    for (const skullsList of Object.values(this.skullsLocations.overworld)) {
+      results = _.union(results, skullsList);
+    }
+
+    // Add dungeon skulls based on MQ settings
+    for (const dungeonName of DUNGEONS) {
+      const source = _.includes(dungeonsMQ, dungeonName)
+        ? this.skullsLocations.dungeon_mq[dungeonName]
+        : this.skullsLocations.dungeon[dungeonName];
+
+      if (source) {
+        results = _.union(results, source);
+      }
+    }
+
+    return results;
+  }
+
+  static hasDrop(dropName) {
+    return this.getDropLocations(dropName) !== null;
+  }
+
+  static hasEvent(eventName) {
+    return this.getEvent(eventName) !== null;
+  }
+
+  static _isAlwaysPlacedLocation(location) {
+    return (
+      _.includes(
+        ["Triforce", "Scarecrow Song", "Deliver Letter", "Time Travel", "Bombchu Drop"],
+        location.vanillaItem,
+      ) || _.isEqual(location.type, "Drop")
     );
   }
 
@@ -115,7 +384,7 @@ class Locations {
     }
 
     // Always Placed Items
-    else if (Locations.isAlwaysPlacedLocation(location)) {
+    else if (this._isAlwaysPlacedLocation(location)) {
       return false;
     }
 
@@ -387,83 +656,39 @@ class Locations {
     }
   }
 
+  static *_iterateLocations() {
+    const dungeonsMQ = SettingsHelper.getSetting("mq_dungeons_specific") || [];
+
+    // Yield overworld locations
+    for (const regionData of Object.values(this.locations.overworld)) {
+      for (const [name, data] of Object.entries(regionData)) {
+        yield [name, data];
+      }
+    }
+
+    // Yield dungeon locations based on MQ settings
+    for (const dungeonName of DUNGEONS) {
+      const source = _.includes(dungeonsMQ, dungeonName)
+        ? this.locations.dungeon_mq[dungeonName]
+        : this.locations.dungeon[dungeonName];
+
+      if (source) {
+        for (const [name, data] of Object.entries(source)) {
+          yield [name, data];
+        }
+      }
+    }
+  }
+
   static mapLocationsToHintAreas() {
     const newLocations = new Map();
 
-    _.forEach(this.activeLocations, (locationData, locationName) => {
+    for (const [locationName, locationData] of this._iterateLocations()) {
       const hintRegionName = this.regionMap[locationData.parentRegion];
       _.set(newLocations, hintRegionName, _.union(newLocations[hintRegionName], [locationName]));
-    });
+    }
 
     return newLocations;
-  }
-
-  static _getDungeonSource(sourceMap, dungeonName, dungeonsMQ) {
-    return _.includes(dungeonsMQ, dungeonName)
-      ? sourceMap.dungeon_mq[dungeonName]
-      : sourceMap.dungeon[dungeonName];
-  }
-
-  static _buildActiveMap(sourceMap, dungeonsMQ, copyFn) {
-    const activeMap = new Map();
-
-    // Copy dungeon data (MQ or non-MQ based on settings)
-    _.forEach(DUNGEONS, dungeonName => {
-      const source = this._getDungeonSource(sourceMap, dungeonName, dungeonsMQ);
-      _.forEach(source, (data, name) => copyFn(activeMap, name, data));
-    });
-
-    // Copy overworld data
-    _.forEach(_.values(sourceMap.overworld), regionData => {
-      _.forEach(regionData, (data, name) => copyFn(activeMap, name, data));
-    });
-
-    return activeMap;
-  }
-
-  static resetActiveLocations() {
-    const dungeonsMQ = SettingsHelper.getSetting("mq_dungeons_specific");
-
-    const simpleCopy = (activeMap, name, data) => _.set(activeMap, name, data);
-    const unionCopy = (activeMap, name, data) => _.set(activeMap, name, _.union(activeMap[name], data));
-
-    // Locations, Events, Exits
-    this.activeLocations = this._buildActiveMap(this.locations, dungeonsMQ, simpleCopy);
-    this.activeEvents = this._buildActiveMap(this.events, dungeonsMQ, simpleCopy);
-    this.activeExits = this._buildActiveMap(this.exits, dungeonsMQ, simpleCopy);
-
-    // Drop locations
-    this.activeDropLocations = this._buildActiveMap(this.dropLocations, dungeonsMQ, unionCopy);
-
-    // Skulls locations
-    this.activeSkullsLocations = [];
-    _.forEach(DUNGEONS, dungeonName => {
-      const source = this._getDungeonSource(this.skullsLocations, dungeonName, dungeonsMQ);
-      this.activeSkullsLocations = _.union(this.activeSkullsLocations, source);
-    });
-    _.forEach(_.values(this.skullsLocations.overworld), skullsLocation => {
-      this.activeSkullsLocations = _.union(this.activeSkullsLocations, skullsLocation);
-    });
-
-    // Key locations
-    this.activeKeyLocations = {};
-    const addKeyLocation = data => {
-      if (Locations.isGuaranteedKey(data)) {
-        _.set(
-          this.activeKeyLocations,
-          data.parentRegion,
-          _.union(this.activeKeyLocations[data.parentRegion], [data]),
-        );
-      }
-    };
-
-    _.forEach(DUNGEONS, dungeonName => {
-      const source = this._getDungeonSource(this.keyLocations, dungeonName, dungeonsMQ);
-      _.forEach(_.values(source), addKeyLocation);
-    });
-    _.forEach(_.values(this.keyLocations.overworld), keyLocation => {
-      _.forEach(_.values(keyLocation), addKeyLocation);
-    });
   }
 
   static removeRegionPrefix(locationName, regionName) {
@@ -482,116 +707,6 @@ class Locations {
 
     // Nothing to trim, return back the location name
     return locationName;
-  }
-
-  static _parseLogicFile(logicFile, isDungeon, isMQ) {
-    const locationKey = isDungeon ? (isMQ ? "dungeon_mq" : "dungeon") : "overworld";
-
-    _.forEach(logicFile, region => {
-      const parentRegion = region.region_name;
-      const hintRegion = this.regionMap[parentRegion];
-
-      if (_.includes(_.keys(region), "locations")) {
-        const missingLocations = [];
-        _.forEach(region.locations, (rule, locationName) => {
-          try {
-            const [type, vanillaItem] = LOCATION_TABLE[locationName];
-
-            if (_.startsWith(type, "Hint")) {
-              // Ignore hint locations
-              return;
-            } else if (_.isEqual(type, "Drop")) {
-              // Accessibility of drops is important for logic, but are stored separately from locations
-              const dropData = {
-                parentRegion,
-                rule: parseRule(rule),
-              };
-              if (hintRegion in this.dropLocations[locationKey]) {
-                // Append new drop location
-                _.set(
-                  this.dropLocations,
-                  [locationKey, hintRegion, vanillaItem],
-                  _.union(this.dropLocations[locationKey][hintRegion][vanillaItem], [dropData]),
-                );
-              } else {
-                // Initialize list of drops
-                _.set(this.dropLocations, [locationKey, hintRegion, vanillaItem], [dropData]);
-              }
-            } else {
-              // Record the location, along with pertinent information to that location
-              const locationData = {
-                isDungeon,
-                locationName,
-                parentRegion,
-                rule: parseRule(rule),
-                type,
-                vanillaItem,
-              };
-              _.set(this.locations, [locationKey, hintRegion, locationName], locationData);
-
-              // Additionally, if the location contains a skulltula token, record that seperately
-              if (_.isEqual(type, "GS Token")) {
-                _.set(
-                  this.skullsLocations,
-                  [locationKey, hintRegion],
-                  _.union(this.skullsLocations[locationKey][hintRegion], [locationName]),
-                );
-              }
-
-              // Additionally, if the location is assuredly a key or silver rupees, record that seperately
-              if (
-                _.startsWith(vanillaItem, "Small Key ") ||
-                _.startsWith(vanillaItem, "Boss Key ") ||
-                _.startsWith(vanillaItem, "Silver Rupee ")
-              ) {
-                const keyData = {
-                  locationName,
-                  parentRegion,
-                  rule: parseRule(rule),
-                  vanillaItem,
-                };
-                _.set(this.keyLocations, [locationKey, hintRegion, locationName], keyData);
-              }
-            }
-          } catch (error) {
-            // Don't stop if an unknown location pops up
-            // console.warn(`Location [${locationName}] missing from location-table.json`); // Alert that a location is missing.
-            missingLocations.push(locationName);
-          }
-        });
-
-        // Alert when there are unknown locations
-        if (missingLocations.length) {
-          console.warn(`[${region.region_name}]: ${missingLocations.length} locations missing from locations table.`);
-        }
-      }
-
-      // Record events as they are relevant to logic
-      if (_.includes(_.keys(region), "events")) {
-        _.forEach(region.events, (rule, eventName) => {
-          const eventData = {
-            parentRegion,
-            rule: parseRule(rule),
-          };
-          if (hintRegion in this.events[locationKey]) {
-            _.set(
-              this.events,
-              [locationKey, hintRegion, eventName],
-              _.union(this.events[locationKey][hintRegion][eventName], [eventData]),
-            );
-          } else {
-            _.set(this.events, [locationKey, hintRegion, eventName], [eventData]);
-          }
-        });
-      }
-
-      // Record exits as they are relevant to logic
-      if (_.includes(_.keys(region), "exits")) {
-        _.forEach(region.exits, (rule, exitName) => {
-          _.set(this.exits, [locationKey, hintRegion, parentRegion, exitName], parseRule(rule));
-        });
-      }
-    });
   }
 }
 

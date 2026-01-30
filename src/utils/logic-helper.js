@@ -267,32 +267,30 @@ class LogicHelper {
 
       // NOTE: Must use native forEach for Sets
       this.regions.child.forEach(regionName => {
-        if (regionName in Locations.activeKeyLocations) {
-          _.forEach(Locations.activeKeyLocations[regionName], keyLocation => {
-            if (
-              !(keyLocation.locationName in guaranteedKeys) &&
-              this._evalNode(keyLocation.rule, "child")
-            ) {
-              _.set(guaranteedKeys, keyLocation.locationName, true);
-              _.update(this.items, this._getItemName(keyLocation.vanillaItem), count => count + 1);
-              updatedKeys = true;
-            }
-          });
-        }
+        const keyLocations = Locations.getKeyLocationsForRegion(regionName);
+        _.forEach(keyLocations, keyLocation => {
+          if (
+            !(keyLocation.locationName in guaranteedKeys) &&
+            this._evalNode(keyLocation.rule, "child")
+          ) {
+            _.set(guaranteedKeys, keyLocation.locationName, true);
+            _.update(this.items, this._getItemName(keyLocation.vanillaItem), count => count + 1);
+            updatedKeys = true;
+          }
+        });
       });
       this.regions.adult.forEach(regionName => {
-        if (regionName in Locations.activeKeyLocations) {
-          _.forEach(Locations.activeKeyLocations[regionName], keyLocation => {
-            if (
-              !(keyLocation.locationName in guaranteedKeys) &&
-              this._evalNode(keyLocation.rule, "adult")
-            ) {
-              _.set(guaranteedKeys, keyLocation.locationName, true);
-              _.update(this.items, this._getItemName(keyLocation.vanillaItem), count => count + 1);
-              updatedKeys = true;
-            }
-          });
-        }
+        const keyLocations = Locations.getKeyLocationsForRegion(regionName);
+        _.forEach(keyLocations, keyLocation => {
+          if (
+            !(keyLocation.locationName in guaranteedKeys) &&
+            this._evalNode(keyLocation.rule, "adult")
+          ) {
+            _.set(guaranteedKeys, keyLocation.locationName, true);
+            _.update(this.items, this._getItemName(keyLocation.vanillaItem), count => count + 1);
+            updatedKeys = true;
+          }
+        });
       });
 
       accessibleChildRegions = _.cloneDeep(newChildRegions);
@@ -312,8 +310,10 @@ class LogicHelper {
   }
 
   static isLocationAvailable(locationName, age) {
-    const parentRegion = Locations.activeLocations[locationName].parentRegion;
-    const locationRule = Locations.activeLocations[locationName].rule;
+    const location = Locations.getLocation(locationName);
+    if (!location) { return false; }
+
+    const { parentRegion, rule: locationRule } = location;
 
     if (_.isUndefined(age)) {
       return this.isLocationAvailable(locationName, "child") || this.isLocationAvailable(locationName, "adult");
@@ -324,7 +324,7 @@ class LogicHelper {
 
   static countSkullsInLogic() {
     return _.size(
-      _.filter(Locations.activeSkullsLocations, locationName => this.isLocationAvailable(locationName)),
+      _.filter(Locations.getSkullsLocations(), locationName => this.isLocationAvailable(locationName)),
     );
   }
 
@@ -423,16 +423,19 @@ class LogicHelper {
 
     let regionsToCheck = [];
 
-    _.forEach(Locations.activeExits[rootRegion], (exitRule, exitName) => {
-      if (!this.regions[age].has(exitName)) {
-        if (this._evalNode(exitRule, age)) {
-          this.regions[age].add(exitName);
-          regionsToCheck = _.union(regionsToCheck, this._recalculateAccessibleRegions(exitName, age));
-        } else {
-          regionsToCheck = _.union(regionsToCheck, [rootRegion]);
+    const exits = Locations.getExitsForRegion(rootRegion);
+    if (exits) {
+      _.forEach(exits, (exitRule, exitName) => {
+        if (!this.regions[age].has(exitName)) {
+          if (this._evalNode(exitRule, age)) {
+            this.regions[age].add(exitName);
+            regionsToCheck = _.union(regionsToCheck, this._recalculateAccessibleRegions(exitName, age));
+          } else {
+            regionsToCheck = _.union(regionsToCheck, [rootRegion]);
+          }
         }
-      }
-    });
+      });
+    }
 
     return regionsToCheck;
   }
@@ -563,7 +566,10 @@ class LogicHelper {
   }
 
   static _canAccessDrop(dropName) {
-    return _.some(Locations.activeDropLocations[dropName], locationData => {
+    const dropLocations = Locations.getDropLocations(dropName);
+    if (!dropLocations) { return false; }
+
+    return _.some(dropLocations, locationData => {
       const parentRegion = locationData.parentRegion;
       const rule = locationData.rule;
 
@@ -703,7 +709,7 @@ class LogicHelper {
       return this._evalRuleAlias(name);
     }
     const escapedIdentifier = _.replace(name, /_/g, " ");
-    if (escapedIdentifier in Locations.activeEvents) {
+    if (Locations.hasEvent(escapedIdentifier)) {
       return this._evalEvent(escapedIdentifier);
     }
 
@@ -725,9 +731,9 @@ class LogicHelper {
   }
 
   static _evalLiteral(value) {
-    if (value in Locations.activeDropLocations) {
+    if (Locations.hasDrop(value)) {
       return this._canAccessDrop(value);
-    } else if (value in Locations.activeEvents) {
+    } else if (Locations.hasEvent(value)) {
       return this._evalEvent(value);
     }
 
@@ -802,9 +808,12 @@ class LogicHelper {
       );
     }
 
-    return _.some(Locations.activeEvents[eventName], eventData => {
-      const parentRegion = eventData.parentRegion;
-      const rule = eventData.rule;
+    const eventData = Locations.getEvent(eventName);
+    if (!eventData) { return false; }
+
+    return _.some(eventData, event => {
+      const parentRegion = event.parentRegion;
+      const rule = event.rule;
 
       const asChild = this._isRegionAccessible(parentRegion, "child") && this._evalNode(rule, "child");
       const asAdult = this._isRegionAccessible(parentRegion, "adult") && this._evalNode(rule, "adult");
