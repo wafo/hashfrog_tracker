@@ -140,8 +140,6 @@ class Locations {
               }
             }
           } catch (error) {
-            // Don't stop if an unknown location pops up
-            // console.warn(`Location [${locationName}] missing from location-table.json`); // Alert that a location is missing.
             missingLocations.push(locationName);
           }
         });

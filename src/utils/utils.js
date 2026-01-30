@@ -58,8 +58,6 @@ export function updateHintRegionsJSON(files) {
     });
   });
 
-  // console.log(JSON.stringify(regions));
-
   return regions;
 }
 
