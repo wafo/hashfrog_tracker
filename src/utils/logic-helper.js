@@ -7,6 +7,7 @@ import SettingsHelper from "./settings-helper";
 
 import DUNGEON_CONFIG from "../data/dungeon-config.json";
 import DUNGEONS from "../data/dungeons.json";
+import GAME_REWARDS from "../data/game-rewards.json";
 import MASK_LOCATIONS from "../data/mask-locations.json";
 import SHOP_RULES from "../data/shop-rules.json";
 import SONG_NOTES from "../data/song-notes.json";
@@ -30,15 +31,7 @@ class LogicHelper {
       const countArg = node.arguments[0];
       const requiredCount = countArg.type === "Identifier" ? this.settings[countArg.name] || 0 : countArg.value;
 
-      const medallions = [
-        "Forest_Medallion",
-        "Fire_Medallion",
-        "Water_Medallion",
-        "Spirit_Medallion",
-        "Shadow_Medallion",
-        "Light_Medallion",
-      ];
-      const count = medallions.filter(m => this.items[m] > 0).length;
+      const count = GAME_REWARDS.medallions.filter(m => this.items[m] > 0).length;
       return count >= requiredCount;
     },
 
@@ -46,8 +39,7 @@ class LogicHelper {
       const countArg = node.arguments[0];
       const requiredCount = countArg.type === "Identifier" ? this.settings[countArg.name] || 0 : countArg.value;
 
-      const stones = ["Kokiri_Emerald", "Goron_Ruby", "Zora_Sapphire"];
-      const count = stones.filter(s => this.items[s] > 0).length;
+      const count = GAME_REWARDS.stones.filter(s => this.items[s] > 0).length;
       return count >= requiredCount;
     },
 
@@ -55,18 +47,7 @@ class LogicHelper {
       const countArg = node.arguments[0];
       const requiredCount = countArg.type === "Identifier" ? this.settings[countArg.name] || 0 : countArg.value;
 
-      const rewards = [
-        "Kokiri_Emerald",
-        "Goron_Ruby",
-        "Zora_Sapphire",
-        "Forest_Medallion",
-        "Fire_Medallion",
-        "Water_Medallion",
-        "Spirit_Medallion",
-        "Shadow_Medallion",
-        "Light_Medallion",
-      ];
-      const count = rewards.filter(r => this.items[r] > 0).length;
+      const count = GAME_REWARDS.dungeonRewards.filter(r => this.items[r] > 0).length;
       return count >= requiredCount;
     },
 

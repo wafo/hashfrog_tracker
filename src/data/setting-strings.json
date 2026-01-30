@@ -1,4 +1,6 @@
 {
+  "currentActiveVersion": "9.0.0",
+  "supportedVersions": ["9.0.0", "8.3.0"],
   "presets": [
     {
       "label": "Tournament S9",

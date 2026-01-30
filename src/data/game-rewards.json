@@ -1,0 +1,26 @@
+{
+  "stones": [
+    "Kokiri_Emerald",
+    "Goron_Ruby",
+    "Zora_Sapphire"
+  ],
+  "medallions": [
+    "Forest_Medallion",
+    "Fire_Medallion",
+    "Water_Medallion",
+    "Spirit_Medallion",
+    "Shadow_Medallion",
+    "Light_Medallion"
+  ],
+  "dungeonRewards": [
+    "Kokiri_Emerald",
+    "Goron_Ruby",
+    "Zora_Sapphire",
+    "Forest_Medallion",
+    "Fire_Medallion",
+    "Water_Medallion",
+    "Spirit_Medallion",
+    "Shadow_Medallion",
+    "Light_Medallion"
+  ]
+}

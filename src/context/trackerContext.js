@@ -1,6 +1,7 @@
 import _ from "lodash";
 import { createContext, useContext, useEffect, useMemo, useReducer } from "react";
 
+import COMBO_ITEMS from "../data/combo-items.json";
 import COUNTER_TO_ITEM from "../data/counter-to-item.json";
 import DEFAULT_ITEMS from "../data/default-items.json";
 import ITEMS_JSON from "../data/items.json";
@@ -12,33 +13,7 @@ import SettingsHelper from "../utils/settings-helper";
 
 const GENERATOR_VERSION = process.env.REACT_APP_GENERATOR_VERSION;
 
-const COMBO_DERIVATIONS = [
-  {
-    // Goron Tunic + Zora Tunic -> Both Tunics
-    components: ["cd6a55f0253f45159521efb2b3b515e8", "c562c7418d7141ffb70101509a52873e"],
-    combo: "d9233a5054af4491924115b47e5730e4",
-  },
-  {
-    // Iron Boots + Hover Boots -> Both Boots
-    components: ["bad09131f88a440093087e11efc1c8b0", "33f4bc4c632846bea5fb88573f2f95b2"],
-    combo: "2c5c72812a6b49c68bb49773e6d3dd98",
-  },
-  {
-    // Fire Arrows + Ice Arrows -> Fire-Ice Arrows
-    components: ["7c3026558a6b49df97733d13ecc815c7", "9bc4daf5728f4b158dc4c3d768df006e"],
-    combo: "4a3433d7792f408b80e2f07caae43da2",
-  },
-  {
-    // Fire Arrows + Light Arrows -> Fire-Light Arrows
-    components: ["7c3026558a6b49df97733d13ecc815c7", "ff67e2e04ce04aa8add77658ee932802"],
-    combo: "ea2dfcbb008248e790b785941d54027d",
-  },
-  {
-    // Din's Fire + Farore's Wind -> Dins-Farores
-    components: ["591d582f479140759fd6501caa23c2f9", "0c3e8979165042f686357b4bcbaab8ec"],
-    combo: "76d769ba496e49ebb39fbfd836ce1db6",
-  },
-];
+const COMBO_DERIVATIONS = COMBO_ITEMS;
 
 const TrackerContext = createContext();
 

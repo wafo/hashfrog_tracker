@@ -20,20 +20,8 @@ const GENERATOR_VERSION = process.env.REACT_APP_GENERATOR_VERSION;
 const isLogicBranchRelease = LOGIC_BRANCH === "release";
 
 const PRESETS = SettingStringsJSON.presets || [];
-
-// https://ootrandomizer.com/api/version?branch=master
-// API expects SemVer format: "5.2.0" for release or "devXYZ_x.x.x-x" for dev
-const CURRENT_ACTIVE_VERSION = "9.0.0";
-const GENERATOR_VERSIONS = [
-  "9.0.0",
-  "8.3.0",
-  "7.1.0",
-  "7.0.0",
-  "6.2.0",
-  "6.0.0",
-  "5.2.0",
-  "5.1.0",
-];
+const CURRENT_ACTIVE_VERSION = SettingStringsJSON.currentActiveVersion || "9.0.0";
+const GENERATOR_VERSIONS = SettingStringsJSON.supportedVersions || ["9.0.0"];
 
 const TrackerLauncher = () => {
   const [checks, setChecks] = useState(false);

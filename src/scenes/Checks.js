@@ -3,12 +3,14 @@ import { useEffect, useMemo, useState } from "react";
 
 import { useLayout } from "../context/layoutContext";
 import { useChecks, useLocation } from "../context/trackerContext";
-import DUNGEON_SHORTCUTS from "../data/dungeon-boss-shortcuts.json";
+import DUNGEON_CONFIG from "../data/dungeon-config.json";
 import DUNGEONS from "../data/dungeons.json";
 import HINT_REGIONS_SHORT_NAMES from "../data/hint-regions-short-names.json";
 import Locations from "../utils/locations";
 import LogicHelper from "../utils/logic-helper";
 import SettingsHelper from "../utils/settings-helper";
+
+const DUNGEON_SHORTCUTS = DUNGEON_CONFIG.dungeonShortcuts;
 
 const Checks = () => {
   const { state: layoutContext } = useLayout();
