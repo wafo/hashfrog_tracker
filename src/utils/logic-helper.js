@@ -201,7 +201,7 @@ class LogicHelper {
     SettingsHelper.setRenamedAttributes(this.renamedAttributes);
 
     if (
-      _.isEqual(this.settings.open_forest, "closed") &&
+      this.settings.open_forest === "closed" &&
       (this.renamedAttributes.shuffle_special_interior_entrances ||
         this.settings.shuffle_overworld_entrances ||
         this.settings.warp_songs ||
@@ -214,21 +214,21 @@ class LogicHelper {
       _.set(this.settings, "shuffle_ganon_bosskey", "triforce");
     }
 
-    if (_.isEqual(this.settings.dungeon_shortcuts_choice, "all")) {
+    if (this.settings.dungeon_shortcuts_choice === "all") {
       _.set(this.settings, "dungeon_shortcuts", DUNGEON_CONFIG.dungeonShortcuts);
     }
 
-    if (_.isEqual(this.settings.key_rings_choice, "all")) {
+    if (this.settings.key_rings_choice === "all") {
       _.set(this.settings, "key_rings", DUNGEON_CONFIG.keyRings);
     }
 
     // Add all dungeons to MQ-dungeons-specific list if all dungeons are set to MQ
-    if (_.isEqual(this.settings.mq_dungeons_mode, "mq")) {
+    if (this.settings.mq_dungeons_mode === "mq") {
       _.set(this.settings, "mq_dungeons_specific", DUNGEONS);
     }
 
     // Ignore initial dungeon shortcuts choices when option is set to random
-    if (_.isEqual(this.settings.dungeon_shortcuts_choice, "random")) {
+    if (this.settings.dungeon_shortcuts_choice === "random") {
       _.set(this.settings, "dungeon_shortcuts", []);
     }
 
@@ -359,12 +359,12 @@ class LogicHelper {
       ["keysanity", "remove", "any_dungeon", "overworld", "regional"],
       this.settings.shuffle_smallkeys,
     );
-    const shuffleSilverRupees = !_.isEqual(this.settings.shuffle_silver_rupees, "vanilla");
-    const checkBeatableOnly = !_.isEqual(this.settings.reachable_locations, "all");
-    const shuffleSpecialInteriorEntrances = _.isEqual(this.settings.shuffle_interior_entrances, "all");
-    const shuffleInteriorEntrances = _.includes(["simple", "all"], this.settings.shuffle_interior_entrances);
-    const shuffleSpecialDungeonEntrances = _.isEqual(this.settings.shuffle_dungeon_entrances, "all");
-    const shuffleDungeonEntrances = _.includes(["simple", "all"], this.settings.shuffle_dungeon_entrances);
+    const shuffleSilverRupees = this.settings.shuffle_silver_rupees !== "vanilla";
+    const checkBeatableOnly = this.settings.reachable_locations !== "all";
+    const shuffleSpecialInteriorEntrances = this.settings.shuffle_interior_entrances === "all";
+    const shuffleInteriorEntrances = this.settings.shuffle_interior_entrances === "simple" || this.settings.shuffle_interior_entrances === "all";
+    const shuffleSpecialDungeonEntrances = this.settings.shuffle_dungeon_entrances === "all";
+    const shuffleDungeonEntrances = this.settings.shuffle_dungeon_entrances === "simple" || this.settings.shuffle_dungeon_entrances === "all";
 
     const entranceShuffle =
       shuffleInteriorEntrances ||
@@ -375,7 +375,7 @@ class LogicHelper {
       this.settings.owl_drops ||
       this.settings.warp_songs ||
       this.settings.spawn_positions ||
-      !_.isEqual(this.settings.shuffle_bosses, "off");
+      this.settings.shuffle_bosses !== "off";
 
     const mixedPoolsBosses = false;
 
@@ -407,7 +407,7 @@ class LogicHelper {
   }
 
   static _getItemName(itemName) {
-    return _.replace(itemName, /[() ]/g, match => (_.isEqual(match, " ") ? "_" : ""));
+    return _.replace(itemName, /[() ]/g, match => (match === " " ? "_" : ""));
   }
 
   static _recalculateAccessibleRegions(rootRegion, age) {
@@ -460,10 +460,10 @@ class LogicHelper {
           }
         }
         if (leftValue in this.settings) {
-          return _.isEqual(this.settings[leftValue], rightValue);
+          return this.settings[leftValue] === rightValue;
         }
         if (leftValue in this.renamedAttributes) {
-          return _.isEqual(this.renamedAttributes[leftValue], rightValue);
+          return this.renamedAttributes[leftValue] === rightValue;
         }
         if (leftValue === "age") {
           if (rightValue === "starting_age") {
@@ -487,10 +487,10 @@ class LogicHelper {
           }
         }
         if (leftValue in this.settings) {
-          return !_.isEqual(this.settings[leftValue], rightValue);
+          return this.settings[leftValue] !== rightValue;
         }
         if (leftValue in this.renamedAttributes) {
-          return !_.isEqual(this.renamedAttributes[leftValue], rightValue);
+          return this.renamedAttributes[leftValue] !== rightValue;
         }
         return true;
 
@@ -677,9 +677,9 @@ class LogicHelper {
       case "had_night_start":
         return this._hadNightStart();
       case "is_adult":
-        return _.isEqual(age, "adult");
+        return age === "adult";
       case "is_child":
-        return _.isEqual(age, "child");
+        return age === "child";
 
       case "Big_Poe":
         return this._canAccessDrop("Big Poe");
@@ -738,12 +738,12 @@ class LogicHelper {
     if (name in this.items) {
       if (_.startsWith(name, "Boss_Key_")) {
         // extra check for boss keysy modes
-        if (_.isEqual(name, "Boss_Key_Ganons_Castle")) {
+        if (name === "Boss_Key_Ganons_Castle") {
           // if Ganon's Boss Keys mode is Keysy, ignore Ganon's Boss Key requirements
-          return _.isEqual(this.settings.shuffle_ganon_bosskey, "remove") || this.items[name] > 0;
+          return this.settings.shuffle_ganon_bosskey === "remove" || this.items[name] > 0;
         } else {
           // if Boss Keys mode is Keysy, ignore Boss Key requirements
-          return _.isEqual(this.settings.shuffle_bosskeys, "remove") || this.items[name] > 0;
+          return this.settings.shuffle_bosskeys === "remove" || this.items[name] > 0;
         }
       } else {
         return this.items[name] > 0;
@@ -815,22 +815,22 @@ class LogicHelper {
     let itemCount = node.expressions[1].value;
 
     // if Small Keys mode is Keysy, ignore small key requirements
-    if (_.isEqual(this.settings.shuffle_smallkeys, "remove") && _.startsWith(itemName, "Small_Key_")) {
+    if (this.settings.shuffle_smallkeys === "remove" && _.startsWith(itemName, "Small_Key_")) {
       return true;
     }
 
     // if Silver Rupees mode is Silver Rupeesy, ignore silver rupee requirements
-    if (_.isEqual(this.settings.shuffle_silver_rupees, "remove") && _.startsWith(itemName, "Silver_Rupee_")) {
+    if (this.settings.shuffle_silver_rupees === "remove" && _.startsWith(itemName, "Silver_Rupee_")) {
       return true;
     }
 
     // case for Bottle_with_Big_Poe sequence expression
-    if (_.isEqual(itemName, "Bottle_with_Big_Poe")) {
+    if (itemName === "Bottle_with_Big_Poe") {
       itemCount = this.big_poe_count_random ? 10 : this.settings.big_poe_count;
     }
 
     // account for removed locked door in Fire Temple when keysanity is off
-    if (!this.renamedAttributes.keysanity && _.isEqual(itemName, "Small_Key_Fire_Temple")) {
+    if (!this.renamedAttributes.keysanity && itemName === "Small_Key_Fire_Temple") {
       itemCount -= 1;
     }
 
@@ -838,7 +838,7 @@ class LogicHelper {
   }
 
   static _evalUnaryExpression(node, age) {
-    if (_.isEqual(node.operator, "!")) {
+    if (node.operator === "!") {
       return !this._evalNode(node.argument, age);
     }
 
@@ -847,7 +847,7 @@ class LogicHelper {
 
   static _evalEvent(eventName) {
     // manually implement event to prevent infinite recursion
-    if (_.isEqual(eventName, "Eyeball Frog Access")) {
+    if (eventName === "Eyeball Frog Access") {
       return (
         this._evalEvent("King Zora Thawed") &&
         ((!this.renamedAttributes.disable_trade_revert && (this.items.Eyedrops > 0 || this.items.Eyeball_Frog > 0)) ||

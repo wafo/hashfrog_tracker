@@ -86,7 +86,7 @@ class Locations {
             if (_.startsWith(type, "Hint")) {
               // Ignore hint locations
               return;
-            } else if (_.isEqual(type, "Drop")) {
+            } else if (type === "Drop") {
               // Accessibility of drops is important for logic, but are stored separately from locations
               const dropData = {
                 parentRegion,
@@ -116,7 +116,7 @@ class Locations {
               _.set(this.locations, [locationKey, hintRegion, locationName], locationData);
 
               // Additionally, if the location contains a skulltula token, record that seperately
-              if (_.isEqual(type, "GS Token")) {
+              if (type === "GS Token") {
                 _.set(
                   this.skullsLocations,
                   [locationKey, hintRegion],
@@ -256,12 +256,12 @@ class Locations {
     const itemName = location.vanillaItem;
 
     return (
-      (_.isEqual(itemName, "Boss Key (Ganons Castle)") && _.isEqual(SettingsHelper.getSetting("shuffle_ganon_bosskey"), "vanilla")) ||
-      (_.startsWith(itemName, "Boss Key ") && _.isEqual(SettingsHelper.getSetting("shuffle_bosskeys"), "vanilla")) ||
-      (_.isEqual(itemName, "Small Key (Thieves Hideout)") && _.isEqual(SettingsHelper.getSetting("shuffle_hideoutkeys"), "vanilla")) ||
-      (_.startsWith(itemName, "Silver Rupee ") && _.isEqual(SettingsHelper.getSetting("shuffle_silver_rupees"), "vanilla")) ||
-      (_.startsWith(itemName, "Small Key ") && _.isEqual(SettingsHelper.getSetting("shuffle_smallkeys"), "vanilla")) ||
-      (_.isEqual(itemName, "Small Key (Treasure Chest Game)") && _.isEqual(SettingsHelper.getSetting("shuffle_tcgkeys"), "vanilla"))
+      (itemName === "Boss Key (Ganons Castle)" && SettingsHelper.getSetting("shuffle_ganon_bosskey") === "vanilla") ||
+      (_.startsWith(itemName, "Boss Key ") && SettingsHelper.getSetting("shuffle_bosskeys") === "vanilla") ||
+      (itemName === "Small Key (Thieves Hideout)" && SettingsHelper.getSetting("shuffle_hideoutkeys") === "vanilla") ||
+      (_.startsWith(itemName, "Silver Rupee ") && SettingsHelper.getSetting("shuffle_silver_rupees") === "vanilla") ||
+      (_.startsWith(itemName, "Small Key ") && SettingsHelper.getSetting("shuffle_smallkeys") === "vanilla") ||
+      (itemName === "Small Key (Treasure Chest Game)" && SettingsHelper.getSetting("shuffle_tcgkeys") === "vanilla")
     );
   }
 
@@ -362,19 +362,19 @@ class Locations {
       _.includes(
         ["Triforce", "Scarecrow Song", "Deliver Letter", "Time Travel", "Bombchu Drop"],
         location.vanillaItem,
-      ) || _.isEqual(location.type, "Drop")
+      ) || location.type === "Drop"
     );
   }
 
   static isProgressLocation(location) {
     // source: ItemPool.py get_pool_core()
 
-    if (_.isEqual(location.vanillaItem, "None")) {
+    if (location.vanillaItem === "None") {
       return false;
     }
 
     // Song from Impa
-    else if (_.isEqual(location.locationName, "Song from Impa")) {
+    else if (location.locationName === "Song from Impa") {
       return !SettingsHelper.getRenamedAttribute("skip_child_zelda");
     }
 
@@ -389,21 +389,21 @@ class Locations {
     }
 
     // Gold Skulltula Tokens
-    else if (_.isEqual(location.vanillaItem, "Gold Skulltula Token")) {
+    else if (location.vanillaItem === "Gold Skulltula Token") {
       const tokensanity = SettingsHelper.getSetting("tokensanity");
       return (
-        _.isEqual(tokensanity, "all") ||
-        (_.isEqual(tokensanity, "dungeons") && location.isDungeon) ||
-        (_.isEqual(tokensanity, "overworld") && !location.isDungeon)
+        tokensanity === "all" ||
+        (tokensanity === "dungeons" && location.isDungeon) ||
+        (tokensanity === "overworld" && !location.isDungeon)
       );
     }
 
     // Shops
-    else if (_.isEqual(location.type, "Shop")) {
+    else if (location.type === "Shop") {
       const shopsanity = SettingsHelper.getSetting("shopsanity");
-      if (_.isEqual(shopsanity, "off")) {
+      if (shopsanity === "off") {
         return false;
-      } else if (_.isEqual(shopsanity, "random")) {
+      } else if (shopsanity === "random") {
         return 4 >= _.toInteger(_.slice(location.locationName, -1));
       } else {
         return _.toInteger(shopsanity) >= _.toInteger(_.slice(location.locationName, -1));
@@ -415,22 +415,22 @@ class Locations {
       if (_.includes(["Piece of Heart", "Deku Stick Capacity", "Deku Nut Capacity"], location.vanillaItem)) {
         return true;
       } else {
-        return !_.isEqual(SettingsHelper.getSetting("shuffle_scrubs"), "off");
+        return SettingsHelper.getSetting("shuffle_scrubs") !== "off";
       }
     }
 
     // Kokiri Sword
-    else if (_.isEqual(location.vanillaItem, "Kokiri Sword")) {
+    else if (location.vanillaItem === "Kokiri Sword") {
       return SettingsHelper.getSetting("shuffle_kokiri_sword");
     }
 
     // Ocarinas
-    else if (_.isEqual(location.vanillaItem, "Ocarina")) {
+    else if (location.vanillaItem === "Ocarina") {
       return SettingsHelper.getSetting("shuffle_ocarinas");
     }
 
     // Giant's Knife
-    else if (_.isEqual(location.vanillaItem, "Giants Knife")) {
+    else if (location.vanillaItem === "Giants Knife") {
       return SettingsHelper.getSetting("shuffle_expensive_merchants");
     }
 
@@ -442,43 +442,43 @@ class Locations {
     // Bombchus
     else if (_.includes(["Bombchus", "Bombchus (5)", "Bombchus (10)", "Bombchus (20)"], location.vanillaItem)) {
       return (
-        !_.isEqual(location.locationName, "Wasteland Bombchu Salesman") || SettingsHelper.getSetting("shuffle_expensive_merchants")
+        location.locationName !== "Wasteland Bombchu Salesman" || SettingsHelper.getSetting("shuffle_expensive_merchants")
       );
     }
 
     // Blue Potion from Granny's Potion Shop
-    else if (_.isEqual(location.vanillaItem, "Blue Potion")) {
+    else if (location.vanillaItem === "Blue Potion") {
       return SettingsHelper.getSetting("shuffle_expensive_merchants");
     }
 
     // Cows
-    else if (_.isEqual(location.vanillaItem, "Milk")) {
+    else if (location.vanillaItem === "Milk") {
       return SettingsHelper.getSetting("shuffle_cows");
     }
 
     // Gerudo Card
-    else if (_.isEqual(location.vanillaItem, "Gerudo Membership Card")) {
-      return SettingsHelper.getSetting("shuffle_gerudo_card") && !_.isEqual(SettingsHelper.getSetting("gerudo_fortress"), "open");
+    else if (location.vanillaItem === "Gerudo Membership Card") {
+      return SettingsHelper.getSetting("shuffle_gerudo_card") && SettingsHelper.getSetting("gerudo_fortress") !== "open";
     }
 
     // Magic Beans
-    else if (_.isEqual(location.vanillaItem, "Buy Magic Bean")) {
+    else if (location.vanillaItem === "Buy Magic Bean") {
       return SettingsHelper.getSetting("shuffle_beans");
     }
 
     // Frogs Purple Rupees
-    else if (_.startsWith(location.locationName, "ZR Frogs ") && _.isEqual(location.vanillaItem, "Rupees (50)")) {
+    else if (_.startsWith(location.locationName, "ZR Frogs ") && location.vanillaItem === "Rupees (50)") {
       return SettingsHelper.getSetting("shuffle_frog_song_rupees");
     }
 
     // 100 Gold Skulltula Reward
-    else if (_.isEqual(location.locationName, "Kak 100 Gold Skulltula Reward")) {
+    else if (location.locationName === "Kak 100 Gold Skulltula Reward") {
       return SettingsHelper.getSetting("shuffle_100_skulltula_rupee");
     }
 
     // Hyrule Loach Reward
-    else if (_.isEqual(location.locationName, "LH Loach Fishing")) {
-      return !_.isEqual(SettingsHelper.getSetting("shuffle_loach_reward"), "off");
+    else if (location.locationName === "LH Loach Fishing") {
+      return SettingsHelper.getSetting("shuffle_loach_reward") !== "off";
     }
 
     // Adult Trade Quest Items
@@ -486,55 +486,55 @@ class Locations {
       const adultTradeShuffle = SettingsHelper.getSetting("adult_trade_shuffle");
       const adultTradeStart = SettingsHelper.getSetting("adult_trade_start");
       if (!adultTradeShuffle) {
-        return _.isEqual(location.vanillaItem, "Pocket Egg") && adultTradeStart;
+        return location.vanillaItem === "Pocket Egg" && adultTradeStart;
       } else if (_.includes(adultTradeStart, location.vanillaItem)) {
         return true;
       } else {
-        return _.isEqual(location.vanillaItem, "Pocket Egg") && _.includes(adultTradeStart, "Pocket Cucco");
+        return location.vanillaItem === "Pocket Egg" && _.includes(adultTradeStart, "Pocket Cucco");
       }
     }
 
     // Child Trade Quest Items
     else if (_.includes(CHILD_TRADE_ITEMS, location.vanillaItem)) {
       const shuffleChildTrade = SettingsHelper.getSetting("shuffle_child_trade");
-      if (_.isEqual(location.vanillaItem, "Weird Egg") && SettingsHelper.getRenamedAttribute("skip_child_zelda")) {
+      if (location.vanillaItem === "Weird Egg" && SettingsHelper.getRenamedAttribute("skip_child_zelda")) {
         return false;
       } else if (!shuffleChildTrade) {
         return false;
       } else if (_.includes(shuffleChildTrade, location.vanillaItem)) {
         return true;
       } else {
-        return _.isEqual(location.vanillaItem, "Weird Egg") && _.includes(shuffleChildTrade, "Chicken");
+        return location.vanillaItem === "Weird Egg" && _.includes(shuffleChildTrade, "Chicken");
       }
     }
 
     // Gerudo Fortress Freestanding Heart Piece
-    else if (_.isEqual(location.vanillaItem, "Piece of Heart (Out of Logic)")) {
-      return _.isEqual(SettingsHelper.getSetting("shuffle_gerudo_fortress_heart_piece"), "shuffle");
+    else if (location.vanillaItem === "Piece of Heart (Out of Logic)") {
+      return SettingsHelper.getSetting("shuffle_gerudo_fortress_heart_piece") === "shuffle";
     }
 
     // Thieves' Hideout
-    else if (_.isEqual(location.vanillaItem, "Small Key (Thieves Hideout)")) {
+    else if (location.vanillaItem === "Small Key (Thieves Hideout)") {
       const gerudoFortress = SettingsHelper.getSetting("gerudo_fortress");
       if (
-        _.isEqual(gerudoFortress, "open") ||
-        (_.isEqual(gerudoFortress, "fast") && !_.isEqual(location.locationName, "Hideout 1 Torch Jail Gerudo Key"))
+        gerudoFortress === "open" ||
+        (gerudoFortress === "fast" && location.locationName !== "Hideout 1 Torch Jail Gerudo Key")
       ) {
         return false;
       } else {
-        return !_.isEqual(SettingsHelper.getSetting("shuffle_hideoutkeys"), "vanilla");
+        return SettingsHelper.getSetting("shuffle_hideoutkeys") !== "vanilla";
       }
     }
 
     // Treasure Chest Game Key Shuffle
     else if (
       _.startsWith(location.locationName, "Market Treasure Chest Game ") &&
-      !_.isEqual(location.vanillaItem, "Piece of Heart (Treasure Chest Game)")
+      location.vanillaItem !== "Piece of Heart (Treasure Chest Game)"
     ) {
       const shuffleTcgkeys = SettingsHelper.getSetting("shuffle_tcgkeys");
       if (_.includes(["regional", "overworld", "any_dungeon", "keysanity"], shuffleTcgkeys)) {
         return true;
-      } else if (_.isEqual(shuffleTcgkeys, "remove")) {
+      } else if (shuffleTcgkeys === "remove") {
         return true;
       } else {
         return false;
@@ -544,11 +544,11 @@ class Locations {
     // Freestanding Rupees and Hearts
     else if (_.includes(["ActorOverride", "Freestanding", "RupeeTower"], location.type)) {
       const shuffleFreestanding = SettingsHelper.getSetting("shuffle_freestanding_items");
-      if (_.isEqual(shuffleFreestanding, "all")) {
+      if (shuffleFreestanding === "all") {
         return true;
-      } else if (_.isEqual(shuffleFreestanding, "dungeons") && location.isDungeon) {
+      } else if (shuffleFreestanding === "dungeons" && location.isDungeon) {
         return true;
-      } else if (_.isEqual(shuffleFreestanding, "overworld") && !location.isDungeon) {
+      } else if (shuffleFreestanding === "overworld" && !location.isDungeon) {
         return true;
       } else {
         return false;
@@ -558,11 +558,11 @@ class Locations {
     // Pots
     else if (_.includes(["Pot", "FlyingPot"], location.type)) {
       const shufflePots = SettingsHelper.getSetting("shuffle_pots");
-      if (_.isEqual(shufflePots, "all")) {
+      if (shufflePots === "all") {
         return true;
-      } else if (_.isEqual(shufflePots, "dungeons") && location.isDungeon) {
+      } else if (shufflePots === "dungeons" && location.isDungeon) {
         return true;
-      } else if (_.isEqual(shufflePots, "overworld") && !location.isDungeon) {
+      } else if (shufflePots === "overworld" && !location.isDungeon) {
         return true;
       } else {
         return false;
@@ -572,11 +572,11 @@ class Locations {
     // Crates
     else if (_.includes(["Crate", "SmallCrate"], location.type)) {
       const shuffleCrates = SettingsHelper.getSetting("shuffle_crates");
-      if (_.isEqual(shuffleCrates, "all")) {
+      if (shuffleCrates === "all") {
         return true;
-      } else if (_.isEqual(shuffleCrates, "dungeons") && location.isDungeon) {
+      } else if (shuffleCrates === "dungeons" && location.isDungeon) {
         return true;
-      } else if (_.isEqual(shuffleCrates, "overworld") && !location.isDungeon) {
+      } else if (shuffleCrates === "overworld" && !location.isDungeon) {
         return true;
       } else {
         return false;
@@ -584,26 +584,26 @@ class Locations {
     }
 
     // Beehives
-    else if (_.isEqual(location.type, "Beehive")) {
+    else if (location.type === "Beehive") {
       return SettingsHelper.getSetting("shuffle_beehives");
     }
 
     // Wonderitems
-    else if (_.isEqual(location.type, "Wonderitem")) {
+    else if (location.type === "Wonderitem") {
       return SettingsHelper.getSetting("shuffle_wonderitems");
     }
 
     // Dungeon Rewards
-    else if (_.isEqual(location.locationName, "ToT Reward from Rauru")) {
-      return _.isEqual(SettingsHelper.getSetting("shuffle_dungeon_rewards"), "vanilla");
-    } else if (_.isEqual(location.type, "Boss")) {
+    else if (location.locationName === "ToT Reward from Rauru") {
+      return SettingsHelper.getSetting("shuffle_dungeon_rewards") === "vanilla";
+    } else if (location.type === "Boss") {
       return _.includes(["any_dungeon", "overworld", "regional", "anywhere"], SettingsHelper.getSetting("shuffle_dungeon_rewards"));
     }
 
     // Ganon boss key
-    else if (_.isEqual(location.vanillaItem, "Boss Key (Ganons Castle)")) {
+    else if (location.vanillaItem === "Boss Key (Ganons Castle)") {
       const shuffleGanonBosskey = SettingsHelper.getSetting("shuffle_ganon_bosskey");
-      if (_.isEqual(shuffleGanonBosskey, "vanilla")) {
+      if (shuffleGanonBosskey === "vanilla") {
         return false;
       }
       return _.includes(["remove", "any_dungeon", "overworld", "keysanity", "regional"], shuffleGanonBosskey);
@@ -627,9 +627,9 @@ class Locations {
         return true;
       }
       // Silver Rupee
-      else if (_.isEqual(location.type, "SilverRupee")) {
+      else if (location.type === "SilverRupee") {
         const shuffleSilverRupees = SettingsHelper.getSetting("shuffle_silver_rupees");
-        if (_.isEqual(shuffleSilverRupees, "vanilla")) {
+        if (shuffleSilverRupees === "vanilla") {
           return false;
         } else {
           return true;
@@ -700,7 +700,7 @@ class Locations {
     } else if (_.startsWith(locationName, regionName)) {
       // Trim the full name for the region from the location name
       return _.slice(locationName, _.size(regionName) + 1);
-    } else if (_.isEqual(regionName, "Desert Colossus") && _.startsWith(locationName, "Colossus ")) {
+    } else if (regionName === "Desert Colossus" && _.startsWith(locationName, "Colossus ")) {
       // Special case: locations in the "Desert Colossus" region start with just "Colossus", so trim that off
       return _.slice(locationName, _.size("Colossus "));
     }
