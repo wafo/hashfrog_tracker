@@ -4,6 +4,9 @@ class SettingsHelper {
   static settings = null;
   static renamedAttributes = null;
 
+  static _mqDungeonsSet = null;
+  static _dungeonShortcutsSet = null;
+
   static initialize(bundle) {
     this.defaults = bundle.settingsDefaults || {};
     this.transformations = bundle.settingsTransformations || [];
@@ -14,6 +17,21 @@ class SettingsHelper {
     this.transformations = [];
     this.settings = null;
     this.renamedAttributes = null;
+
+    this._mqDungeonsSet = null;
+    this._dungeonShortcutsSet = null;
+  }
+
+  static _updateCachedSets() {
+    const mqDungeons = this.settings?.mq_dungeons_specific || this.defaults.mq_dungeons_specific || [];
+    this._mqDungeonsSet = new Set(mqDungeons);
+
+    const dungeonShortcuts = this.settings?.dungeon_shortcuts || this.defaults.dungeon_shortcuts || [];
+    this._dungeonShortcutsSet = new Set(dungeonShortcuts);
+  }
+
+  static invalidateCachedSets() {
+    this._updateCachedSets();
   }
 
   static getRenamedAttribute(name, defaultValue = false) {
@@ -25,6 +43,20 @@ class SettingsHelper {
       return this.settings[name];
     }
     return this.defaults[name];
+  }
+
+  static hasDungeonShortcut(regionName) {
+    if (!this._dungeonShortcutsSet) {
+      this._updateCachedSets();
+    }
+    return this._dungeonShortcutsSet.has(regionName);
+  }
+
+  static isMQDungeon(dungeonName) {
+    if (!this._mqDungeonsSet) {
+      this._updateCachedSets();
+    }
+    return this._mqDungeonsSet.has(dungeonName);
   }
 
   static _evaluateConversion(convert, oldValue) {
@@ -70,6 +102,9 @@ class SettingsHelper {
 
     // Merge with defaults so missing fields have values
     this.settings = { ...this.defaults, ...transformed };
+
+    // Update cached Sets
+    this._updateCachedSets();
   }
 
   static setRenamedAttributes(renamedAttributes) {

@@ -179,7 +179,6 @@ class Locations {
   }
 
   static getDropLocations(dropName) {
-    const dungeonsMQ = SettingsHelper.getSetting("mq_dungeons_specific") || [];
     const results = [];
 
     // Check overworld
@@ -191,7 +190,7 @@ class Locations {
 
     // Check dungeons based on MQ settings
     for (const dungeonName of DUNGEONS) {
-      const source = _.includes(dungeonsMQ, dungeonName)
+      const source = SettingsHelper.isMQDungeon(dungeonName)
         ? this.dropLocations.dungeon_mq[dungeonName]
         : this.dropLocations.dungeon[dungeonName];
 
@@ -204,7 +203,6 @@ class Locations {
   }
 
   static getEvent(eventName) {
-    const dungeonsMQ = SettingsHelper.getSetting("mq_dungeons_specific") || [];
     const results = [];
 
     // Check overworld
@@ -216,7 +214,7 @@ class Locations {
 
     // Check dungeons based on MQ settings
     for (const dungeonName of DUNGEONS) {
-      const source = _.includes(dungeonsMQ, dungeonName)
+      const source = SettingsHelper.isMQDungeon(dungeonName)
         ? this.events.dungeon_mq[dungeonName]
         : this.events.dungeon[dungeonName];
 
@@ -229,8 +227,6 @@ class Locations {
   }
 
   static getExitsForRegion(regionName) {
-    const dungeonsMQ = SettingsHelper.getSetting("mq_dungeons_specific") || [];
-
     // Check overworld
     for (const regionExits of Object.values(this.exits.overworld)) {
       if (regionName in regionExits) {
@@ -240,7 +236,7 @@ class Locations {
 
     // Check dungeons based on MQ settings
     for (const dungeonName of DUNGEONS) {
-      const source = _.includes(dungeonsMQ, dungeonName)
+      const source = SettingsHelper.isMQDungeon(dungeonName)
         ? this.exits.dungeon_mq[dungeonName]
         : this.exits.dungeon[dungeonName];
 
@@ -266,7 +262,6 @@ class Locations {
   }
 
   static getKeyLocationsForRegion(regionName) {
-    const dungeonsMQ = SettingsHelper.getSetting("mq_dungeons_specific") || [];
     const results = [];
 
     const addIfGuaranteed = data => {
@@ -286,7 +281,7 @@ class Locations {
 
     // Check dungeons based on MQ settings
     for (const dungeonName of DUNGEONS) {
-      const source = _.includes(dungeonsMQ, dungeonName)
+      const source = SettingsHelper.isMQDungeon(dungeonName)
         ? this.keyLocations.dungeon_mq[dungeonName]
         : this.keyLocations.dungeon[dungeonName];
 
@@ -303,8 +298,6 @@ class Locations {
   }
 
   static getLocation(locationName) {
-    const dungeonsMQ = SettingsHelper.getSetting("mq_dungeons_specific") || [];
-
     // Check overworld first (most common case)
     for (const regionData of Object.values(this.locations.overworld)) {
       if (locationName in regionData) {
@@ -314,7 +307,7 @@ class Locations {
 
     // Check dungeons based on MQ settings
     for (const dungeonName of DUNGEONS) {
-      const source = _.includes(dungeonsMQ, dungeonName)
+      const source = SettingsHelper.isMQDungeon(dungeonName)
         ? this.locations.dungeon_mq[dungeonName]
         : this.locations.dungeon[dungeonName];
 
@@ -327,7 +320,6 @@ class Locations {
   }
 
   static getSkullsLocations() {
-    const dungeonsMQ = SettingsHelper.getSetting("mq_dungeons_specific") || [];
     let results = [];
 
     // Add overworld skulls
@@ -337,7 +329,7 @@ class Locations {
 
     // Add dungeon skulls based on MQ settings
     for (const dungeonName of DUNGEONS) {
-      const source = _.includes(dungeonsMQ, dungeonName)
+      const source = SettingsHelper.isMQDungeon(dungeonName)
         ? this.skullsLocations.dungeon_mq[dungeonName]
         : this.skullsLocations.dungeon[dungeonName];
 
@@ -657,8 +649,6 @@ class Locations {
   }
 
   static *_iterateLocations() {
-    const dungeonsMQ = SettingsHelper.getSetting("mq_dungeons_specific") || [];
-
     // Yield overworld locations
     for (const regionData of Object.values(this.locations.overworld)) {
       for (const [name, data] of Object.entries(regionData)) {
@@ -668,7 +658,7 @@ class Locations {
 
     // Yield dungeon locations based on MQ settings
     for (const dungeonName of DUNGEONS) {
-      const source = _.includes(dungeonsMQ, dungeonName)
+      const source = SettingsHelper.isMQDungeon(dungeonName)
         ? this.locations.dungeon_mq[dungeonName]
         : this.locations.dungeon[dungeonName];
 

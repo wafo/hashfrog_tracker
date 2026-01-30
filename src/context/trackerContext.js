@@ -168,10 +168,11 @@ function reducer(state, action) {
       if (!_.includes(dungeonsMQ, payload)) {
         newDungeonsMQ = _.union(dungeonsMQ, [payload]);
       } else {
-        newDungeonsMQ = _.filter(dungeonsMQ, dungeon => !_.isEqual(dungeon, payload));
+        newDungeonsMQ = _.filter(dungeonsMQ, dungeon => dungeon !== payload);
       }
       _.set(LogicHelper.settings, "mq_dungeons_specific", newDungeonsMQ);
       SettingsHelper.settings["mq_dungeons_specific"] = newDungeonsMQ;
+      SettingsHelper.invalidateCachedSets();
 
       // Modify toggled dungeon to use MQ/non-MQ locations
       const locations = _.cloneDeep(state.locations);
@@ -206,10 +207,11 @@ function reducer(state, action) {
       if (!_.includes(shortcuts, payload)) {
         newShortcuts = _.union(shortcuts, [payload]);
       } else {
-        newShortcuts = _.filter(shortcuts, dungeon => !_.isEqual(dungeon, payload));
+        newShortcuts = _.filter(shortcuts, dungeon => dungeon !== payload);
       }
       _.set(LogicHelper.settings, "dungeon_shortcuts", newShortcuts);
       SettingsHelper.settings["dungeon_shortcuts"] = newShortcuts;
+      SettingsHelper.invalidateCachedSets();
 
       // Revalidate checks based on items collected
       const validatedLocations = validateLocations(

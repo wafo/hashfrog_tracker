@@ -164,16 +164,16 @@ const HintRegion = ({ actions, locations, selectedRegion, setSelectedRegion }) =
   };
   const showMQToggle =
     _.includes(DUNGEONS, selectedRegion) &&
-    (_.isEqual(SettingsHelper.getSetting("mq_dungeons_mode"), "random") ||
-      (_.isEqual(SettingsHelper.getSetting("mq_dungeons_mode"), "count") && SettingsHelper.getSetting("mq_dungeons_count") > 0));
-  const isMQToggled = _.includes(SettingsHelper.getSetting("mq_dungeons_specific"), selectedRegion);
+    (SettingsHelper.getSetting("mq_dungeons_mode") === "random" ||
+      (SettingsHelper.getSetting("mq_dungeons_mode") === "count" && SettingsHelper.getSetting("mq_dungeons_count") > 0));
+  const isMQToggled = SettingsHelper.isMQDungeon(selectedRegion);
 
   const toggleShortcut = () => {
     actions.toggleShortcut(selectedRegion);
   };
   const showShortcutToggle =
-    _.includes(DUNGEON_SHORTCUTS, selectedRegion) && _.isEqual(SettingsHelper.getSetting("dungeon_shortcuts_choice"), "random");
-  const isShortcutToggled = _.includes(SettingsHelper.getSetting("dungeon_shortcuts"), selectedRegion);
+    _.includes(DUNGEON_SHORTCUTS, selectedRegion) && SettingsHelper.getSetting("dungeon_shortcuts_choice") === "random";
+  const isShortcutToggled = SettingsHelper.hasDungeonShortcut(selectedRegion);
 
   const toggleRegion = () => {
     actions.toggleRegion(selectedRegion);

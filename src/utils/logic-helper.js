@@ -97,7 +97,7 @@ class LogicHelper {
       if (!(regionName in Locations.regionMap)) {
         return false;
       }
-      return _.includes(this.settings.dungeon_shortcuts, Locations.regionMap[regionName]);
+      return SettingsHelper.hasDungeonShortcut(Locations.regionMap[regionName]);
     },
 
     has_soul: function (_node, _age) {
