@@ -245,17 +245,21 @@ class LogicHelper {
 
     this.regions = { child: new Set(), adult: new Set() };
 
+    this._invalidateMemoizedFunctions();
+
     let accessibleChildRegions = [];
-    let newChildRegions = this._recalculateAccessibleRegions("Root", "child");
+    const newChildRegions = Array.from(this._recalculateAccessibleRegions("Root", "child"));
 
     let accessibleAdultRegions = [];
-    let newAdultRegions = this._recalculateAccessibleRegions("Root", "adult");
+    const newAdultRegions = Array.from(this._recalculateAccessibleRegions("Root", "adult"));
 
     const guaranteedKeys = {};
     let updatedKeys = false;
 
     do {
       updatedKeys = false;
+
+      this._invalidateMemoizedFunctions();
 
       // NOTE: Must use native forEach for Sets
       this.regions.child.forEach(regionName => {
@@ -285,19 +289,29 @@ class LogicHelper {
         });
       });
 
-      accessibleChildRegions = _.cloneDeep(newChildRegions);
-      accessibleAdultRegions = _.cloneDeep(newAdultRegions);
+      accessibleChildRegions = [...newChildRegions];
+      accessibleAdultRegions = [...newAdultRegions];
 
-      _.forEach(accessibleChildRegions, regionName => {
-        newChildRegions = _.union(newChildRegions, this._recalculateAccessibleRegions(regionName, "child"));
+      accessibleChildRegions.forEach(regionName => {
+        const moreRegions = this._recalculateAccessibleRegions(regionName, "child");
+        moreRegions.forEach(r => {
+          if (!newChildRegions.includes(r)) {
+            newChildRegions.push(r);
+          }
+        });
       });
-      _.forEach(accessibleAdultRegions, regionName => {
-        newAdultRegions = _.union(newAdultRegions, this._recalculateAccessibleRegions(regionName, "adult"));
+      accessibleAdultRegions.forEach(regionName => {
+        const moreRegions = this._recalculateAccessibleRegions(regionName, "adult");
+        moreRegions.forEach(r => {
+          if (!newAdultRegions.includes(r)) {
+            newAdultRegions.push(r);
+          }
+        });
       });
     } while (
       updatedKeys ||
-      !_.isEqual(accessibleChildRegions, newChildRegions) ||
-      !_.isEqual(accessibleAdultRegions, newAdultRegions)
+      accessibleChildRegions.length !== newChildRegions.length ||
+      accessibleAdultRegions.length !== newAdultRegions.length
     );
   }
 
@@ -410,20 +424,16 @@ class LogicHelper {
     return _.replace(itemName, /[() ]/g, match => (match === " " ? "_" : ""));
   }
 
-  static _recalculateAccessibleRegions(rootRegion, age) {
-    this._invalidateMemoizedFunctions();
-
-    let regionsToCheck = [];
-
+  static _recalculateAccessibleRegions(rootRegion, age, regionsToCheck = new Set()) {
     const exits = Locations.getExitsForRegion(rootRegion);
     if (exits) {
       _.forEach(exits, (exitRule, exitName) => {
         if (!this.regions[age].has(exitName)) {
           if (this._evalNode(exitRule, age)) {
             this.regions[age].add(exitName);
-            regionsToCheck = _.union(regionsToCheck, this._recalculateAccessibleRegions(exitName, age));
+            this._recalculateAccessibleRegions(exitName, age, regionsToCheck);
           } else {
-            regionsToCheck = _.union(regionsToCheck, [rootRegion]);
+            regionsToCheck.add(rootRegion);
           }
         }
       });
