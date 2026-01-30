@@ -1,7 +1,7 @@
-const BUNDLED_VERSIONS = new Set(["v9.0", "v8.3"]);
+const BUNDLED_VERSIONS = new Set(["9.0.0", "8.3.0"]);
 
 const DEFAULT_OWNER = "OoTRandomizer";
-const FALLBACK_VERSION = "v9.0";
+const FALLBACK_VERSION = "9.0.0";
 
 function isBundled(version) {
   return BUNDLED_VERSIONS.has(version);
@@ -44,7 +44,21 @@ function normalizeVersion(version) {
     return FALLBACK_VERSION;
   }
 
-  return version;
+  // Dev versions pass through unchanged
+  if (version.startsWith("dev")) {
+    return version;
+  }
+
+  // Remove leading "v" if present
+  let normalized = version.startsWith("v") ? version.slice(1) : version;
+
+  // Add .0 patch version if only major.minor provided
+  const parts = normalized.split(".");
+  if (parts.length === 2) {
+    normalized = `${normalized}.0`;
+  }
+
+  return normalized;
 }
 
 const VersionConfig = {

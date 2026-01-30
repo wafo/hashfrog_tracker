@@ -1,53 +1,80 @@
-import LogicHelper from "./logic-helper";
+class SettingsHelper {
+  static defaults = {};
+  static transformations = [];
+  static settings = null;
+  static renamedAttributes = null;
 
-const SETTING_DEFAULTS = {
-  dungeon_shortcuts_choice: "off",
-  dungeon_shortcuts: [],
-  mq_dungeons_mode: "vanilla",
-  mq_dungeons_specific: [],
-  mq_dungeons_count: 0,
-  shuffle_ganon_bosskey: "vanilla",
-  gerudo_fortress: "fast",
-  shuffle_gerudo_fortress_heart_piece: "remove",
-  shopsanity: "off",
-  tokensanity: "off",
-  shuffle_scrubs: "off",
-  shuffle_child_trade: [],
-  adult_trade_shuffle: false,
-  adult_trade_start: [],
-  shuffle_freestanding_items: "off",
-  shuffle_pots: "off",
-  shuffle_crates: "off",
-  shuffle_cows: false,
-  shuffle_beehives: false,
-  shuffle_wonderitems: false,
-  shuffle_kokiri_sword: true,
-  shuffle_ocarinas: false,
-  shuffle_gerudo_card: false,
-  shuffle_beans: false,
-  shuffle_expensive_merchants: false,
-  shuffle_frog_song_rupees: false,
-  shuffle_100_skulltula_rupee: false,
-  shuffle_loach_reward: "off",
-  shuffle_dungeon_rewards: "reward",
-  shuffle_smallkeys: "dungeon",
-  shuffle_hideoutkeys: "vanilla",
-  shuffle_tcgkeys: "vanilla",
-  shuffle_bosskeys: "dungeon",
-  shuffle_silver_rupees: "vanilla",
-  disabled_locations: [],
-};
-
-function getSetting(name) {
-  const value = LogicHelper.settings?.[name];
-  if (value !== undefined && value !== null) {
-    return value;
+  static initialize(bundle) {
+    this.defaults = bundle.settingsDefaults || {};
+    this.transformations = bundle.settingsTransformations || [];
   }
-  return SETTING_DEFAULTS[name];
+
+  static reset() {
+    this.defaults = {};
+    this.transformations = [];
+    this.settings = null;
+    this.renamedAttributes = null;
+  }
+
+  static getRenamedAttribute(name, defaultValue = false) {
+    return this.renamedAttributes?.[name] ?? defaultValue;
+  }
+
+  static getSetting(name) {
+    if (this.settings && name in this.settings) {
+      return this.settings[name];
+    }
+    return this.defaults[name];
+  }
+
+  static _evaluateConversion(convert, oldValue) {
+    if (typeof convert === "object") {
+      return convert[String(oldValue)] ?? oldValue;
+    }
+
+    if (typeof convert === "string" && convert.includes("?")) {
+      const match = convert.match(/oldValue\s*\?\s*['"]([^'"]+)['"]\s*:\s*['"]([^'"]+)['"]/);
+      if (match) {
+        return oldValue ? match[1] : match[2];
+      }
+    }
+
+    return oldValue;
+  }
+
+  static _applyTransformations(settings) {
+    const result = { ...settings };
+
+    for (const transform of this.transformations) {
+      // Only apply if old field exists and new field doesn't
+      if (transform.from in result && !(transform.to in result)) {
+        const oldValue = result[transform.from];
+
+        if (transform.convert) {
+          // Apply the conversion
+          result[transform.to] = this._evaluateConversion(transform.convert, oldValue);
+        } else {
+          result[transform.to] = oldValue;
+        }
+
+        delete result[transform.from];
+      }
+    }
+
+    return result;
+  }
+
+  static setSettings(settings) {
+    // Apply transformations to convert old field names to current ones
+    const transformed = this._applyTransformations(settings);
+
+    // Merge with defaults so missing fields have values
+    this.settings = { ...this.defaults, ...transformed };
+  }
+
+  static setRenamedAttributes(renamedAttributes) {
+    this.renamedAttributes = renamedAttributes;
+  }
 }
 
-function getRenamedAttribute(name, defaultValue = false) {
-  return LogicHelper.renamedAttributes?.[name] ?? defaultValue;
-}
-
-export { getRenamedAttribute, getSetting, SETTING_DEFAULTS };
+export default SettingsHelper;

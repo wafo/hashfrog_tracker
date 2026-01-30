@@ -3,6 +3,7 @@ import memoize from "memoizee";
 
 import Locations from "./locations";
 import { parseRule } from "./rule-parser";
+import SettingsHelper from "./settings-helper";
 
 import DUNGEON_CONFIG from "../data/dungeon-config.json";
 import DUNGEONS from "../data/dungeons.json";
@@ -203,6 +204,9 @@ class LogicHelper {
     });
 
     this.renamedAttributes = this._initRenamedAttributes();
+
+    // Share renamedAttributes with SettingsHelper to break circular dependency
+    SettingsHelper.setRenamedAttributes(this.renamedAttributes);
 
     if (
       _.isEqual(this.settings.open_forest, "closed") &&

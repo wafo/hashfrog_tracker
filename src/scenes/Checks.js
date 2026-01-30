@@ -8,7 +8,7 @@ import DUNGEONS from "../data/dungeons.json";
 import HINT_REGIONS_SHORT_NAMES from "../data/hint-regions-short-names.json";
 import Locations from "../utils/locations";
 import LogicHelper from "../utils/logic-helper";
-import { getSetting } from "../utils/settings-helper";
+import SettingsHelper from "../utils/settings-helper";
 
 const Checks = () => {
   const { state: layoutContext } = useLayout();
@@ -36,8 +36,8 @@ const Checks = () => {
         // so that the user can toggle to MQ.
         if (!locationAddedForRegion && _.includes(DUNGEONS, regionName)) {
           const showMQToggle =
-            _.isEqual(getSetting("mq_dungeons_mode"), "random") ||
-            (_.isEqual(getSetting("mq_dungeons_mode"), "count") && getSetting("mq_dungeons_count") > 0);
+            _.isEqual(SettingsHelper.getSetting("mq_dungeons_mode"), "random") ||
+            (_.isEqual(SettingsHelper.getSetting("mq_dungeons_mode"), "count") && SettingsHelper.getSetting("mq_dungeons_count") > 0);
 
           const hasPossibleLocations =
             _.some(_.values(Locations.locations.dungeon[regionName]), locationData => {
@@ -162,16 +162,16 @@ const HintRegion = ({ actions, locations, selectedRegion, setSelectedRegion }) =
   };
   const showMQToggle =
     _.includes(DUNGEONS, selectedRegion) &&
-    (_.isEqual(getSetting("mq_dungeons_mode"), "random") ||
-      (_.isEqual(getSetting("mq_dungeons_mode"), "count") && getSetting("mq_dungeons_count") > 0));
-  const isMQToggled = _.includes(getSetting("mq_dungeons_specific"), selectedRegion);
+    (_.isEqual(SettingsHelper.getSetting("mq_dungeons_mode"), "random") ||
+      (_.isEqual(SettingsHelper.getSetting("mq_dungeons_mode"), "count") && SettingsHelper.getSetting("mq_dungeons_count") > 0));
+  const isMQToggled = _.includes(SettingsHelper.getSetting("mq_dungeons_specific"), selectedRegion);
 
   const toggleShortcut = () => {
     actions.toggleShortcut(selectedRegion);
   };
   const showShortcutToggle =
-    _.includes(DUNGEON_SHORTCUTS, selectedRegion) && _.isEqual(getSetting("dungeon_shortcuts_choice"), "random");
-  const isShortcutToggled = _.includes(getSetting("dungeon_shortcuts"), selectedRegion);
+    _.includes(DUNGEON_SHORTCUTS, selectedRegion) && _.isEqual(SettingsHelper.getSetting("dungeon_shortcuts_choice"), "random");
+  const isShortcutToggled = _.includes(SettingsHelper.getSetting("dungeon_shortcuts"), selectedRegion);
 
   const toggleRegion = () => {
     actions.toggleRegion(selectedRegion);

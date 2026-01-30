@@ -1,4 +1,5 @@
 import LogicHelpers from "./LogicHelpers.json";
+import SettingsDefaults from "./settings-defaults.json";
 import Bosses from "./Bosses.json";
 import Overworld from "./Overworld.json";
 import DekuTree from "./Deku Tree.json";
@@ -28,6 +29,8 @@ import GerudoTrainingGroundMQ from "./Gerudo Training Ground MQ.json";
 
 export default {
   logicHelpersFile: LogicHelpers,
+  settingsDefaults: SettingsDefaults,
+  settingsTransformations: [],
   bossesFile: Bosses,
   overworldFile: Overworld,
   dungeonFiles: {

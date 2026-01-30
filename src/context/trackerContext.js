@@ -8,7 +8,7 @@ import SettingStringsJSON from "../data/setting-strings.json";
 import UUID_TO_ITEM from "../data/uuid-to-item.json";
 import Locations from "../utils/locations";
 import LogicHelper from "../utils/logic-helper";
-import { getRenamedAttribute, getSetting } from "../utils/settings-helper";
+import SettingsHelper from "../utils/settings-helper";
 
 const GENERATOR_VERSION = process.env.REACT_APP_GENERATOR_VERSION;
 
@@ -44,7 +44,7 @@ const TrackerContext = createContext();
 
 function parseItems(items_list, counters, unchanged_starting_inventory) {
   const items = _.cloneDeep(DEFAULT_ITEMS);
-  const tradeRevert = !getSetting("adult_trade_shuffle") && !getRenamedAttribute("disable_trade_revert");
+  const tradeRevert = !SettingsHelper.getSetting("adult_trade_shuffle") && !SettingsHelper.getRenamedAttribute("disable_trade_revert");
 
   _.forEach(_.union(_.values(items_list), unchanged_starting_inventory), uuid => {
     const mapping = UUID_TO_ITEM[uuid];

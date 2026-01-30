@@ -4,6 +4,7 @@ import { getGeneratorVersionCache, getSettingsStringCache, useItems } from "../c
 import Locations from "../utils/locations";
 import LogicHelper from "../utils/logic-helper";
 import LogicLoader from "../utils/logic-loader";
+import SettingsHelper from "../utils/settings-helper";
 
 const useLogicInitialization = (options = {}) => {
   const { skip = false } = options;
@@ -23,8 +24,11 @@ const useLogicInitialization = (options = {}) => {
       const settingsString = getSettingsStringCache();
 
       // Load logic files for the specific generator version
-      const { logicHelpersFile, dungeonFiles, dungeonMQFiles, bossesFile, overworldFile } =
-        await LogicLoader.loadLogicFiles(generatorVersion);
+      const bundle = await LogicLoader.loadLogicFiles(generatorVersion);
+      const { logicHelpersFile, dungeonFiles, dungeonMQFiles, bossesFile, overworldFile } = bundle;
+
+      // Initialize SettingsHelper with version-specific defaults
+      SettingsHelper.initialize(bundle);
 
       Locations.initialize(dungeonFiles, dungeonMQFiles, bossesFile, overworldFile);
 
@@ -37,6 +41,9 @@ const useLogicInitialization = (options = {}) => {
           settingsString: settingsString,
         }),
       ).then(response => response.json());
+
+      // Set settings on SettingsHelper
+      SettingsHelper.setSettings(settings);
 
       LogicHelper.initialize(logicHelpersFile, settings);
       updateItemsFromLogic(settings); // Starting items.

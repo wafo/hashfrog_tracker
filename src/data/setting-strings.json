@@ -3,28 +3,28 @@
     {
       "label": "Tournament S9",
       "value": "tournament_s9",
-      "generatorVersion": "v9.0",
+      "generatorVersion": "9.0.0",
       "settingsString": "BSAWDNCAX2TB2WCHGAB3L62ANAEACAAAJAEACACA2DAAGXMAASASECCAWAATSLBAASAGADWBRAJSD8EJQ4VNFAGSCWEV43CAAABAEZAAVHC2HMJAD25ASATBUDWEARAAACALEJGUBC",
       "description": "The official tournament settings for S9."
     },
     {
       "label": "League S9",
       "value": "league_s9",
-      "generatorVersion": "v9.0",
+      "generatorVersion": "9.0.0",
       "settingsString": "BSAXDNCAX2TB2TCHGAK3L62ANAEACAAAJAAAG4AAWAASK7CAAECETSAAFAAWAJXAAAJADSB4SHAEBUV8EMBSBWAF3WQYAAAJAA3CYPQBSBA2A9WBTPA9BACGJQSU4A6BUDJAJTA3JGE",
       "description": "The official settings for League Season 9."
     },
     {
       "label": "Scrubs S7",
       "value": "scrubs_s7",
-      "generatorVersion": "v9.0",
+      "generatorVersion": "9.0.0",
       "settingsString": "BSAWDNCAX2TBJYCHGABSL62ANAEACA2ASAAAGSAA8AAYAAABAKEEAJBABBXAWLAHF8WJNF98B6ZS9E852RE9X6HV9AASAGADWBRAJCEH7KYCAF3WQYAAAJLNBA3CGZA2AAESR4S2GSMBADEGHQA8A8BEAWJSNEDC",
       "description": "The official settings for Scrubs Tournament Season 7."
     },
     {
       "label": "SGL 2025",
       "value": "sgl_2025",
-      "generatorVersion": "v9.0",
+      "generatorVersion": "9.0.0",
       "settingsString": "BSAND6CAX2TBJX4GGABZL62ANAEABASACEAAABABA6BANBAACAUJJASCACCLBJXAQL6KBAACABNAGJD8AS6GBUV8EMBSBWAF3WQYAAAJAA3CGZA2AAESR4S2GSRBABDEGHA8CARABAFCED3SA",
       "description": "The official settings for SpeedGaming Live 2025."
     }
