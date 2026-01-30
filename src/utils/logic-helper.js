@@ -4,21 +4,201 @@ import memoize from "memoizee";
 import Locations from "./locations";
 import { parseRule } from "./rule-parser";
 
-import DUNGEONS from "../data/dungeons.json";
 import DUNGEON_CONFIG from "../data/dungeon-config.json";
+import DUNGEONS from "../data/dungeons.json";
 import MASK_LOCATIONS from "../data/mask-locations.json";
-import TRADE_SEQUENCE from "../data/trade-sequence.json";
-import SONG_NOTES from "../data/song-notes.json";
 import SHOP_RULES from "../data/shop-rules.json";
+import SONG_NOTES from "../data/song-notes.json";
+import TRADE_SEQUENCE from "../data/trade-sequence.json";
 
 class LogicHelper {
+  static BUILTIN_FUNCTIONS = {
+    // source: State.py
+
+    has_hearts: function (node, _age) {
+      const countArg = node.arguments[0];
+      const requiredCount = countArg.type === "Identifier" ? this.settings[countArg.name] || 0 : countArg.value;
+
+      const pieces = this.items.Piece_of_Heart || 0;
+      const containers = this.items.Heart_Container || 0;
+      const totalHearts = Math.floor(pieces / 4) + containers + 3;
+      return totalHearts >= requiredCount;
+    },
+
+    has_medallions: function (node, _age) {
+      const countArg = node.arguments[0];
+      const requiredCount = countArg.type === "Identifier" ? this.settings[countArg.name] || 0 : countArg.value;
+
+      const medallions = [
+        "Forest_Medallion",
+        "Fire_Medallion",
+        "Water_Medallion",
+        "Spirit_Medallion",
+        "Shadow_Medallion",
+        "Light_Medallion",
+      ];
+      const count = medallions.filter(m => this.items[m] > 0).length;
+      return count >= requiredCount;
+    },
+
+    has_stones: function (node, _age) {
+      const countArg = node.arguments[0];
+      const requiredCount = countArg.type === "Identifier" ? this.settings[countArg.name] || 0 : countArg.value;
+
+      const stones = ["Kokiri_Emerald", "Goron_Ruby", "Zora_Sapphire"];
+      const count = stones.filter(s => this.items[s] > 0).length;
+      return count >= requiredCount;
+    },
+
+    has_dungeon_rewards: function (node, _age) {
+      const countArg = node.arguments[0];
+      const requiredCount = countArg.type === "Identifier" ? this.settings[countArg.name] || 0 : countArg.value;
+
+      const rewards = [
+        "Kokiri_Emerald",
+        "Goron_Ruby",
+        "Zora_Sapphire",
+        "Forest_Medallion",
+        "Fire_Medallion",
+        "Water_Medallion",
+        "Spirit_Medallion",
+        "Shadow_Medallion",
+        "Light_Medallion",
+      ];
+      const count = rewards.filter(r => this.items[r] > 0).length;
+      return count >= requiredCount;
+    },
+
+    can_live_dmg: function (node, age) {
+      const heartsArg = node.arguments[0];
+      const hearts = heartsArg.value;
+
+      const allowReviveArg = node.arguments[1];
+      const allowRevive = allowReviveArg ? allowReviveArg.name !== "False" && allowReviveArg.value !== false : true;
+
+      const allowNayrusArg = node.arguments[2];
+      const allowNayrus = allowNayrusArg ? allowNayrusArg.name !== "False" && allowNayrusArg.value !== false : true;
+
+      const mult = this.settings.damage_multiplier;
+      const hasNayrus = allowNayrus && this.items.Nayrus_Love > 0 && this.items.Magic_Meter > 0;
+      const hasFairy = allowRevive && this._evalNode(parseRule("Fairy"), age);
+
+      if (mult === "ohko") {
+        return hasFairy || hasNayrus;
+      } else if (mult === "quad") {
+        return hearts < 0.75 || hasFairy || hasNayrus;
+      } else if (mult === "double") {
+        return hearts < 1.5 || hasFairy || hasNayrus;
+      } else if (mult === "normal") {
+        return hearts < 3 || hasFairy || hasNayrus;
+      } else if (mult === "half") {
+        return hearts < 6 || hasFairy || hasNayrus;
+      }
+      return false;
+    },
+
+    region_has_shortcuts: function (node, _age) {
+      const regionArg = node.arguments[0];
+      const regionName = regionArg.type === "Identifier" ? regionArg.name : regionArg.value;
+
+      if (!(regionName in Locations.regionMap)) {
+        return false;
+      }
+      return _.includes(this.settings.dungeon_shortcuts, Locations.regionMap[regionName]);
+    },
+
+    has_soul: function (_node, _age) {
+      // const enemyName = node.arguments[0].type === "Identifier" ? node.arguments[0].name : node.arguments[0].value;
+      // return !this.settings.shuffle_enemy_souls || this.items[`${enemyName}_Soul`] > 0;
+      return true;
+    },
+
+    has_all_notes_for_song: function (node, _age) {
+      if (!this.settings.shuffle_individual_ocarina_notes) {
+        return true;
+      }
+
+      const songArg = node.arguments[0];
+      const songName = songArg.type === "Identifier" ? songArg.name : songArg.value;
+
+      // Scarecrow needs 2 different notes
+      if (songName === "Scarecrow_Song" || songName === "Scarecrow Song") {
+        if (this.settings.scarecrow_behavior === "free") {
+          return true;
+        }
+        const buttons = [
+          "Ocarina_A_Button",
+          "Ocarina_C_up_Button",
+          "Ocarina_C_down_Button",
+          "Ocarina_C_left_Button",
+          "Ocarina_C_right_Button",
+        ];
+        const count = buttons.filter(b => this.items[b] > 0).length;
+        return count >= 2;
+      }
+
+      // Other songs
+      const normalizedName = songName.replace(/_/g, " ").replace(/'/g, "");
+      if (normalizedName in SONG_NOTES) {
+        return SONG_NOTES[normalizedName].every(button => this.items[button] > 0);
+      }
+      if (songName in SONG_NOTES) {
+        return SONG_NOTES[songName].every(button => this.items[button] > 0);
+      }
+
+      return true;
+    },
+
+    // Internal functions
+    // source: RuleParser.py
+    at: function (node, _age) {
+      const spotToCheck = node.arguments[0].value;
+      const expression = node.arguments[1];
+      return (
+        (this._isRegionAccessible(spotToCheck, "child") && this._evalNode(expression, "child")) ||
+        (this._isRegionAccessible(spotToCheck, "adult") && this._evalNode(expression, "adult"))
+      );
+    },
+
+    here: function (node, age) {
+      return this._evalNode(node.arguments[0], age);
+    },
+
+    at_day: function (_node, _age) {
+      return true;
+    },
+
+    at_dampe_time: function (_node, _age) {
+      return true;
+    },
+
+    at_night: function (_node, _age) {
+      return true;
+    },
+  };
+
   static async initialize(logicHelpersFile, settings) {
     this.settings = settings;
 
     this.ruleAliases = {};
+    this.parameterizedAliases = {};
     _.forEach(logicHelpersFile, (rule, alias) => {
-      if (!_.endsWith(alias, ")")) {
-        _.set(this.ruleAliases, alias, this.parseRule(rule));
+      if (alias.includes("(")) {
+        const match = alias.match(/^([a-zA-Z_][a-zA-Z0-9_]*)\(([^)]+)\)$/);
+        if (match) {
+          const funcName = match[1];
+          const paramNames = match[2].split(",").map(p => p.trim());
+
+          // Create regex patterns for each parameter
+          const paramPatterns = paramNames.map(p => new RegExp(`\\b${p}\\b`, "g"));
+          this.parameterizedAliases[funcName] = {
+            params: paramNames,
+            patterns: paramPatterns,
+            template: rule,
+          };
+        }
+      } else {
+        _.set(this.ruleAliases, alias, parseRule(rule));
       }
     });
 
@@ -90,7 +270,7 @@ class LogicHelper {
               this._evalNode(keyLocation.rule, "child")
             ) {
               _.set(guaranteedKeys, keyLocation.locationName, true);
-              _.update(this.items, LogicHelper._getItemName(keyLocation.vanillaItem), count => count + 1);
+              _.update(this.items, this._getItemName(keyLocation.vanillaItem), count => count + 1);
               updatedKeys = true;
             }
           });
@@ -104,7 +284,7 @@ class LogicHelper {
               this._evalNode(keyLocation.rule, "adult")
             ) {
               _.set(guaranteedKeys, keyLocation.locationName, true);
-              _.update(this.items, LogicHelper._getItemName(keyLocation.vanillaItem), count => count + 1);
+              _.update(this.items, this._getItemName(keyLocation.vanillaItem), count => count + 1);
               updatedKeys = true;
             }
           });
@@ -127,10 +307,6 @@ class LogicHelper {
     );
   }
 
-  static parseRule(ruleString) {
-    return parseRule(ruleString);
-  }
-
   static isLocationAvailable(locationName, age) {
     const parentRegion = Locations.activeLocations[locationName].parentRegion;
     const locationRule = Locations.activeLocations[locationName].rule;
@@ -144,7 +320,7 @@ class LogicHelper {
 
   static countSkullsInLogic() {
     return _.size(
-      _.filter(Locations.activeSkullsLocations, locationName => LogicHelper.isLocationAvailable(locationName)),
+      _.filter(Locations.activeSkullsLocations, locationName => this.isLocationAvailable(locationName)),
     );
   }
 
@@ -268,125 +444,215 @@ class LogicHelper {
     }
   }
 
-  static _evalNode(node, age) {
-    switch (node.type) {
-      case "BinaryExpression":
-        return this._evalBinaryExpression(node);
-      case "CallExpression":
-        return this._evalCallExpression(node, age);
-      case "ExpressionStatement":
-        return this._evalNode(node.expression, age);
-      case "Identifier":
-        return this._evalIdentifier(node.name, age);
-      case "Literal":
-        return this._evalLiteral(node.value, age);
-      case "LogicalExpression":
-        return this._evalLogicalExpression(node, age);
-      case "MemberExpression":
-        return this._evalMemberExpression();
-      case "SequenceExpression":
-        return this._evalSequenceExpression(node, age);
-      case "UnaryExpression":
-        return this._evalUnaryExpression(node, age);
-      default:
-        throw Error(`Unknown AST node of type ${node.type}`);
-    }
-  }
-
   static _evalBinaryExpression(node) {
-    const leftSide = _.isEqual(node.left.type, "Identifier") ? node.left.name : node.left.value;
-    const rightSide = _.isEqual(node.right.type, "Identifier") ? node.right.name : node.right.value;
+    const leftNode = node.left;
+    const rightNode = node.right;
+    const leftValue = leftNode.type === "Identifier" ? leftNode.name : leftNode.value;
+    const rightValue = rightNode.type === "Identifier" ? rightNode.name : rightNode.value;
+
     switch (node.operator) {
       case "==":
-        if (leftSide in this.settings) {
-          return _.isEqual(this.settings[leftSide], rightSide);
-        } else if (_.isEqual(leftSide, "selected_adult_trade_item")) {
-          return _.includes(this.items, rightSide);
-        } else if (_.isEqual(leftSide, "age") && _.isEqual(rightSide, "starting_age")) {
-          return true; //TODO: don't hardcode this
+        if (leftNode.type === "Identifier" && rightNode.type === "Identifier") {
+          const leftIsSettingOrAttribute = leftValue in this.settings || leftValue in this.renamedAttributes;
+          const rightIsSettingOrAttribute = rightValue in this.settings || rightValue in this.renamedAttributes;
+
+          if (!leftIsSettingOrAttribute && !rightIsSettingOrAttribute) {
+            return leftValue === rightValue;
+          }
         }
-        else {
+        if (leftValue in this.settings) {
+          return _.isEqual(this.settings[leftValue], rightValue);
+        }
+        if (leftValue in this.renamedAttributes) {
+          return _.isEqual(this.renamedAttributes[leftValue], rightValue);
+        }
+        if (leftValue === "age") {
+          if (rightValue === "starting_age") {
+            return true; // TODO: don't hardcode this
+          }
           return false;
         }
+        else if (leftValue === "selected_adult_trade_item") {
+          return _.includes(this.items, rightValue);
+        }
+        return false;
+
       case "!=":
-        if (leftSide in this.settings) {
-          return !_.isEqual(this.settings[leftSide], rightSide);
+        if (leftNode.type === "Identifier" && rightNode.type === "Identifier") {
+          const leftIsSettingOrAttribute = leftValue in this.settings || leftValue in this.renamedAttributes;
+          const rightIsSettingOrAttribute = rightValue in this.settings || rightValue in this.renamedAttributes;
+
+          if (!leftIsSettingOrAttribute && !rightIsSettingOrAttribute) {
+            return leftValue !== rightValue;
+          }
         }
-        break;
+        if (leftValue in this.settings) {
+          return !_.isEqual(this.settings[leftValue], rightValue);
+        }
+        if (leftValue in this.renamedAttributes) {
+          return !_.isEqual(this.renamedAttributes[leftValue], rightValue);
+        }
+        return true;
+
       case "<":
-        if (leftSide in this.settings) {
-          return this.settings[leftSide] < rightSide;
+        if (leftValue in this.settings) {
+          return this.settings[leftValue] < rightValue;
         }
-        break;
+        throw Error(`Unable to eval BinaryExpression: ${leftValue} < ${rightValue}`);
+
       case "in":
-        if (rightSide in this.settings) {
-          return _.includes(this.settings[rightSide], leftSide);
-        } else {
-          return false;
+        if (rightValue in this.settings) {
+          return _.includes(this.settings[rightValue], leftValue);
         }
+        return false;
+
     }
 
-    throw Error(`Unable to eval BinaryExpression: ${leftSide} ${node.operator} ${rightSide}`);
+    throw Error(`Unable to eval BinaryExpression: ${leftValue} ${node.operator} ${rightValue}`);
+  }
+
+  static _substituteParameters(template, patterns, argValues) {
+    let result = template;
+    patterns.forEach((pattern, i) => {
+      result = result.replace(pattern, argValues[i]);
+    });
+    return result;
   }
 
   static _evalCallExpression(node, age) {
-    const arg = node.arguments[0].name;
-    switch (node.callee.name) {
-      case "at":
-        return this._at(node);
-      case "at_night":
-        // TODO: this is hardcoded for now
-        return true;
-      case "can_play":
-      case "can_play_ocarina":
-        return this._canPlay(arg);
-      case "can_use":
-        return this._canUse(arg, age);
-      case "has_dungeon_rewards":
-        return this._hasDungeonRewards(arg);
-      case "has_hearts":
-        return this._hasHearts(arg);
-      case "has_medallions":
-        return this._hasMedallions(arg);
-      case "has_projectile":
-        return this._hasProjectile(arg, age);
-      case "has_stones":
-        return this._hasStones(arg);
-      case "here":
-        return this._evalNode(node.arguments[0], age);
-      // Hardcoded (TODO: don't hardcode this)
-      case "region_has_shortcuts":
-        return this._regionHasShortcuts(node.arguments[0].value);
-      case "has_all_notes_for_song":
-        // TODO: this is hardcoded for now
-        return true;
-      default:
-        throw Error(`Unknown CallExpression: ${node.callee.name}`);
+    const funcName = node.callee.name;
+
+    // Check built-in functions
+    if (funcName in this.BUILTIN_FUNCTIONS) {
+      return this.BUILTIN_FUNCTIONS[funcName].call(this, node, age);
     }
+
+    // Check parameterized aliases
+    if (funcName in this.parameterizedAliases) {
+      const { params, patterns, template } = this.parameterizedAliases[funcName];
+
+      // Extract argument values as strings
+      const argValues = node.arguments.map(arg => {
+        if (arg.type === "Identifier") {
+          return arg.name;
+        }
+        if (arg.type === "Literal") {
+          return typeof arg.value === "string" ? arg.value : String(arg.value);
+        }
+        throw Error(`Unsupported argument type in ${funcName}: ${arg.type}`);
+      });
+
+      // Validate argument count
+      if (argValues.length !== params.length) {
+        throw Error(`Expected ${params.length} args for ${funcName}, got ${argValues.length}`);
+      }
+
+      // Substitute parameters with strings
+      const substituted = this._substituteParameters(template, patterns, argValues);
+
+      // Parse substituted string and evaluate
+      const parsedRule = parseRule(substituted);
+      return this._evalNode(parsedRule, age);
+    }
+
+    throw Error(`Unknown CallExpression: ${funcName}`);
+  }
+
+  static _canAccessDrop(dropName) {
+    return _.some(Locations.activeDropLocations[dropName], locationData => {
+      const parentRegion = locationData.parentRegion;
+      const rule = locationData.rule;
+
+      const asChild = this._isRegionAccessible(parentRegion, "child") && this._evalNode(rule, "child");
+      const asAdult = this._isRegionAccessible(parentRegion, "adult") && this._evalNode(rule, "adult");
+
+      return asChild || asAdult;
+    });
+  }
+
+  static _canBuy(itemName, age) {
+    const rules = [];
+
+    if (_.includes(SHOP_RULES.walletRequired, itemName)) {
+      rules.push("Progressive_Wallet");
+    } else if (_.includes(SHOP_RULES.wallet2Required, itemName)) {
+      rules.push("(Progressive_Wallet, 2)");
+    }
+
+    if (_.includes(SHOP_RULES.adultRequired, itemName)) {
+      rules.push("is_adult");
+    }
+
+    if (_.includes(SHOP_RULES.bottleRequired, itemName)) {
+      rules.push("has_bottle");
+    }
+
+    if (_.includes(SHOP_RULES.bombchusRequired, itemName)) {
+      rules.push("found_bombchus");
+    }
+
+    if (_.isEmpty(rules)) {
+      return true;
+    } else {
+      const combinedRule = _.join(rules, " and ");
+      return this._evalNode(parseRule(combinedRule), age);
+    }
+  }
+
+  static _evalRuleAlias(ruleName) {
+    const rule = this.ruleAliases[ruleName];
+
+    const asChild = this._evalNode(rule, "child");
+    const asAdult = this._evalNode(rule, "adult");
+
+    return asChild || asAdult;
+  }
+
+  static _hadNightStart() {
+    const stod = this.settings.starting_tod;
+    return _.includes(["sunset", "evening", "midnight", "witching-hour"], stod);
+  }
+
+  static _hasBottle() {
+    return this.items.Bottle > 0 || this.isLocationAvailable("Deliver Rutos Letter");
   }
 
   static _evalIdentifier(name, age) {
     switch (name) {
       case "True":
         return true;
-      case "had_night_start":
-        return this._hadNightStart();
+
       case "has_bottle":
         return this._hasBottle();
-      case "Big_Poe":
-        return this._canAccessDrop("Big Poe");
-      case "Bombchu_Drop":
-        return this.isLocationAvailable("Market Bombchu Bowling Bombchus");
-      case "Deliver_Letter":
-        return this.isLocationAvailable("Deliver Rutos Letter");
-      case "Time_Travel":
-        return this.isLocationAvailable("Master Sword Pedestal");
-
-      case "is_child":
-        return _.isEqual(age, "child");
+      case "had_night_start":
+        return this._hadNightStart();
       case "is_adult":
         return _.isEqual(age, "adult");
+      case "is_child":
+        return _.isEqual(age, "child");
 
+      case "Big_Poe":
+        return this._canAccessDrop("Big Poe");
+      case "Blue_Fire_Arrows":
+        return this.settings.blue_fire_arrows && this.items.Ice_Arrows > 0;
+      case "Bombchu_Drop":
+        return this.isLocationAvailable("Market Bombchu Bowling Bombchus");
+      case "Deku_Nut_Drop":
+        return this._canAccessDrop("Deku Nut Drop");
+      case "Deku_Shield_Drop":
+        return this._canAccessDrop("Deku Shield Drop");
+      case "Deku_Stick_Drop":
+        return this._canAccessDrop("Deku Stick Drop");
+      case "Deliver_Letter":
+        return this.isLocationAvailable("Deliver Rutos Letter");
+      case "Scarecrow_Song":
+        return (
+          this.settings.scarecrow_behavior === "free" ||
+          this.settings.scarecrow_behavior === "fast" ||
+          (age === "adult" && this._evalEvent("Bonooru"))
+        );
+      case "Time_Travel":
+        return this.isLocationAvailable("Master Sword Pedestal");
       case "Zeldas_Letter":
         return (
           this.items[name] > 0 ||
@@ -403,8 +669,8 @@ class LogicHelper {
       const trade = TRADE_SEQUENCE[name];
       return (
         this.items[name] > 0 ||
-        ((!LogicHelper.settings.adult_trade_shuffle ||
-          !_.includes(LogicHelper.settings.adult_trade_start, trade.tradeStartName)) &&
+        ((!this.settings.adult_trade_shuffle ||
+          !_.includes(this.settings.adult_trade_start, trade.tradeStartName)) &&
           this.isLocationAvailable(trade.location, "adult"))
       );
     }
@@ -447,8 +713,11 @@ class LogicHelper {
     if (_.startsWith(name, "Buy_")) {
       return this._canBuy(name, age);
     }
+    if (_.startsWith(name, "adv_") || _.startsWith(name, "glitch_")) {
+      return _.includes(this.settings.advanced_allowed_tricks, name);
+    }
 
-    throw Error(`Unknown identifier: ${name}`);
+    throw Error(`Unknown Identifier: ${name}`);
   }
 
   static _evalLiteral(value) {
@@ -516,123 +785,6 @@ class LogicHelper {
     throw Error(`Unknown unary operator: ${node.operator}`);
   }
 
-  static _at(node) {
-    const spotToCheck = node.arguments[0].value;
-    const expression = node.arguments[1];
-
-    return (
-      (this._isRegionAccessible(spotToCheck, "child") && this._evalNode(expression, "child")) ||
-      (this._isRegionAccessible(spotToCheck, "adult") && this._evalNode(expression, "adult"))
-    );
-  }
-
-  static _canAccessDrop(dropName) {
-    return _.some(Locations.activeDropLocations[dropName], locationData => {
-      const parentRegion = locationData.parentRegion;
-      const rule = locationData.rule;
-
-      const asChild = this._isRegionAccessible(parentRegion, "child") && this._evalNode(rule, "child");
-      const asAdult = this._isRegionAccessible(parentRegion, "adult") && this._evalNode(rule, "adult");
-
-      return asChild || asAdult;
-    });
-  }
-
-  static _canBuy(itemName, age) {
-    const rules = [];
-
-    if (_.includes(SHOP_RULES.walletRequired, itemName)) {
-      rules.push("Progressive_Wallet");
-    } else if (_.includes(SHOP_RULES.wallet2Required, itemName)) {
-      rules.push("(Progressive_Wallet, 2)");
-    }
-
-    if (_.includes(SHOP_RULES.adultRequired, itemName)) {
-      rules.push("is_adult");
-    }
-
-    if (_.includes(SHOP_RULES.bottleRequired, itemName)) {
-      rules.push("has_bottle");
-    }
-
-    if (_.includes(SHOP_RULES.bombchusRequired, itemName)) {
-      rules.push("found_bombchus");
-    }
-
-    if (_.isEmpty(rules)) {
-      return true;
-    } else {
-      const combinedRule = _.join(rules, " and ");
-      return this._evalNode(this.parseRule(combinedRule), age);
-    }
-  }
-
-  static _canPlay(songName, age) {
-    if (_.isEqual(songName, "Scarecrow_Song")) {
-      return (
-        this.items.Ocarina > 0 &&
-        (this.settings.scarecrow_behavior === "free" || this.settings.scarecrow_behavior === "fast" || (_.isEqual(age, "adult") && this._evalEvent("Bonooru"))) &&
-        (!this.settings.shuffle_individual_ocarina_notes || this._hasAllNotesForSong("Scarecrow_Song"))
-      );
-    } else {
-      return (
-        this.items.Ocarina > 0 &&
-        this.items[songName] > 0 &&
-        (!this.settings.shuffle_individual_ocarina_notes || this._hasAllNotesForSong(songName))
-      );
-    }
-  }
-
-  static _canUse(itemName, age) {
-    if (_.isEqual(itemName, "Scarecrow")) {
-      return this.items.Progressive_Hookshot > 0 && this._canPlay("Scarecrow_Song", age);
-    }
-    if (_.isEqual(itemName, "Distant_Scarecrow")) {
-      return this.items.Progressive_Hookshot > 1 && this._canPlay("Scarecrow_Song", age);
-    }
-    if (this.settings.blue_fire_arrows && _.isEqual(itemName, "Blue_Fire_Arrows")) {
-      itemName = "Ice_Arrows";
-    }
-
-    const isChildItem = _.includes(["Slingshot", "Boomerang", "Kokiri_Sword", "Sticks", "Deku_Shield"], itemName);
-    const isAdultItem = _.includes(
-      [
-        "Bow",
-        "Megaton_Hammer",
-        "Iron_Boots",
-        "Hover_Boots",
-        "Hookshot",
-        "Longshot",
-        "Silver_Gauntlets",
-        "Golden_Gauntlets",
-        "Goron_Tunic",
-        "Zora_Tunic",
-        "Mirror_Shield",
-      ],
-      itemName,
-    );
-    const isMagicItem = _.includes(["Dins_Fire", "Farores_Wind", "Nayrus_Love", "Lens_of_Truth"], itemName);
-    const isMagicArrow =
-      _.includes(["Fire_Arrows", "Light_Arrows"], itemName) ||
-      (this.settings.blue_fire_arrows && _.isEqual(itemName, "Ice_Arrows"));
-
-    if (_.isUndefined(age)) {
-      return (
-        (isChildItem && this._evalNode(this.parseRule(`${itemName}`), age)) ||
-        (isAdultItem && this._evalNode(this.parseRule(`${itemName}`), age)) ||
-        (isMagicItem && this._evalNode(this.parseRule(`${itemName} and Magic_Meter`), age)) ||
-        (isMagicArrow && this._evalNode(this.parseRule(`${itemName} and Bow and Magic_Meter`), age))
-      );
-    } else {
-      return (
-        (isChildItem && this._evalNode(this.parseRule(`is_child and ${itemName}`), age)) ||
-        (isAdultItem && this._evalNode(this.parseRule(`is_adult and ${itemName}`), age)) ||
-        (isMagicItem && this._evalNode(this.parseRule(`${itemName} and Magic_Meter`), age)) ||
-        (isMagicArrow && this._evalNode(this.parseRule(`is_adult and ${itemName} and Bow and Magic_Meter`), age))
-      );
-    }
-  }
-
   static _evalEvent(eventName) {
     // manually implement event to prevent infinite recursion
     if (_.isEqual(eventName, "Eyeball Frog Access")) {
@@ -640,8 +792,8 @@ class LogicHelper {
         this._evalEvent("King Zora Thawed") &&
         ((!this.renamedAttributes.disable_trade_revert && (this.items.Eyedrops > 0 || this.items.Eyeball_Frog > 0)) ||
           this.items.Prescription > 0 ||
-          ((!LogicHelper.settings.adult_trade_shuffle ||
-            !_.includes(LogicHelper.settings.adult_trade_start, "Broken Sword")) &&
+          ((!this.settings.adult_trade_shuffle ||
+            !_.includes(this.settings.adult_trade_start, "Broken Sword")) &&
             this._evalEvent("Prescription Access")))
       );
     }
@@ -657,116 +809,29 @@ class LogicHelper {
     });
   }
 
-  static _evalRuleAlias(ruleName) {
-    const rule = this.ruleAliases[ruleName];
-
-    const asChild = this._evalNode(rule, "child");
-    const asAdult = this._evalNode(rule, "adult");
-
-    return asChild || asAdult;
-  }
-
-  static _hadNightStart() {
-    const stod = this.settings.starting_tod;
-    return _.includes(["sunset", "evening", "midnight", "witching-hour"], stod);
-  }
-
-  static _hasBottle() {
-    return this.items.Bottle > 0 || this.isLocationAvailable("Deliver Rutos Letter");
-  }
-
-  static _hasDungeonRewards(count) {
-    if (!(count in this.settings)) {
-      throw Error(`Bad argument to has_dungeon_rewards: ${count}`);
+  static _evalNode(node, age) {
+    switch (node.type) {
+      case "BinaryExpression":
+        return this._evalBinaryExpression(node);
+      case "CallExpression":
+        return this._evalCallExpression(node, age);
+      case "ExpressionStatement":
+        return this._evalNode(node.expression, age);
+      case "Identifier":
+        return this._evalIdentifier(node.name, age);
+      case "Literal":
+        return this._evalLiteral(node.value, age);
+      case "LogicalExpression":
+        return this._evalLogicalExpression(node, age);
+      case "MemberExpression":
+        return this._evalMemberExpression();
+      case "SequenceExpression":
+        return this._evalSequenceExpression(node, age);
+      case "UnaryExpression":
+        return this._evalUnaryExpression(node, age);
+      default:
+        throw Error(`Unknown AST node of type ${node.type}`);
     }
-
-    const dungeonRewardsCount = this.settings[count];
-    return (
-      _.sum([
-        this.items.Kokiri_Emerald,
-        this.items.Goron_Ruby,
-        this.items.Zora_Sapphire,
-        this.items.Forest_Medallion,
-        this.items.Fire_Medallion,
-        this.items.Water_Medallion,
-        this.items.Spirit_Medallion,
-        this.items.Shadow_Medallion,
-        this.items.Light_Medallion,
-      ]) >= dungeonRewardsCount
-    );
-  }
-
-  static _hasHearts() {
-    // TODO: not yet implemented
-    return false;
-  }
-
-  static _hasMedallions(count) {
-    if (!(count in this.settings)) {
-      throw Error(`Bad argument to has_medallions: ${count}`);
-    }
-
-    const medallionCount = this.settings[count];
-    return (
-      _.sum([
-        this.items.Forest_Medallion,
-        this.items.Fire_Medallion,
-        this.items.Water_Medallion,
-        this.items.Spirit_Medallion,
-        this.items.Shadow_Medallion,
-        this.items.Light_Medallion,
-      ]) >= medallionCount
-    );
-  }
-
-  static _hasProjectile(forAge, age) {
-    const canChildProjectile = this.items.Slingshot > 0 || this.items.Boomerang > 0;
-    const canAdultProjectile = this.items.Bow > 0 || this.items.Hookshot > 0;
-
-    return (
-      this._evalNode(this.parseRule("has_explosives"), age) ||
-      (_.isEqual(forAge, "child") && canChildProjectile) ||
-      (_.isEqual(forAge, "adult") && canAdultProjectile) ||
-      (_.isEqual(forAge, "both") && canChildProjectile && canAdultProjectile) ||
-      (_.isEqual(forAge, "either") && (canChildProjectile || canAdultProjectile))
-    );
-  }
-
-  static _hasAllNotesForSong(songName) {
-    if (_.isEqual(songName, "Scarecrow Song")) {
-      return (
-        _.sum([
-          this.items.Ocarina_A_Button,
-          this.items.Ocarina_C_up_Button,
-          this.items.Ocarina_C_down_Button,
-          this.items.Ocarina_C_left_Button,
-          this.items.Ocarina_C_right_Button,
-        ]) >= 2
-      );
-    }
-
-    if (songName in SONG_NOTES) {
-      return SONG_NOTES[songName].every(button => this.items[button] > 0);
-    }
-
-    return false;
-  }
-
-  static _hasStones(count) {
-    if (!(count in this.settings)) {
-      throw Error(`Bad argument to has_stones: ${count}`);
-    }
-
-    const stonesCount = this.settings[count];
-    return _.sum([this.items.Kokiri_Emerald, this.items.Goron_Ruby, this.items.Zora_Sapphire]) >= stonesCount;
-  }
-
-  static _regionHasShortcuts(regionName) {
-    if (!(regionName in Locations.regionMap)) {
-      throw Error(`Bad argument to region_has_shortcuts: ${regionName}`);
-    }
-
-    return _.includes(this.settings.dungeon_shortcuts, Locations.regionMap[regionName]);
   }
 }
 
