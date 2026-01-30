@@ -2,7 +2,9 @@
   {
     "from": "free_scarecrow",
     "to": "scarecrow_behavior",
-    "convert": { "true": "free", "false": "start" },
-    "note": "v8.3 had boolean free_scarecrow, v9.0 uses scarecrow_behavior with options: free, fast, start"
+    "convert": {
+      "true": "free",
+      "false": "start"
+    }
   }
 ]
