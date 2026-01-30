@@ -371,7 +371,7 @@ class Locations {
     }
 
     // Disabled Locations
-    else if (_.includes(SettingsHelper.getSetting("disabled_locations"), location.locationName)) {
+    else if (SettingsHelper.isDisabledLocation(location.locationName)) {
       return false;
     }
 

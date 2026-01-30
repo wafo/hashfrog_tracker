@@ -6,6 +6,11 @@ class SettingsHelper {
 
   static _mqDungeonsSet = null;
   static _dungeonShortcutsSet = null;
+  static _allowedTricksSet = null;
+  static _advancedAllowedTricksSet = null;
+  static _adultTradeStartSet = null;
+  static _shuffleChildTradeSet = null;
+  static _disabledLocationsSet = null;
 
   static initialize(bundle) {
     this.defaults = bundle.settingsDefaults || {};
@@ -20,6 +25,11 @@ class SettingsHelper {
 
     this._mqDungeonsSet = null;
     this._dungeonShortcutsSet = null;
+    this._allowedTricksSet = null;
+    this._advancedAllowedTricksSet = null;
+    this._adultTradeStartSet = null;
+    this._shuffleChildTradeSet = null;
+    this._disabledLocationsSet = null;
   }
 
   static _updateCachedSets() {
@@ -28,6 +38,21 @@ class SettingsHelper {
 
     const dungeonShortcuts = this.settings?.dungeon_shortcuts || this.defaults.dungeon_shortcuts || [];
     this._dungeonShortcutsSet = new Set(dungeonShortcuts);
+
+    const allowedTricks = this.settings?.allowed_tricks || this.defaults.allowed_tricks || [];
+    this._allowedTricksSet = new Set(allowedTricks);
+
+    const advancedAllowedTricks = this.settings?.advanced_allowed_tricks || this.defaults.advanced_allowed_tricks || [];
+    this._advancedAllowedTricksSet = new Set(advancedAllowedTricks);
+
+    const adultTradeStart = this.settings?.adult_trade_start || this.defaults.adult_trade_start || [];
+    this._adultTradeStartSet = new Set(adultTradeStart);
+
+    const shuffleChildTrade = this.settings?.shuffle_child_trade || this.defaults.shuffle_child_trade || [];
+    this._shuffleChildTradeSet = new Set(shuffleChildTrade);
+
+    const disabledLocations = this.settings?.disabled_locations || this.defaults.disabled_locations || [];
+    this._disabledLocationsSet = new Set(disabledLocations);
   }
 
   static invalidateCachedSets() {
@@ -45,11 +70,46 @@ class SettingsHelper {
     return this.defaults[name];
   }
 
+  static hasAdultTradeStart(itemName) {
+    if (!this._adultTradeStartSet) {
+      this._updateCachedSets();
+    }
+    return this._adultTradeStartSet.has(itemName);
+  }
+
   static hasDungeonShortcut(regionName) {
     if (!this._dungeonShortcutsSet) {
       this._updateCachedSets();
     }
     return this._dungeonShortcutsSet.has(regionName);
+  }
+
+  static hasShuffleChildTrade(itemName) {
+    if (!this._shuffleChildTradeSet) {
+      this._updateCachedSets();
+    }
+    return this._shuffleChildTradeSet.has(itemName);
+  }
+
+  static isAdvancedAllowedTrick(trickName) {
+    if (!this._advancedAllowedTricksSet) {
+      this._updateCachedSets();
+    }
+    return this._advancedAllowedTricksSet.has(trickName);
+  }
+
+  static isAllowedTrick(trickName) {
+    if (!this._allowedTricksSet) {
+      this._updateCachedSets();
+    }
+    return this._allowedTricksSet.has(trickName);
+  }
+
+  static isDisabledLocation(locationName) {
+    if (!this._disabledLocationsSet) {
+      this._updateCachedSets();
+    }
+    return this._disabledLocationsSet.has(locationName);
   }
 
   static isMQDungeon(dungeonName) {

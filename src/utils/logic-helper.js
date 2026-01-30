@@ -384,7 +384,7 @@ class LogicHelper {
     const disableTradeRevert =
       shuffleInteriorEntrances || this.settings.shuffle_overworld_entrances || this.settings.adult_trade_shuffle;
     const skipChildZelda =
-      !_.includes(this.settings.shuffle_child_trade, "Zeldas Letter") &&
+      !SettingsHelper.hasShuffleChildTrade("Zeldas Letter") &&
       _.includes(this.settings.starting_inventory, "zeldas_letter");
 
     const triforceGoal = this.settings.triforce_goal_per_world * this.settings.world_count;
@@ -637,7 +637,7 @@ class LogicHelper {
   static _hasLaterChildTradeItem(itemName) {
     // If child trade is shuffled, we can't assume sequence progression
     const itemWithSpaces = itemName.replace(/_/g, " ");
-    if (_.includes(this.settings.shuffle_child_trade, itemWithSpaces)) {
+    if (SettingsHelper.hasShuffleChildTrade(itemWithSpaces)) {
       return false;
     }
 
@@ -730,7 +730,7 @@ class LogicHelper {
       return (
         this.items[name] > 0 ||
         ((!this.settings.adult_trade_shuffle ||
-          !_.includes(this.settings.adult_trade_start, trade.displayName)) &&
+          !SettingsHelper.hasAdultTradeStart(trade.displayName)) &&
           this.isLocationAvailable(trade.location, "adult"))
       );
     }
@@ -764,7 +764,7 @@ class LogicHelper {
     }
 
     if (_.startsWith(name, "logic_")) {
-      return _.includes(this.settings.allowed_tricks, name);
+      return SettingsHelper.isAllowedTrick(name);
     }
     // Assume can always let time of day pass
     if (_.startsWith(name, "at_")) {
@@ -774,7 +774,7 @@ class LogicHelper {
       return this._canBuy(name, age);
     }
     if (_.startsWith(name, "adv_") || _.startsWith(name, "glitch_")) {
-      return _.includes(this.settings.advanced_allowed_tricks, name);
+      return SettingsHelper.isAdvancedAllowedTrick(name);
     }
 
     throw Error(`Unknown Identifier: ${name}`);
@@ -853,7 +853,7 @@ class LogicHelper {
         ((!this.renamedAttributes.disable_trade_revert && (this.items.Eyedrops > 0 || this.items.Eyeball_Frog > 0)) ||
           this.items.Prescription > 0 ||
           ((!this.settings.adult_trade_shuffle ||
-            !_.includes(this.settings.adult_trade_start, "Broken Sword")) &&
+            !SettingsHelper.hasAdultTradeStart("Broken Sword")) &&
             this._evalEvent("Prescription Access")))
       );
     }
