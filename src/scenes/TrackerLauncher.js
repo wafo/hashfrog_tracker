@@ -14,10 +14,7 @@ import SettingStringsJSON from "../data/setting-strings.json";
 import useDebounce from "../hooks/useDebounce";
 
 const baseURL = process.env.PUBLIC_URL;
-const LOGIC_BRANCH = process.env.REACT_APP_LOGIC_BRANCH;
 const GENERATOR_VERSION = process.env.REACT_APP_GENERATOR_VERSION;
-
-const isLogicBranchRelease = LOGIC_BRANCH === "release";
 
 const PRESETS = SettingStringsJSON.presets || [];
 const CURRENT_ACTIVE_VERSION = SettingStringsJSON.currentActiveVersion || "9.0.0";
@@ -271,22 +268,10 @@ const TrackerLauncher = () => {
                 </DropdownButton>
               </div>
 
-              {isLogicBranchRelease && (
-                <Alert variant="info" className="mt-3 mb-0 py-2 small">
-                  📦 Using <strong>release</strong> logic files.{" "}
-                  <Alert.Link href="https://dev.hashfrog-tracker.com/">
-                    Switch to dev
-                  </Alert.Link>
-                </Alert>
-              )}
-              {!isLogicBranchRelease && (
-                <Alert variant="warning" className="mt-3 mb-0 py-2 small">
-                  ⚠️ Using <strong>dev</strong> logic files — things may break.{" "}
-                  <Alert.Link href="https://hashfrog-tracker.com/">
-                    Switch to release
-                  </Alert.Link>
-                </Alert>
-              )}
+              <Alert variant="info" className="mt-3 mb-0 py-2 small">
+                {" "}To use a different version, select &ldquo;Other...&rdquo; in the Generator Version field and enter a version
+                (e.g., <code>7.1.0</code> for releases or <code>dev_9.0.1</code> or <code>devrreal_9.0.2-15</code> for dev branches).
+              </Alert>
             </div>
           )}
         </Card.Body>
@@ -330,6 +315,9 @@ const TrackerLauncher = () => {
             <li>
               The logic assumes that the initial value for a counter is zero.
               Click the counter to update it if not.
+            </li>
+            <li>
+              Advanced logic is not yet supported.
             </li>
           </ul>
         </Card.Body>

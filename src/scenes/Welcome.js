@@ -66,13 +66,19 @@ const Welcome = () => {
               <Accordion.Body className="bg-dark text-light">
                 <ul className="list-unstyled mb-0">
                   <li className="mb-2">
-                    <Badge bg="success" className="me-2">0.6.3</Badge>
-                    <span className="small">Bug fixes, performance improvements and dungeon related logic changes (boss keys are now taken into account and new key designs have been added).</span>
+                    <Badge bg="success" className="me-2">0.7.0</Badge>
+                    <span className="small">Logic updates, performance improvements for check tracking, multi-version support, new look for launcher page, updated key icons, and fixes for starting inventory.</span>
                   </li>
                   <li className="mb-2">
-                    <Badge bg="secondary" className="me-2">0.6.0</Badge>
-                    <span className="small">Separation of release and dev logic branches.</span>
+                    <Badge bg="secondary" className="me-2">0.6.x</Badge>
+                    <span className="small">Support release and dev branches. Bug fixes, performance improvements, and dungeon-related logic changes.</span>
                   </li>
+                  {
+                    /*
+                      <li>0.6.3 - Bug fixes, performance improvements and dungeon related logic changes (boss keys are now taken into account and new key designs have been added).</li>
+                      <li>0.6.0 - Separation of release and dev logic branches.</li>
+                    */
+                  }
                   <li className="mb-2">
                     <Badge bg="secondary" className="me-2">0.5.x</Badge>
                     <span className="small">Logic parsing from the generator including setting string parsing and counters.</span>
