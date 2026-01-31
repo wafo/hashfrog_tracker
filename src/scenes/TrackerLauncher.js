@@ -67,13 +67,13 @@ const TrackerLauncher = () => {
   } = useSettingsString();
 
   const [settingsString, setSettingsString] = useState(
-    () => cachedSettingsString || SettingStringsJSON.presets.find(preset => preset.value === "tournament_s9")
+    () => cachedSettingsString || ""
   );
   const debouncedString = useDebounce(settingsString, 300);
 
   useEffect(() => {
-    setSettingsStringCache(debouncedString);
-  }, [debouncedString, setSettingsStringCache]);
+    setSettingsStringCache(checks ? debouncedString : "");
+  }, [checks, debouncedString, setSettingsStringCache]);
 
   const [generatorVersion, setGeneratorVersion] = useState(
     () => cachedGeneratorVersion || CURRENT_ACTIVE_VERSION

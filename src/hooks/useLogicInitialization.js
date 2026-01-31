@@ -32,15 +32,19 @@ const useLogicInitialization = (options = {}) => {
 
       Locations.initialize(dungeonFiles, dungeonMQFiles, bossesFile, overworldFile);
 
-      // Getting settings from hashfrog backend instead of parsing them here.
-      // Backend gets them from the generator endpoint and caches them.
-      const { settings } = await fetch(
-        `${process.env.REACT_APP_API_URL}/settings/string?` +
-        new URLSearchParams({
-          version: generatorVersion,
-          settingsString: settingsString,
-        }),
-      ).then(response => response.json());
+      let settings;
+      if (!settingsString) {
+        settings = bundle.settingsDefaults;
+      } else {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/settings/string?` +
+          new URLSearchParams({
+            version: generatorVersion,
+            settingsString: settingsString,
+          }),
+        ).then(res => res.json());
+        settings = response.settings;
+      }
 
       // Set settings on SettingsHelper
       SettingsHelper.setSettings(settings);

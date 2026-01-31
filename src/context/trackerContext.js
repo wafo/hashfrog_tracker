@@ -5,7 +5,6 @@ import COMBO_ITEMS from "../data/combo-items.json";
 import COUNTER_TO_ITEM from "../data/counter-to-item.json";
 import DEFAULT_ITEMS from "../data/default-items.json";
 import ITEMS_JSON from "../data/items.json";
-import SettingStringsJSON from "../data/setting-strings.json";
 import UUID_TO_ITEM from "../data/uuid-to-item.json";
 import Locations from "../utils/locations";
 import LogicHelper from "../utils/logic-helper";
@@ -83,19 +82,8 @@ function validateLocations(locations, parsedItems) {
 }
 
 function getSettingsStringCache() {
-  let string = localStorage.getItem("settings_string");
-  if (!string) {
-    const preset = SettingStringsJSON.presets.find(p => p.value === "tournament_s9");
-
-    // We should always find a preset. If not, just make it blank to be safe.
-    if (preset) {
-      string = preset.settingsString;
-    } else {
-      string = ""
-    }
-
-  }
-  return string;
+  // Return empty string if no cached value
+  return localStorage.getItem("settings_string") || "";
 }
 
 function setSettingsStringCache(string) {
