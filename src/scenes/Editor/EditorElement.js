@@ -24,7 +24,7 @@ const EditorElement = ({ element, setElement }) => {
     event => {
       let { value } = event.target;
       const { name } = event.target;
-      if (toNumber.includes(name)) value = parseInt(value, 10);
+      if (toNumber.includes(name)) { value = parseInt(value, 10); }
 
       switch (name) {
         // Size specific
@@ -101,16 +101,16 @@ const EditorElement = ({ element, setElement }) => {
     }));
   };
 
-  const removeFromIcons = (e, icon) => {
+  const removeFromIcons = (e, iconToRemove) => {
     e.preventDefault();
     setElement(prev => ({
       ...prev,
-      icons: [...prev.icons.filter(x => x !== icon)],
+      icons: [...prev.icons.filter(x => x !== iconToRemove)],
     }));
   };
 
-  const onDragStart = (event, icon) => {
-    setDraggedIcon(icon);
+  const onDragStart = (event, iconToDrag) => {
+    setDraggedIcon(iconToDrag);
     event.dataTransfer.effectAllowed = "move";
     // event.dataTransfer.setDragImage(event.target, 50, 50);
   };
@@ -123,15 +123,15 @@ const EditorElement = ({ element, setElement }) => {
     index => {
       const draggedOverIcon = element.icons[index];
       // Ignore if dragged over itself
-      if (draggedOverIcon === draggedIcon) return;
+      if (draggedOverIcon === draggedIcon) { return; }
       // filter out the currently dragged item
       // add the dragged item after the dragged over item
       setElement(prev => {
-        let icons = [...prev.icons.filter(icon => icon !== draggedIcon)];
-        icons.splice(index, 0, draggedIcon);
+        const filtered = [...prev.icons.filter(ic => ic !== draggedIcon)];
+        filtered.splice(index, 0, draggedIcon);
         return {
           ...prev,
-          icons,
+          icons: filtered,
         };
       });
     },
@@ -391,9 +391,9 @@ const EditorElement = ({ element, setElement }) => {
             <option value="" disabled>
               Select icon
             </option>
-            {iconsJSON.map(element => (
-              <option key={element} value={element}>
-                {element}
+            {iconsJSON.map(iconName => (
+              <option key={iconName} value={iconName}>
+                {iconName}
               </option>
             ))}
           </select>
@@ -407,16 +407,16 @@ const EditorElement = ({ element, setElement }) => {
         <Fragment>
           <p style={{ fontSize: "0.75em", margin: 0, opacity: 0.5 }}>Right click to remove. Drag to re-order.</p>
           <ul className="list-unstyled table-list">
-            {element.icons.map((icon, index) => (
+            {element.icons.map((ic, index) => (
               <li
                 key={index}
-                onContextMenu={e => removeFromIcons(e, icon)}
-                onDragStart={e => onDragStart(e, icon)}
+                onContextMenu={e => removeFromIcons(e, ic)}
+                onDragStart={e => onDragStart(e, ic)}
                 onDragEnd={onDragEnd}
                 onDragOver={() => onDragOver(index)}
                 draggable
               >
-                {splitNameBase64(icon).name}
+                {splitNameBase64(ic).name}
               </li>
             ))}
           </ul>

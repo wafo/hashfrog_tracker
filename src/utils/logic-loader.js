@@ -1,30 +1,55 @@
-import _ from "lodash";
-
 import DUNGEONS from "../data/dungeons.json";
-
-const LOGIC_BRANCH = process.env.REACT_APP_LOGIC_BRANCH;
+import VersionConfig from "../versions/version-config";
 
 class LogicLoader {
-  static async loadLogicFiles() {
-    // Load the LogicHelpers.json file, which defines macros and item aliases for convenience
-    const logicHelpersFile = await this._loadLogicFile(this._logicHelpersFileUrl());
+  static async loadLogicFiles(version) {
+    const normalizedVersion = VersionConfig.normalizeVersion(version);
 
-    // Load in the logic files for each dungeon
-    const dungeonFiles = new Map();
-    const dungeonMQFiles = new Map();
-    for await (let dungeonName of DUNGEONS) {
-      _.set(dungeonFiles, dungeonName, await this._loadLogicFile(this._logicFileUrl(`${dungeonName}.json`)));
-
-      // Include the logic files for the Master Quest dungeons as well
-      dungeonName = dungeonName + " MQ";
-      _.set(dungeonMQFiles, dungeonName, await this._loadLogicFile(this._logicFileUrl(`${dungeonName}.json`)));
+    // Check for bundled logic files
+    if (VersionConfig.isBundled(normalizedVersion)) {
+      return await VersionConfig.getBundledLogicFiles(normalizedVersion);
     }
 
-    // Load in the logic file for boss rooms
-    const bossesFile = await this._loadLogicFile(this._logicFileUrl("Bosses.json"));
+    // If none are found, try to fetch them from GitHub
+    const { owner, tag } = VersionConfig.parseVersion(normalizedVersion);
 
-    // Load in the logic file for overworld locations
-    const overworldFile = await this._loadLogicFile(this._logicFileUrl("Overworld.json"));
+    try {
+      return await this._fetchLogicFiles(owner, tag);
+    } catch (error) {
+      // If unable to fetch logic files, fall back to bundled version
+      return await VersionConfig.getFallbackLogicFiles();
+    }
+  }
+
+  static async _fetchLogicFiles(owner, tag) {
+    // Load all logic files in parallel
+    const [logicHelpersFile, bossesFile, overworldFile, ...dungeonResults] = await Promise.all([
+      this._loadLogicFile(this._logicHelpersFileUrl(owner, tag)),
+      this._loadLogicFile(this._logicFileUrl(owner, tag, "Bosses.json")),
+      this._loadLogicFile(this._logicFileUrl(owner, tag, "Overworld.json")),
+      ...DUNGEONS.flatMap(dungeonName => [
+        this._loadLogicFile(this._logicFileUrl(owner, tag, `${dungeonName}.json`)).then(data => ({
+          type: "normal",
+          name: dungeonName,
+          data,
+        })),
+        this._loadLogicFile(this._logicFileUrl(owner, tag, `${dungeonName} MQ.json`)).then(data => ({
+          type: "mq",
+          name: `${dungeonName} MQ`,
+          data,
+        })),
+      ]),
+    ]);
+
+    const dungeonFiles = {};
+    const dungeonMQFiles = {};
+    dungeonResults.forEach(result => {
+      if (result.type === "normal") {
+        dungeonFiles[result.name] = result.data;
+      } else {
+        dungeonMQFiles[result.name] = result.data;
+      }
+    });
 
     return {
       logicHelpersFile,
@@ -55,12 +80,12 @@ class LogicLoader {
     return removedMultilines;
   }
 
-  static _logicHelpersFileUrl() {
-    return `https://raw.githubusercontent.com/OoTRandomizer/OoT-Randomizer/${LOGIC_BRANCH}/data/LogicHelpers.json`;
+  static _logicHelpersFileUrl(owner, tag) {
+    return `https://raw.githubusercontent.com/${owner}/OoT-Randomizer/${tag}/data/LogicHelpers.json`;
   }
 
-  static _logicFileUrl(fileName) {
-    return `https://raw.githubusercontent.com/OoTRandomizer/OoT-Randomizer/${LOGIC_BRANCH}/data/World/${fileName}`;
+  static _logicFileUrl(owner, tag, fileName) {
+    return `https://raw.githubusercontent.com/${owner}/OoT-Randomizer/${tag}/data/World/${fileName}`;
   }
 }
 

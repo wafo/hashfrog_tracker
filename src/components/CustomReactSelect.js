@@ -102,7 +102,7 @@ const CustomReactSelect = props => {
   }, [onValueCallback, value]);
 
   return (
-    <div onContextMenu={handleRightClick} onAuxClick={handleOnClick} style={{ flex: 1 }}>
+    <div onContextMenu={handleRightClick} onAuxClick={handleOnClick} style={{ flex: 1, overflow: "hidden" }}>
       <Select
         id={id}
         name={name}

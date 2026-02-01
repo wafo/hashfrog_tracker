@@ -1,0 +1,55 @@
+[
+  {
+    "item": "Pocket_Egg",
+    "displayName": "Pocket Egg"
+  },
+  {
+    "item": "Pocket_Cucco",
+    "displayName": "Pocket Cucco"
+  },
+  {
+    "item": "Cojiro",
+    "displayName": "Cojiro",
+    "location": "Kak Anju Trade Pocket Cucco"
+  },
+  {
+    "item": "Odd_Mushroom",
+    "displayName": "Odd Mushroom",
+    "location": "LW Trade Cojiro"
+  },
+  {
+    "item": "Odd_Potion",
+    "displayName": "Odd Potion",
+    "location": "Kak Granny Trade Odd Mushroom"
+  },
+  {
+    "item": "Poachers_Saw",
+    "displayName": "Poachers Saw",
+    "location": "LW Trade Odd Potion"
+  },
+  {
+    "item": "Broken_Sword",
+    "displayName": "Broken Sword",
+    "location": "GV Trade Poachers Saw"
+  },
+  {
+    "item": "Prescription",
+    "displayName": "Prescription",
+    "location": "DMT Trade Broken Sword"
+  },
+  {
+    "item": "Eyeball_Frog",
+    "displayName": "Eyeball Frog",
+    "location": "ZD Trade Prescription"
+  },
+  {
+    "item": "Eyedrops",
+    "displayName": "Eyedrops",
+    "location": "LH Trade Eyeball Frog"
+  },
+  {
+    "item": "Claim_Check",
+    "displayName": "Claim Check",
+    "location": "DMT Trade Eyedrops"
+  }
+]

@@ -1,14 +1,16 @@
 import _ from "lodash";
 import { useEffect, useMemo, useState } from "react";
 
-import { useChecks, useLocation } from "../context/trackerContext";
-import Locations from "../utils/locations";
-import LogicHelper from "../utils/logic-helper";
-
 import { useLayout } from "../context/layoutContext";
-import DUNGEON_SHORTCUTS from "../data/dungeon-boss-shortcuts.json";
+import { useChecks, useLocation } from "../context/trackerContext";
+import DUNGEON_CONFIG from "../data/dungeon-config.json";
 import DUNGEONS from "../data/dungeons.json";
 import HINT_REGIONS_SHORT_NAMES from "../data/hint-regions-short-names.json";
+import Locations from "../utils/locations";
+import LogicHelper from "../utils/logic-helper";
+import SettingsHelper from "../utils/settings-helper";
+
+const DUNGEON_SHORTCUTS = DUNGEON_CONFIG.dungeonShortcuts;
 
 const Checks = () => {
   const { state: layoutContext } = useLayout();
@@ -20,13 +22,14 @@ const Checks = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   useEffect(() => {
     if (!isInitialized) {
-      Locations.resetActiveLocations();
+      LogicHelper.updateItems(items);
 
       _.forEach(Locations.mapLocationsToHintAreas(), (regionLocations, regionName) => {
         let locationAddedForRegion = false;
 
         _.forEach(regionLocations, locationName => {
-          if (Locations.isProgressLocation(Locations.activeLocations[locationName])) {
+          const location = Locations.getLocation(locationName);
+          if (location && Locations.isProgressLocation(location)) {
             actions.addLocation(locationName, regionName);
             locationAddedForRegion = true;
           }
@@ -36,8 +39,8 @@ const Checks = () => {
         // so that the user can toggle to MQ.
         if (!locationAddedForRegion && _.includes(DUNGEONS, regionName)) {
           const showMQToggle =
-            _.isEqual(LogicHelper.settings.mq_dungeons_mode, "random") ||
-            (_.isEqual(LogicHelper.settings.mq_dungeons_mode, "count") && LogicHelper.settings.mq_dungeons_count > 0);
+            _.isEqual(SettingsHelper.getSetting("mq_dungeons_mode"), "random") ||
+            (_.isEqual(SettingsHelper.getSetting("mq_dungeons_mode"), "count") && SettingsHelper.getSetting("mq_dungeons_count") > 0);
 
           const hasPossibleLocations =
             _.some(_.values(Locations.locations.dungeon[regionName]), locationData => {
@@ -53,7 +56,6 @@ const Checks = () => {
         }
       });
 
-      LogicHelper.updateItems(items);
       setIsInitialized(true);
     }
   }, [actions, isInitialized, items]);
@@ -63,10 +65,10 @@ const Checks = () => {
       const isAvailable = locationData.isAvailable;
       const isChecked = locationData.isChecked;
 
-      if (isAvailable && !isChecked) counter.available += 1;
-      if (!isAvailable) counter.locked += 1;
-      if (isChecked) counter.checked += 1;
-      if (!isChecked) counter.remaining += 1;
+      if (isAvailable && !isChecked) { counter.available += 1; }
+      if (!isAvailable) { counter.locked += 1; }
+      if (isChecked) { counter.checked += 1; }
+      if (!isChecked) { counter.remaining += 1; }
     });
   };
 
@@ -138,8 +140,8 @@ const Buttons = ({ type, setType }) => {
 const HintRegion = ({ actions, locations, selectedRegion, setSelectedRegion }) => {
   const locationsList = _.map(locations[selectedRegion], (locationData, locationName) => {
     const style = {};
-    if (locationData.isChecked) style.textDecoration = "line-through";
-    if (!locationData.isAvailable) style.opacity = "0.5";
+    if (locationData.isChecked) { style.textDecoration = "line-through"; }
+    if (!locationData.isAvailable) { style.opacity = "0.5"; }
     return (
       <li key={locationName} className="check">
         <button
@@ -162,16 +164,16 @@ const HintRegion = ({ actions, locations, selectedRegion, setSelectedRegion }) =
   };
   const showMQToggle =
     _.includes(DUNGEONS, selectedRegion) &&
-    (_.isEqual(LogicHelper.settings.mq_dungeons_mode, "random") ||
-      (_.isEqual(LogicHelper.settings.mq_dungeons_mode, "count") && LogicHelper.settings.mq_dungeons_count > 0));
-  const isMQToggled = _.includes(LogicHelper.settings.mq_dungeons_specific, selectedRegion);
+    (SettingsHelper.getSetting("mq_dungeons_mode") === "random" ||
+      (SettingsHelper.getSetting("mq_dungeons_mode") === "count" && SettingsHelper.getSetting("mq_dungeons_count") > 0));
+  const isMQToggled = SettingsHelper.isMQDungeon(selectedRegion);
 
   const toggleShortcut = () => {
     actions.toggleShortcut(selectedRegion);
   };
   const showShortcutToggle =
-    _.includes(DUNGEON_SHORTCUTS, selectedRegion) && _.isEqual(LogicHelper.settings.dungeon_shortcuts_choice, "random");
-  const isShortcutToggled = _.includes(LogicHelper.settings.dungeon_shortcuts, selectedRegion);
+    _.includes(DUNGEON_SHORTCUTS, selectedRegion) && SettingsHelper.getSetting("dungeon_shortcuts_choice") === "random";
+  const isShortcutToggled = SettingsHelper.hasDungeonShortcut(selectedRegion);
 
   const toggleRegion = () => {
     actions.toggleRegion(selectedRegion);

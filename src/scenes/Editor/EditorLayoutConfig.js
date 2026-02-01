@@ -4,20 +4,20 @@ const EditorLayoutConfig = ({ layoutConfig, setLayout }) => {
   const { name, width, height, backgroundColor } = layoutConfig;
 
   const handleChange = event => {
-    let {
-      target: { name, value },
+    const {
+      target: { name: fieldName, value },
     } = event;
 
     // Temp
-    if (name === "width" || name === "height") {
-      value = parseInt(value, 10);
-    }
+    const fieldValue = (fieldName === "width" || fieldName === "height")
+      ? parseInt(value, 10)
+      : value;
 
     setLayout(prev => ({
       ...prev,
       layoutConfig: {
         ...layoutConfig,
-        [name]: value,
+        [fieldName]: fieldValue,
       },
     }));
   };

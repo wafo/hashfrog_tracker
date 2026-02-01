@@ -10,22 +10,38 @@
     "plugin:react/recommended",
     "plugin:react-hooks/recommended"
   ],
-  "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaFeatures": {
       "jsx": true
     },
-    "ecmaVersion": 2018,
+    "ecmaVersion": "latest",
     "sourceType": "module"
   },
   "plugins": ["react", "react-hooks"],
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
   "rules": {
-    "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "warn",
-    "react/prop-types": "off",
+    "no-debugger": "error",
+    "no-duplicate-imports": "error",
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
+
+    "curly": ["error", "all"],
+    "eqeqeq": ["error", "always"],
+    "no-console": "warn",
+    "no-shadow": "error",
+    "no-throw-literal": "error",
+    "no-useless-return": "error",
+    "no-var": "error",
+    "prefer-const": "error",
+
     "react/display-name": "off",
+    "react/prop-types": "off",
     "react/react-in-jsx-scope": "off",
-    "no-unused-vars": "warn",
-    "@typescript-eslint/no-explicit-any": "off"
+
+    "react-hooks/exhaustive-deps": "warn",
+    "react-hooks/rules-of-hooks": "error"
   }
 }

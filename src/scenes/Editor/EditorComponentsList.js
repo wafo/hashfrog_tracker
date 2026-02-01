@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import elementsJSON from "../../data/elements.json";
-import { generateId, duplicate } from "../../utils/utils";
+import { duplicate, generateId } from "../../utils/utils";
 import EditorComponent from "./EditorComponent";
 
 const EditorComponentsList = ({ components, setLayout, customElements }) => {
@@ -18,10 +18,10 @@ const EditorComponentsList = ({ components, setLayout, customElements }) => {
 
   const deleteComponent = useCallback(() => {
     setLayout(prev => {
-      let components = [...prev.components.filter(x => x.id !== component.id)];
+      const filtered = [...prev.components.filter(x => x.id !== component.id)];
       return {
         ...prev,
-        components: components,
+        components: filtered,
       };
     });
     setComponent(null);
@@ -30,19 +30,19 @@ const EditorComponentsList = ({ components, setLayout, customElements }) => {
   // Any time a component change (coming from EditorComponent)
   // we update layout from EditorLayoutConfig to display the changes in real time
   useEffect(() => {
-    if (!component) return;
+    if (!component) { return; }
 
     setLayout(prev => {
-      let components = [...prev.components];
-      const index = components.findIndex(x => x.id === component.id);
+      let updated = [...prev.components];
+      const index = updated.findIndex(x => x.id === component.id);
       if (index !== -1) {
-        components[index] = { ...component };
+        updated[index] = { ...component };
       } else {
-        components = [...components, component];
+        updated = [...updated, component];
       }
       return {
         ...prev,
-        components: components,
+        components: updated,
       };
     });
   }, [component, setLayout]);
@@ -79,10 +79,10 @@ const EditorComponentsList = ({ components, setLayout, customElements }) => {
         <ul className="list-unstyled mb-0">
           {!component &&
             components.length > 0 &&
-            components.map(component => (
-              <li key={component.id}>
-                <button type="button" className="btn btn-dark btn-sm" onClick={() => setComponent(component)}>
-                  {component.type || "undefined"} - {component.displayName || component.id.substring(0, 12)}
+            components.map(comp => (
+              <li key={comp.id}>
+                <button type="button" className="btn btn-dark btn-sm" onClick={() => setComponent(comp)}>
+                  {comp.type || "undefined"} - {comp.displayName || comp.id.substring(0, 12)}
                 </button>
               </li>
             ))}

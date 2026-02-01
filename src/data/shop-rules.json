@@ -1,0 +1,34 @@
+{
+  "walletRequired": [
+    "Buy_Arrows_50",
+    "Buy_Fish",
+    "Buy_Goron_Tunic",
+    "Buy_Bombchu_20",
+    "Buy_Bombs_30"
+  ],
+  "wallet2Required": [
+    "Buy_Zora_Tunic",
+    "Buy_Blue_Fire"
+  ],
+  "adultRequired": [
+    "Buy_Zora_Tunic",
+    "Buy_Blue_Fire"
+  ],
+  "bottleRequired": [
+    "Buy_Blue_Fire",
+    "Buy_Blue_Potion",
+    "Buy_Bottle_Bug",
+    "Buy_Fish",
+    "Buy_Green_Potion",
+    "Buy_Poe",
+    "Buy_Red_Potion_for_30_Rupees",
+    "Buy_Red_Potion_for_40_Rupees",
+    "Buy_Red_Potion_for_50_Rupees",
+    "Buy_Fairy's_Spirit"
+  ],
+  "bombchusRequired": [
+    "Buy_Bombchu_10",
+    "Buy_Bombchu_20",
+    "Buy_Bombchu_5"
+  ]
+}

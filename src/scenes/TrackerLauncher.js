@@ -1,38 +1,24 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 
+import Alert from "react-bootstrap/Alert";
+import Button from "react-bootstrap/Button";
+import Card from "react-bootstrap/Card";
+import Dropdown from "react-bootstrap/Dropdown";
+import DropdownButton from "react-bootstrap/DropdownButton";
+import Form from "react-bootstrap/Form";
+import InputGroup from "react-bootstrap/InputGroup";
 import LayoutSelector from "../components/LayoutSelector";
 import { useLayout } from "../context/layoutContext";
 import { useSettingsString } from "../context/trackerContext";
 import SettingStringsJSON from "../data/setting-strings.json";
 import useDebounce from "../hooks/useDebounce";
-import Button from "react-bootstrap/Button";
-import InputGroup from "react-bootstrap/InputGroup";
-import Form from "react-bootstrap/Form";
-import DropdownButton from "react-bootstrap/DropdownButton";
-import Dropdown from "react-bootstrap/Dropdown";
-import Card from "react-bootstrap/Card";
-import Alert from "react-bootstrap/Alert";
 
 const baseURL = process.env.PUBLIC_URL;
-const LOGIC_BRANCH = process.env.REACT_APP_LOGIC_BRANCH;
 const GENERATOR_VERSION = process.env.REACT_APP_GENERATOR_VERSION;
 
-const isLogicBranchRelease = LOGIC_BRANCH === "release";
-
 const PRESETS = SettingStringsJSON.presets || [];
-
-// https://ootrandomizer.com/api/version?branch=master
-const CURRENT_ACTIVE_VERSION = "9.0.0";
-const GENERATOR_VERSIONS = [
-  "9.0.0",
-  "8.3.0",
-  "7.1.0",
-  "7.0.0",
-  "6.2.0",
-  "6.0.0",
-  "5.2.0",
-  "5.1.0",
-];
+const CURRENT_ACTIVE_VERSION = SettingStringsJSON.currentActiveVersion || "9.0.0";
+const GENERATOR_VERSIONS = SettingStringsJSON.supportedVersions || ["9.0.0"];
 
 const TrackerLauncher = () => {
   const [checks, setChecks] = useState(false);
@@ -59,7 +45,7 @@ const TrackerLauncher = () => {
 
   const launchTracker = useCallback(() => {
     let url = `${baseURL}/tracker`;
-    if (checks) url = `${baseURL}/tracker/checks`;
+    if (checks) { url = `${baseURL}/tracker/checks`; }
 
     const { width, height } = layoutSize;
 
@@ -78,13 +64,13 @@ const TrackerLauncher = () => {
   } = useSettingsString();
 
   const [settingsString, setSettingsString] = useState(
-    () => cachedSettingsString || SettingStringsJSON.presets.find(preset => preset.value === "tournament_s9")
+    () => cachedSettingsString || ""
   );
   const debouncedString = useDebounce(settingsString, 300);
 
   useEffect(() => {
-    setSettingsStringCache(debouncedString);
-  }, [debouncedString, setSettingsStringCache]);
+    setSettingsStringCache(checks ? debouncedString : "");
+  }, [checks, debouncedString, setSettingsStringCache]);
 
   const [generatorVersion, setGeneratorVersion] = useState(
     () => cachedGeneratorVersion || CURRENT_ACTIVE_VERSION
@@ -282,22 +268,10 @@ const TrackerLauncher = () => {
                 </DropdownButton>
               </div>
 
-              {isLogicBranchRelease && (
-                <Alert variant="info" className="mt-3 mb-0 py-2 small">
-                  📦 Using <strong>release</strong> logic files.{" "}
-                  <Alert.Link href="https://dev.hashfrog-tracker.com/">
-                    Switch to dev
-                  </Alert.Link>
-                </Alert>
-              )}
-              {!isLogicBranchRelease && (
-                <Alert variant="warning" className="mt-3 mb-0 py-2 small">
-                  ⚠️ Using <strong>dev</strong> logic files — things may break.{" "}
-                  <Alert.Link href="https://hashfrog-tracker.com/">
-                    Switch to release
-                  </Alert.Link>
-                </Alert>
-              )}
+              <Alert variant="info" className="mt-3 mb-0 py-2 small">
+                {" "}To use a different version, select &ldquo;Other...&rdquo; in the Generator Version field and enter a version
+                (e.g., <code>7.1.0</code> for releases or <code>dev_9.0.1</code> or <code>devrreal_9.0.2-15</code> for dev branches).
+              </Alert>
             </div>
           )}
         </Card.Body>
@@ -341,6 +315,9 @@ const TrackerLauncher = () => {
             <li>
               The logic assumes that the initial value for a counter is zero.
               Click the counter to update it if not.
+            </li>
+            <li>
+              Advanced logic is not yet supported.
             </li>
           </ul>
         </Card.Body>

@@ -1,43 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
-
 import frog from "../assets/icons/hashfrogsping.gif";
+import useLogicInitialization from "../hooks/useLogicInitialization";
 import Checks from "./Checks";
 import Layout from "./Layout";
 
-import { getGeneratorVersionCache, getSettingsStringCache, useItems } from "../context/trackerContext";
-import Locations from "../utils/locations";
-import LogicHelper from "../utils/logic-helper";
-import LogicLoader from "../utils/logic-loader";
-
 const TrackerChecks = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const { updateItemsFromLogic } = useItems();
-
-  const initializeLogic = useCallback(async () => {
-    const { logicHelpersFile, dungeonFiles, dungeonMQFiles, bossesFile, overworldFile } =
-      await LogicLoader.loadLogicFiles();
-
-    Locations.initialize(dungeonFiles, dungeonMQFiles, bossesFile, overworldFile);
-
-    // Getting settings from hashfrog backend instead of parsing them here.
-    // Backend gets them from the generator endpoint and caches them.
-    const { settings } = await fetch(
-      `${process.env.REACT_APP_API_URL}/settings/string?` +
-        new URLSearchParams({
-          version: getGeneratorVersionCache(),
-          settingsString: getSettingsStringCache(),
-        }),
-    ).then(response => response.json())
-    .catch(error => console.error(error));
-
-    LogicHelper.initialize(logicHelpersFile, settings);
-    updateItemsFromLogic(settings); // Starting items.
-    setIsLoading(false);
-  }, [updateItemsFromLogic]);
-
-  useEffect(() => {
-    initializeLogic();
-  }, [initializeLogic]);
+  const { isLoading } = useLogicInitialization();
 
   if (isLoading) {
     return (
@@ -46,14 +13,14 @@ const TrackerChecks = () => {
         <span>Loading...</span>
       </div>
     );
-  } else {
-    return (
-      <div className="d-flex justify-content-between">
-        <Layout />
-        <Checks />
-      </div>
-    );
   }
+
+  return (
+    <div className="d-flex justify-content-between">
+      <Layout />
+      <Checks />
+    </div>
+  );
 };
 
 export default TrackerChecks;

@@ -69,7 +69,7 @@ const HintsTable = props => {
 
     const splitArray = splitIntoChunk(hintRows, columns);
 
-    return splitArray.map((rows, index) => <tr key={index}>{rows}</tr>);
+    return splitArray.map((rowCells, index) => <tr key={index}>{rowCells}</tr>);
   }, [
     id,
     columns,
