@@ -30,7 +30,7 @@
 
     "curly": ["error", "all"],
     "eqeqeq": ["error", "always"],
-    "no-console": "warn",
+    "no-console": "off",
     "no-shadow": "error",
     "no-throw-literal": "error",
     "no-useless-return": "error",
