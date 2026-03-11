@@ -8,7 +8,8 @@
   "extends": [
     "eslint:recommended",
     "plugin:react/recommended",
-    "plugin:react-hooks/recommended"
+    "plugin:react-hooks/recommended",
+    "plugin:jsdoc/recommended-error"
   ],
   "parserOptions": {
     "ecmaFeatures": {
@@ -17,7 +18,11 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "plugins": ["react", "react-hooks"],
+  "plugins": [
+    "react",
+    "react-hooks",
+    "jsdoc"
+  ],
   "settings": {
     "react": {
       "version": "detect"
