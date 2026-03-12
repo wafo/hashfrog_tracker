@@ -1,6 +1,8 @@
 import _ from "lodash";
 import { useEffect, useMemo, useState } from "react";
+import { OverlayTrigger, Popover } from "react-bootstrap";
 
+import RequirementsTooltip from "../components/RequirementsTooltip";
 import { useLayout } from "../context/layoutContext";
 import { useChecks, useLocation } from "../context/trackerContext";
 import DUNGEON_CONFIG from "../data/dungeon-config.json";
@@ -103,6 +105,7 @@ const Checks = () => {
       <LocationsList
         actions={actions}
         countLocations={countLocations}
+        items={items}
         locations={locations}
         onRegionClicked={onRegionClicked}
         selectedRegion={selectedRegion}
@@ -137,24 +140,42 @@ const Buttons = ({ type, setType }) => {
   );
 };
 
-const HintRegion = ({ actions, locations, selectedRegion, setSelectedRegion }) => {
+const HintRegion = ({ actions, items, locations, selectedRegion, setSelectedRegion }) => {
   const locationsList = _.map(locations[selectedRegion], (locationData, locationName) => {
     const style = {};
     if (locationData.isChecked) { style.textDecoration = "line-through"; }
     if (!locationData.isAvailable) { style.opacity = "0.5"; }
+
+    const displayName = Locations.removeRegionPrefix(locationName, selectedRegion);
+
+    const popover = (
+      <Popover id={`popover-${locationName}`} className="requirements-popover">
+        <Popover.Body>
+          <RequirementsTooltip locationName={locationName} items={items} />
+        </Popover.Body>
+      </Popover>
+    );
+
     return (
       <li key={locationName} className="check">
-        <button
-          type="button"
-          style={style}
-          onClick={() => actions.markLocation(locationName, selectedRegion)}
-          onContextMenu={e => {
-            e.preventDefault();
-            actions.markLocation(locationName, selectedRegion);
-          }}
+        <OverlayTrigger
+          trigger={["hover", "focus"]}
+          placement="auto"
+          delay={{ show: 300, hide: 0 }}
+          overlay={popover}
         >
-          {Locations.removeRegionPrefix(locationName, selectedRegion)}
-        </button>
+          <button
+            type="button"
+            style={style}
+            onClick={() => actions.markLocation(locationName, selectedRegion)}
+            onContextMenu={e => {
+              e.preventDefault();
+              actions.markLocation(locationName, selectedRegion);
+            }}
+          >
+            {displayName}
+          </button>
+        </OverlayTrigger>
       </li>
     );
   });
@@ -209,6 +230,7 @@ const HintRegion = ({ actions, locations, selectedRegion, setSelectedRegion }) =
 const LocationsList = ({
   actions,
   countLocations,
+  items,
   locations,
   onRegionClicked,
   selectedRegion,
@@ -219,6 +241,7 @@ const LocationsList = ({
     return (
       <HintRegion
         actions={actions}
+        items={items}
         locations={locations}
         selectedRegion={selectedRegion}
         setSelectedRegion={setSelectedRegion}
