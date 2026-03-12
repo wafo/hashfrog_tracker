@@ -1,6 +1,11 @@
 import { parse } from "acorn";
 import _ from "lodash";
 
+/**
+ * Parses a logic rule string into an AST node.
+ * @param {string} ruleString - The rule string.
+ * @returns {object} The parsed AST expression statement.
+ */
 export function parseRule(ruleString) {
   const rule = _.flow(
     _.trim,

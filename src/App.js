@@ -6,6 +6,10 @@ import TrackerChecks from "./scenes/TrackerChecks";
 import TrackerLayout from "./scenes/TrackerLayout";
 import Welcome from "./scenes/Welcome";
 
+/**
+ * Root application component with route definitions.
+ * @returns {object} The rendered routes.
+ */
 function App() {
   return (
     <div className="App">
