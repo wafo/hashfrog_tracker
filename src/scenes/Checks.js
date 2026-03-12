@@ -41,8 +41,8 @@ const Checks = () => {
         // so that the user can toggle to MQ.
         if (!locationAddedForRegion && _.includes(DUNGEONS, regionName)) {
           const showMQToggle =
-            _.isEqual(SettingsHelper.getSetting("mq_dungeons_mode"), "random") ||
-            (_.isEqual(SettingsHelper.getSetting("mq_dungeons_mode"), "count") && SettingsHelper.getSetting("mq_dungeons_count") > 0);
+            SettingsHelper.getSetting("mq_dungeons_mode") === "random" ||
+            (SettingsHelper.getSetting("mq_dungeons_mode") === "count" && SettingsHelper.getSetting("mq_dungeons_count") > 0);
 
           const hasPossibleLocations =
             _.some(_.values(Locations.locations.dungeon[regionName]), locationData => {
@@ -92,7 +92,7 @@ const Checks = () => {
   }, [locations]);
 
   const onRegionClicked = regionName => {
-    setSelectedRegion(prev => (_.isEqual(prev, regionName) ? null : regionName));
+    setSelectedRegion(prev => (prev === regionName ? null : regionName));
   };
 
   useEffect(() => {
@@ -208,19 +208,15 @@ const HintRegion = ({ actions, items, locations, selectedRegion, setSelectedRegi
       <button type="button" className="btn btn-dark btn-sm py-0 mb-2 me-1" onClick={toggleRegion}>
         Toggle All
       </button>
-      {showMQToggle ? (
+      {showMQToggle && (
         <button type="button" className="btn btn-dark btn-sm py-0 mb-2 me-1" onClick={toggleMQ}>
           {isMQToggled ? "MQ: On" : "MQ: Off"}
         </button>
-      ) : (
-        ""
       )}
-      {showShortcutToggle ? (
+      {showShortcutToggle && (
         <button type="button" className="btn btn-dark btn-sm py-0 mb-2 me-1" onClick={toggleShortcut}>
           {isShortcutToggled ? "Shortcut: On" : "Shortcut: Off"}
         </button>
-      ) : (
-        ""
       )}
       <ul className="check-list">{locationsList}</ul>
     </div>
@@ -267,7 +263,6 @@ const LocationsList = ({
         checked: 0,
         available: 0,
         remaining: 0,
-        skulls: 0,
       };
       countLocations(locationData, locationsCounter);
 
