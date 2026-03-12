@@ -45,10 +45,10 @@ class Locations {
       overworld: new Map(),
     };
 
-    this.regionMap = new Map();
+    this.regionMap = {};
     _.forEach(HINT_REGIONS, (hintRegionData, hintRegionName) => {
       _.forEach(hintRegionData, regionName => {
-        _.set(this.regionMap, regionName, hintRegionName);
+        this.regionMap[regionName] = hintRegionName;
       });
     });
 
@@ -317,6 +317,36 @@ class Locations {
     }
 
     return null;
+  }
+
+  static getLocationsByVanillaItem(vanillaItemName) {
+    const results = [];
+
+    // Check overworld
+    for (const regionData of Object.values(this.locations.overworld)) {
+      for (const location of Object.values(regionData)) {
+        if (location.vanillaItem === vanillaItemName) {
+          results.push(location);
+        }
+      }
+    }
+
+    // Check dungeons based on MQ settings
+    for (const dungeonName of DUNGEONS) {
+      const source = SettingsHelper.isMQDungeon(dungeonName)
+        ? this.locations.dungeon_mq[dungeonName]
+        : this.locations.dungeon[dungeonName];
+
+      if (source) {
+        for (const location of Object.values(source)) {
+          if (location.vanillaItem === vanillaItemName) {
+            results.push(location);
+          }
+        }
+      }
+    }
+
+    return results;
   }
 
   static getSkullsLocations() {
@@ -595,10 +625,7 @@ class Locations {
     // Ganon boss key
     else if (location.vanillaItem === "Boss Key (Ganons Castle)") {
       const shuffleGanonBosskey = SettingsHelper.getSetting("shuffle_ganon_bosskey");
-      if (shuffleGanonBosskey === "vanilla") {
-        return false;
-      }
-      return _.includes(["remove", "any_dungeon", "overworld", "keysanity", "regional"], shuffleGanonBosskey);
+      return shuffleGanonBosskey !== "vanilla";
     }
 
     // Dungeon Items
