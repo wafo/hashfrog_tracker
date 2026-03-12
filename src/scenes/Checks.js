@@ -244,19 +244,12 @@ const LocationsList = ({
       />
     );
   } else {
-    const filteredLocations = _.filter(_.keys(locations), regionName => {
-      if (_.isEqual(type, "dungeon")) {
-        return _.includes(DUNGEONS, regionName);
-      } else {
-        return !_.includes(DUNGEONS, regionName);
-      }
-    });
+    const regionNames = _.keys(locations).filter(regionName =>
+      type === "dungeon" ? _.includes(DUNGEONS, regionName) : !_.includes(DUNGEONS, regionName)
+    );
 
-    const locationsList = _.map(locations, (locationData, regionName) => {
-      if (!_.includes(filteredLocations, regionName)) {
-        return;
-      }
-
+    const locationsList = regionNames.map(regionName => {
+      const locationData = locations[regionName];
       const numLocations = _.size(locationData);
       const locationsCounter = {
         locked: 0,
