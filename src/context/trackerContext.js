@@ -16,6 +16,13 @@ const COMBO_DERIVATIONS = COMBO_ITEMS;
 
 const TrackerContext = createContext();
 
+/**
+ * Converts UUID-based item lists and counters into a logic-compatible items object.
+ * @param {object} items_list - Map of element IDs to item UUIDs.
+ * @param {object} counters - Map of counter names to their values.
+ * @param {Array} unchanged_starting_inventory - Starting inventory UUIDs.
+ * @returns {object} Parsed items keyed by logic item name.
+ */
 function parseItems(items_list, counters, unchanged_starting_inventory) {
   const items = _.cloneDeep(DEFAULT_ITEMS);
   const tradeRevert = !SettingsHelper.getSetting("adult_trade_shuffle") && !SettingsHelper.getRenamedAttribute("disable_trade_revert");
@@ -65,6 +72,12 @@ function parseItems(items_list, counters, unchanged_starting_inventory) {
   return items;
 }
 
+/**
+ * Revalidates location availability based on current items.
+ * @param {object} locations - Map of region names to location data.
+ * @param {object} parsedItems - Parsed items from parseItems.
+ * @returns {object} Cloned locations with updated isAvailable flags.
+ */
 function validateLocations(locations, parsedItems) {
   const clonedLocations = _.cloneDeep(locations);
 
@@ -81,15 +94,27 @@ function validateLocations(locations, parsedItems) {
   return clonedLocations;
 }
 
+/**
+ * Retrieves the cached settings string from localStorage.
+ * @returns {string} The cached settings string, or empty string.
+ */
 function getSettingsStringCache() {
   // Return empty string if no cached value
   return localStorage.getItem("settings_string") || "";
 }
 
+/**
+ * Persists the settings string to localStorage.
+ * @param {string} string - The settings string to cache.
+ */
 function setSettingsStringCache(string) {
   localStorage.setItem("settings_string", string);
 }
 
+/**
+ * Retrieves the cached generator version from localStorage.
+ * @returns {string} The cached version, or the default from env.
+ */
 function getGeneratorVersionCache() {
   let version = localStorage.getItem("generator_version");
   if (!version) {
@@ -99,10 +124,20 @@ function getGeneratorVersionCache() {
   return version;
 }
 
+/**
+ * Persists the generator version to localStorage.
+ * @param {string} version - The generator version string.
+ */
 function setGeneratorVersionCache(version) {
   localStorage.setItem("generator_version", version);
 }
 
+/**
+ * Tracker context reducer handling all state mutations.
+ * @param {object} state - The current tracker state.
+ * @param {object} action - The dispatched action with type and payload.
+ * @returns {object} The new tracker state.
+ */
 function reducer(state, action) {
   const { payload } = action;
   switch (action.type) {
@@ -379,6 +414,11 @@ function reducer(state, action) {
   }
 }
 
+/**
+ * Provides tracker state and dispatch to child components.
+ * @param {object} props - React component props.
+ * @returns {object} The context provider.
+ */
 function TrackerProvider(props) {
   const initialState = {
     locations: {},

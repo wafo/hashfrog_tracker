@@ -24,6 +24,29 @@ const ADULT_TRADE_LOOKUP = Object.fromEntries(
   ])
 );
 
+// Map of setting names to item names for starting items.
+// Authoritative source — expression-converter delegates to getStartingItems().
+const STARTING_ITEM_SETTINGS = {
+  ocarina: "Ocarina",
+  deku_shield: "Deku_Shield",
+  hylian_shield: "Hylian_Shield",
+  mirror_shield: "Mirror_Shield",
+  kokiri_sword: "Kokiri_Sword",
+  master_sword: "Master_Sword",
+  biggoron_sword: "Biggoron_Sword",
+  goron_tunic: "Goron_Tunic",
+  zora_tunic: "Zora_Tunic",
+  iron_boots: "Iron_Boots",
+  hover_boots: "Hover_Boots",
+  zeldas_letter: "Zeldas_Letter",
+  weird_egg: "Weird_Egg",
+  stone_of_agony: "Stone_of_Agony",
+  gerudo_card: "Gerudo_Membership_Card",
+  deku_nut: "Deku_Nut",
+  deku_stick: "Deku_Stick",
+  rupee: "Rupee",
+};
+
 class LogicHelper {
   static BUILTIN_FUNCTIONS = {
     // source: State.py
@@ -238,6 +261,23 @@ class LogicHelper {
     this.memoizedFunctions = this._memoizeFunctions();
 
     return this.settings;
+  }
+
+  static getStartingItems() {
+    const items = {};
+    const startingLists = [
+      this.settings?.starting_inventory || [],
+      this.settings?.starting_equipment || [],
+    ];
+    for (const list of startingLists) {
+      for (const startingItem of list) {
+        const mappedName = STARTING_ITEM_SETTINGS[startingItem];
+        if (mappedName) {
+          items[mappedName] = (items[mappedName] || 0) + 1;
+        }
+      }
+    }
+    return items;
   }
 
   static updateItems(newItems) {

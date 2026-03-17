@@ -1,6 +1,8 @@
 import _ from "lodash";
 import { useEffect, useMemo, useState } from "react";
+import { OverlayTrigger, Popover } from "react-bootstrap";
 
+import RequirementsTooltip from "../components/RequirementsTooltip";
 import { useLayout } from "../context/layoutContext";
 import { useChecks, useLocation } from "../context/trackerContext";
 import DUNGEON_CONFIG from "../data/dungeon-config.json";
@@ -39,8 +41,8 @@ const Checks = () => {
         // so that the user can toggle to MQ.
         if (!locationAddedForRegion && _.includes(DUNGEONS, regionName)) {
           const showMQToggle =
-            _.isEqual(SettingsHelper.getSetting("mq_dungeons_mode"), "random") ||
-            (_.isEqual(SettingsHelper.getSetting("mq_dungeons_mode"), "count") && SettingsHelper.getSetting("mq_dungeons_count") > 0);
+            SettingsHelper.getSetting("mq_dungeons_mode") === "random" ||
+            (SettingsHelper.getSetting("mq_dungeons_mode") === "count" && SettingsHelper.getSetting("mq_dungeons_count") > 0);
 
           const hasPossibleLocations =
             _.some(_.values(Locations.locations.dungeon[regionName]), locationData => {
@@ -90,7 +92,7 @@ const Checks = () => {
   }, [locations]);
 
   const onRegionClicked = regionName => {
-    setSelectedRegion(prev => (_.isEqual(prev, regionName) ? null : regionName));
+    setSelectedRegion(prev => (prev === regionName ? null : regionName));
   };
 
   useEffect(() => {
@@ -103,6 +105,7 @@ const Checks = () => {
       <LocationsList
         actions={actions}
         countLocations={countLocations}
+        items={items}
         locations={locations}
         onRegionClicked={onRegionClicked}
         selectedRegion={selectedRegion}
@@ -137,24 +140,42 @@ const Buttons = ({ type, setType }) => {
   );
 };
 
-const HintRegion = ({ actions, locations, selectedRegion, setSelectedRegion }) => {
+const HintRegion = ({ actions, items, locations, selectedRegion, setSelectedRegion }) => {
   const locationsList = _.map(locations[selectedRegion], (locationData, locationName) => {
     const style = {};
     if (locationData.isChecked) { style.textDecoration = "line-through"; }
     if (!locationData.isAvailable) { style.opacity = "0.5"; }
+
+    const displayName = Locations.removeRegionPrefix(locationName, selectedRegion);
+
+    const popover = (
+      <Popover id={`popover-${locationName}`} className="requirements-popover">
+        <Popover.Body>
+          <RequirementsTooltip locationName={locationName} items={items} />
+        </Popover.Body>
+      </Popover>
+    );
+
     return (
       <li key={locationName} className="check">
-        <button
-          type="button"
-          style={style}
-          onClick={() => actions.markLocation(locationName, selectedRegion)}
-          onContextMenu={e => {
-            e.preventDefault();
-            actions.markLocation(locationName, selectedRegion);
-          }}
+        <OverlayTrigger
+          trigger={["hover", "focus"]}
+          placement="auto"
+          delay={{ show: 300, hide: 0 }}
+          overlay={popover}
         >
-          {Locations.removeRegionPrefix(locationName, selectedRegion)}
-        </button>
+          <button
+            type="button"
+            style={style}
+            onClick={() => actions.markLocation(locationName, selectedRegion)}
+            onContextMenu={e => {
+              e.preventDefault();
+              actions.markLocation(locationName, selectedRegion);
+            }}
+          >
+            {displayName}
+          </button>
+        </OverlayTrigger>
       </li>
     );
   });
@@ -187,19 +208,15 @@ const HintRegion = ({ actions, locations, selectedRegion, setSelectedRegion }) =
       <button type="button" className="btn btn-dark btn-sm py-0 mb-2 me-1" onClick={toggleRegion}>
         Toggle All
       </button>
-      {showMQToggle ? (
+      {showMQToggle && (
         <button type="button" className="btn btn-dark btn-sm py-0 mb-2 me-1" onClick={toggleMQ}>
           {isMQToggled ? "MQ: On" : "MQ: Off"}
         </button>
-      ) : (
-        ""
       )}
-      {showShortcutToggle ? (
+      {showShortcutToggle && (
         <button type="button" className="btn btn-dark btn-sm py-0 mb-2 me-1" onClick={toggleShortcut}>
           {isShortcutToggled ? "Shortcut: On" : "Shortcut: Off"}
         </button>
-      ) : (
-        ""
       )}
       <ul className="check-list">{locationsList}</ul>
     </div>
@@ -209,6 +226,7 @@ const HintRegion = ({ actions, locations, selectedRegion, setSelectedRegion }) =
 const LocationsList = ({
   actions,
   countLocations,
+  items,
   locations,
   onRegionClicked,
   selectedRegion,
@@ -219,32 +237,25 @@ const LocationsList = ({
     return (
       <HintRegion
         actions={actions}
+        items={items}
         locations={locations}
         selectedRegion={selectedRegion}
         setSelectedRegion={setSelectedRegion}
       />
     );
   } else {
-    const filteredLocations = _.filter(_.keys(locations), regionName => {
-      if (_.isEqual(type, "dungeon")) {
-        return _.includes(DUNGEONS, regionName);
-      } else {
-        return !_.includes(DUNGEONS, regionName);
-      }
-    });
+    const regionNames = _.keys(locations).filter(regionName =>
+      type === "dungeon" ? _.includes(DUNGEONS, regionName) : !_.includes(DUNGEONS, regionName)
+    );
 
-    const locationsList = _.map(locations, (locationData, regionName) => {
-      if (!_.includes(filteredLocations, regionName)) {
-        return;
-      }
-
+    const locationsList = regionNames.map(regionName => {
+      const locationData = locations[regionName];
       const numLocations = _.size(locationData);
       const locationsCounter = {
         locked: 0,
         checked: 0,
         available: 0,
         remaining: 0,
-        skulls: 0,
       };
       countLocations(locationData, locationsCounter);
 

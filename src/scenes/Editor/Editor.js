@@ -8,6 +8,11 @@ import EditorComponentsList from "./EditorComponentsList";
 import EditorElementsList from "./EditorElementsList";
 import EditorLayoutConfig from "./EditorLayoutConfig";
 
+/**
+ * Normalizes a raw layout by applying default values to each component.
+ * @param {object} rawLayout - The raw layout JSON object.
+ * @returns {object} The prepared layout with defaults applied.
+ */
 function prepareLayout(rawLayout) {
   const cleanedComponents = [
     ...rawLayout.components.map(component => {

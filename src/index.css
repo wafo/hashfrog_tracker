@@ -223,6 +223,45 @@ body {
 }
 
 /** *************************************** */
+/** Requirements Tooltip */
+/** *************************************** */
+
+.requirements-popover {
+  --bs-popover-bg: #212529;
+  --bs-popover-border-color: #495057;
+  --bs-popover-body-color: #ffffff;
+  max-width: 250px;
+  font-size: 0.75rem;
+}
+
+.requirements-popover .popover-body {
+  padding: 0.4rem 0.6rem;
+}
+
+.requirements-tooltip ul {
+  list-style-type: disc;
+  margin: 0;
+  padding-left: 1em;
+}
+
+.requirements-tooltip li {
+  margin: 1px 0;
+  line-height: 1.2;
+}
+
+.requirements-tooltip .owned {
+  color: #ffffff;
+}
+
+.requirements-tooltip .missing {
+  color: #6c757d;
+}
+
+.requirements-tooltip .operator {
+  color: #999;
+}
+
+/** *************************************** */
 /** Editor */
 /** *************************************** */
 

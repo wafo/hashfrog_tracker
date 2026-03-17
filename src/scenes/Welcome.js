@@ -55,7 +55,8 @@ const Welcome = () => {
                 <ul className="mb-0 ps-3">
                   <li className="mb-2">Layout customization, UI editor, custom elements/icons and more.</li>
                   <li className="mb-2">Store and share layout configuration in JSON files.</li>
-                  <li>Check/Location tracking based on the randomizer generator logic.</li>
+                  <li className="mb-2">Check/Location tracking based on the randomizer generator logic.</li>
+                  <li className="mb-2">Item requirement tooltips on check locations.</li>
                 </ul>
               </Accordion.Body>
             </Accordion.Item>
@@ -66,7 +67,11 @@ const Welcome = () => {
               <Accordion.Body className="bg-dark text-light">
                 <ul className="list-unstyled mb-0">
                   <li className="mb-2">
-                    <Badge bg="success" className="me-2">0.7.0</Badge>
+                    <Badge bg="success" className="me-2">0.7.1</Badge>
+                    <span className="small">Add item requirement tooltips on check locations, showing what items are needed with tracked items highlighted.</span>
+                  </li>
+                  <li className="mb-2">
+                    <Badge bg="secondary" className="me-2">0.7.0</Badge>
                     <span className="small">Logic updates, performance improvements for check tracking, multi-version support, new look for launcher page, updated key icons, and fixes for starting inventory.</span>
                   </li>
                   <li className="mb-2">

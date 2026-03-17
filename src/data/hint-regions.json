@@ -130,7 +130,8 @@
   ],
   "Temple of Time": [
     "Temple of Time",
-    "Beyond Door of Time"
+    "Beyond Door of Time",
+    "Beyond Door of Time Skippable Locations"
   ],
   "Hyrule Castle": [
     "Castle Grounds",
@@ -143,6 +144,7 @@
   "Outside Ganons Castle": [
     "Castle Grounds From Ganons Castle",
     "Ganons Castle Grounds",
+    "Ganons Castle Ledge",
     "OGC Great Fairy Fountain"
   ],
   "Kakariko Village": [
@@ -247,7 +249,8 @@
     "Deku Tree Compass Room",
     "Deku Tree Basement Water Room Front",
     "Deku Tree Basement Water Room Back",
-    "Queen Gohma Boss Room"
+    "Queen Gohma Boss Room",
+    "Queen Gohma Blue Warp"
   ],
   "Dodongos Cavern": [
     "Dodongos Cavern Beginning",
@@ -268,7 +271,8 @@
     "Dodongos Cavern Torch Puzzle Upper",
     "Dodongos Cavern Lower Lizalfos",
     "Dodongos Cavern Poes Room",
-    "King Dodongo Boss Room"
+    "King Dodongo Boss Room",
+    "King Dodongo Blue Warp"
   ],
   "Jabu Jabus Belly": [
     "Jabu Jabus Belly Beginning",
@@ -278,7 +282,8 @@
     "Jabu Jabus Belly Before Boss",
     "Jabu Jabus Belly Elevator Room",
     "Jabu Jabus Belly Before Slimy Thing",
-    "Barinade Boss Room"
+    "Barinade Boss Room",
+    "Barinade Blue Warp"
   ],
   "Forest Temple": [
     "Forest Temple Lobby",
@@ -298,7 +303,8 @@
     "Forest Temple Before Block Puzzle",
     "Forest Temple After Block Puzzle",
     "Forest Temple NE Outdoors Ledge",
-    "Phantom Ganon Boss Room"
+    "Phantom Ganon Boss Room",
+    "Phantom Ganon Blue Warp"
   ],
   "Fire Temple": [
     "Fire Temple Lower",
@@ -318,10 +324,12 @@
     "Fire Temple Block On Fire Room",
     "Fire Temple Shoot Torch On Wall Room",
     "Fire Temple Flame Maze Side Room",
-    "Volvagia Boss Room"
+    "Volvagia Boss Room",
+    "Volvagia Blue Warp"
   ],
   "Water Temple": [
     "Water Temple Lobby",
+    "Water Temple Before Boss Lower",
     "Water Temple Before Boss",
     "Water Temple Dive",
     "Water Temple Lowered Water Levels",
@@ -342,7 +350,8 @@
     "Water Temple Triple Wall Torch",
     "Water Temple Freestanding Key Room",
     "Water Temple Dodongo Room",
-    "Morpha Boss Room"
+    "Morpha Boss Room",
+    "Morpha Blue Warp"
   ],
   "Shadow Temple": [
     "Shadow Temple Entryway",
@@ -367,7 +376,8 @@
     "Shadow Temple Lower Huge Pit",
     "Shadow Temple Across Chasm",
     "Shadow Temple Invisible Maze",
-    "Bongo Bongo Boss Room"
+    "Bongo Bongo Boss Room",
+    "Bongo Bongo Blue Warp"
   ],
   "Spirit Temple": [
     "Spirit Temple Lobby",
@@ -392,7 +402,8 @@
     "Spirit Temple After Shifting Wall",
     "Spirit Temple Mirror Puzzle",
     "Desert Colossus Hands",
-    "Twinrova Boss Room"
+    "Twinrova Boss Room",
+    "Twinrova Blue Warp"
   ],
   "Ganons Castle": [
     "Ganons Castle Lobby",
