@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useEffect, useState } from "react";
 
 import { getGeneratorVersionCache, getSettingsStringCache, useItems } from "../context/trackerContext";
@@ -37,7 +39,7 @@ const useLogicInitialization = (options = {}) => {
         settings = bundle.settingsDefaults;
       } else {
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/settings/string?` +
+          `${process.env.NEXT_PUBLIC_API_URL}/settings/string?` +
           new URLSearchParams({
             version: generatorVersion,
             settingsString: settingsString,

@@ -1,4 +1,6 @@
-import frog from "../assets/icons/hashfrogsping.gif";
+'use client';
+
+const frog = "/icons/hashfrogsping.gif";
 import useLogicInitialization from "../hooks/useLogicInitialization";
 import Layout from "./Layout";
 

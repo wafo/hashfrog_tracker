@@ -1,11 +1,13 @@
+'use client';
+
 import Accordion from "react-bootstrap/Accordion";
 import Badge from "react-bootstrap/Badge";
 import Card from "react-bootstrap/Card";
 import Footer from "../components/Footer";
 import TrackerLauncher from "./TrackerLauncher";
 
-import profile_tanjo3 from "../assets/contributors/tanjo3.jpg";
-import profile_wafo from "../assets/contributors/wafo.png";
+const profile_tanjo3 = "/contributors/tanjo3.jpg";
+const profile_wafo = "/contributors/wafo.png";
 
 const Welcome = () => {
   return (

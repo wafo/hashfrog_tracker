@@ -1,3 +1,5 @@
+'use client';
+
 import FileSaver from "file-saver";
 import { useCallback, useMemo, useState } from "react";
 import useDebounce from "../../hooks/useDebounce";

@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useMemo } from "react";
 
 import { getRequirementsStructure, updateRequirementsOwnership } from "../utils/expression-converter";

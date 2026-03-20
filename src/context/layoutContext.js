@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, useContext, useReducer } from "react";
 
 import defaultLayout from "../layouts/hashfrog.json";
@@ -7,6 +9,7 @@ import defaultLayout from "../layouts/hashfrog.json";
  * @returns {object} The initial layout object.
  */
 function getInitialLayout() {
+  if (typeof window === 'undefined') { return { ...defaultLayout }; }
   const layout = localStorage.getItem("layout");
   return layout ? JSON.parse(layout) : { ...defaultLayout };
 }

@@ -1,3 +1,5 @@
+'use client';
+
 import _ from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import { OverlayTrigger, Popover } from "react-bootstrap";

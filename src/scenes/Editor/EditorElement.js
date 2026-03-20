@@ -1,3 +1,5 @@
+'use client';
+
 import { Fragment, useCallback, useState } from "react";
 
 import iconsJSON from "../../data/icons.json";

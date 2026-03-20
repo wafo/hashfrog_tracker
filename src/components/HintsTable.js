@@ -1,3 +1,5 @@
+'use client';
+
 import { Fragment, useMemo } from "react";
 
 import { splitIntoChunk } from "../utils/utils";

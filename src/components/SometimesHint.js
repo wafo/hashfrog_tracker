@@ -1,3 +1,5 @@
+'use client';
+
 import { useMemo } from "react";
 
 import labelsJSON from "../data/labels.json";

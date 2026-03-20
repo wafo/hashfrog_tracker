@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useLayout } from "../context/layoutContext";
@@ -16,7 +18,7 @@ import elementsJSON from "../data/elements.json";
 import LayoutID from "../utils/layout-id";
 import { isBase64, splitNameBase64 } from "../utils/utils";
 
-const baseURL = process.env.PUBLIC_URL;
+const baseURL = "";
 
 const Layout = props => {
   const { state: layoutContext } = useLayout();

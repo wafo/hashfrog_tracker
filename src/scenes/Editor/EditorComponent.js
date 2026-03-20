@@ -1,3 +1,5 @@
+'use client';
+
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 
 import labelsJSON from "../../data/labels.json";

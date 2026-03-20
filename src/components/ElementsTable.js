@@ -1,3 +1,5 @@
+'use client';
+
 import { Fragment, useMemo } from "react";
 
 import LayoutID from "../utils/layout-id";

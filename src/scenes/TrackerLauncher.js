@@ -1,3 +1,5 @@
+'use client';
+
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 
 import Alert from "react-bootstrap/Alert";
@@ -13,8 +15,8 @@ import { useSettingsString } from "../context/trackerContext";
 import SettingStringsJSON from "../data/setting-strings.json";
 import useDebounce from "../hooks/useDebounce";
 
-const baseURL = process.env.PUBLIC_URL;
-const GENERATOR_VERSION = process.env.REACT_APP_GENERATOR_VERSION;
+const baseURL = "";
+const GENERATOR_VERSION = process.env.NEXT_PUBLIC_GENERATOR_VERSION;
 
 const PRESETS = SettingStringsJSON.presets || [];
 const CURRENT_ACTIVE_VERSION = SettingStringsJSON.currentActiveVersion || "9.0.0";

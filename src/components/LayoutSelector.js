@@ -1,7 +1,9 @@
+'use client';
+
 import FileSaver from "file-saver";
 import { useCallback, useState } from "react";
 
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { useLayout } from "../context/layoutContext";
 import { readFileAsText } from "../utils/utils";
 
@@ -68,7 +70,7 @@ const LayoutSelector = () => {
         />
       </div>
       <div className="mb-2">
-        <Link to="/editor" className="btn btn-light btn-sm w-25 me-2">
+        <Link href="/editor" className="btn btn-light btn-sm w-25 me-2">
           Editor
         </Link>
         <button type="button" className="btn btn-light btn-sm w-25" onClick={resetLayout}>

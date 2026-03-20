@@ -1,3 +1,5 @@
+'use client';
+
 import _ from "lodash";
 import { createContext, useContext, useEffect, useMemo, useReducer } from "react";
 
@@ -10,7 +12,7 @@ import Locations from "../utils/locations";
 import LogicHelper from "../utils/logic-helper";
 import SettingsHelper from "../utils/settings-helper";
 
-const GENERATOR_VERSION = process.env.REACT_APP_GENERATOR_VERSION;
+const GENERATOR_VERSION = process.env.NEXT_PUBLIC_GENERATOR_VERSION;
 
 const COMBO_DERIVATIONS = COMBO_ITEMS;
 
@@ -99,7 +101,7 @@ function validateLocations(locations, parsedItems) {
  * @returns {string} The cached settings string, or empty string.
  */
 function getSettingsStringCache() {
-  // Return empty string if no cached value
+  if (typeof window === 'undefined') { return ""; }
   return localStorage.getItem("settings_string") || "";
 }
 
@@ -116,6 +118,7 @@ function setSettingsStringCache(string) {
  * @returns {string} The cached version, or the default from env.
  */
 function getGeneratorVersionCache() {
+  if (typeof window === 'undefined') { return GENERATOR_VERSION; }
   let version = localStorage.getItem("generator_version");
   if (!version) {
     // Coming from .env and using it as default

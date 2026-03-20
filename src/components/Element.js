@@ -1,12 +1,14 @@
+'use client';
+
 import _ from "lodash";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useElement, useItems } from "../context/trackerContext";
 
 // Base Icons
-import icon_check from "../assets/icons/check_16x16.png";
-import icon_hashfrog from "../assets/icons/hash_frog_bw_32x32.png";
-import icon_unknown from "../assets/icons/unknown_16x16.png";
+const icon_check = "/icons/check_16x16.png";
+const icon_hashfrog = "/icons/hash_frog_bw_32x32.png";
+const icon_unknown = "/icons/unknown_16x16.png";
 
 const nestedStyles = {
   position: "absolute",

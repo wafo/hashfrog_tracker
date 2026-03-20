@@ -1,7 +1,9 @@
+'use client';
+
 import { Fragment } from "react";
 
-const name = process.env.REACT_APP_NAME;
-const version = process.env.REACT_APP_VERSION;
+const name = process.env.NEXT_PUBLIC_NAME;
+const version = process.env.NEXT_PUBLIC_VERSION;
 
 const Footer = props => {
   const { showGitHub = true, opacity = 1 } = props;
