@@ -287,6 +287,20 @@ const LocationsList = ({
             style={style}
           >
             <span>{_.toUpper(HINT_REGIONS_SHORT_NAMES[regionName])}</span>
+            <span style={{
+              fontSize: "0.7em",
+              display: "block",
+              color: (numLocations - locationsCounter.checked) === 0
+                ? undefined
+                : locationsCounter.available === 0
+                  ? "#dc3545"
+                  : locationsCounter.available === (numLocations - locationsCounter.checked)
+                    ? "#198754"
+                    : "#ffc107",
+              opacity: (numLocations - locationsCounter.checked) === 0 ? 0.4 : 1,
+            }}>
+              {locationsCounter.available}/{numLocations - locationsCounter.checked}
+            </span>
           </button>
         </div>
       );
