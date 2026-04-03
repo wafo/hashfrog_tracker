@@ -1,0 +1,149 @@
+{
+   "id": "1d5a40bc94254c548b2cd1ed77e3ea5d",
+   "layoutConfig": {
+      "name": "EscapeFromKak",
+      "backgroundColor": "#000",
+      "width": 325,
+      "height": 650,
+      "fontFamily": null,
+      "fontSize": null,
+      "fontColor": null
+   },
+   "components": [
+      {
+         "id": "80104bad45684265a7c638b0af398c6d",
+         "type": "table",
+         "position": [
+            5,
+            5
+         ],
+         "columns": 10,
+         "padding": "3px",
+         "elements": [
+            "kokiri_sword",
+            "master_sword",
+            "biggoron_sword",
+            "sticks",
+            "nuts",
+            "bombs",
+            "bow",
+            "fire_arrows",
+            "dins",
+            "rutos_letter",
+            "deku_shield",
+            "hylian_shield",
+            "mirror_shield",
+            "slingshot",
+            "progressive_ocarina",
+            "bombchus",
+            "hookshot",
+            "ice_arrows",
+            "farores",
+            "bottle_all",
+            "strength",
+            "tunic_goron",
+            "tunic_zora",
+            "boomerang",
+            "lens",
+            "beans",
+            "hammer",
+            "light_arrows",
+            "nayrus",
+            "wallet",
+            "magic",
+            "boots_iron",
+            "boots_hover",
+            "scale"
+         ],
+         "elementsSize": [
+            25,
+            25
+         ],
+         "displayName": "Items & Equipment",
+         "elementId": "a081121b16f84366bf16e16ca90cd23f"
+      },
+      {
+         "id": "7717af26740543a88a97e44df5f73a9f",
+         "type": "table",
+         "position": [
+            140,
+            4
+         ],
+         "columns": 6,
+         "padding": "4px 3px",
+         "elements": [
+            "song_lullaby_simple",
+            "song_time_simple"
+         ],
+         "elementsSize": [
+            25,
+            25
+         ],
+         "displayName": "Songs",
+         "elementId": "a081121b16f84366bf16e16ca90cd23f"
+      },
+      {
+         "id": "b0ee7a5ef1e44537b0b63ec133ecfa73",
+         "type": "table",
+         "position": [
+            180,
+            4
+         ],
+         "columns": 6,
+         "padding": "4px 2px",
+         "elements": [
+            "keys_forest",
+            "keys_fire",
+            "keys_water",
+            "keys_spirit",
+            "keys_shadow",
+            "keys_botw",
+            "bk_forest",
+            "bk_fire",
+            "bk_water",
+            "bk_spirit",
+            "bk_shadow",
+            "keys_gtg"
+         ],
+         "elementsSize": [
+            22,
+            22
+         ],
+         "displayName": "Dungeon Keys",
+         "elementId": "a081121b16f84366bf16e16ca90cd23f"
+      },
+      {
+         "id": "51af886b4d1c4c4bb9c2b6b91117b462",
+         "type": "",
+         "displayName": "",
+         "position": [
+            0,
+            0
+         ],
+         "elementId": "a081121b16f84366bf16e16ca90cd23f"
+      }
+   ],
+   "elements": [
+      {
+         "id": "e84ec5895a604cb69b76acc87142d274",
+         "type": "simple",
+         "name": "",
+         "displayName": "",
+         "label": "",
+         "labelStartingIndex": 0,
+         "size": [
+            25,
+            25
+         ],
+         "icons": [
+            "hash_frog_bw_32x32.png"
+         ],
+         "countConfig": [
+            0,
+            1
+         ],
+         "receiver": false,
+         "selectedStartingIndex": 0
+      }
+   ]
+}
