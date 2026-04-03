@@ -4,7 +4,7 @@ import { OverlayTrigger, Popover } from "react-bootstrap";
 
 import RequirementsTooltip from "../components/RequirementsTooltip";
 import { useLayout } from "../context/layoutContext";
-import { useChecks, useLocation, useSettingsString } from "../context/trackerContext";
+import { useChecks, useLocation, useSelectedEFKDungeons, useSettingsString } from "../context/trackerContext";
 import DUNGEON_CONFIG from "../data/dungeon-config.json";
 import DUNGEONS from "../data/dungeons.json";
 import HINT_REGIONS_SHORT_NAMES from "../data/hint-regions-short-names.json";
@@ -23,6 +23,7 @@ const Checks = () => {
   const { locations, items } = useChecks();
   const { settings_string } = useSettingsString();
   const isEFK = settings_string === EFK_SETTINGS_STRING;
+  const selectedEFKDungeonNames = useSelectedEFKDungeons();
   const [type, setType] = useState("overworld");
   const [selectedRegion, setSelectedRegion] = useState(null);
 
@@ -114,6 +115,7 @@ const Checks = () => {
         items={items}
         locations={locations}
         onRegionClicked={onRegionClicked}
+        selectedEFKDungeonNames={selectedEFKDungeonNames}
         selectedRegion={selectedRegion}
         setSelectedRegion={setSelectedRegion}
         type={type}
@@ -239,6 +241,7 @@ const LocationsList = ({
   items,
   locations,
   onRegionClicked,
+  selectedEFKDungeonNames,
   selectedRegion,
   setSelectedRegion,
   type,
@@ -255,11 +258,14 @@ const LocationsList = ({
     );
   } else {
     // EFK (Escape From Kak) shows only relevant regions in one combined list.
+    // If dungeon selectors are set, show only those dungeons + Kak; otherwise fall back to all dungeons.
     // Otherwise, split regions into overworld or dungeon based on the active tab.
     const regionNames = isEFK
       ? _.keys(locations).filter(regionName =>
           regionName === "Kakariko Village" ||
-          (_.includes(DUNGEONS, regionName) && regionName !== "Ganons Castle")
+          (selectedEFKDungeonNames.length === 4
+            ? _.includes(selectedEFKDungeonNames, regionName)
+            : (_.includes(DUNGEONS, regionName) && regionName !== "Ganons Castle"))
         )
       : _.keys(locations).filter(regionName =>
           type === "dungeon" ? _.includes(DUNGEONS, regionName) : !_.includes(DUNGEONS, regionName)

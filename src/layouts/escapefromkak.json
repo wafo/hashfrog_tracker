@@ -67,7 +67,7 @@
          "type": "table",
          "position": [
             140,
-            4
+            35
          ],
          "columns": 6,
          "padding": "4px 3px",
@@ -86,8 +86,8 @@
          "id": "b0ee7a5ef1e44537b0b63ec133ecfa73",
          "type": "table",
          "position": [
-            180,
-            4
+            110,
+            140
          ],
          "columns": 6,
          "padding": "4px 2px",
@@ -113,22 +113,163 @@
          "elementId": "a081121b16f84366bf16e16ca90cd23f"
       },
       {
-         "id": "51af886b4d1c4c4bb9c2b6b91117b462",
-         "type": "",
-         "displayName": "",
+         "id": "f5cc5938bc9c43ff9ec395c647506ff9",
+         "type": "table",
+         "displayName": "EFK Dungeon 1",
          "position": [
-            0,
-            0
+            200,
+            5
          ],
+         "columns": 10,
+         "padding": "2px",
+         "elements": [
+            "efk_dungeon",
+            "efk_counter",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes"
+         ],
+         "elementsSize": [
+            25,
+            25
+         ],
+         "hidden": false,
+         "elementId": "a081121b16f84366bf16e16ca90cd23f"
+      },
+      {
+         "id": "d38ae66407b4491e91908e6f1612f638",
+         "type": "table",
+         "displayName": "EFK Dungeon 2",
+         "position": [
+            240,
+            5
+         ],
+         "columns": 10,
+         "padding": "2px",
+         "elements": [
+            "efk_dungeon",
+            "efk_counter",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes"
+         ],
+         "elementsSize": [
+            25,
+            25
+         ],
+         "hidden": false,
+         "elementId": "a081121b16f84366bf16e16ca90cd23f"
+      },
+      {
+         "id": "38756662e9a04b11b3fd72e8d757cf43",
+         "type": "table",
+         "displayName": "EFK Dungeon 3",
+         "position": [
+            280,
+            5
+         ],
+         "columns": 10,
+         "padding": "2px",
+         "elements": [
+            "efk_dungeon",
+            "efk_counter",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes"
+         ],
+         "elementsSize": [
+            25,
+            25
+         ],
+         "hidden": false,
+         "elementId": "a081121b16f84366bf16e16ca90cd23f"
+      },
+      {
+         "id": "8551c150230e43f08eff89cc0876b89d",
+         "type": "table",
+         "displayName": "EFK Dungeon 4",
+         "position": [
+            320,
+            5
+         ],
+         "columns": 10,
+         "padding": "2px",
+         "elements": [
+            "efk_dungeon",
+            "efk_counter",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes"
+         ],
+         "elementsSize": [
+            25,
+            25
+         ],
+         "hidden": false,
          "elementId": "a081121b16f84366bf16e16ca90cd23f"
       }
    ],
    "elements": [
       {
-         "id": "e84ec5895a604cb69b76acc87142d274",
-         "type": "simple",
-         "name": "",
-         "displayName": "",
+         "id": "167600d90cc0420bb0194852c247f459",
+         "type": "label",
+         "name": "efk_dungeon",
+         "displayName": "EFK Dungeon",
+         "label": [
+            "GTG",
+            "ICE",
+            "BOTW",
+            "???",
+            "DEK",
+            "DC",
+            "JAB",
+            "FOR",
+            "FIR",
+            "WAT",
+            "SHA",
+            "SPI"
+         ],
+         "labelStartingIndex": 3,
+         "size": [
+            25,
+            25
+         ],
+         "icons": [
+            "single_triforce_bw_32x32.png",
+            "single_triforce_32x32.png"
+         ],
+         "countConfig": [
+            0,
+            1
+         ],
+         "receiver": false,
+         "selectedStartingIndex": 0
+      },
+      {
+         "id": "167336c4565243ca86508b139d972569",
+         "type": "counter",
+         "name": "efk_counter",
+         "displayName": "EFK Counter",
          "label": "",
          "labelStartingIndex": 0,
          "size": [
@@ -136,11 +277,11 @@
             25
          ],
          "icons": [
-            "hash_frog_bw_32x32.png"
+            "hash_frog_32x32.png"
          ],
          "countConfig": [
             0,
-            1
+            20
          ],
          "receiver": false,
          "selectedStartingIndex": 0

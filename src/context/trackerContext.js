@@ -1,10 +1,11 @@
 import _ from "lodash";
-import { createContext, useContext, useEffect, useMemo, useReducer } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useReducer } from "react";
 
 import COMBO_ITEMS from "../data/combo-items.json";
 import COUNTER_TO_ITEM from "../data/counter-to-item.json";
 import DEFAULT_ITEMS from "../data/default-items.json";
 import ITEMS_JSON from "../data/items.json";
+import HINT_REGIONS_SHORT_NAMES from "../data/hint-regions-short-names.json";
 import UUID_TO_ITEM from "../data/uuid-to-item.json";
 import Locations from "../utils/locations";
 import LogicHelper from "../utils/logic-helper";
@@ -372,6 +373,13 @@ function reducer(state, action) {
         generator_version: payload,
       };
     }
+    case "LABEL_SELECT": {
+      const { elementId, name, value } = payload;
+      return {
+        ...state,
+        labelSelections: { ...state.labelSelections, [elementId]: { name, value } },
+      };
+    }
     case "ELEMENT_REGISTER": {
       const { id, startingItem } = payload;
 
@@ -431,6 +439,7 @@ function TrackerProvider(props) {
     starting_item_claims: {}, // { elementId: uuid } - tracks which element claimed which starting item
     settings_string: getSettingsStringCache(),
     generator_version: getGeneratorVersionCache(),
+    labelSelections: {}, // { elementId: { name, value } } - e.g. { 1: {"efk_dungeon", "DEK"} }
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -542,6 +551,26 @@ const useItems = (items, elementId = null) => {
   return { ...actions, startingIndex, startingItem };
 };
 
+const useLabelSelect = () => {
+  const { dispatch } = useTracker();
+  return useCallback(
+    (elementId, name, value) =>
+      dispatch({ type: "LABEL_SELECT", payload: { elementId, name, value } }),
+    [dispatch],
+  );
+};
+
+const useSelectedEFKDungeons = () => {
+  const { state: { labelSelections } } = useTracker();
+  return useMemo(() => {
+    const shortToFull = _.invert(HINT_REGIONS_SHORT_NAMES);
+    return Object.values(labelSelections)
+      .filter(s => s.name === "efk_dungeon" && s.value !== "???")
+      .map(s => shortToFull[s.value])
+      .filter(Boolean);
+  }, [labelSelections]);
+};
+
 const useSettingsString = () => {
   const {
     state: { settings_string, generator_version },
@@ -561,6 +590,7 @@ const useSettingsString = () => {
 
 export {
   getGeneratorVersionCache, getSettingsStringCache, TrackerProvider, useChecks,
-  useElement, useItems, useLocation, useSettingsString, useTracker
+  useElement, useItems, useLabelSelect, useLocation, useSelectedEFKDungeons,
+  useSettingsString, useTracker
 };
 
