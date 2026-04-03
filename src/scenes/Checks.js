@@ -290,14 +290,14 @@ const LocationsList = ({
             <span style={{
               fontSize: "0.7em",
               display: "block",
-              color: (numLocations - locationsCounter.checked) === 0
+              color: locationsCounter.checked >= numLocations
                 ? undefined
                 : locationsCounter.available === 0
                   ? "#dc3545"
-                  : locationsCounter.available === (numLocations - locationsCounter.checked)
+                  : locationsCounter.available + locationsCounter.checked >= numLocations
                     ? "#198754"
                     : "#ffc107",
-              opacity: (numLocations - locationsCounter.checked) === 0 ? 0.4 : 1,
+              opacity: locationsCounter.checked >= numLocations ? 0.75 : 1,
             }}>
               {locationsCounter.available}/{numLocations - locationsCounter.checked}
             </span>
