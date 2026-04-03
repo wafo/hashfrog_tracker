@@ -1,4 +1,4 @@
-const BUNDLED_VERSIONS = new Set(["9.0.0", "8.3.0"]);
+const BUNDLED_VERSIONS = new Set(["9.0.0", "8.3.0", "devTFBlitz_"]);
 
 const DEFAULT_OWNER = "OoTRandomizer";
 const FALLBACK_VERSION = "9.0.0";
