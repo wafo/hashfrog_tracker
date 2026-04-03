@@ -1,24 +1,37 @@
 const BUNDLED_VERSIONS = new Set(["9.0.0", "8.3.0", "devTFBlitz_"]);
 
+// Versions that are only bundled when the settings string exactly matches.
+const BUNDLED_VERSION_SETTINGS = {
+  "devTFBlitz_": "BSAZASAALTDDSLFQNACAAASWCHGADSFCAAABAAAA2NCA2VCAGXM29TASECCAWAACWAAFAXC2JTFF2WJVCQL6KTH5CQDAABSAGADWBRAJEWHBLZLAF2BQULFPBAASNBAUFZALAAESR4S25AQMAENSW26AFBJ9A3BEAWJSNEDC",
+};
+
 const DEFAULT_OWNER = "OoTRandomizer";
 const FALLBACK_VERSION = "9.0.0";
 
 /**
  * Checks if a version has bundled logic files.
  * @param {string} version - The version string to check.
+ * @param {string} [settingsString] - The settings string, required for versions in BUNDLED_VERSION_SETTINGS.
  * @returns {boolean} True if the version is bundled.
  */
-function isBundled(version) {
-  return BUNDLED_VERSIONS.has(version);
+function isBundled(version, settingsString) {
+  if (!BUNDLED_VERSIONS.has(version)) {
+    return false;
+  }
+  if (version in BUNDLED_VERSION_SETTINGS) {
+    return settingsString === BUNDLED_VERSION_SETTINGS[version];
+  }
+  return true;
 }
 
 /**
  * Dynamically imports bundled logic files for a version.
  * @param {string} version - The version string.
+ * @param {string} [settingsString] - The settings string, required for versions in BUNDLED_VERSION_SETTINGS.
  * @returns {Promise<object|null>} The bundle or null if not bundled.
  */
-async function getBundledLogicFiles(version) {
-  if (!isBundled(version)) {
+async function getBundledLogicFiles(version, settingsString) {
+  if (!isBundled(version, settingsString)) {
     return null;
   }
 

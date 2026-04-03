@@ -1563,7 +1563,6 @@
       "Kak Windmill": "True",
       "Kak Bazaar": "is_adult and at_day",
       "Kak Shooting Gallery": "is_adult and at_day",
-      "Bottom of the Well": "'Drain Well' and (is_child or shuffle_dungeon_entrances)",
       "Kak Potion Shop Front": "is_child or at_day",
       "Kak Redead Grotto": "can_open_bomb_grotto",
       "Kak Impas Ledge": "(is_child and at_day) or (is_adult and logic_visible_collisions)",
@@ -1571,7 +1570,18 @@
       "Kak Odd Medicine Rooftop": " can_use(Hookshot) or (logic_man_on_roof and (is_adult or at_day or Slingshot or has_bombchus or (logic_kakariko_tower_gs and (Sticks or Kokiri_Sword))))",
       "Kak Backyard": "is_adult or at_day",
       "Graveyard": "True",
-      "Kak Behind Gate": "is_adult or 'Kakariko Village Gate Open' or open_kakariko == 'open'"
+      "Kak Behind Gate": "is_adult or 'Kakariko Village Gate Open' or open_kakariko == 'open'",
+      "Bottom of the Well": "True",
+      "Deku Tree Lobby": "True",
+      "Dodongos Cavern Beginning": "True",
+      "Jabu Jabus Belly Beginning": "True",
+      "Forest Temple Lobby": "True",
+      "Fire Temple Lower": "True",
+      "Water Temple Lobby": "True",
+      "Shadow Temple Entryway": "True",
+      "Spirit Temple Lobby": "True",
+      "Ice Cavern Beginning": "True",
+      "Gerudo Training Ground Lobby": "True"
     }
   },
   {
