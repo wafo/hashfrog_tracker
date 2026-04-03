@@ -143,8 +143,8 @@ const Buttons = ({ type, setType }) => {
 const HintRegion = ({ actions, items, locations, selectedRegion, setSelectedRegion }) => {
   const locationsList = _.map(locations[selectedRegion], (locationData, locationName) => {
     const style = {};
-    if (locationData.isChecked) { style.textDecoration = "line-through"; }
     if (!locationData.isAvailable) { style.opacity = "0.5"; }
+    if (locationData.isChecked) { style.textDecoration = "line-through"; style.opacity = "0.2"; }
 
     const displayName = Locations.removeRegionPrefix(locationName, selectedRegion);
 
