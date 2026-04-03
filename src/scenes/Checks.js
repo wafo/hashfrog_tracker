@@ -4,13 +4,16 @@ import { OverlayTrigger, Popover } from "react-bootstrap";
 
 import RequirementsTooltip from "../components/RequirementsTooltip";
 import { useLayout } from "../context/layoutContext";
-import { useChecks, useLocation } from "../context/trackerContext";
+import { useChecks, useLocation, useSettingsString } from "../context/trackerContext";
 import DUNGEON_CONFIG from "../data/dungeon-config.json";
 import DUNGEONS from "../data/dungeons.json";
 import HINT_REGIONS_SHORT_NAMES from "../data/hint-regions-short-names.json";
+import SETTING_STRINGS_JSON from "../data/setting-strings.json";
 import Locations from "../utils/locations";
 import LogicHelper from "../utils/logic-helper";
 import SettingsHelper from "../utils/settings-helper";
+
+const EFK_SETTINGS_STRING = SETTING_STRINGS_JSON.presets.find(p => p.value === "escape_from_kak")?.settingsString;
 
 const DUNGEON_SHORTCUTS = DUNGEON_CONFIG.dungeonShortcuts;
 
@@ -18,6 +21,8 @@ const Checks = () => {
   const { state: layoutContext } = useLayout();
   const [actions] = useLocation();
   const { locations, items } = useChecks();
+  const { settings_string } = useSettingsString();
+  const isEFK = settings_string === EFK_SETTINGS_STRING;
   const [type, setType] = useState("overworld");
   const [selectedRegion, setSelectedRegion] = useState(null);
 
@@ -101,10 +106,11 @@ const Checks = () => {
 
   return (
     <div id="checks" className="check-tracker" style={{ backgroundColor: layoutContext.layoutConfig.backgroundColor }}>
-      <Buttons type={type} setType={setType} />
+      <Buttons isEFK={isEFK} type={type} setType={setType} />
       <LocationsList
         actions={actions}
         countLocations={countLocations}
+        isEFK={isEFK}
         items={items}
         locations={locations}
         onRegionClicked={onRegionClicked}
@@ -117,7 +123,10 @@ const Checks = () => {
   );
 };
 
-const Buttons = ({ type, setType }) => {
+const Buttons = ({ isEFK, type, setType }) => {
+  if (isEFK) {
+    return null;
+  }
   return (
     <div className="buttons mb-2">
       <button
@@ -226,6 +235,7 @@ const HintRegion = ({ actions, items, locations, selectedRegion, setSelectedRegi
 const LocationsList = ({
   actions,
   countLocations,
+  isEFK,
   items,
   locations,
   onRegionClicked,
@@ -244,9 +254,16 @@ const LocationsList = ({
       />
     );
   } else {
-    const regionNames = _.keys(locations).filter(regionName =>
-      type === "dungeon" ? _.includes(DUNGEONS, regionName) : !_.includes(DUNGEONS, regionName)
-    );
+    // EFK (Escape From Kak) shows only relevant regions in one combined list.
+    // Otherwise, split regions into overworld or dungeon based on the active tab.
+    const regionNames = isEFK
+      ? _.keys(locations).filter(regionName =>
+          regionName === "Kakariko Village" ||
+          (_.includes(DUNGEONS, regionName) && regionName !== "Ganons Castle")
+        )
+      : _.keys(locations).filter(regionName =>
+          type === "dungeon" ? _.includes(DUNGEONS, regionName) : !_.includes(DUNGEONS, regionName)
+        );
 
     const locationsList = regionNames.map(regionName => {
       const locationData = locations[regionName];
