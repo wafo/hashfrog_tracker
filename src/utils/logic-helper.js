@@ -280,10 +280,15 @@ class LogicHelper {
     return items;
   }
 
-  static updateItems(newItems) {
+  static updateItems(newItems, skipRegions = new Set()) {
     this.items = _.cloneDeep(newItems);
 
-    this.regions = { child: new Set(), adult: new Set() };
+    // Pre-populate skip regions as "already visited" so _recalculateAccessibleRegions
+    // won't traverse into them. Cleaned up at the end so isLocationAvailable stays correct.
+    this.regions = {
+      child: new Set(skipRegions),
+      adult: new Set(skipRegions),
+    };
 
     this._invalidateMemoizedFunctions();
 
@@ -353,6 +358,12 @@ class LogicHelper {
       accessibleChildRegions.length !== newChildRegions.length ||
       accessibleAdultRegions.length !== newAdultRegions.length
     );
+
+    // Remove skip regions so they aren't treated as accessible by isLocationAvailable
+    skipRegions.forEach(r => {
+      this.regions.child.delete(r);
+      this.regions.adult.delete(r);
+    });
   }
 
   static isLocationAvailable(locationName, age) {
