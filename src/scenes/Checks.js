@@ -89,13 +89,22 @@ const Checks = () => {
       skulls: 0,
     };
 
-    _.forEach(_.values(locations), regionLocations => {
+    const filteredRegions = isEFK
+      ? _.pickBy(locations, (_k, regionName) =>
+          regionName === "Kakariko Village" ||
+          (selectedEFKDungeonNames.length === 4
+            ? _.includes(selectedEFKDungeonNames, regionName)
+            : _.includes(DUNGEONS, regionName) && regionName !== "Ganons Castle")
+        )
+      : locations;
+
+    _.forEach(_.values(filteredRegions), regionLocations => {
       countLocations(regionLocations, newCounter);
     });
     newCounter.skulls = LogicHelper.countSkullsInLogic();
 
     return newCounter;
-  }, [locations]);
+  }, [locations, isEFK, selectedEFKDungeonNames]);
 
   const onRegionClicked = regionName => {
     setSelectedRegion(prev => (prev === regionName ? null : regionName));
