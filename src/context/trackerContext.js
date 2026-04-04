@@ -326,8 +326,10 @@ function reducer(state, action) {
       // Prepping collecting items with counters
       const parsedItems = parseItems(state.items_list, counters, state.unchanged_starting_inventory);
 
-      // Validating checks based on items collected
-      const locations = validateLocations(state.locations, parsedItems);
+      // Skip expensive location validation if items didn't actually change
+      const locations = _.isEqual(parsedItems, state.items)
+        ? state.locations
+        : validateLocations(state.locations, parsedItems);
 
       return {
         ...state,
@@ -349,8 +351,10 @@ function reducer(state, action) {
 
       const parsedItems = parseItems(items_list, state.counters, state.unchanged_starting_inventory);
 
-      // Validating checks based on items collected
-      const locations = validateLocations(state.locations, parsedItems);
+      // Skip expensive location validation if items didn't actually change
+      const locations = _.isEqual(parsedItems, state.items)
+        ? state.locations
+        : validateLocations(state.locations, parsedItems);
 
       return {
         ...state,
