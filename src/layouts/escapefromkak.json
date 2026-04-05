@@ -17,7 +17,7 @@
             5,
             5
          ],
-         "columns": 10,
+         "columns": 9,
          "padding": "3px",
          "elements": [
             "kokiri_sword",
@@ -29,7 +29,6 @@
             "bow",
             "fire_arrows",
             "dins",
-            "rutos_letter",
             "deku_shield",
             "hylian_shield",
             "mirror_shield",
@@ -39,16 +38,13 @@
             "hookshot",
             "ice_arrows",
             "farores",
-            "bottle_all",
             "strength",
             "tunic_goron",
             "tunic_zora",
             "boomerang",
             "lens",
-            "beans",
             "hammer",
-            "light_arrows",
-            "nayrus",
+            "bottle",
             "wallet",
             "magic",
             "boots_iron",
@@ -67,7 +63,7 @@
          "type": "table",
          "position": [
             140,
-            35
+            20
          ],
          "columns": 6,
          "padding": "4px 3px",
@@ -87,7 +83,7 @@
          "type": "table",
          "position": [
             110,
-            140
+            120
          ],
          "columns": 6,
          "padding": "4px 2px",
