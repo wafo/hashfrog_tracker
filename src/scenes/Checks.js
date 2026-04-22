@@ -163,8 +163,8 @@ const Buttons = ({ isEFK, type, setType }) => {
 const HintRegion = ({ actions, items, locations, selectedRegion, setSelectedRegion }) => {
   const locationsList = _.map(locations[selectedRegion], (locationData, locationName) => {
     const style = {};
-    if (locationData.isChecked) { style.textDecoration = "line-through"; }
     if (!locationData.isAvailable) { style.opacity = "0.5"; }
+    if (locationData.isChecked) { style.textDecoration = "line-through"; style.opacity = "0.2"; }
 
     const displayName = Locations.removeRegionPrefix(locationName, selectedRegion);
 
@@ -319,6 +319,20 @@ const LocationsList = ({
             style={style}
           >
             <span>{_.toUpper(HINT_REGIONS_SHORT_NAMES[regionName])}</span>
+            <span style={{
+              fontSize: "0.7em",
+              display: "block",
+              color: locationsCounter.checked >= numLocations
+                ? undefined
+                : locationsCounter.available === 0
+                  ? "#dc3545"
+                  : locationsCounter.available + locationsCounter.checked >= numLocations
+                    ? "#198754"
+                    : "#ffc107",
+              opacity: locationsCounter.checked >= numLocations ? 0.75 : 1,
+            }}>
+              {locationsCounter.available}/{numLocations - locationsCounter.checked}
+            </span>
           </button>
         </div>
       );
