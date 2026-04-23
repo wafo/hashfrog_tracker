@@ -8,12 +8,10 @@ import { useChecks, useLocation, useSelectedEFKDungeons, useSettingsString } fro
 import DUNGEON_CONFIG from "../data/dungeon-config.json";
 import DUNGEONS from "../data/dungeons.json";
 import HINT_REGIONS_SHORT_NAMES from "../data/hint-regions-short-names.json";
-import SETTING_STRINGS_JSON from "../data/setting-strings.json";
+import { isEFK, isEFKRelevantRegion } from "../utils/efk";
 import Locations from "../utils/locations";
 import LogicHelper from "../utils/logic-helper";
 import SettingsHelper from "../utils/settings-helper";
-
-const EFK_SETTINGS_STRING = SETTING_STRINGS_JSON.presets.find(p => p.value === "escape_from_kak")?.settingsString;
 
 const DUNGEON_SHORTCUTS = DUNGEON_CONFIG.dungeonShortcuts;
 
@@ -22,7 +20,7 @@ const Checks = () => {
   const [actions] = useLocation();
   const { locations, items } = useChecks();
   const { settings_string } = useSettingsString();
-  const isEFK = settings_string === EFK_SETTINGS_STRING;
+  const efkActive = isEFK(settings_string);
   const selectedEFKDungeonNames = useSelectedEFKDungeons();
   const [type, setType] = useState("overworld");
   const [selectedRegion, setSelectedRegion] = useState(null);
@@ -89,13 +87,8 @@ const Checks = () => {
       skulls: 0,
     };
 
-    const filteredRegions = isEFK
-      ? _.pickBy(locations, (_k, regionName) =>
-          regionName === "Kakariko Village" ||
-          (selectedEFKDungeonNames.length === 4
-            ? _.includes(selectedEFKDungeonNames, regionName)
-            : _.includes(DUNGEONS, regionName) && regionName !== "Ganons Castle")
-        )
+    const filteredRegions = efkActive
+      ? _.pickBy(locations, (_v, regionName) => isEFKRelevantRegion(regionName, selectedEFKDungeonNames))
       : locations;
 
     _.forEach(_.values(filteredRegions), regionLocations => {
@@ -104,7 +97,7 @@ const Checks = () => {
     newCounter.skulls = LogicHelper.countSkullsInLogic();
 
     return newCounter;
-  }, [locations, isEFK, selectedEFKDungeonNames]);
+  }, [locations, efkActive, selectedEFKDungeonNames]);
 
   const onRegionClicked = regionName => {
     setSelectedRegion(prev => (prev === regionName ? null : regionName));
@@ -116,11 +109,11 @@ const Checks = () => {
 
   return (
     <div id="checks" className="check-tracker" style={{ backgroundColor: layoutContext.layoutConfig.backgroundColor }}>
-      <Buttons isEFK={isEFK} type={type} setType={setType} />
+      <Buttons efkActive={efkActive} type={type} setType={setType} />
       <LocationsList
         actions={actions}
         countLocations={countLocations}
-        isEFK={isEFK}
+        efkActive={efkActive}
         items={items}
         locations={locations}
         onRegionClicked={onRegionClicked}
@@ -134,8 +127,8 @@ const Checks = () => {
   );
 };
 
-const Buttons = ({ isEFK, type, setType }) => {
-  if (isEFK) {
+const Buttons = ({ efkActive, type, setType }) => {
+  if (efkActive) {
     return null;
   }
   return (
@@ -246,7 +239,7 @@ const HintRegion = ({ actions, items, locations, selectedRegion, setSelectedRegi
 const LocationsList = ({
   actions,
   countLocations,
-  isEFK,
+  efkActive,
   items,
   locations,
   onRegionClicked,
@@ -266,16 +259,8 @@ const LocationsList = ({
       />
     );
   } else {
-    // EFK (Escape From Kak) shows only relevant regions in one combined list.
-    // If dungeon selectors are set, show only those dungeons + Kak; otherwise fall back to all dungeons.
-    // Otherwise, split regions into overworld or dungeon based on the active tab.
-    const regionNames = isEFK
-      ? _.keys(locations).filter(regionName =>
-          regionName === "Kakariko Village" ||
-          (selectedEFKDungeonNames.length === 4
-            ? _.includes(selectedEFKDungeonNames, regionName)
-            : (_.includes(DUNGEONS, regionName) && regionName !== "Ganons Castle"))
-        )
+    const regionNames = efkActive
+      ? _.keys(locations).filter(regionName => isEFKRelevantRegion(regionName, selectedEFKDungeonNames))
       : _.keys(locations).filter(regionName =>
           type === "dungeon" ? _.includes(DUNGEONS, regionName) : !_.includes(DUNGEONS, regionName)
         );

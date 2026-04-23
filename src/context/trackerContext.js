@@ -5,9 +5,8 @@ import COMBO_ITEMS from "../data/combo-items.json";
 import COUNTER_TO_ITEM from "../data/counter-to-item.json";
 import DEFAULT_ITEMS from "../data/default-items.json";
 import ITEMS_JSON from "../data/items.json";
-import HINT_REGIONS_SHORT_NAMES from "../data/hint-regions-short-names.json";
-import SETTING_STRINGS_JSON from "../data/setting-strings.json";
 import UUID_TO_ITEM from "../data/uuid-to-item.json";
+import { getEFKSkipRegions, getSelectedEFKDungeons, isEFKLabel } from "../utils/efk";
 import Locations from "../utils/locations";
 import LogicHelper from "../utils/logic-helper";
 import SettingsHelper from "../utils/settings-helper";
@@ -15,24 +14,6 @@ import SettingsHelper from "../utils/settings-helper";
 const GENERATOR_VERSION = process.env.REACT_APP_GENERATOR_VERSION;
 
 const COMBO_DERIVATIONS = COMBO_ITEMS;
-
-const EFK_SETTINGS_STRING = SETTING_STRINGS_JSON.presets.find(p => p.value === "escape_from_kak")?.settingsString;
-
-// Maps full dungeon hint-region names to the lobby region name used in the devTFBlitz_ Overworld graph.
-// These are the unconditional (True) exits added from Kakariko Village in the EFK version.
-const EFK_DUNGEON_LOBBY_REGIONS = {
-  "Deku Tree": "Deku Tree Lobby",
-  "Dodongos Cavern": "Dodongos Cavern Beginning",
-  "Jabu Jabus Belly": "Jabu Jabus Belly Beginning",
-  "Forest Temple": "Forest Temple Lobby",
-  "Fire Temple": "Fire Temple Lower",
-  "Water Temple": "Water Temple Lobby",
-  "Shadow Temple": "Shadow Temple Entryway",
-  "Spirit Temple": "Spirit Temple Lobby",
-  "Bottom of the Well": "Bottom of the Well",
-  "Ice Cavern": "Ice Cavern Beginning",
-  "Gerudo Training Ground": "Gerudo Training Ground Lobby"
-};
 
 const TrackerContext = createContext();
 
@@ -90,35 +71,6 @@ function parseItems(items_list, counters, unchanged_starting_inventory) {
   });
 
   return items;
-}
-
-/**
- * Returns a set of dungeon lobby region names to skip during region traversal.
- * Only applies when the EFK preset is active and all 4 dungeons are selected —
- * in that case we can skip traversing the 6 unselected dungeon regions.
- * @param {object} state - Current tracker state.
- * @returns {Set<string>} Region names to skip.
- */
-function getEFKSkipRegions(state) {
-  if (state.settings_string !== EFK_SETTINGS_STRING) {
-    return new Set();
-  }
-
-  const shortToFull = _.invert(HINT_REGIONS_SHORT_NAMES);
-  const selectedDungeons = new Set(
-    Object.values(state.labelSelections)
-      .filter(s => s.name === "efk_dungeon" && s.value !== "???")
-      .map(s => shortToFull[s.value])
-      .filter(Boolean),
-  );
-
-  const skipRegions = new Set();
-  Object.entries(EFK_DUNGEON_LOBBY_REGIONS).forEach(([dungeonName, lobbyRegion]) => {
-    if (!selectedDungeons.has(dungeonName)) {
-      skipRegions.add(lobbyRegion);
-    }
-  });
-  return skipRegions;
 }
 
 /**
@@ -378,7 +330,7 @@ function reducer(state, action) {
       // Skip expensive location validation if items didn't actually change
       const locations = _.isEqual(parsedItems, state.items)
         ? state.locations
-        : validateLocations(state.locations, parsedItems, getEFKSkipRegions(state));
+        : validateLocations(state.locations, parsedItems, getEFKSkipRegions(state.settings_string, state.labelSelections));
 
       return {
         ...state,
@@ -403,7 +355,7 @@ function reducer(state, action) {
       // Skip expensive location validation if items didn't actually change
       const locations = _.isEqual(parsedItems, state.items)
         ? state.locations
-        : validateLocations(state.locations, parsedItems, getEFKSkipRegions(state));
+        : validateLocations(state.locations, parsedItems, getEFKSkipRegions(state.settings_string, state.labelSelections));
 
       return {
         ...state,
@@ -430,12 +382,14 @@ function reducer(state, action) {
       const { elementId, name, value } = payload;
       const newLabelSelections = { ...state.labelSelections, [elementId]: { name, value } };
 
-      if (name === "efk_dungeon") {
-        // When an EFK dungeon label changes, the accessible dungeons change, so we get the updated 
-        // skip regions and revalidate locations to update the checks.
-        const newState = { ...state, labelSelections: newLabelSelections };
-        const locations = validateLocations(state.locations, state.items, getEFKSkipRegions(newState));
-        return { ...newState, locations };
+      if (isEFKLabel(name)) {
+        // Accessible dungeons changed; revalidate locations against the updated skip regions.
+        const locations = validateLocations(
+          state.locations,
+          state.items,
+          getEFKSkipRegions(state.settings_string, newLabelSelections),
+        );
+        return { ...state, labelSelections: newLabelSelections, locations };
       }
 
       return { ...state, labelSelections: newLabelSelections };
@@ -622,13 +576,7 @@ const useLabelSelect = () => {
 
 const useSelectedEFKDungeons = () => {
   const { state: { labelSelections } } = useTracker();
-  return useMemo(() => {
-    const shortToFull = _.invert(HINT_REGIONS_SHORT_NAMES);
-    return Object.values(labelSelections)
-      .filter(s => s.name === "efk_dungeon" && s.value !== "???")
-      .map(s => shortToFull[s.value])
-      .filter(Boolean);
-  }, [labelSelections]);
+  return useMemo(() => getSelectedEFKDungeons(labelSelections), [labelSelections]);
 };
 
 const useSettingsString = () => {
