@@ -283,20 +283,15 @@ class LogicHelper {
   static updateItems(newItems, skipRegions = new Set()) {
     this.items = _.cloneDeep(newItems);
 
-    // Pre-populate skip regions as "already visited" so _recalculateAccessibleRegions
-    // won't traverse into them. Cleaned up at the end so isLocationAvailable stays correct.
-    this.regions = {
-      child: new Set(skipRegions),
-      adult: new Set(skipRegions),
-    };
+    this.regions = { child: new Set(), adult: new Set() };
 
     this._invalidateMemoizedFunctions();
 
     let accessibleChildRegions = [];
-    const newChildRegions = Array.from(this._recalculateAccessibleRegions("Root", "child"));
+    const newChildRegions = Array.from(this._recalculateAccessibleRegions("Root", "child", new Set(), skipRegions));
 
     let accessibleAdultRegions = [];
-    const newAdultRegions = Array.from(this._recalculateAccessibleRegions("Root", "adult"));
+    const newAdultRegions = Array.from(this._recalculateAccessibleRegions("Root", "adult", new Set(), skipRegions));
 
     const guaranteedKeys = {};
     let updatedKeys = false;
@@ -338,7 +333,7 @@ class LogicHelper {
       accessibleAdultRegions = [...newAdultRegions];
 
       accessibleChildRegions.forEach(regionName => {
-        const moreRegions = this._recalculateAccessibleRegions(regionName, "child");
+        const moreRegions = this._recalculateAccessibleRegions(regionName, "child", new Set(), skipRegions);
         moreRegions.forEach(r => {
           if (!newChildRegions.includes(r)) {
             newChildRegions.push(r);
@@ -346,7 +341,7 @@ class LogicHelper {
         });
       });
       accessibleAdultRegions.forEach(regionName => {
-        const moreRegions = this._recalculateAccessibleRegions(regionName, "adult");
+        const moreRegions = this._recalculateAccessibleRegions(regionName, "adult", new Set(), skipRegions);
         moreRegions.forEach(r => {
           if (!newAdultRegions.includes(r)) {
             newAdultRegions.push(r);
@@ -358,12 +353,6 @@ class LogicHelper {
       accessibleChildRegions.length !== newChildRegions.length ||
       accessibleAdultRegions.length !== newAdultRegions.length
     );
-
-    // Remove skip regions so they aren't treated as accessible by isLocationAvailable
-    skipRegions.forEach(r => {
-      this.regions.child.delete(r);
-      this.regions.adult.delete(r);
-    });
   }
 
   static isLocationAvailable(locationName, age) {
@@ -475,14 +464,17 @@ class LogicHelper {
     return _.replace(itemName, /[() ]/g, match => (match === " " ? "_" : ""));
   }
 
-  static _recalculateAccessibleRegions(rootRegion, age, regionsToCheck = new Set()) {
+  static _recalculateAccessibleRegions(rootRegion, age, regionsToCheck = new Set(), skipRegions = new Set()) {
     const exits = Locations.getExitsForRegion(rootRegion);
     if (exits) {
       _.forEach(exits, (exitRule, exitName) => {
+        if (skipRegions.has(exitName)) {
+          return;
+        }
         if (!this.regions[age].has(exitName)) {
           if (this._evalNode(exitRule, age)) {
             this.regions[age].add(exitName);
-            this._recalculateAccessibleRegions(exitName, age, regionsToCheck);
+            this._recalculateAccessibleRegions(exitName, age, regionsToCheck, skipRegions);
           } else {
             regionsToCheck.add(rootRegion);
           }
