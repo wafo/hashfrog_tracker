@@ -8,6 +8,7 @@ import { readFileAsText } from "../utils/utils";
 // Layouts
 import hashfrogJSON from "../layouts/hashfrog.json";
 import linsoJSON from "../layouts/linso.json";
+import escapefromkakJSON from "../layouts/escapefromkak.json";
 
 const LayoutSelector = () => {
   const [key, setKey] = useState(Math.random());
@@ -43,6 +44,9 @@ const LayoutSelector = () => {
         break;
       case "linso":
         selectedLayout = linsoJSON;
+        break;
+      case "escapefromkak":
+        selectedLayout = escapefromkakJSON;
         break;
       default:
         selectedLayout = hashfrogJSON;
@@ -88,6 +92,12 @@ const LayoutSelector = () => {
         <li>
           <button type="button" className="btn btn-link btm-sm p-0" onClick={() => downloadLayout("linso")}>
             LinSo Like
+          </button>
+        </li>
+        <li className="list-divider">|</li>
+        <li>
+          <button type="button" className="btn btn-link btm-sm p-0" onClick={() => downloadLayout("escapefromkak")}>
+            EscapeFromKak
           </button>
         </li>
       </ul>

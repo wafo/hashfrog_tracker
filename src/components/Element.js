@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { useElement, useItems } from "../context/trackerContext";
+import { useElement, useItems, useLabelSelect } from "../context/trackerContext";
 
 // Base Icons
 import icon_check from "../assets/icons/check_16x16.png";
@@ -36,6 +36,7 @@ const Element = props => {
 
   const { markCounter, markItem, startingIndex: trackerContextStartingIndex, startingItem } = useItems(items, id);
   useElement(id, startingItem);
+  const labelSelect = useLabelSelect();
 
   const [selected, setSelected] = useState(trackerContextStartingIndex || selectedStartingIndex);
   const [counter, setCounter] = useState(0);
@@ -175,6 +176,7 @@ const Element = props => {
             label={label}
             labelStartingIndex={labelStartingIndex}
             labelBackgroundColor={labelBackgroundColor}
+            onLabelChange={(value) => labelSelect(id, name, value)}
           />
         )}
         {type === "nested" && (
@@ -192,7 +194,7 @@ const Element = props => {
   );
 };
 
-const ElementLabel = ({ label, labelStartingIndex, labelBackgroundColor }) => {
+const ElementLabel = ({ label, labelStartingIndex, labelBackgroundColor, onLabelChange }) => {
   const [index, setIndex] = useState(labelStartingIndex);
 
   const display = useMemo(() => {
@@ -207,12 +209,20 @@ const ElementLabel = ({ label, labelStartingIndex, labelBackgroundColor }) => {
       const { deltaY } = event;
       const max = label.length - 1 || 0;
       if (deltaY > 0) {
-        setIndex(prev => (prev === max ? prev : ++prev));
+        setIndex(prev => {
+          if (prev === max) { return prev; }
+          if (onLabelChange) { onLabelChange(label[++prev]); }
+          return prev;
+        });
       } else if (deltaY < 0) {
-        setIndex(prev => (prev === 0 ? prev : --prev));
+        setIndex(prev => {
+          if (prev === 0) { return prev; }
+          if (onLabelChange) { onLabelChange(label[--prev]); }
+          return prev;
+        });
       }
     },
-    [label],
+    [label, onLabelChange],
   );
 
   const handleOnClick = useCallback(
@@ -221,12 +231,20 @@ const ElementLabel = ({ label, labelStartingIndex, labelBackgroundColor }) => {
       event.stopPropagation();
       const max = label.length - 1 || 0;
       if (event.nativeEvent.type === "click") {
-        setIndex(prev => (prev === max ? prev : ++prev));
+        setIndex(prev => {
+          if (prev === max) { return prev; }
+          if (onLabelChange) { onLabelChange(label[++prev]); }
+          return prev;
+        });
       } else if (event.nativeEvent.type === "contextmenu") {
-        setIndex(prev => (prev === 0 ? prev : --prev));
+        setIndex(prev => {
+          if (prev === 0) { return prev; }
+          if (onLabelChange) { onLabelChange(label[--prev]); }
+          return prev;
+        });
       }
     },
-    [label],
+    [label, onLabelChange],
   );
 
   if (!label) { return null; }

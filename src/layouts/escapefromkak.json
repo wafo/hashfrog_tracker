@@ -1,0 +1,286 @@
+{
+   "id": "1d5a40bc94254c548b2cd1ed77e3ea5d",
+   "layoutConfig": {
+      "name": "EscapeFromKak",
+      "backgroundColor": "#000",
+      "width": 325,
+      "height": 650,
+      "fontFamily": null,
+      "fontSize": null,
+      "fontColor": null
+   },
+   "components": [
+      {
+         "id": "80104bad45684265a7c638b0af398c6d",
+         "type": "table",
+         "position": [
+            5,
+            5
+         ],
+         "columns": 9,
+         "padding": "3px",
+         "elements": [
+            "kokiri_sword",
+            "master_sword",
+            "biggoron_sword",
+            "sticks",
+            "nuts",
+            "bombs",
+            "bow",
+            "fire_arrows",
+            "dins",
+            "deku_shield",
+            "hylian_shield",
+            "mirror_shield",
+            "slingshot",
+            "progressive_ocarina",
+            "bombchus",
+            "hookshot",
+            "ice_arrows",
+            "farores",
+            "strength",
+            "tunic_goron",
+            "tunic_zora",
+            "boomerang",
+            "lens",
+            "hammer",
+            "bottle",
+            "wallet",
+            "magic",
+            "boots_iron",
+            "boots_hover",
+            "scale"
+         ],
+         "elementsSize": [
+            25,
+            25
+         ],
+         "displayName": "Items & Equipment",
+         "elementId": "a081121b16f84366bf16e16ca90cd23f"
+      },
+      {
+         "id": "7717af26740543a88a97e44df5f73a9f",
+         "type": "table",
+         "position": [
+            140,
+            20
+         ],
+         "columns": 6,
+         "padding": "4px 3px",
+         "elements": [
+            "song_lullaby_simple",
+            "song_time_simple"
+         ],
+         "elementsSize": [
+            25,
+            25
+         ],
+         "displayName": "Songs",
+         "elementId": "a081121b16f84366bf16e16ca90cd23f"
+      },
+      {
+         "id": "b0ee7a5ef1e44537b0b63ec133ecfa73",
+         "type": "table",
+         "position": [
+            110,
+            120
+         ],
+         "columns": 6,
+         "padding": "4px 2px",
+         "elements": [
+            "keys_forest",
+            "keys_fire",
+            "keys_water",
+            "keys_spirit",
+            "keys_shadow",
+            "keys_botw",
+            "bk_forest",
+            "bk_fire",
+            "bk_water",
+            "bk_spirit",
+            "bk_shadow",
+            "keys_gtg"
+         ],
+         "elementsSize": [
+            22,
+            22
+         ],
+         "displayName": "Dungeon Keys",
+         "elementId": "a081121b16f84366bf16e16ca90cd23f"
+      },
+      {
+         "id": "f5cc5938bc9c43ff9ec395c647506ff9",
+         "type": "table",
+         "displayName": "EFK Dungeon 1",
+         "position": [
+            200,
+            5
+         ],
+         "columns": 10,
+         "padding": "2px",
+         "elements": [
+            "efk_dungeon",
+            "efk_counter",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes"
+         ],
+         "elementsSize": [
+            25,
+            25
+         ],
+         "hidden": false,
+         "elementId": "a081121b16f84366bf16e16ca90cd23f"
+      },
+      {
+         "id": "d38ae66407b4491e91908e6f1612f638",
+         "type": "table",
+         "displayName": "EFK Dungeon 2",
+         "position": [
+            240,
+            5
+         ],
+         "columns": 10,
+         "padding": "2px",
+         "elements": [
+            "efk_dungeon",
+            "efk_counter",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes"
+         ],
+         "elementsSize": [
+            25,
+            25
+         ],
+         "hidden": false,
+         "elementId": "a081121b16f84366bf16e16ca90cd23f"
+      },
+      {
+         "id": "38756662e9a04b11b3fd72e8d757cf43",
+         "type": "table",
+         "displayName": "EFK Dungeon 3",
+         "position": [
+            280,
+            5
+         ],
+         "columns": 10,
+         "padding": "2px",
+         "elements": [
+            "efk_dungeon",
+            "efk_counter",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes"
+         ],
+         "elementsSize": [
+            25,
+            25
+         ],
+         "hidden": false,
+         "elementId": "a081121b16f84366bf16e16ca90cd23f"
+      },
+      {
+         "id": "8551c150230e43f08eff89cc0876b89d",
+         "type": "table",
+         "displayName": "EFK Dungeon 4",
+         "position": [
+            320,
+            5
+         ],
+         "columns": 10,
+         "padding": "2px",
+         "elements": [
+            "efk_dungeon",
+            "efk_counter",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes",
+            "sometimes"
+         ],
+         "elementsSize": [
+            25,
+            25
+         ],
+         "hidden": false,
+         "elementId": "a081121b16f84366bf16e16ca90cd23f"
+      }
+   ],
+   "elements": [
+      {
+         "id": "167600d90cc0420bb0194852c247f459",
+         "type": "label",
+         "name": "efk_dungeon",
+         "displayName": "EFK Dungeon",
+         "label": [
+            "GTG",
+            "ICE",
+            "BOTW",
+            "???",
+            "DEK",
+            "DC",
+            "JAB",
+            "FOR",
+            "FIR",
+            "WAT",
+            "SHA",
+            "SPI"
+         ],
+         "labelStartingIndex": 3,
+         "size": [
+            25,
+            25
+         ],
+         "icons": [
+            "single_triforce_bw_32x32.png",
+            "single_triforce_32x32.png"
+         ],
+         "countConfig": [
+            0,
+            1
+         ],
+         "receiver": false,
+         "selectedStartingIndex": 0
+      },
+      {
+         "id": "167336c4565243ca86508b139d972569",
+         "type": "counter",
+         "name": "efk_counter",
+         "displayName": "EFK Counter",
+         "label": "",
+         "labelStartingIndex": 0,
+         "size": [
+            25,
+            25
+         ],
+         "icons": [
+            "hash_frog_32x32.png"
+         ],
+         "countConfig": [
+            0,
+            20
+         ],
+         "receiver": false,
+         "selectedStartingIndex": 0
+      }
+   ]
+}

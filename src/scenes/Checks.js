@@ -4,10 +4,11 @@ import { OverlayTrigger, Popover } from "react-bootstrap";
 
 import RequirementsTooltip from "../components/RequirementsTooltip";
 import { useLayout } from "../context/layoutContext";
-import { useChecks, useLocation } from "../context/trackerContext";
+import { useChecks, useLocation, useSelectedEFKDungeons, useSettingsString } from "../context/trackerContext";
 import DUNGEON_CONFIG from "../data/dungeon-config.json";
 import DUNGEONS from "../data/dungeons.json";
 import HINT_REGIONS_SHORT_NAMES from "../data/hint-regions-short-names.json";
+import { isEFK, isEFKRelevantRegion } from "../utils/efk";
 import Locations from "../utils/locations";
 import LogicHelper from "../utils/logic-helper";
 import SettingsHelper from "../utils/settings-helper";
@@ -18,6 +19,9 @@ const Checks = () => {
   const { state: layoutContext } = useLayout();
   const [actions] = useLocation();
   const { locations, items } = useChecks();
+  const { settings_string } = useSettingsString();
+  const efkActive = isEFK(settings_string);
+  const selectedEFKDungeonNames = useSelectedEFKDungeons();
   const [type, setType] = useState("overworld");
   const [selectedRegion, setSelectedRegion] = useState(null);
 
@@ -83,13 +87,17 @@ const Checks = () => {
       skulls: 0,
     };
 
-    _.forEach(_.values(locations), regionLocations => {
+    const filteredRegions = efkActive
+      ? _.pickBy(locations, (_v, regionName) => isEFKRelevantRegion(regionName, selectedEFKDungeonNames))
+      : locations;
+
+    _.forEach(_.values(filteredRegions), regionLocations => {
       countLocations(regionLocations, newCounter);
     });
     newCounter.skulls = LogicHelper.countSkullsInLogic();
 
     return newCounter;
-  }, [locations]);
+  }, [locations, efkActive, selectedEFKDungeonNames]);
 
   const onRegionClicked = regionName => {
     setSelectedRegion(prev => (prev === regionName ? null : regionName));
@@ -101,13 +109,15 @@ const Checks = () => {
 
   return (
     <div id="checks" className="check-tracker" style={{ backgroundColor: layoutContext.layoutConfig.backgroundColor }}>
-      <Buttons type={type} setType={setType} />
+      <Buttons efkActive={efkActive} type={type} setType={setType} />
       <LocationsList
         actions={actions}
         countLocations={countLocations}
+        efkActive={efkActive}
         items={items}
         locations={locations}
         onRegionClicked={onRegionClicked}
+        selectedEFKDungeonNames={selectedEFKDungeonNames}
         selectedRegion={selectedRegion}
         setSelectedRegion={setSelectedRegion}
         type={type}
@@ -117,7 +127,10 @@ const Checks = () => {
   );
 };
 
-const Buttons = ({ type, setType }) => {
+const Buttons = ({ efkActive, type, setType }) => {
+  if (efkActive) {
+    return null;
+  }
   return (
     <div className="buttons mb-2">
       <button
@@ -226,9 +239,11 @@ const HintRegion = ({ actions, items, locations, selectedRegion, setSelectedRegi
 const LocationsList = ({
   actions,
   countLocations,
+  efkActive,
   items,
   locations,
   onRegionClicked,
+  selectedEFKDungeonNames,
   selectedRegion,
   setSelectedRegion,
   type,
@@ -244,9 +259,11 @@ const LocationsList = ({
       />
     );
   } else {
-    const regionNames = _.keys(locations).filter(regionName =>
-      type === "dungeon" ? _.includes(DUNGEONS, regionName) : !_.includes(DUNGEONS, regionName)
-    );
+    const regionNames = efkActive
+      ? _.keys(locations).filter(regionName => isEFKRelevantRegion(regionName, selectedEFKDungeonNames))
+      : _.keys(locations).filter(regionName =>
+          type === "dungeon" ? _.includes(DUNGEONS, regionName) : !_.includes(DUNGEONS, regionName)
+        );
 
     const locationsList = regionNames.map(regionName => {
       const locationData = locations[regionName];

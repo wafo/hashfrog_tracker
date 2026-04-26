@@ -1,11 +1,12 @@
 import _ from "lodash";
-import { createContext, useContext, useEffect, useMemo, useReducer } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useReducer } from "react";
 
 import COMBO_ITEMS from "../data/combo-items.json";
 import COUNTER_TO_ITEM from "../data/counter-to-item.json";
 import DEFAULT_ITEMS from "../data/default-items.json";
 import ITEMS_JSON from "../data/items.json";
 import UUID_TO_ITEM from "../data/uuid-to-item.json";
+import { getEFKSkipRegions, getSelectedEFKDungeons, isEFK, isEFKLabel } from "../utils/efk";
 import Locations from "../utils/locations";
 import LogicHelper from "../utils/logic-helper";
 import SettingsHelper from "../utils/settings-helper";
@@ -76,13 +77,14 @@ function parseItems(items_list, counters, unchanged_starting_inventory) {
  * Revalidates location availability based on current items.
  * @param {object} locations - Map of region names to location data.
  * @param {object} parsedItems - Parsed items from parseItems.
+ * @param {Set<string>} [skipRegions] - Lobby region names to exclude from traversal.
  * @returns {object} Cloned locations with updated isAvailable flags.
  */
-function validateLocations(locations, parsedItems) {
+function validateLocations(locations, parsedItems, skipRegions = new Set()) {
   const clonedLocations = _.cloneDeep(locations);
 
   if (!_.isEmpty(clonedLocations)) {
-    LogicHelper.updateItems(parsedItems);
+    LogicHelper.updateItems(parsedItems, skipRegions);
 
     _.forEach(_.values(clonedLocations), regionLocations => {
       _.forEach(regionLocations, (locationData, locationName) => {
@@ -325,8 +327,10 @@ function reducer(state, action) {
       // Prepping collecting items with counters
       const parsedItems = parseItems(state.items_list, counters, state.unchanged_starting_inventory);
 
-      // Validating checks based on items collected
-      const locations = validateLocations(state.locations, parsedItems);
+      // Skip expensive location validation if items didn't actually change
+      const locations = _.isEqual(parsedItems, state.items)
+        ? state.locations
+        : validateLocations(state.locations, parsedItems, getEFKSkipRegions(state.settings_string, state.labelSelections));
 
       return {
         ...state,
@@ -348,8 +352,10 @@ function reducer(state, action) {
 
       const parsedItems = parseItems(items_list, state.counters, state.unchanged_starting_inventory);
 
-      // Validating checks based on items collected
-      const locations = validateLocations(state.locations, parsedItems);
+      // Skip expensive location validation if items didn't actually change
+      const locations = _.isEqual(parsedItems, state.items)
+        ? state.locations
+        : validateLocations(state.locations, parsedItems, getEFKSkipRegions(state.settings_string, state.labelSelections));
 
       return {
         ...state,
@@ -371,6 +377,22 @@ function reducer(state, action) {
         ...state,
         generator_version: payload,
       };
+    }
+    case "LABEL_SELECT": {
+      const { elementId, name, value } = payload;
+      const newLabelSelections = { ...state.labelSelections, [elementId]: { name, value } };
+
+      if (isEFKLabel(name) && isEFK(state.settings_string)) {
+        // Accessible dungeons changed; revalidate locations against the updated skip regions.
+        const locations = validateLocations(
+          state.locations,
+          state.items,
+          getEFKSkipRegions(state.settings_string, newLabelSelections),
+        );
+        return { ...state, labelSelections: newLabelSelections, locations };
+      }
+
+      return { ...state, labelSelections: newLabelSelections };
     }
     case "ELEMENT_REGISTER": {
       const { id, startingItem } = payload;
@@ -431,6 +453,7 @@ function TrackerProvider(props) {
     starting_item_claims: {}, // { elementId: uuid } - tracks which element claimed which starting item
     settings_string: getSettingsStringCache(),
     generator_version: getGeneratorVersionCache(),
+    labelSelections: {}, // { elementId: { name, value } } - e.g. { 1: {"efk_dungeon", "DEK"} }
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -542,6 +565,20 @@ const useItems = (items, elementId = null) => {
   return { ...actions, startingIndex, startingItem };
 };
 
+const useLabelSelect = () => {
+  const { dispatch } = useTracker();
+  return useCallback(
+    (elementId, name, value) =>
+      dispatch({ type: "LABEL_SELECT", payload: { elementId, name, value } }),
+    [dispatch],
+  );
+};
+
+const useSelectedEFKDungeons = () => {
+  const { state: { labelSelections } } = useTracker();
+  return useMemo(() => getSelectedEFKDungeons(labelSelections), [labelSelections]);
+};
+
 const useSettingsString = () => {
   const {
     state: { settings_string, generator_version },
@@ -561,6 +598,7 @@ const useSettingsString = () => {
 
 export {
   getGeneratorVersionCache, getSettingsStringCache, TrackerProvider, useChecks,
-  useElement, useItems, useLocation, useSettingsString, useTracker
+  useElement, useItems, useLabelSelect, useLocation, useSelectedEFKDungeons,
+  useSettingsString, useTracker
 };
 
