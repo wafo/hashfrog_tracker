@@ -6,7 +6,7 @@ import COUNTER_TO_ITEM from "../data/counter-to-item.json";
 import DEFAULT_ITEMS from "../data/default-items.json";
 import ITEMS_JSON from "../data/items.json";
 import UUID_TO_ITEM from "../data/uuid-to-item.json";
-import { getEFKSkipRegions, getSelectedEFKDungeons, isEFKLabel } from "../utils/efk";
+import { getEFKSkipRegions, getSelectedEFKDungeons, isEFK, isEFKLabel } from "../utils/efk";
 import Locations from "../utils/locations";
 import LogicHelper from "../utils/logic-helper";
 import SettingsHelper from "../utils/settings-helper";
@@ -382,7 +382,7 @@ function reducer(state, action) {
       const { elementId, name, value } = payload;
       const newLabelSelections = { ...state.labelSelections, [elementId]: { name, value } };
 
-      if (isEFKLabel(name)) {
+      if (isEFKLabel(name) && isEFK(state.settings_string)) {
         // Accessible dungeons changed; revalidate locations against the updated skip regions.
         const locations = validateLocations(
           state.locations,
