@@ -713,13 +713,13 @@ class Locations {
 
     if (_.startsWith(locationName, regionShortName)) {
       // Trim the short name for the region from the location name
-      return _.slice(locationName, _.size(regionShortName) + 1);
+      return locationName.slice(_.size(regionShortName) + 1);
     } else if (_.startsWith(locationName, regionName)) {
       // Trim the full name for the region from the location name
-      return _.slice(locationName, _.size(regionName) + 1);
+      return locationName.slice(_.size(regionName) + 1);
     } else if (regionName === "Desert Colossus" && _.startsWith(locationName, "Colossus ")) {
       // Special case: locations in the "Desert Colossus" region start with just "Colossus", so trim that off
-      return _.slice(locationName, _.size("Colossus "));
+      return locationName.slice(_.size("Colossus "));
     }
 
     // Nothing to trim, return back the location name
