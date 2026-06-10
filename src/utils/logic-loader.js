@@ -2,12 +2,12 @@ import DUNGEONS from "../data/dungeons.json";
 import VersionConfig from "../versions/version-config";
 
 class LogicLoader {
-  static async loadLogicFiles(version) {
+  static async loadLogicFiles(version, settingsString) {
     const normalizedVersion = VersionConfig.normalizeVersion(version);
 
     // Check for bundled logic files
-    if (VersionConfig.isBundled(normalizedVersion)) {
-      return await VersionConfig.getBundledLogicFiles(normalizedVersion);
+    if (VersionConfig.isBundled(normalizedVersion, settingsString)) {
+      return await VersionConfig.getBundledLogicFiles(normalizedVersion, settingsString);
     }
 
     // If none are found, try to fetch them from GitHub

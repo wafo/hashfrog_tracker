@@ -32,6 +32,13 @@
       "generatorVersion": "9.0.0",
       "settingsString": "BSAND6CAX2TBJX4GGABZL62ANAEABASACEAAABABA6BANBAACAUJJASCACCLBJXAQL6KBAACABNAGJD8AS6GBUV8EMBSBWAF3WQYAAAJAA3CGZA2AAESR4S2GSRBABDEGHA8CARABAFCED3SA",
       "description": "The official settings for SpeedGaming Live 2025."
+    },
+    {
+      "label": "Escape From Kak",
+      "value": "escape_from_kak",
+      "generatorVersion": "devTFBlitz_",
+      "settingsString": "BSAZASAALTDDSLFQNACAAASWCHGADSFCAAABAAAA2NCA2VCAGXM29TASECCAWAACWAAFAXC2JTFF2WJVCQL6KTH5CQDAABSAGADWBRAJEWHBLZLAF2BQULFPBAASNBAUFZALAAESR4S25AQMAENSW26AFBJ9A3BEAWJSNEDC",
+      "description": "The settings for Escape from Kak."
     }
   ]
 }
