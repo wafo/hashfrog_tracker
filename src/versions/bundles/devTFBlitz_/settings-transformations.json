@@ -1,0 +1,10 @@
+[
+  {
+    "from": "free_scarecrow",
+    "to": "scarecrow_behavior",
+    "convert": {
+      "true": "free",
+      "false": "start"
+    }
+  }
+]

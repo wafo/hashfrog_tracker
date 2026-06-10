@@ -24,7 +24,7 @@ const useLogicInitialization = (options = {}) => {
       const settingsString = getSettingsStringCache();
 
       // Load logic files for the specific generator version
-      const bundle = await LogicLoader.loadLogicFiles(generatorVersion);
+      const bundle = await LogicLoader.loadLogicFiles(generatorVersion, settingsString);
       const { logicHelpersFile, dungeonFiles, dungeonMQFiles, bossesFile, overworldFile } = bundle;
 
       // Initialize SettingsHelper with version-specific defaults
