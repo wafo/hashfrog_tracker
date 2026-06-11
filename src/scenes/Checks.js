@@ -179,7 +179,8 @@ const groupRegionChecks = (regionLocations, regionName) => {
     // Gives us match[1] -> "Child Pot", match[2] -> "1"
     const match = /^(.+?)\s+(\d+)$/.exec(displayName);
     const location = Locations.getLocation(locationName);
-    const groupable = match && !(location && location.type === "Shop");
+    const isShop = location && (location.type === "Shop" || location.type === "MaskShop");
+    const groupable = match && !isShop;
     // Merge only same-prefix checks with identical requirements: "Prefix|Requirements".
     const groupKey = groupable ? `${match[1]}|${requirementsString(locationName)}` : locationName;
     if (!groups[groupKey]) {
