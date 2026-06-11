@@ -198,7 +198,7 @@
   "Market Potion Shop Item 1":                                            ["Shop",         "Buy Green Potion"],
   "Market Potion Shop Item 2":                                            ["Shop",         "Buy Blue Fire"],
   "Market Potion Shop Item 3":                                            ["Shop",         "Buy Red Potion for 30 Rupees"],
-  "Market Potion Shop Item 4":                                            ["Shop",         "None"],
+  "Market Potion Shop Item 4":                                            ["Shop",         "Buy Fairy's Spirit"],
   "Market Potion Shop Item 5":                                            ["Shop",         "Buy Deku Nut (5)"],
   "Market Potion Shop Item 6":                                            ["Shop",         "Buy Bottle Bug"],
   "Market Potion Shop Item 7":                                            ["Shop",         "Buy Poe"],
@@ -386,7 +386,7 @@
   "Kak Potion Shop Item 5":                                               ["Shop",         "Buy Blue Fire"],
   "Kak Potion Shop Item 6":                                               ["Shop",         "Buy Bottle Bug"],
   "Kak Potion Shop Item 7":                                               ["Shop",         "Buy Poe"],
-  "Kak Potion Shop Item 8":                                               ["Shop",         "None"],
+  "Kak Potion Shop Item 8":                                               ["Shop",         "Buy Fairy's Spirit"],
 
   "Kak Near Potion Shop Pot 1":                                           ["Pot",          "Recovery Heart"],
   "Kak Near Potion Shop Pot 2":                                           ["Pot",          "Recovery Heart"],
@@ -443,7 +443,7 @@
   "Graveyard Dampe Race Rupee 7":                                         ["Freestanding", "Rupee (1)"],
   "Graveyard Dampe Race Rupee 8":                                         ["Freestanding", "Rupee (1)"],
 
-  "Graveyard Freestanding PoH Crate":                                     ["Crate",        "None"],
+  "Graveyard Freestanding PoH Crate":                                     ["Crate",        "Nothing"],
   "Graveyard Dampe Pot 1":                                                ["Pot",          "Recovery Heart"],
   "Graveyard Dampe Pot 2":                                                ["Pot",          "Deku Nuts (5)"],
   "Graveyard Dampe Pot 3":                                                ["Pot",          "Bombs (5)"],
