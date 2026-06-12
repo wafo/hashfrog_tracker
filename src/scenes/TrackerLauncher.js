@@ -319,6 +319,11 @@ const TrackerLauncher = () => {
             <li>
               Advanced logic is not yet supported.
             </li>
+            <li>
+              Checks with the same name plus a number prefix are grouped together
+              if they have the same access requirements, with the total number of
+              checks shown in parentheses, e.g. Guard House Child Pot (44).
+            </li>
           </ul>
         </Card.Body>
       </Card>

@@ -8,6 +8,7 @@ import { useChecks, useLocation, useSelectedEFKDungeons, useSettingsString } fro
 import DUNGEON_CONFIG from "../data/dungeon-config.json";
 import DUNGEONS from "../data/dungeons.json";
 import HINT_REGIONS_SHORT_NAMES from "../data/hint-regions-short-names.json";
+import { getRequirementsStructure } from "../utils/expression-converter";
 import { isEFK, isEFKRelevantRegion } from "../utils/efk";
 import Locations from "../utils/locations";
 import LogicHelper from "../utils/logic-helper";
@@ -153,13 +154,70 @@ const Buttons = ({ efkActive, type, setType }) => {
   );
 };
 
-const HintRegion = ({ actions, items, locations, selectedRegion, setSelectedRegion }) => {
-  const locationsList = _.map(locations[selectedRegion], (locationData, locationName) => {
-    const style = {};
-    if (!locationData.isAvailable) { style.opacity = "0.5"; }
-    if (locationData.isChecked) { style.textDecoration = "line-through"; style.opacity = "0.2"; }
+// Stable string describing a location's item requirements. Used to compare
+// two checks for requirements equality.
+const requirementsString = locationName => {
+  const { clauses, satisfied } = getRequirementsStructure(locationName);
+  if (satisfied || !clauses || clauses.length === 0) {
+    return "NONE";
+  }
+  return clauses
+    .map(clause => clause.items.map(item => item.name).sort().join("&"))
+    .sort()
+    .join("|");
+};
 
-    const displayName = Locations.removeRegionPrefix(locationName, selectedRegion);
+// Collapse checks that share a name prefix and end in a number (e.g.
+// "Guard House Child Pot 1".."44") into a single entry. Only checks with
+// identical item requirements merge. Shop slots are kept individual since
+// wallet requirements are unknown.
+const groupRegionChecks = (regionLocations, regionName) => {
+  const groups = {};
+  _.forEach(regionLocations, (locationData, locationName) => {
+    const displayName = Locations.removeRegionPrefix(locationName, regionName);
+    // Match prefix, space, number.
+    // Gives us match[1] -> "Child Pot", match[2] -> "1"
+    const match = /^(.+?)\s+(\d+)$/.exec(displayName);
+    const location = Locations.getLocation(locationName);
+    const isShop = location && (location.type === "Shop" || location.type === "MaskShop");
+    const groupable = match && !isShop;
+    // Merge only same-prefix checks with identical requirements: "Prefix|Requirements".
+    const groupKey = groupable ? `${match[1]}|${requirementsString(locationName)}` : locationName;
+    if (!groups[groupKey]) {
+      groups[groupKey] = { prefix: groupable ? match[1] : displayName, members: [] };
+    }
+    groups[groupKey].members.push({ locationName, locationData, displayName });
+  });
+  return _.values(groups);
+};
+
+const HintRegion = ({ actions, items, locations, selectedRegion, setSelectedRegion }) => {
+  const groups = useMemo(
+    () => groupRegionChecks(locations[selectedRegion], selectedRegion),
+    [locations, selectedRegion],
+  );
+
+  const locationsList = _.map(groups, ({ prefix, members }) => {
+    const isChecked = _.every(members, m => m.locationData.isChecked);
+    const isAvailable = _.some(members, m => m.locationData.isAvailable);
+    const count = members.length;
+    // The first member is unique to this group, so it identifies the entry.
+    const locationName = members[0].locationName;
+
+    const style = {};
+    if (!isAvailable) { style.opacity = "0.5"; }
+    if (isChecked) { style.textDecoration = "line-through"; style.opacity = "0.2"; }
+
+    // Collapsed groups show their size, e.g. "Child Pot (44)".
+    const displayName = count > 1 ? `${prefix} (${count})` : members[0].displayName;
+
+    // Toggle every member toward one target state.
+    const mark = () => {
+      const target = !isChecked;
+      members.forEach(m => {
+        if (m.locationData.isChecked !== target) { actions.markLocation(m.locationName, selectedRegion); }
+      });
+    };
 
     const popover = (
       <Popover id={`popover-${locationName}`} className="requirements-popover">
@@ -180,10 +238,10 @@ const HintRegion = ({ actions, items, locations, selectedRegion, setSelectedRegi
           <button
             type="button"
             style={style}
-            onClick={() => actions.markLocation(locationName, selectedRegion)}
+            onClick={mark}
             onContextMenu={e => {
               e.preventDefault();
-              actions.markLocation(locationName, selectedRegion);
+              mark();
             }}
           >
             {displayName}
