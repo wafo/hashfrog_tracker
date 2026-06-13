@@ -579,6 +579,9 @@ class Locations {
 
     // Pots
     else if (_.includes(["Pot", "FlyingPot"], location.type)) {
+      if (location.vanillaItem === "Nothing" && !SettingsHelper.getSetting("shuffle_empty_pots")) {
+        return false;
+      }
       const shufflePots = SettingsHelper.getSetting("shuffle_pots");
       if (shufflePots === "all") {
         return true;
@@ -593,6 +596,9 @@ class Locations {
 
     // Crates
     else if (_.includes(["Crate", "SmallCrate"], location.type)) {
+      if (location.vanillaItem === "Nothing" && !SettingsHelper.getSetting("shuffle_empty_crates")) {
+        return false;
+      }
       const shuffleCrates = SettingsHelper.getSetting("shuffle_crates");
       if (shuffleCrates === "all") {
         return true;
