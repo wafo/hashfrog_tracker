@@ -36,25 +36,33 @@ const LayoutSelector = () => {
     setKey(Math.random());
   }, [dispatch]);
 
-  const downloadLayout = selected => {
-    let selectedLayout = null;
-    switch (selected) {
-      case "hashfrog":
-        selectedLayout = hashfrogJSON;
-        break;
-      case "linso":
-        selectedLayout = linsoJSON;
-        break;
-      case "escapefromkak":
-        selectedLayout = escapefromkakJSON;
-        break;
-      default:
-        selectedLayout = hashfrogJSON;
-        break;
-    }
-    const jsonBlob = new Blob([JSON.stringify(selectedLayout)], { type: "text/plain" });
-    FileSaver.saveAs(jsonBlob, `${selectedLayout.layoutConfig.name.replace(/ /g, "_")}.json`);
-  };
+  const downloadCurrentLayout = useCallback(() => {
+    const jsonBlob = new Blob([JSON.stringify(layout)], { type: "text/plain" });
+    FileSaver.saveAs(jsonBlob, `${layout.layoutConfig.name.replace(/ /g, "_")}.json`);
+  }, [layout]);
+
+  const applyPreset = useCallback(
+    selected => {
+      let selectedLayout = null;
+      switch (selected) {
+        case "hashfrog":
+          selectedLayout = hashfrogJSON;
+          break;
+        case "linso":
+          selectedLayout = linsoJSON;
+          break;
+        case "escapefromkak":
+          selectedLayout = escapefromkakJSON;
+          break;
+        default:
+          selectedLayout = hashfrogJSON;
+          break;
+      }
+      dispatch({ type: "LAYOUT_UPDATE", payload: selectedLayout });
+      setKey(Math.random());
+    },
+    [dispatch],
+  );
 
   return (
     <div className="w-75">
@@ -75,7 +83,7 @@ const LayoutSelector = () => {
         <Link to="/editor" className="btn btn-light btn-sm w-25 me-2">
           Editor
         </Link>
-        <button type="button" className="btn btn-light btn-sm w-25" onClick={resetLayout}>
+        <button type="button" className="btn btn-light btn-sm w-25 me-2" onClick={resetLayout}>
           Reset
         </button>
       </div>
@@ -84,23 +92,26 @@ const LayoutSelector = () => {
       <h5>Layout Presets</h5>
       <ul className="list-unstyled list-horizontal">
         <li>
-          <button type="button" className="btn btn-link btm-sm p-0" onClick={() => downloadLayout("hashfrog")}>
+          <button type="button" className="btn btn-link btm-sm p-0" onClick={() => applyPreset("hashfrog")}>
             HashFrog
           </button>
         </li>
         <li className="list-divider">|</li>
         <li>
-          <button type="button" className="btn btn-link btm-sm p-0" onClick={() => downloadLayout("linso")}>
+          <button type="button" className="btn btn-link btm-sm p-0" onClick={() => applyPreset("linso")}>
             LinSo Like
           </button>
         </li>
         <li className="list-divider">|</li>
         <li>
-          <button type="button" className="btn btn-link btm-sm p-0" onClick={() => downloadLayout("escapefromkak")}>
+          <button type="button" className="btn btn-link btm-sm p-0" onClick={() => applyPreset("escapefromkak")}>
             EscapeFromKak
           </button>
         </li>
       </ul>
+      <button type="button" className="btn btn-light btn-sm" onClick={downloadCurrentLayout}>
+        Download Current Layout
+      </button>
     </div>
   );
 };
