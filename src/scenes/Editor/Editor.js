@@ -1,5 +1,6 @@
 import FileSaver from "file-saver";
 import { useCallback, useMemo, useState } from "react";
+import { useLayout } from "../../context/layoutContext";
 import useDebounce from "../../hooks/useDebounce";
 import baseLayout from "../../layouts/base.json";
 import { generateId, readFileAsText } from "../../utils/utils";
@@ -115,8 +116,9 @@ function prepareLayout(rawLayout) {
 }
 
 const Editor = () => {
+  const { state: currentLayout } = useLayout();
   const [tab, setTab] = useState(0);
-  const [layout, setLayout] = useState({ ...baseLayout });
+  const [layout, setLayout] = useState(() => prepareLayout(currentLayout));
   const [layoutKey, setLayoutKey] = useState(Math.random());
 
   const newLayout = () => {

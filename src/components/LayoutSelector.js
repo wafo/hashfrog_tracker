@@ -1,4 +1,3 @@
-import FileSaver from "file-saver";
 import { useCallback, useState } from "react";
 
 import { Link } from "react-router-dom";
@@ -35,11 +34,6 @@ const LayoutSelector = () => {
     dispatch({ type: "LAYOUT_DEFAULT" });
     setKey(Math.random());
   }, [dispatch]);
-
-  const downloadCurrentLayout = useCallback(() => {
-    const jsonBlob = new Blob([JSON.stringify(layout)], { type: "text/plain" });
-    FileSaver.saveAs(jsonBlob, `${layout.layoutConfig.name.replace(/ /g, "_")}.json`);
-  }, [layout]);
 
   const applyPreset = useCallback(
     selected => {
@@ -83,7 +77,7 @@ const LayoutSelector = () => {
         <Link to="/editor" className="btn btn-light btn-sm w-25 me-2">
           Editor
         </Link>
-        <button type="button" className="btn btn-light btn-sm w-25 me-2" onClick={resetLayout}>
+        <button type="button" className="btn btn-light btn-sm w-25" onClick={resetLayout}>
           Reset
         </button>
       </div>
@@ -109,9 +103,6 @@ const LayoutSelector = () => {
           </button>
         </li>
       </ul>
-      <button type="button" className="btn btn-light btn-sm" onClick={downloadCurrentLayout}>
-        Download Current Layout
-      </button>
     </div>
   );
 };
