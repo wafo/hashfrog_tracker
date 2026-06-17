@@ -1,4 +1,3 @@
-import FileSaver from "file-saver";
 import { useCallback, useState } from "react";
 
 import { Link } from "react-router-dom";
@@ -36,25 +35,28 @@ const LayoutSelector = () => {
     setKey(Math.random());
   }, [dispatch]);
 
-  const downloadLayout = selected => {
-    let selectedLayout = null;
-    switch (selected) {
-      case "hashfrog":
-        selectedLayout = hashfrogJSON;
-        break;
-      case "linso":
-        selectedLayout = linsoJSON;
-        break;
-      case "escapefromkak":
-        selectedLayout = escapefromkakJSON;
-        break;
-      default:
-        selectedLayout = hashfrogJSON;
-        break;
-    }
-    const jsonBlob = new Blob([JSON.stringify(selectedLayout)], { type: "text/plain" });
-    FileSaver.saveAs(jsonBlob, `${selectedLayout.layoutConfig.name.replace(/ /g, "_")}.json`);
-  };
+  const applyPreset = useCallback(
+    selected => {
+      let selectedLayout = null;
+      switch (selected) {
+        case "hashfrog":
+          selectedLayout = hashfrogJSON;
+          break;
+        case "linso":
+          selectedLayout = linsoJSON;
+          break;
+        case "escapefromkak":
+          selectedLayout = escapefromkakJSON;
+          break;
+        default:
+          selectedLayout = hashfrogJSON;
+          break;
+      }
+      dispatch({ type: "LAYOUT_UPDATE", payload: selectedLayout });
+      setKey(Math.random());
+    },
+    [dispatch],
+  );
 
   return (
     <div className="w-75">
@@ -84,19 +86,19 @@ const LayoutSelector = () => {
       <h5>Layout Presets</h5>
       <ul className="list-unstyled list-horizontal">
         <li>
-          <button type="button" className="btn btn-link btm-sm p-0" onClick={() => downloadLayout("hashfrog")}>
+          <button type="button" className="btn btn-link btm-sm p-0" onClick={() => applyPreset("hashfrog")}>
             HashFrog
           </button>
         </li>
         <li className="list-divider">|</li>
         <li>
-          <button type="button" className="btn btn-link btm-sm p-0" onClick={() => downloadLayout("linso")}>
+          <button type="button" className="btn btn-link btm-sm p-0" onClick={() => applyPreset("linso")}>
             LinSo Like
           </button>
         </li>
         <li className="list-divider">|</li>
         <li>
-          <button type="button" className="btn btn-link btm-sm p-0" onClick={() => downloadLayout("escapefromkak")}>
+          <button type="button" className="btn btn-link btm-sm p-0" onClick={() => applyPreset("escapefromkak")}>
             EscapeFromKak
           </button>
         </li>
