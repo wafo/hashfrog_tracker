@@ -34,11 +34,15 @@ const Element = props => {
     hidden = false
   } = props;
 
-  const { markCounter, markItem, startingIndex: trackerContextStartingIndex, startingItem } = useItems(items, id);
+  const {
+    markCounter, markItem, startingIndex: trackerContextStartingIndex, startingItem, savedIndex, savedCounter, savedLabelValue,
+  } = useItems(items, id, name);
   useElement(id, startingItem);
   const labelSelect = useLabelSelect();
 
-  const [selected, setSelected] = useState(trackerContextStartingIndex || selectedStartingIndex);
+  const resolvedStartingIndex = savedIndex !== null ? savedIndex : trackerContextStartingIndex;
+
+  const [selected, setSelected] = useState(resolvedStartingIndex || selectedStartingIndex);
   const [counter, setCounter] = useState(0);
   const [iconHash, setIconHash] = useState(null);
   const [draggedIcon, setDraggedIcon] = useState(null);
@@ -51,23 +55,30 @@ const Element = props => {
       return (acc += cv);
     }, "");
 
-    if (iconHash !== null && hash !== iconHash && trackerContextStartingIndex === 0) {
+    if (iconHash !== null && hash !== iconHash && resolvedStartingIndex === 0) {
       setSelected(0);
     }
 
     setIconHash(hash);
-  }, [icons, iconHash, name, trackerContextStartingIndex]);
+  }, [icons, iconHash, name, resolvedStartingIndex]);
 
-  // Sync selected state when starting items change
+  // Sync selected state when the restored/starting item index changes
   useEffect(() => {
-    if (trackerContextStartingIndex > 0) {
-      // This element should claim the starting item
-      setSelected(trackerContextStartingIndex);
+    if (resolvedStartingIndex > 0) {
+      // This element should claim the restored or starting item
+      setSelected(resolvedStartingIndex);
     } else if (!hasUserInteracted.current) {
       // Another element claimed the item and user hasn't interacted - reset to uncollected
       setSelected(0);
     }
-  }, [trackerContextStartingIndex]);
+  }, [resolvedStartingIndex]);
+
+  // Restore a saved counter value when one is present
+  useEffect(() => {
+    if (savedCounter !== null) {
+      setCounter(savedCounter);
+    }
+  }, [savedCounter]);
 
   const icon = useMemo(() => {
     return icons[selected];
@@ -176,6 +187,7 @@ const Element = props => {
             label={label}
             labelStartingIndex={labelStartingIndex}
             labelBackgroundColor={labelBackgroundColor}
+            savedValue={savedLabelValue}
             onLabelChange={(value) => labelSelect(id, name, value)}
           />
         )}
@@ -194,8 +206,16 @@ const Element = props => {
   );
 };
 
-const ElementLabel = ({ label, labelStartingIndex, labelBackgroundColor, onLabelChange }) => {
+const ElementLabel = ({ label, labelStartingIndex, labelBackgroundColor, savedValue, onLabelChange }) => {
   const [index, setIndex] = useState(labelStartingIndex);
+
+  // Restore a saved label selection by resolving its value back to an index
+  useEffect(() => {
+    if (savedValue !== null && Array.isArray(label)) {
+      const idx = label.indexOf(savedValue);
+      if (idx >= 0) { setIndex(idx); }
+    }
+  }, [savedValue, label]);
 
   const display = useMemo(() => {
     if (Array.isArray(label)) {

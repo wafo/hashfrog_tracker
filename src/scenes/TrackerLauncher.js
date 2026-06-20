@@ -9,7 +9,7 @@ import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import LayoutSelector from "../components/LayoutSelector";
 import { useLayout } from "../context/layoutContext";
-import { useSettingsString } from "../context/trackerContext";
+import { loadSession, useSettingsString } from "../context/trackerContext";
 import SettingStringsJSON from "../data/setting-strings.json";
 import useDebounce from "../hooks/useDebounce";
 
@@ -42,19 +42,6 @@ const TrackerLauncher = () => {
       height: height + heightPadding,
     };
   }, [checks, layout]);
-
-  const launchTracker = useCallback(() => {
-    let url = `${baseURL}/tracker`;
-    if (checks) { url = `${baseURL}/tracker/checks`; }
-
-    const { width, height } = layoutSize;
-
-    window.open(
-      url,
-      "HashFrog Tracker",
-      `toolbar=0,location=0,status=0,menubar=0,scrollbars=0,resizable=0,width=${width},height=${height}`
-    );
-  }, [checks, layoutSize]);
 
   const {
     setString: setSettingsStringCache,
@@ -94,6 +81,62 @@ const TrackerLauncher = () => {
     setGeneratorVersionCache(debouncedVersion);
   }, [debouncedVersion, setGeneratorVersionCache]);
 
+  const launchTracker = useCallback(() => {
+    let url = `${baseURL}/tracker`;
+    if (checks) { url = `${baseURL}/tracker/checks`; }
+
+    // Launch with exactly what the launcher currently displays, in case a
+    // prior resumeSession overwrote the cached config in localStorage.
+    localStorage.setItem("layout", JSON.stringify(layout));
+    localStorage.setItem("settings_string", checks ? settingsString : "");
+    localStorage.setItem("generator_version", generatorVersion);
+
+    const { width, height } = layoutSize;
+
+    window.open(
+      url,
+      "HashFrog Tracker",
+      `toolbar=0,location=0,status=0,menubar=0,scrollbars=0,resizable=0,width=${width},height=${height}`
+    );
+  }, [checks, layout, settingsString, generatorVersion, layoutSize]);
+
+  // Track whether a saved session exists so the Resume button reacts when one
+  // is created in a popup window; refresh on focus when returning to the launcher.
+  const [savedSession, setSavedSession] = useState(loadSession);
+  useEffect(() => {
+    const refresh = () => setSavedSession(loadSession());
+    window.addEventListener("focus", refresh);
+    return () => window.removeEventListener("focus", refresh);
+  }, []);
+
+  const resumeSession = useCallback(() => {
+    // Re-read fresh: another window may have saved a newer session since the
+    // launcher last rendered, leaving the render-time `savedSession` stale.
+    const session = loadSession();
+    if (!session) { return; }
+
+    // Force the resumed window to reproduce the saved session's config.
+    localStorage.setItem("layout", session.layout);
+    localStorage.setItem("settings_string", session.settings_string);
+    localStorage.setItem("generator_version", session.generator_version);
+
+    const resumeChecks = !!session.checksEnabled;
+    let url = resumeChecks ? `${baseURL}/tracker/checks` : `${baseURL}/tracker`;
+    url += "?resume=1";
+
+    const {
+      layoutConfig: { width, height },
+    } = JSON.parse(session.layout);
+    const windowWidth = width + (resumeChecks ? 285 : 0);
+    const windowHeight = height + 25;
+
+    window.open(
+      url,
+      "HashFrog Tracker",
+      `toolbar=0,location=0,status=0,menubar=0,scrollbars=0,resizable=0,width=${windowWidth},height=${windowHeight}`
+    );
+  }, []);
+
   const updateString = (preset) => {
 
     if (preset.settingsString) {
@@ -132,7 +175,7 @@ const TrackerLauncher = () => {
             Tracker Settings
           </h5>
 
-          <div className="d-grid mb-4">
+          <div className="d-grid mb-3">
             <Button
               type="button"
               variant="success"
@@ -140,7 +183,18 @@ const TrackerLauncher = () => {
               onClick={launchTracker}
               className="fw-semibold"
             >
-              🚀 Launch Tracker
+              🚀 Launch New Tracker
+            </Button>
+          </div>
+
+          <div className="d-grid mb-4">
+            <Button
+              type="button"
+              variant="outline-light"
+              onClick={resumeSession}
+              disabled={!savedSession}
+            >
+              ↻ Resume Session
             </Button>
           </div>
 
