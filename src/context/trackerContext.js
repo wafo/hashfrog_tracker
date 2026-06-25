@@ -166,6 +166,7 @@ function buildSnapshot(state) {
     counters: state.counters,
     labelSelections: state.labelSelections,
     hintEntries: state.hintEntries,
+    draggedIcons: state.draggedIcons,
     starting_item_claims: state.starting_item_claims,
     unchanged_starting_inventory: state.unchanged_starting_inventory,
     checkedLocations,
@@ -488,6 +489,23 @@ function reducer(state, action) {
       saveSession(newState);
       return newState;
     }
+    case "DRAGGED_ICON_SET": {
+      const { id, iconName } = payload;
+      const newDraggedIcons = { ...state.draggedIcons };
+      if (iconName) {
+        newDraggedIcons[id] = iconName;
+      } else {
+        delete newDraggedIcons[id];
+      }
+
+      const newState = { ...state, draggedIcons: newDraggedIcons };
+      saveSession(newState);
+      return newState;
+    }
+    case "ICON_CACHE_SET": {
+      const { iconUrlByName, iconNameByUrl } = payload;
+      return { ...state, iconUrlByName, iconNameByUrl };
+    }
     case "ELEMENT_REGISTER": {
       const { id, startingItem } = payload;
 
@@ -533,6 +551,7 @@ function reducer(state, action) {
       const counters = snapshot.counters || {};
       const labelSelections = snapshot.labelSelections || {};
       const hintEntries = snapshot.hintEntries || {};
+      const draggedIcons = snapshot.draggedIcons || {};
       const starting_item_claims = snapshot.starting_item_claims || {};
       const unchanged_starting_inventory = snapshot.unchanged_starting_inventory || [];
 
@@ -583,6 +602,7 @@ function reducer(state, action) {
         counters,
         labelSelections,
         hintEntries,
+        draggedIcons,
         starting_item_claims,
         unchanged_starting_inventory,
       };
@@ -611,6 +631,9 @@ function TrackerProvider(props) {
     generator_version: getGeneratorVersionCache(),
     labelSelections: {}, // { elementId: { name, value } } - e.g. { 1: {"efk_dungeon", "DEK"} }
     hintEntries: {}, // { selectId: "hint string" } - text typed into hint inputs
+    draggedIcons: {}, // { elementId: iconName } - stable name of the icon shown on a receiver
+    iconUrlByName: {}, // { iconName: blobUrl } - this session's icon cache (name -> url)
+    iconNameByUrl: {}, // { blobUrl: iconName } - reverse of iconUrlByName (url -> name)
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -766,6 +789,34 @@ const useHintEntry = (id = null) => {
   return { setHintEntry, savedHintEntry };
 };
 
+const useDraggedIcon = (id = null) => {
+  const { state, dispatch } = useTracker();
+
+  const persistDraggedIcon = useCallback(
+    iconName => dispatch({ type: "DRAGGED_ICON_SET", payload: { id, iconName } }),
+    [dispatch, id],
+  );
+
+  const savedDraggedIcon = useMemo(() => {
+    if (id === null) { return null; }
+    return state.draggedIcons[id] ?? null;
+  }, [id, state.draggedIcons]);
+
+  return { persistDraggedIcon, savedDraggedIcon };
+};
+
+const useIconCache = () => {
+  const { state, dispatch } = useTracker();
+
+  const setIconCache = useCallback(
+    (iconUrlByName, iconNameByUrl) =>
+      dispatch({ type: "ICON_CACHE_SET", payload: { iconUrlByName, iconNameByUrl } }),
+    [dispatch],
+  );
+
+  return { setIconCache, iconUrlByName: state.iconUrlByName, iconNameByUrl: state.iconNameByUrl };
+};
+
 const useSelectedEFKDungeons = () => {
   const { state: { labelSelections } } = useTracker();
   return useMemo(() => getSelectedEFKDungeons(labelSelections), [labelSelections]);
@@ -813,7 +864,7 @@ const useSessionRestore = isReady => {
 
 export {
   getGeneratorVersionCache, getSettingsStringCache, loadSession, TrackerProvider,
-  useChecks, useElement, useHintEntry, useItems, useLabelSelect, useLocation,
+  useChecks, useDraggedIcon, useElement, useHintEntry, useIconCache, useItems, useLabelSelect, useLocation,
   useSelectedEFKDungeons, useSessionRestore, useSettingsString, useTracker
 };
 

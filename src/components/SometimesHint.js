@@ -50,8 +50,8 @@ const SometimesHint = props => {
       )}
       {showIcon && dual && (
         <Element
-          id={`sometimes_item_${id}`}
-          name={`sometimes_item_${name}`}
+          id={`sometimes_item2_${id}`}
+          name={`sometimes_item2_${name}`}
           type="simple"
           size={[20, 20]}
           icons={icons}

@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { useElement, useItems, useLabelSelect } from "../context/trackerContext";
+import { useDraggedIcon, useElement, useIconCache, useItems, useLabelSelect } from "../context/trackerContext";
 
 // Base Icons
 import icon_check from "../assets/icons/check_16x16.png";
@@ -28,6 +28,7 @@ const Element = props => {
     icons = [],
     countConfig = [0, 5], // min, max
     receiver = false, // if draggin overrides item
+    persistIcon = false, // remember the displayed icon across sessions
     dragCurrent = false, // if dragging should default or drag the current selected
     selectedStartingIndex = 0, // on which of the icons we start
     items = [],
@@ -39,6 +40,8 @@ const Element = props => {
   } = useItems(items, id, name);
   useElement(id, startingItem);
   const labelSelect = useLabelSelect();
+  const { persistDraggedIcon, savedDraggedIcon } = useDraggedIcon(id);
+  const { iconUrlByName, iconNameByUrl } = useIconCache();
 
   const resolvedStartingIndex = savedIndex !== null ? savedIndex : trackerContextStartingIndex;
 
@@ -47,6 +50,7 @@ const Element = props => {
   const [iconHash, setIconHash] = useState(null);
   const [draggedIcon, setDraggedIcon] = useState(null);
   const hasUserInteracted = useRef(false);
+  const draggedIconRestoredRef = useRef(false);
 
   // Whenever a change in icon list is detected, reset the selection.
   // Only reset if icons actually changed AND we don't have a starting item.
@@ -80,6 +84,26 @@ const Element = props => {
     }
   }, [savedCounter]);
 
+  // Restore a receiver's saved icon once on resume. The saved value is a stable
+  // icon name, so resolve it to this session's url. If it's one of this
+  // element's own icons it was cycled to by clicking, so restore that index;
+  // otherwise it was dragged in from elsewhere, so show it as an override.
+  useEffect(() => {
+    if (draggedIconRestoredRef.current) { return; }
+    if (savedDraggedIcon === null) { return; }
+
+    const url = iconUrlByName[savedDraggedIcon];
+    if (!url) { return; } // icon cache not ready yet; wait for it to populate
+
+    const idx = icons.indexOf(url);
+    if (idx >= 0) {
+      setSelected(idx);
+    } else {
+      setDraggedIcon(url);
+    }
+    draggedIconRestoredRef.current = true;
+  }, [savedDraggedIcon, icons, iconUrlByName]);
+
   const icon = useMemo(() => {
     return icons[selected];
   }, [icons, selected]);
@@ -107,6 +131,7 @@ const Element = props => {
       if (!isCounter) {
         setDraggedIcon(null);
         setSelected(updated);
+        if (receiver || persistIcon) { persistDraggedIcon(iconNameByUrl[icons[updated]] ?? null); }
       } else {
         setCounter(updated);
       }
@@ -118,7 +143,7 @@ const Element = props => {
         markCounter(updated, name);
       }
     },
-    [id, icons, type, countConfig, selected, items, markCounter, markItem, counter, name],
+    [id, icons, type, countConfig, selected, items, markCounter, markItem, counter, name, receiver, persistIcon, persistDraggedIcon, iconNameByUrl],
   );
 
   const wheelHandler = useCallback(
@@ -155,9 +180,10 @@ const Element = props => {
         const { icon: droppedIcon } = JSON.parse(item);
         setDraggedIcon(droppedIcon);
         setSelected(0) //reset selected so if the dragged item gets cleared, the user will see the hashfrog
+        persistDraggedIcon(iconNameByUrl[droppedIcon] ?? null);
       }
     },
-    [receiver],
+    [receiver, persistDraggedIcon, iconNameByUrl],
   );
 
   return (
@@ -193,6 +219,7 @@ const Element = props => {
         )}
         {type === "nested" && (
           <Element
+            id={`${id}_nested`}
             name={`${name}_nested`}
             type="simple"
             icons={[icon_unknown, icon_check]}
