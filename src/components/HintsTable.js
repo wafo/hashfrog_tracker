@@ -36,6 +36,7 @@ const HintsTable = props => {
         hintRows.push(
           <td key={`${i}-${id}`} style={{ padding }}>
             <SometimesHint
+              id={`${id}-${i}`}
               labels={labels}
               width={width}
               color={color}
@@ -51,6 +52,7 @@ const HintsTable = props => {
         hintRows.push(
           <td key={`${i}-${id}`} style={{ padding }}>
             <LocationHint
+              id={`${id}-${i}`}
               labels={labels}
               width={width}
               color={color}

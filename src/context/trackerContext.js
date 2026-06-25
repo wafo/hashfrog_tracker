@@ -165,6 +165,7 @@ function buildSnapshot(state) {
     items_list: state.items_list,
     counters: state.counters,
     labelSelections: state.labelSelections,
+    hintEntries: state.hintEntries,
     starting_item_claims: state.starting_item_claims,
     unchanged_starting_inventory: state.unchanged_starting_inventory,
     checkedLocations,
@@ -474,6 +475,19 @@ function reducer(state, action) {
       saveSession(newState);
       return newState;
     }
+    case "HINT_ENTRY": {
+      const { id, value } = payload;
+      const newHintEntries = { ...state.hintEntries };
+      if (value) {
+        newHintEntries[id] = value;
+      } else {
+        delete newHintEntries[id];
+      }
+
+      const newState = { ...state, hintEntries: newHintEntries };
+      saveSession(newState);
+      return newState;
+    }
     case "ELEMENT_REGISTER": {
       const { id, startingItem } = payload;
 
@@ -518,6 +532,7 @@ function reducer(state, action) {
       const items_list = snapshot.items_list || {};
       const counters = snapshot.counters || {};
       const labelSelections = snapshot.labelSelections || {};
+      const hintEntries = snapshot.hintEntries || {};
       const starting_item_claims = snapshot.starting_item_claims || {};
       const unchanged_starting_inventory = snapshot.unchanged_starting_inventory || [];
 
@@ -567,6 +582,7 @@ function reducer(state, action) {
         items_list,
         counters,
         labelSelections,
+        hintEntries,
         starting_item_claims,
         unchanged_starting_inventory,
       };
@@ -594,6 +610,7 @@ function TrackerProvider(props) {
     settings_string: getSettingsStringCache(),
     generator_version: getGeneratorVersionCache(),
     labelSelections: {}, // { elementId: { name, value } } - e.g. { 1: {"efk_dungeon", "DEK"} }
+    hintEntries: {}, // { selectId: "hint string" } - text typed into hint inputs
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -733,6 +750,22 @@ const useLabelSelect = () => {
   );
 };
 
+const useHintEntry = (id = null) => {
+  const { state, dispatch } = useTracker();
+
+  const setHintEntry = useCallback(
+    value => dispatch({ type: "HINT_ENTRY", payload: { id, value } }),
+    [dispatch, id],
+  );
+
+  const savedHintEntry = useMemo(() => {
+    if (id === null) { return null; }
+    return state.hintEntries[id] ?? null;
+  }, [id, state.hintEntries]);
+
+  return { setHintEntry, savedHintEntry };
+};
+
 const useSelectedEFKDungeons = () => {
   const { state: { labelSelections } } = useTracker();
   return useMemo(() => getSelectedEFKDungeons(labelSelections), [labelSelections]);
@@ -780,7 +813,7 @@ const useSessionRestore = isReady => {
 
 export {
   getGeneratorVersionCache, getSettingsStringCache, loadSession, TrackerProvider,
-  useChecks, useElement, useItems, useLabelSelect, useLocation,
+  useChecks, useElement, useHintEntry, useItems, useLabelSelect, useLocation,
   useSelectedEFKDungeons, useSessionRestore, useSettingsString, useTracker
 };
 
