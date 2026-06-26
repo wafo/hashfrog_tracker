@@ -1,10 +1,18 @@
+import _ from "lodash";
+
 import frog from "../assets/icons/hashfrogsping.gif";
+import { useSessionRestore, useTracker } from "../context/trackerContext";
 import useLogicInitialization from "../hooks/useLogicInitialization";
 import Checks from "./Checks";
 import Layout from "./Layout";
 
 const TrackerChecks = () => {
   const { isLoading } = useLogicInitialization();
+  const { state } = useTracker();
+
+  // In checks mode the location structure is built by Checks.js after logic
+  // loads; only then is it safe to overlay saved progress.
+  useSessionRestore(!isLoading && !_.isEmpty(state.locations));
 
   if (isLoading) {
     return (

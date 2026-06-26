@@ -51,6 +51,7 @@ const LocationHint = props => {
           icons={(bossElementsIcons.length && bossElementsIcons) || bossIcons}
           customStyle={{ marginRight: "0.25rem" }}
           receiver={bossReceiver}
+          persistIcon
         />
       )}
       <CustomReactSelect
@@ -73,8 +74,8 @@ const LocationHint = props => {
             receiver
           />
           <Element
-            id={`locations_item1_${id}`}
-            name={`locations_item1_${name}`}
+            id={`locations_item2_${id}`}
+            name={`locations_item2_${name}`}
             type="simple"
             size={[20, 20]}
             icons={itemsIcons}
@@ -82,8 +83,8 @@ const LocationHint = props => {
             receiver
           />
           <Element
-            id={`locations_item1_${id}`}
-            name={`locations_item1_${name}`}
+            id={`locations_item3_${id}`}
+            name={`locations_item3_${name}`}
             type="simple"
             size={[20, 20]}
             icons={itemsIcons}
@@ -91,8 +92,8 @@ const LocationHint = props => {
             receiver
           />
           <Element
-            id={`locations_item1_${id}`}
-            name={`locations_item1_${name}`}
+            id={`locations_item4_${id}`}
+            name={`locations_item4_${name}`}
             type="simple"
             size={[20, 20]}
             icons={itemsIcons}

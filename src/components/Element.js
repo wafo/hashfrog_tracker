@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { useElement, useItems, useLabelSelect } from "../context/trackerContext";
+import { useDraggedIcon, useElement, useIconCache, useItems, useLabelSelect } from "../context/trackerContext";
 
 // Base Icons
 import icon_check from "../assets/icons/check_16x16.png";
@@ -28,21 +28,29 @@ const Element = props => {
     icons = [],
     countConfig = [0, 5], // min, max
     receiver = false, // if draggin overrides item
+    persistIcon = false, // remember the displayed icon across sessions
     dragCurrent = false, // if dragging should default or drag the current selected
     selectedStartingIndex = 0, // on which of the icons we start
     items = [],
     hidden = false
   } = props;
 
-  const { markCounter, markItem, startingIndex: trackerContextStartingIndex, startingItem } = useItems(items, id);
+  const {
+    markCounter, markItem, startingIndex: trackerContextStartingIndex, startingItem, savedIndex, savedCounter, savedLabelValue,
+  } = useItems(items, id, name);
   useElement(id, startingItem);
   const labelSelect = useLabelSelect();
+  const { persistDraggedIcon, savedDraggedIcon } = useDraggedIcon(id);
+  const { iconUrlByName, iconNameByUrl } = useIconCache();
 
-  const [selected, setSelected] = useState(trackerContextStartingIndex || selectedStartingIndex);
+  const resolvedStartingIndex = savedIndex !== null ? savedIndex : trackerContextStartingIndex;
+
+  const [selected, setSelected] = useState(resolvedStartingIndex || selectedStartingIndex);
   const [counter, setCounter] = useState(0);
   const [iconHash, setIconHash] = useState(null);
   const [draggedIcon, setDraggedIcon] = useState(null);
   const hasUserInteracted = useRef(false);
+  const draggedIconRestoredRef = useRef(false);
 
   // Whenever a change in icon list is detected, reset the selection.
   // Only reset if icons actually changed AND we don't have a starting item.
@@ -51,23 +59,50 @@ const Element = props => {
       return (acc += cv);
     }, "");
 
-    if (iconHash !== null && hash !== iconHash && trackerContextStartingIndex === 0) {
+    if (iconHash !== null && hash !== iconHash && resolvedStartingIndex === 0) {
       setSelected(0);
     }
 
     setIconHash(hash);
-  }, [icons, iconHash, name, trackerContextStartingIndex]);
+  }, [icons, iconHash, name, resolvedStartingIndex]);
 
-  // Sync selected state when starting items change
+  // Sync selected state when the restored/starting item index changes
   useEffect(() => {
-    if (trackerContextStartingIndex > 0) {
-      // This element should claim the starting item
-      setSelected(trackerContextStartingIndex);
+    if (resolvedStartingIndex > 0) {
+      // This element should claim the restored or starting item
+      setSelected(resolvedStartingIndex);
     } else if (!hasUserInteracted.current) {
       // Another element claimed the item and user hasn't interacted - reset to uncollected
       setSelected(0);
     }
-  }, [trackerContextStartingIndex]);
+  }, [resolvedStartingIndex]);
+
+  // Restore a saved counter value when one is present
+  useEffect(() => {
+    if (savedCounter !== null) {
+      setCounter(savedCounter);
+    }
+  }, [savedCounter]);
+
+  // Restore a receiver's saved icon once on resume. The saved value is a stable
+  // icon name, so resolve it to this session's url. If it's one of this
+  // element's own icons it was cycled to by clicking, so restore that index;
+  // otherwise it was dragged in from elsewhere, so show it as an override.
+  useEffect(() => {
+    if (draggedIconRestoredRef.current) { return; }
+    if (savedDraggedIcon === null) { return; }
+
+    const url = iconUrlByName[savedDraggedIcon];
+    if (!url) { return; } // icon cache not ready yet; wait for it to populate
+
+    const idx = icons.indexOf(url);
+    if (idx >= 0) {
+      setSelected(idx);
+    } else {
+      setDraggedIcon(url);
+    }
+    draggedIconRestoredRef.current = true;
+  }, [savedDraggedIcon, icons, iconUrlByName]);
 
   const icon = useMemo(() => {
     return icons[selected];
@@ -96,6 +131,7 @@ const Element = props => {
       if (!isCounter) {
         setDraggedIcon(null);
         setSelected(updated);
+        if (receiver || persistIcon) { persistDraggedIcon(iconNameByUrl[icons[updated]] ?? null); }
       } else {
         setCounter(updated);
       }
@@ -107,7 +143,7 @@ const Element = props => {
         markCounter(updated, name);
       }
     },
-    [id, icons, type, countConfig, selected, items, markCounter, markItem, counter, name],
+    [id, icons, type, countConfig, selected, items, markCounter, markItem, counter, name, receiver, persistIcon, persistDraggedIcon, iconNameByUrl],
   );
 
   const wheelHandler = useCallback(
@@ -144,9 +180,10 @@ const Element = props => {
         const { icon: droppedIcon } = JSON.parse(item);
         setDraggedIcon(droppedIcon);
         setSelected(0) //reset selected so if the dragged item gets cleared, the user will see the hashfrog
+        persistDraggedIcon(iconNameByUrl[droppedIcon] ?? null);
       }
     },
-    [receiver],
+    [receiver, persistDraggedIcon, iconNameByUrl],
   );
 
   return (
@@ -176,11 +213,13 @@ const Element = props => {
             label={label}
             labelStartingIndex={labelStartingIndex}
             labelBackgroundColor={labelBackgroundColor}
+            savedValue={savedLabelValue}
             onLabelChange={(value) => labelSelect(id, name, value)}
           />
         )}
         {type === "nested" && (
           <Element
+            id={`${id}_nested`}
             name={`${name}_nested`}
             type="simple"
             icons={[icon_unknown, icon_check]}
@@ -194,8 +233,16 @@ const Element = props => {
   );
 };
 
-const ElementLabel = ({ label, labelStartingIndex, labelBackgroundColor, onLabelChange }) => {
+const ElementLabel = ({ label, labelStartingIndex, labelBackgroundColor, savedValue, onLabelChange }) => {
   const [index, setIndex] = useState(labelStartingIndex);
+
+  // Restore a saved label selection by resolving its value back to an index
+  useEffect(() => {
+    if (savedValue !== null && Array.isArray(label)) {
+      const idx = label.indexOf(savedValue);
+      if (idx >= 0) { setIndex(idx); }
+    }
+  }, [savedValue, label]);
 
   const display = useMemo(() => {
     if (Array.isArray(label)) {

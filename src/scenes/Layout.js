@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useLayout } from "../context/layoutContext";
+import { useIconCache } from "../context/trackerContext";
 
 // Components
 import Element from "../components/Element";
@@ -20,6 +21,7 @@ const baseURL = process.env.PUBLIC_URL;
 
 const Layout = props => {
   const { state: layoutContext } = useLayout();
+  const { setIconCache } = useIconCache();
 
   const renderLayout = useMemo(() => {
     if (props.layout) { return props.layout; }
@@ -62,14 +64,17 @@ const Layout = props => {
           }));
       }),
     );
-    icons = icons.reduce((accumulator, image) => {
-      accumulator[image.icon] = image.image;
-      return accumulator;
-    }, {});
+    const iconUrlByName = {};
+    const iconNameByUrl = {};
+    icons.forEach(({ icon, image }) => {
+      iconUrlByName[icon] = image; // name -> url
+      iconNameByUrl[image] = icon; // url -> name
+    });
 
-    setCachedIcons(icons);
-    return icons;
-  }, [elements]);
+    setCachedIcons(iconUrlByName);
+    setIconCache(iconUrlByName, iconNameByUrl);
+    return iconUrlByName;
+  }, [elements, setIconCache]);
 
   const getCacheElement = useCallback(
     id => {

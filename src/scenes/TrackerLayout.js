@@ -1,9 +1,11 @@
 import frog from "../assets/icons/hashfrogsping.gif";
+import { useSessionRestore } from "../context/trackerContext";
 import useLogicInitialization from "../hooks/useLogicInitialization";
 import Layout from "./Layout";
 
 const TrackerLayout = () => {
-  const { isLoading } = useLogicInitialization();
+  const { isLoading, isInitialized } = useLogicInitialization();
+  useSessionRestore(isInitialized);
 
   if (isLoading) {
     return (

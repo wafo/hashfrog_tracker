@@ -67,7 +67,11 @@ const Welcome = () => {
               <Accordion.Body className="bg-dark text-light">
                 <ul className="list-unstyled mb-0">
                   <li className="mb-2">
-                    <Badge bg="success" className="me-2">0.7.1</Badge>
+                    <Badge bg="success" className="me-2">0.7.2</Badge>
+                    <span className="small">Identical checks grouping, EfK preset, resume session button.</span>
+                  </li>
+                  <li className="mb-2">
+                    <Badge bg="secondary" className="me-2">0.7.1</Badge>
                     <span className="small">Add item requirement tooltips on check locations, showing what items are needed with tracked items highlighted.</span>
                   </li>
                   <li className="mb-2">

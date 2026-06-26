@@ -1,9 +1,10 @@
 import _ from "lodash";
-import { createContext, useCallback, useContext, useEffect, useMemo, useReducer } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef } from "react";
 
 import COMBO_ITEMS from "../data/combo-items.json";
 import COUNTER_TO_ITEM from "../data/counter-to-item.json";
 import DEFAULT_ITEMS from "../data/default-items.json";
+import DUNGEONS from "../data/dungeons.json";
 import ITEMS_JSON from "../data/items.json";
 import UUID_TO_ITEM from "../data/uuid-to-item.json";
 import { getEFKSkipRegions, getSelectedEFKDungeons, isEFK, isEFKLabel } from "../utils/efk";
@@ -134,6 +135,73 @@ function setGeneratorVersionCache(version) {
   localStorage.setItem("generator_version", version);
 }
 
+// localStorage key for a persisted tracker session (single slot).
+const SESSION_KEY = "tracker_session";
+
+/**
+ * Builds a serializable snapshot of user progress from the tracker state.
+ * @param {object} state - The current tracker state.
+ * @returns {object} A snapshot suitable for JSON serialization.
+ */
+function buildSnapshot(state) {
+  const checkedLocations = {};
+  _.forEach(state.locations, (locations, regionName) => {
+    const checkedNames = _.keys(_.pickBy(locations, location => location.isChecked));
+    if (checkedNames.length) {
+      checkedLocations[regionName] = checkedNames;
+    }
+  });
+
+  return {
+    // Whether this was a check-tracking session, so Resume opens the right route/size.
+    checksEnabled: !_.isEmpty(state.locations),
+    // The layout active at save time, used to detect layout changes before resuming.
+    layout: localStorage.getItem("layout"),
+    // MQ/shortcut toggles live in the settings singletons, not in reducer state.
+    mq_dungeons_specific: SettingsHelper.settings?.mq_dungeons_specific || [],
+    dungeon_shortcuts: SettingsHelper.settings?.dungeon_shortcuts || [],
+    settings_string: state.settings_string,
+    generator_version: state.generator_version,
+    items_list: state.items_list,
+    counters: state.counters,
+    labelSelections: state.labelSelections,
+    hintEntries: state.hintEntries,
+    draggedIcons: state.draggedIcons,
+    starting_item_claims: state.starting_item_claims,
+    unchanged_starting_inventory: state.unchanged_starting_inventory,
+    checkedLocations,
+  };
+}
+
+/**
+ * Persists a snapshot of the tracker state to localStorage.
+ * @param {object} state - The current tracker state.
+ */
+function saveSession(state) {
+  try {
+    localStorage.setItem(SESSION_KEY, JSON.stringify(buildSnapshot(state)));
+  } catch (err) {
+    console.warn("Failed to save tracker session:", err);
+  }
+}
+
+/**
+ * Loads the persisted session snapshot, if one exists and is parseable.
+ * @returns {object|null} The snapshot, or null when absent/corrupt.
+ */
+function loadSession() {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (!raw) { return null; }
+    const snapshot = JSON.parse(raw);
+    if (!snapshot || typeof snapshot !== "object") { return null; }
+    return snapshot;
+  } catch (err) {
+    console.warn("Failed to load tracker session:", err);
+    return null;
+  }
+}
+
 /**
  * Tracker context reducer handling all state mutations.
  * @param {object} state - The current tracker state.
@@ -178,10 +246,12 @@ function reducer(state, action) {
         const isChecked = locations[regionName][locationName].isChecked;
         _.set(locations, [regionName, locationName, "isChecked"], !isChecked);
 
-        return {
+        const newState = {
           ...state,
           locations,
         };
+        saveSession(newState);
+        return newState;
       }
     }
     case "MQ_TOGGLE": {
@@ -218,10 +288,12 @@ function reducer(state, action) {
         parseItems(state.items_list, state.counters, state.unchanged_starting_inventory),
       );
 
-      return {
+      const newState = {
         ...state,
         locations: validatedLocations,
       };
+      saveSession(newState);
+      return newState;
     }
     case "SHORTCUT_TOGGLE": {
       // payload = regionName
@@ -244,10 +316,12 @@ function reducer(state, action) {
         parseItems(state.items_list, state.counters, state.unchanged_starting_inventory),
       );
 
-      return {
+      const newState = {
         ...state,
         locations: validatedLocations,
       };
+      saveSession(newState);
+      return newState;
     }
     case "REGION_TOGGLE": {
       // payload = regionName
@@ -260,10 +334,12 @@ function reducer(state, action) {
         _.set(locationData, "isChecked", !setTo);
       });
 
-      return {
+      const newState = {
         ...state,
         locations,
       };
+      saveSession(newState);
+      return newState;
     }
     case "ITEMS_UPDATE_FROM_LOGIC": {
       const settings = payload;
@@ -332,12 +408,14 @@ function reducer(state, action) {
         ? state.locations
         : validateLocations(state.locations, parsedItems, getEFKSkipRegions(state.settings_string, state.labelSelections));
 
-      return {
+      const newState = {
         ...state,
         locations,
         items: parsedItems,
         counters,
       };
+      saveSession(newState);
+      return newState;
     }
     case "ITEM_MARK": {
       const { item, parentID } = payload;
@@ -357,12 +435,14 @@ function reducer(state, action) {
         ? state.locations
         : validateLocations(state.locations, parsedItems, getEFKSkipRegions(state.settings_string, state.labelSelections));
 
-      return {
+      const newState = {
         ...state,
         locations,
         items: parsedItems,
         items_list,
       };
+      saveSession(newState);
+      return newState;
     }
     case "STRING_SET": {
       setSettingsStringCache(payload);
@@ -382,6 +462,7 @@ function reducer(state, action) {
       const { elementId, name, value } = payload;
       const newLabelSelections = { ...state.labelSelections, [elementId]: { name, value } };
 
+      let newState = { ...state, labelSelections: newLabelSelections };
       if (isEFKLabel(name) && isEFK(state.settings_string)) {
         // Accessible dungeons changed; revalidate locations against the updated skip regions.
         const locations = validateLocations(
@@ -389,10 +470,41 @@ function reducer(state, action) {
           state.items,
           getEFKSkipRegions(state.settings_string, newLabelSelections),
         );
-        return { ...state, labelSelections: newLabelSelections, locations };
+        newState = { ...newState, locations };
       }
 
-      return { ...state, labelSelections: newLabelSelections };
+      saveSession(newState);
+      return newState;
+    }
+    case "HINT_ENTRY": {
+      const { id, value } = payload;
+      const newHintEntries = { ...state.hintEntries };
+      if (value) {
+        newHintEntries[id] = value;
+      } else {
+        delete newHintEntries[id];
+      }
+
+      const newState = { ...state, hintEntries: newHintEntries };
+      saveSession(newState);
+      return newState;
+    }
+    case "DRAGGED_ICON_SET": {
+      const { id, iconName } = payload;
+      const newDraggedIcons = { ...state.draggedIcons };
+      if (iconName) {
+        newDraggedIcons[id] = iconName;
+      } else {
+        delete newDraggedIcons[id];
+      }
+
+      const newState = { ...state, draggedIcons: newDraggedIcons };
+      saveSession(newState);
+      return newState;
+    }
+    case "ICON_CACHE_SET": {
+      const { iconUrlByName, iconNameByUrl } = payload;
+      return { ...state, iconUrlByName, iconNameByUrl };
     }
     case "ELEMENT_REGISTER": {
       const { id, startingItem } = payload;
@@ -407,7 +519,7 @@ function reducer(state, action) {
       let newUnchangedStartingInventory = [...state.unchanged_starting_inventory];
       const newStartingItemClaims = { ...state.starting_item_claims };
 
-      if (startingItem !== null) {
+      if (startingItem !== null && newItemsList[id] === undefined) {
         newItemsList[id] = startingItem;
 
         // Note that starting item appears on the tracker layout
@@ -429,6 +541,70 @@ function reducer(state, action) {
         items_list: newItemsList,
         unchanged_starting_inventory: newUnchangedStartingInventory,
         starting_item_claims: newStartingItemClaims,
+      };
+    }
+    case "SESSION_RESTORE": {
+      const snapshot = payload;
+      if (!snapshot) { return state; }
+
+      const items_list = snapshot.items_list || {};
+      const counters = snapshot.counters || {};
+      const labelSelections = snapshot.labelSelections || {};
+      const hintEntries = snapshot.hintEntries || {};
+      const draggedIcons = snapshot.draggedIcons || {};
+      const starting_item_claims = snapshot.starting_item_claims || {};
+      const unchanged_starting_inventory = snapshot.unchanged_starting_inventory || [];
+
+      if (snapshot.mq_dungeons_specific) {
+        _.set(LogicHelper.settings, "mq_dungeons_specific", snapshot.mq_dungeons_specific);
+        SettingsHelper.settings["mq_dungeons_specific"] = snapshot.mq_dungeons_specific;
+      }
+      if (snapshot.dungeon_shortcuts) {
+        _.set(LogicHelper.settings, "dungeon_shortcuts", snapshot.dungeon_shortcuts);
+        SettingsHelper.settings["dungeon_shortcuts"] = snapshot.dungeon_shortcuts;
+      }
+      SettingsHelper.invalidateCachedSets();
+
+      const locations = _.cloneDeep(state.locations);
+
+      // Rebuild each dungeon's location list to match the restored MQ setting.
+      _.forEach(_.keys(locations), regionName => {
+        if (!_.includes(DUNGEONS, regionName)) { return; }
+        const locationKey = SettingsHelper.isMQDungeon(regionName) ? "dungeon_mq" : "dungeon";
+        _.set(locations, regionName, {});
+        _.forEach(Locations.locations[locationKey][regionName], (locationData, locationName) => {
+          if (Locations.isProgressLocation(locationData)) {
+            _.set(locations, [regionName, locationName], { isAvailable: false, isChecked: false });
+          }
+        });
+      });
+
+      _.forEach(snapshot.checkedLocations || {}, (locationNames, regionName) => {
+        if (!locations[regionName]) { return; }
+        locationNames.forEach(locationName => {
+          if (locations[regionName][locationName]) {
+            _.set(locations, [regionName, locationName, "isChecked"], true);
+          }
+        });
+      });
+
+      const settingsString = snapshot.settings_string || state.settings_string;
+      const skipRegions = isEFK(settingsString) ? getEFKSkipRegions(settingsString, labelSelections) : new Set();
+
+      const parsedItems = parseItems(items_list, counters, unchanged_starting_inventory);
+      const validatedLocations = validateLocations(locations, parsedItems, skipRegions);
+
+      return {
+        ...state,
+        locations: validatedLocations,
+        items: parsedItems,
+        items_list,
+        counters,
+        labelSelections,
+        hintEntries,
+        draggedIcons,
+        starting_item_claims,
+        unchanged_starting_inventory,
       };
     }
     default:
@@ -454,11 +630,14 @@ function TrackerProvider(props) {
     settings_string: getSettingsStringCache(),
     generator_version: getGeneratorVersionCache(),
     labelSelections: {}, // { elementId: { name, value } } - e.g. { 1: {"efk_dungeon", "DEK"} }
+    hintEntries: {}, // { selectId: "hint string" } - text typed into hint inputs
+    draggedIcons: {}, // { elementId: iconName } - stable name of the icon shown on a receiver
+    iconUrlByName: {}, // { iconName: blobUrl } - this session's icon cache (name -> url)
+    iconNameByUrl: {}, // { blobUrl: iconName } - reverse of iconUrlByName (url -> name)
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  // Implementar local storage?
   return <TrackerContext.Provider value={{ state, dispatch }} {...props} />;
 }
 
@@ -507,7 +686,7 @@ const useLocation = () => {
   return [actions];
 };
 
-const useItems = (items, elementId = null) => {
+const useItems = (items, elementId = null, name = null) => {
   const { state, dispatch } = useTracker();
 
   const actions = useMemo(
@@ -562,7 +741,27 @@ const useItems = (items, elementId = null) => {
     return itemID;
   }, [items, state.unchanged_starting_inventory, state.starting_item_claims, elementId]);
 
-  return { ...actions, startingIndex, startingItem };
+  const savedIndex = useMemo(() => {
+    if (elementId === null || !items || !items.length) { return null; }
+    const savedItem = state.items_list[elementId];
+    if (!savedItem) { return null; }
+    const idx = items.indexOf(savedItem);
+    return idx >= 0 ? idx : null;
+  }, [items, elementId, state.items_list]);
+
+  const savedCounter = useMemo(() => {
+    if (name === null) { return null; }
+    const value = state.counters[name];
+    return value === undefined ? null : value;
+  }, [name, state.counters]);
+
+  const savedLabelValue = useMemo(() => {
+    if (elementId === null) { return null; }
+    const selection = state.labelSelections[elementId];
+    return selection ? selection.value : null;
+  }, [elementId, state.labelSelections]);
+
+  return { ...actions, startingIndex, startingItem, savedIndex, savedCounter, savedLabelValue };
 };
 
 const useLabelSelect = () => {
@@ -572,6 +771,50 @@ const useLabelSelect = () => {
       dispatch({ type: "LABEL_SELECT", payload: { elementId, name, value } }),
     [dispatch],
   );
+};
+
+const useHintEntry = (id = null) => {
+  const { state, dispatch } = useTracker();
+
+  const setHintEntry = useCallback(
+    value => dispatch({ type: "HINT_ENTRY", payload: { id, value } }),
+    [dispatch, id],
+  );
+
+  const savedHintEntry = useMemo(() => {
+    if (id === null) { return null; }
+    return state.hintEntries[id] ?? null;
+  }, [id, state.hintEntries]);
+
+  return { setHintEntry, savedHintEntry };
+};
+
+const useDraggedIcon = (id = null) => {
+  const { state, dispatch } = useTracker();
+
+  const persistDraggedIcon = useCallback(
+    iconName => dispatch({ type: "DRAGGED_ICON_SET", payload: { id, iconName } }),
+    [dispatch, id],
+  );
+
+  const savedDraggedIcon = useMemo(() => {
+    if (id === null) { return null; }
+    return state.draggedIcons[id] ?? null;
+  }, [id, state.draggedIcons]);
+
+  return { persistDraggedIcon, savedDraggedIcon };
+};
+
+const useIconCache = () => {
+  const { state, dispatch } = useTracker();
+
+  const setIconCache = useCallback(
+    (iconUrlByName, iconNameByUrl) =>
+      dispatch({ type: "ICON_CACHE_SET", payload: { iconUrlByName, iconNameByUrl } }),
+    [dispatch],
+  );
+
+  return { setIconCache, iconUrlByName: state.iconUrlByName, iconNameByUrl: state.iconNameByUrl };
 };
 
 const useSelectedEFKDungeons = () => {
@@ -596,9 +839,32 @@ const useSettingsString = () => {
   return { ...actions, settings_string, generator_version };
 };
 
+/**
+ * Restores a saved session once the tracker structure is ready, when the
+ * window was opened with `?resume=1`. Runs at most once.
+ * @param {boolean} isReady - True when locations/items have finished building.
+ */
+const useSessionRestore = isReady => {
+  const { dispatch } = useTracker();
+  const restoredRef = useRef(false);
+
+  useEffect(() => {
+    if (!isReady || restoredRef.current) { return; }
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("resume") !== "1") { return; }
+
+    const snapshot = loadSession();
+    if (snapshot) {
+      dispatch({ type: "SESSION_RESTORE", payload: snapshot });
+    }
+    restoredRef.current = true;
+  }, [isReady, dispatch]);
+};
+
 export {
-  getGeneratorVersionCache, getSettingsStringCache, TrackerProvider, useChecks,
-  useElement, useItems, useLabelSelect, useLocation, useSelectedEFKDungeons,
-  useSettingsString, useTracker
+  getGeneratorVersionCache, getSettingsStringCache, loadSession, TrackerProvider,
+  useChecks, useDraggedIcon, useElement, useHintEntry, useIconCache, useItems, useLabelSelect, useLocation,
+  useSelectedEFKDungeons, useSessionRestore, useSettingsString, useTracker
 };
 

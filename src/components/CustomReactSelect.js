@@ -1,5 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Select from "react-select";
+
+import { useHintEntry } from "../context/trackerContext";
 
 const CustomReactSelect = props => {
   const {
@@ -14,6 +16,10 @@ const CustomReactSelect = props => {
   const [value, setValue] = useState(null);
   const [inputValue, setInputValue] = useState("");
   const [hueRotate, setHueRotate] = useState(0);
+
+  const { setHintEntry, savedHintEntry } = useHintEntry(id);
+  const hintRestoredRef = useRef(false);
+  const isMountRef = useRef(true);
 
   const customStyles = useMemo(() => {
     return {
@@ -100,6 +106,25 @@ const CustomReactSelect = props => {
   useEffect(() => {
     onValueCallback(value);
   }, [onValueCallback, value]);
+
+  // Persist hint changes. Skip the initial mount so an empty input doesn't
+  // clobber a saved entry before the resume restore below can apply it.
+  useEffect(() => {
+    if (isMountRef.current) {
+      isMountRef.current = false;
+      return;
+    }
+    setHintEntry(value ? value.value : null);
+  }, [value, setHintEntry]);
+
+  // Restore a saved hint once, after a resumed session populates it.
+  useEffect(() => {
+    if (hintRestoredRef.current) { return; }
+    if (savedHintEntry !== null) {
+      setValue({ label: savedHintEntry, value: savedHintEntry });
+      hintRestoredRef.current = true;
+    }
+  }, [savedHintEntry]);
 
   return (
     <div onContextMenu={handleRightClick} onAuxClick={handleOnClick} style={{ flex: 1, overflow: "hidden" }}>
