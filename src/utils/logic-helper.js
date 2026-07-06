@@ -193,7 +193,7 @@ class LogicHelper {
     },
   };
 
-  static async initialize(logicHelpersFile, settings) {
+  static initialize(logicHelpersFile, settings) {
     this.settings = settings;
 
     this.ruleAliases = {};
@@ -438,7 +438,7 @@ class LogicHelper {
     const disableTradeRevert =
       shuffleInteriorEntrances || this.settings.shuffle_overworld_entrances || this.settings.adult_trade_shuffle;
     const skipChildZelda =
-      !SettingsHelper.hasShuffleChildTrade("Zeldas Letter") &&
+      !_.includes(this.settings.shuffle_child_trade, "Zeldas Letter") &&
       _.includes(this.settings.starting_inventory, "zeldas_letter");
 
     const triforceGoal = this.settings.triforce_goal_per_world * this.settings.world_count;
