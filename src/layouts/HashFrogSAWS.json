@@ -1,0 +1,428 @@
+{
+  "id": "1d5a40bc94254c548b2cd1ed77e3ea5d",
+  "layoutConfig": {
+    "name": "HashFrogSAWS",
+    "backgroundColor": "#000",
+    "width": 325,
+    "height": 650,
+    "fontFamily": null,
+    "fontSize": null,
+    "fontColor": null
+  },
+  "components": [
+    {
+      "id": "80104bad45684265a7c638b0af398c6d",
+      "type": "table",
+      "position": [
+        5,
+        5
+      ],
+      "columns": 10,
+      "padding": "3px",
+      "elements": [
+        "kokiri_sword",
+        "master_sword",
+        "biggoron_sword",
+        "sticks",
+        "nuts",
+        "bombs",
+        "bow",
+        "fire_arrows",
+        "dins",
+        "rutos_letter",
+        "deku_shield",
+        "hylian_shield",
+        "mirror_shield",
+        "slingshot",
+        "progressive_ocarina",
+        "bombchus",
+        "hookshot",
+        "ice_arrows",
+        "farores",
+        "bottle_all",
+        "strength",
+        "tunic_goron",
+        "tunic_zora",
+        "boomerang",
+        "lens",
+        "beans",
+        "hammer",
+        "light_arrows",
+        "nayrus",
+        "wallet",
+        "magic",
+        "boots_iron",
+        "boots_hover",
+        "scale",
+        "gerudo_card",
+        "weird_egg",
+        "zeldas_letter",
+        "mask_of_truth"
+      ],
+      "elementsSize": [
+        25,
+        25
+      ],
+      "displayName": "Items & Equipment",
+      "elementId": "a081121b16f84366bf16e16ca90cd23f"
+    },
+    {
+      "id": "6d98c18059154e28a7ded50cfec565c5",
+      "type": "table",
+      "position": [
+        132,
+        5
+      ],
+      "columns": 10,
+      "padding": "3px",
+      "elements": [
+        "pocket_egg",
+        "cojiro",
+        "odd_mushroom",
+        "odd_potion",
+        "poachers_saw",
+        "broken_sword",
+        "prescription",
+        "hash_frog",
+        "eye_drops"
+      ],
+      "elementsSize": [
+        25,
+        25
+      ],
+      "displayName": "Trade Items",
+      "hidden": false,
+      "elementId": "a081121b16f84366bf16e16ca90cd23f"
+    },
+    {
+      "id": "af8a06b46398414abe4f59668e115d2c",
+      "type": "table",
+      "position": [
+        166,
+        5
+      ],
+      "columns": 5,
+      "padding": "3px",
+      "elements": [
+        "ocarina_a_button",
+        "ocarina_c_up_button",
+        "ocarina_c_down_button",
+        "ocarina_c_left_button",
+        "ocarina_c_right_button"
+      ],
+      "elementsSize": [
+        25,
+        25
+      ],
+      "displayName": "Ocarina Buttons",
+      "hidden": false,
+      "elementId": "a081121b16f84366bf16e16ca90cd23f"
+    },
+    {
+      "id": "7717af26740543a88a97e44df5f73a9f",
+      "type": "table",
+      "position": [
+        200,
+        4
+      ],
+      "columns": 6,
+      "padding": "4px 3px",
+      "elements": [
+        "song_lullaby",
+        "song_epona",
+        "song_saria",
+        "song_suns",
+        "song_time",
+        "song_storms",
+        "song_minuet",
+        "song_bolero",
+        "song_serenade",
+        "song_requiem",
+        "song_nocturne",
+        "song_prelude"
+      ],
+      "elementsSize": [
+        25,
+        25
+      ],
+      "displayName": "Songs",
+      "elementId": "a081121b16f84366bf16e16ca90cd23f"
+    },
+    {
+      "id": "e5af8c00cfaf4305aabdfe12f61f95f8",
+      "type": "table",
+      "position": [
+        160,
+        191
+      ],
+      "columns": 3,
+      "padding": "8px",
+      "elements": [
+        "stone_kokiri",
+        "stone_goron",
+        "stone_zora"
+      ],
+      "elementsSize": [
+        25,
+        25
+      ],
+      "displayName": "Spiritual Stones",
+      "elementId": "a081121b16f84366bf16e16ca90cd23f"
+    },
+    {
+      "id": "d64023910f6844e5a29bdb01ebb83fa7",
+      "type": "hinttable",
+      "elementId": "4c1b24c3e3954038b14f4daa3656e0b5",
+      "position": [
+        273,
+        4
+      ],
+      "hintType": "sometimes",
+      "hintNumber": 5,
+      "columns": 1,
+      "width": 175,
+      "padding": "2px",
+      "labels": "sometimes",
+      "color": "#ffffff",
+      "backgroundColor": "#333333",
+      "showIcon": true,
+      "inverted": false,
+      "showBoss": true,
+      "showItems": true,
+      "displayName": "Sometimes Hints",
+      "dual": false
+    },
+    {
+      "id": "f8f2fc4d1ff648f583679a00dfbe97c8",
+      "type": "sometimeshint",
+      "displayName": "Dual Hint",
+      "elementId": "4c1b24c3e3954038b14f4daa3656e0b5",
+      "position": [
+        405,
+        6
+      ],
+      "labels": "sometimes",
+      "width": 199,
+      "color": "#ffffff",
+      "backgroundColor": "#333333",
+      "showIcon": true,
+      "inverted": false,
+      "dual": true,
+      "hidden": false
+    },
+    {
+      "id": "273870ce25414299a6305db007807b4e",
+      "type": "hinttable",
+      "elementId": "4c1b24c3e3954038b14f4daa3656e0b5",
+      "position": [
+        430,
+        4
+      ],
+      "hintType": "location",
+      "hintNumber": 5,
+      "columns": 1,
+      "width": 310,
+      "padding": "2px",
+      "labels": "locations",
+      "color": "#ffffff",
+      "backgroundColor": "#2082aa",
+      "showIcon": true,
+      "inverted": false,
+      "showBoss": true,
+      "showItems": true,
+      "displayName": "Path Hints",
+      "bossElements": [
+        "saws_goals"
+      ]
+    },
+    {
+      "id": "9b4efc9066574c9ab8a46d79b6349e26",
+      "type": "hinttable",
+      "elementId": "4c1b24c3e3954038b14f4daa3656e0b5",
+      "position": [
+        562,
+        4
+      ],
+      "hintType": "location",
+      "hintNumber": 3,
+      "columns": 1,
+      "width": 310,
+      "padding": "2px",
+      "labels": "locations",
+      "color": "#ffffff",
+      "backgroundColor": "#c20f0f",
+      "showIcon": true,
+      "inverted": false,
+      "showBoss": false,
+      "showItems": false,
+      "displayName": "Foolish Locations"
+    },
+    {
+      "id": "285d253c2b344e2798bf4e7a11565ff4",
+      "type": "label",
+      "displayName": "House Cow Label",
+      "position": [
+        247,
+        190
+      ],
+      "color": "#ffffff",
+      "backgroundColor": "#333333",
+      "padding": "2px",
+      "text": "House Cow",
+      "fontSize": "12px",
+      "hidden": false,
+      "elementId": "a081121b16f84366bf16e16ca90cd23f"
+    },
+    {
+      "id": "7c07f92746d146249755ec5f853483e3",
+      "type": "label",
+      "displayName": "ZL Label",
+      "position": [
+        273,
+        190
+      ],
+      "color": "#ffffff",
+      "backgroundColor": "#333333",
+      "padding": "2px",
+      "text": "Zelda's Letter",
+      "fontSize": "12px",
+      "hidden": false,
+      "elementId": "a081121b16f84366bf16e16ca90cd23f"
+    },
+    {
+      "id": "3b37df03a4ba4b84a210d7ae9cc453bf",
+      "type": "label",
+      "displayName": "ZF Cave GS",
+      "position": [
+        299,
+        190
+      ],
+      "color": "#ffffff",
+      "backgroundColor": "#333333",
+      "padding": "2px",
+      "text": "ZF Cave GS",
+      "fontSize": "12px",
+      "hidden": false,
+      "elementId": "a081121b16f84366bf16e16ca90cd23f"
+    },
+    {
+      "id": "f7cd770eb44e4d95b1af57db2e37a175",
+      "type": "label",
+      "displayName": "OoT Label",
+      "position": [
+        325,
+        190
+      ],
+      "color": "#ffffff",
+      "backgroundColor": "#333333",
+      "padding": "2px",
+      "text": "OoT",
+      "fontSize": "12px",
+      "hidden": false,
+      "elementId": "a081121b16f84366bf16e16ca90cd23f"
+    },
+    {
+      "id": "e664dd673cc84070a829575298cd7171",
+      "type": "label",
+      "displayName": "DMC Dual Label",
+      "position": [
+        351,
+        190
+      ],
+      "color": "#ffffff",
+      "backgroundColor": "#333333",
+      "padding": "2px",
+      "text": "DMC GS+Scr",
+      "fontSize": "12px",
+      "hidden": false,
+      "elementId": "a081121b16f84366bf16e16ca90cd23f"
+    },
+    {
+      "id": "5de523e52d64426eb7d9edbab2e305bc",
+      "type": "label",
+      "displayName": "HF Cow+GS Label",
+      "position": [
+        377,
+        190
+      ],
+      "color": "#ffffff",
+      "backgroundColor": "#333333",
+      "padding": "2px",
+      "text": "HF Cow+GS",
+      "fontSize": "12px",
+      "hidden": false,
+      "elementId": "a081121b16f84366bf16e16ca90cd23f"
+    },
+    {
+      "id": "ff7d937930a04642b02ca636f0c4395a",
+      "type": "table",
+      "displayName": "Always Frogs 1",
+      "position": [
+        247,
+        293
+      ],
+      "columns": 1,
+      "padding": "3px",
+      "elements": [
+        "sometimes",
+        "sometimes",
+        "sometimes",
+        "sometimes",
+        "sometimes",
+        "sometimes"
+      ],
+      "elementsSize": [
+        20,
+        20
+      ],
+      "hidden": false,
+      "elementId": "a081121b16f84366bf16e16ca90cd23f"
+    },
+    {
+      "id": "44a89ae2efac44dca81a7f50e62e66fb",
+      "type": "table",
+      "displayName": "Always Frogs 2",
+      "position": [
+        351,
+        268
+      ],
+      "columns": 1,
+      "padding": "3px",
+      "elements": [
+        "sometimes",
+        "sometimes"
+      ],
+      "elementsSize": [
+        20,
+        20
+      ],
+      "hidden": false,
+      "elementId": "a081121b16f84366bf16e16ca90cd23f"
+    }
+  ],
+  "elements": [
+    {
+      "id": "f89bfeec40d142ee8e5cdac808f69203",
+      "type": "simple",
+      "name": "saws_goals",
+      "displayName": "SAWS Goals",
+      "label": "",
+      "labelStartingIndex": 0,
+      "size": [
+        25,
+        25
+      ],
+      "icons": [
+        "boss_na_25x25.png",
+        "song_time_32x32.png",
+        "light_arrows_32x32.png"
+      ],
+      "countConfig": [
+        0,
+        1
+      ],
+      "receiver": false,
+      "selectedStartingIndex": 0
+    }
+  ]
+}

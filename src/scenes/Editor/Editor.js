@@ -145,7 +145,7 @@ const Editor = () => {
     if (layout.layoutConfig.name) {
       filename = layout.layoutConfig.name.replace(/ /g, "_");
     }
-    const jsonBlob = new Blob([JSON.stringify(layout)], { type: "text/plain" });
+    const jsonBlob = new Blob([JSON.stringify(layout, null, 2)], { type: "text/plain" });
     FileSaver.saveAs(jsonBlob, `${filename}.json`);
   }, [layout]);
 

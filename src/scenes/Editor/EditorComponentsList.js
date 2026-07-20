@@ -6,6 +6,7 @@ import EditorComponent from "./EditorComponent";
 
 const EditorComponentsList = ({ components, setLayout, customElements }) => {
   const [component, setComponent] = useState(null);
+  const [draggedId, setDraggedId] = useState(null);
 
   const addComponent = () => {
     setComponent(prev => ({
@@ -54,6 +55,21 @@ const EditorComponentsList = ({ components, setLayout, customElements }) => {
 
   const duplicateComponent = useCallback(() => duplicate(component, components, setComponent), [component, components]);
 
+  const onDragOver = useCallback(
+    index => {
+      if (!draggedId) { return; }
+      setLayout(prev => {
+        if (prev.components[index]?.id === draggedId) { return prev; }
+        const dragged = prev.components.find(x => x.id === draggedId);
+        if (!dragged) { return prev; }
+        const updated = prev.components.filter(x => x.id !== draggedId);
+        updated.splice(index, 0, dragged);
+        return { ...prev, components: updated };
+      });
+    },
+    [draggedId, setLayout],
+  );
+
   return (
     <div className="component-list">
       <h5>Components</h5>
@@ -76,11 +92,21 @@ const EditorComponentsList = ({ components, setLayout, customElements }) => {
       )}
       {!component && components.length < 1 && <p className="uuid my-2">Add a component to start</p>}
       {!component && components.length > 0 && (
+        <p style={{ fontSize: "0.75em", margin: 0, opacity: 0.5 }}>Drag to re-order.</p>
+      )}
+      {!component && components.length > 0 && (
         <ul className="list-unstyled mb-0">
           {!component &&
             components.length > 0 &&
-            components.map(comp => (
-              <li key={comp.id}>
+            components.map((comp, index) => (
+              <li
+                key={comp.id}
+                draggable
+                onDragStart={() => setDraggedId(comp.id)}
+                onDragEnd={() => setDraggedId(null)}
+                onDragOver={() => onDragOver(index)}
+                style={{ cursor: "move" }}
+              >
                 <button type="button" className="btn btn-dark btn-sm" onClick={() => setComponent(comp)}>
                   {comp.type || "undefined"} - {comp.displayName || comp.id.substring(0, 12)}
                 </button>
