@@ -775,7 +775,13 @@ class LogicHelper {
     }
 
     if (name in MASK_LOCATIONS) {
-      return this.items[name] > 0 || this.isLocationAvailable(MASK_LOCATIONS[name]);
+      if (this.items[name] > 0) {
+        return true;
+      }
+      if (SettingsHelper.hasShuffleChildTrade(name.replace(/_/g, " "))) {
+        return false;
+      }
+      return this.isLocationAvailable(MASK_LOCATIONS[name]);
     }
 
     if (name in ADULT_TRADE_LOOKUP) {

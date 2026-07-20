@@ -6,6 +6,7 @@ import { readFileAsText } from "../utils/utils";
 
 // Layouts
 import hashfrogJSON from "../layouts/hashfrog.json";
+import hashfrogSawsJSON from "../layouts/HashFrogSAWS.json";
 import linsoJSON from "../layouts/linso.json";
 import escapefromkakJSON from "../layouts/escapefromkak.json";
 
@@ -47,6 +48,9 @@ const LayoutSelector = () => {
           break;
         case "escapefromkak":
           selectedLayout = escapefromkakJSON;
+          break;
+        case "hashfrogSaws":
+          selectedLayout = hashfrogSawsJSON;
           break;
         default:
           selectedLayout = hashfrogJSON;
@@ -100,6 +104,12 @@ const LayoutSelector = () => {
         <li>
           <button type="button" className="btn btn-link btm-sm p-0" onClick={() => applyPreset("escapefromkak")}>
             EscapeFromKak
+          </button>
+        </li>
+        <li className="list-divider">|</li>
+        <li>
+          <button type="button" className="btn btn-link btm-sm p-0" onClick={() => applyPreset("hashfrogSaws")}>
+            HashFrog SAWS
           </button>
         </li>
       </ul>
