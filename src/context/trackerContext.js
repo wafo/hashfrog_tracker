@@ -160,6 +160,7 @@ function buildSnapshot(state) {
     // MQ/shortcut toggles live in the settings singletons, not in reducer state.
     mq_dungeons_specific: SettingsHelper.settings?.mq_dungeons_specific || [],
     dungeon_shortcuts: SettingsHelper.settings?.dungeon_shortcuts || [],
+    starting_age_selection: state.starting_age_selection,
     settings_string: state.settings_string,
     generator_version: state.generator_version,
     items_list: state.items_list,
@@ -323,6 +324,25 @@ function reducer(state, action) {
       saveSession(newState);
       return newState;
     }
+    case "STARTING_AGE_SET": {
+      // payload = "child" | "adult", clicking the selected age again clears it
+      const selection = state.starting_age_selection === payload ? null : payload;
+      SettingsHelper.setStartingAgeSelection(selection);
+
+      const locations = validateLocations(
+        state.locations,
+        state.items,
+        getEFKSkipRegions(state.settings_string, state.labelSelections),
+      );
+
+      const newState = {
+        ...state,
+        locations,
+        starting_age_selection: selection,
+      };
+      saveSession(newState);
+      return newState;
+    }
     case "REGION_TOGGLE": {
       // payload = regionName
 
@@ -353,7 +373,7 @@ function reducer(state, action) {
         starting_inventory.push("34b2ad3657e94b75b281cec30e617f37");
         starting_inventory.push("73a0f3f5688745a8bb4a0973d9858960");
       }
-      if (settings.open_door_of_time && settings.open_forest !== "closed") {
+      if (!SettingsHelper.isDoorOfTimeClosed() && settings.open_forest !== "closed") {
         starting_inventory.push("c50e8543ab0c4bdaa8a23e6a80ae6d1c");
       }
       if (!settings.shuffle_individual_ocarina_notes) {
@@ -565,6 +585,9 @@ function reducer(state, action) {
       }
       SettingsHelper.invalidateCachedSets();
 
+      const starting_age_selection = snapshot.starting_age_selection || null;
+      SettingsHelper.setStartingAgeSelection(starting_age_selection);
+
       const locations = _.cloneDeep(state.locations);
 
       // Rebuild each dungeon's location list to match the restored MQ setting.
@@ -605,6 +628,7 @@ function reducer(state, action) {
         draggedIcons,
         starting_item_claims,
         unchanged_starting_inventory,
+        starting_age_selection,
       };
     }
     default:
@@ -627,6 +651,7 @@ function TrackerProvider(props) {
     items_list: {},
     layoutElements: [],
     starting_item_claims: {}, // { elementId: uuid } - tracks which element claimed which starting item
+    starting_age_selection: null, // "child" | "adult"
     settings_string: getSettingsStringCache(),
     generator_version: getGeneratorVersionCache(),
     labelSelections: {}, // { elementId: { name, value } } - e.g. { 1: {"efk_dungeon", "DEK"} }
@@ -817,6 +842,17 @@ const useIconCache = () => {
   return { setIconCache, iconUrlByName: state.iconUrlByName, iconNameByUrl: state.iconNameByUrl };
 };
 
+const useStartingAge = () => {
+  const {
+    state: { starting_age_selection },
+    dispatch,
+  } = useTracker();
+
+  const setStartingAge = useCallback(age => dispatch({ type: "STARTING_AGE_SET", payload: age }), [dispatch]);
+
+  return { startingAge: starting_age_selection, setStartingAge };
+};
+
 const useSelectedEFKDungeons = () => {
   const { state: { labelSelections } } = useTracker();
   return useMemo(() => getSelectedEFKDungeons(labelSelections), [labelSelections]);
@@ -865,6 +901,6 @@ const useSessionRestore = isReady => {
 export {
   getGeneratorVersionCache, getSettingsStringCache, loadSession, TrackerProvider,
   useChecks, useDraggedIcon, useElement, useHintEntry, useIconCache, useItems, useLabelSelect, useLocation,
-  useSelectedEFKDungeons, useSessionRestore, useSettingsString, useTracker
+  useSelectedEFKDungeons, useSessionRestore, useSettingsString, useStartingAge, useTracker
 };
 

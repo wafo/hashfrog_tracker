@@ -295,11 +295,14 @@ class LogicHelper {
 
     const guaranteedKeys = {};
     let updatedKeys = false;
+    let previousRegionCount = 0;
 
     do {
       updatedKeys = false;
 
       this._invalidateMemoizedFunctions();
+
+      previousRegionCount = this.regions.child.size + this.regions.adult.size;
 
       // NOTE: Must use native forEach for Sets
       this.regions.child.forEach(regionName => {
@@ -351,7 +354,8 @@ class LogicHelper {
     } while (
       updatedKeys ||
       accessibleChildRegions.length !== newChildRegions.length ||
-      accessibleAdultRegions.length !== newAdultRegions.length
+      accessibleAdultRegions.length !== newAdultRegions.length ||
+      previousRegionCount !== this.regions.child.size + this.regions.adult.size
     );
   }
 
@@ -496,7 +500,7 @@ class LogicHelper {
     }
   }
 
-  static _evalBinaryExpression(node) {
+  static _evalBinaryExpression(node, age) {
     const leftNode = node.left;
     const rightNode = node.right;
     const leftValue = leftNode.type === "Identifier" ? leftNode.name : leftNode.value;
@@ -520,7 +524,10 @@ class LogicHelper {
         }
         if (leftValue === "age") {
           if (rightValue === "starting_age") {
-            return true; // TODO: don't hardcode this
+            if (!SettingsHelper.isDoorOfTimeClosed()) {
+              return true;
+            }
+            return age === SettingsHelper.getStartingAge();
           }
           return false;
         }
@@ -655,13 +662,8 @@ class LogicHelper {
     }
   }
 
-  static _evalRuleAlias(ruleName) {
-    const rule = this.ruleAliases[ruleName];
-
-    const asChild = this._evalNode(rule, "child");
-    const asAdult = this._evalNode(rule, "adult");
-
-    return asChild || asAdult;
+  static _evalRuleAlias(ruleName, age) {
+    return this._evalNode(this.ruleAliases[ruleName], age);
   }
 
   static _hasLaterAdultTradeItem(itemName) {
@@ -815,7 +817,7 @@ class LogicHelper {
       return this.settings[name];
     }
     if (name in this.ruleAliases) {
-      return this._evalRuleAlias(name);
+      return this._evalRuleAlias(name, age);
     }
     const escapedIdentifier = _.replace(name, /_/g, " ");
     if (Locations.hasEvent(escapedIdentifier)) {
@@ -934,7 +936,7 @@ class LogicHelper {
   static _evalNode(node, age) {
     switch (node.type) {
       case "BinaryExpression":
-        return this._evalBinaryExpression(node);
+        return this._evalBinaryExpression(node, age);
       case "CallExpression":
         return this._evalCallExpression(node, age);
       case "ExpressionStatement":

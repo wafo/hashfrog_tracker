@@ -4,6 +4,8 @@ class SettingsHelper {
   static settings = null;
   static renamedAttributes = null;
 
+  static startingAgeSelection = null;
+
   static _mqDungeonsSet = null;
   static _dungeonShortcutsSet = null;
   static _allowedTricksSet = null;
@@ -22,6 +24,7 @@ class SettingsHelper {
     this.transformations = [];
     this.settings = null;
     this.renamedAttributes = null;
+    this.startingAgeSelection = null;
 
     this._mqDungeonsSet = null;
     this._dungeonShortcutsSet = null;
@@ -68,6 +71,31 @@ class SettingsHelper {
       return this.settings[name];
     }
     return this.defaults[name];
+  }
+
+  // The setting is a boolean in 8.3.0 and a string ("open", "sot", "stones", ...) from 9.0.0 on.
+  static isDoorOfTimeClosed() {
+    const openDoorOfTime = this.getSetting("open_door_of_time");
+    return openDoorOfTime !== true && openDoorOfTime !== "open";
+  }
+
+  // The age the player starts as, or null when it is not known yet.
+  static getStartingAge() {
+    if (this.startingAgeSelection) {
+      return this.startingAgeSelection;
+    }
+    const startingAge = this.getSetting("starting_age");
+    return startingAge === "child" || startingAge === "adult" ? startingAge : null;
+  }
+
+  // The player has to tell us the starting age when the door is closed and the settings don't name one.
+  static needsStartingAgeSelection() {
+    const startingAge = this.getSetting("starting_age");
+    return this.isDoorOfTimeClosed() && startingAge !== "child" && startingAge !== "adult";
+  }
+
+  static setStartingAgeSelection(age) {
+    this.startingAgeSelection = age;
   }
 
   static hasAdultTradeStart(itemName) {
@@ -162,6 +190,7 @@ class SettingsHelper {
 
     // Merge with defaults so missing fields have values
     this.settings = { ...this.defaults, ...transformed };
+    this.startingAgeSelection = null;
 
     // Update cached Sets
     this._updateCachedSets();

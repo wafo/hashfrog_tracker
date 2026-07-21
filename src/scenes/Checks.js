@@ -4,7 +4,9 @@ import { OverlayTrigger, Popover } from "react-bootstrap";
 
 import RequirementsTooltip from "../components/RequirementsTooltip";
 import { useLayout } from "../context/layoutContext";
-import { useChecks, useLocation, useSelectedEFKDungeons, useSettingsString } from "../context/trackerContext";
+import {
+  useChecks, useLocation, useSelectedEFKDungeons, useSettingsString, useStartingAge,
+} from "../context/trackerContext";
 import DUNGEON_CONFIG from "../data/dungeon-config.json";
 import DUNGEONS from "../data/dungeons.json";
 import HINT_REGIONS_SHORT_NAMES from "../data/hint-regions-short-names.json";
@@ -124,6 +126,7 @@ const Checks = () => {
         type={type}
       />
       <Info locationsCounter={locationsCounter} />
+      <StartingAge />
     </div>
   );
 };
@@ -408,6 +411,33 @@ const Info = ({ locationsCounter }) => {
           </tr>
         </tbody>
       </table>
+    </div>
+  );
+};
+
+// With Closed Door of Time and a random starting age, nothing is reachable until the
+// player picks starting age.
+const StartingAge = () => {
+  const { startingAge, setStartingAge } = useStartingAge();
+
+  if (!SettingsHelper.needsStartingAgeSelection()) {
+    return null;
+  }
+
+  return (
+    <div className="starting-age">
+      <span className="me-2">Starting age</span>
+      {["child", "adult"].map(age => (
+        <button
+          key={age}
+          type="button"
+          className="btn btn-dark btn-sm me-1"
+          onClick={() => setStartingAge(age)}
+          style={{ opacity: startingAge === age ? 1 : 0.5 }}
+        >
+          {_.upperFirst(age)}
+        </button>
+      ))}
     </div>
   );
 };
