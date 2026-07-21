@@ -358,13 +358,11 @@ const TrackerLauncher = () => {
           </p>
           <ul className="small text-secondary mb-0 ps-3">
             <li className="mb-1">
-              The logic assumes: access to both ages; no shuffled entrances, owl
-              drops, warp song destinations, or spawns; and vanilla (default)
-              ocarina melodies.
+              The logic assumes: no shuffled entrances, owl drops, warp song
+              destinations, or spawns; and vanilla (default) ocarina melodies.
             </li>
             <li className="mb-1">
-              Closed Forest and Closed Door of Time do not work for the reasons
-              above.
+              Closed Forest does not work for the reasons above.
             </li>
             <li>
               The logic assumes that the initial value for a counter is zero.

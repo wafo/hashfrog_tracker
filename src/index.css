@@ -222,6 +222,13 @@ body {
   margin: 1rem 0;
 }
 
+.check-tracker .starting-age {
+  display: flex;
+  align-items: center;
+  font-size: 0.75em;
+  padding: 0 2px;
+}
+
 /** *************************************** */
 /** Requirements Tooltip */
 /** *************************************** */
