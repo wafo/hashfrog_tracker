@@ -762,7 +762,7 @@ class LogicHelper {
   }
 
   static _hasBottle() {
-    return this.items.Bottle > 0 || this.isLocationAvailable("Deliver Rutos Letter");
+    return this.items.Bottle > 0 || this.isLocationAvailable("Deliver Rutos Letter") || this._evalEvent("Sell Big Poe");
   }
 
   static _evalIdentifier(name, age) {

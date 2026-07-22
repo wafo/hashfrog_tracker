@@ -43,7 +43,7 @@ const CHILD_ONLY_ITEMS = new Set([
 ]);
 
 // Regions that are always reachable without any items.
-const ENTRY_POINT_REGIONS = new Set(["Root", "Root Exits", "Child Spawn", "Adult Spawn"]);
+const ENTRY_POINT_REGIONS = new Set(["Root"]);
 
 // Farore's Wind Warp is a dynamic save warp.
 // Unlike song warps (which have fixed destinations), this creates spurious paths in our BFS. Exclude it entirely.
@@ -79,7 +79,7 @@ const KEY_SHUFFLE_RULES = [
 
 // Drops that require effort to obtain and should not be auto-satisfied during tooltip evaluation.
 // All other drops are treated as free.
-const NON_FREE_DROPS = new Set(["Blue Fire"]);
+const NON_FREE_DROPS = new Set(["Blue Fire", "Fish"]);
 
 // Logic identifiers for individual ocarina buttons.
 const OCARINA_NOTE_IDENTIFIERS = new Set([
@@ -92,7 +92,7 @@ const SETTINGS_PREFIXES = new Set(["logic_", "at_", "adv_", "glitch_"]);
 
 // Logic identifiers that are always auto-satisfied or otherwise irrelevant to tooltip display.
 const SKIP_IDENTIFIERS = new Set([
-  "True", "is_starting_age", "had_night_start", "Scarecrow_Song", "Bonooru", "Time_Travel",
+  "True", "had_night_start", "Scarecrow_Song", "Bonooru",
 ]);
 
 // Item name prefixes to silently skip.
@@ -753,8 +753,10 @@ function expandEventSkippingAge(eventName, items, visited, depth) {
       } else if (ENTRY_POINT_REGIONS.has(parentRegion)) {
         regionExpr = new Expression();
       } else if (!cache) {
-        // This age's cache is being built or not yet built, so treat region as reachable
-        regionExpr = new Expression();
+        // This age's cache is being built or not yet built.
+        // Treat the region as reachable, but still apply the age's baseline access gate, which the missing cache would have carried.
+        regionExpr = baseAgeAccessExpr(age, items, visited, depth + 1);
+        if (regionExpr.isImpossible()) { continue; }
       } else {
         // Region unreachable at this age
         continue;
@@ -791,6 +793,26 @@ function expandEventSkippingAge(eventName, items, visited, depth) {
 }
 
 /**
+ * Baseline requirements for playing as a given age at all, independent of any region.
+ * @param {string} age - The age to compute the access gate for ("child" or "adult").
+ * @param {object} items - Current tracked items.
+ * @param {Set} visited - Visited set for cycle detection.
+ * @param {number} depth - Current recursion depth.
+ * @returns {Expression} The baseline access requirements for the age.
+ */
+function baseAgeAccessExpr(age, items, visited, depth) {
+  if (!SettingsHelper.isDoorOfTimeClosed()) { return new Expression(); }
+
+  const startingAge = SettingsHelper.getStartingAge();
+  if (!startingAge || age === startingAge) { return new Expression(); }
+
+  if ("can_open_door_of_time" in LogicHelper.ruleAliases) {
+    return handleIdentifier("can_open_door_of_time", items, visited, depth);
+  }
+  return new Expression();
+}
+
+/**
  * Expand has_bottle into actual bottle item requirements.
  * @param {object} items - Current tracked items.
  * @param {Set} visited - Visited set for cycle detection.
@@ -804,12 +826,19 @@ function expandHasBottle(items, visited = new Set(), depth = 0) {
     new Clause([new RequirementItem("Bottle", "Bottle", bottleOwned)]),
   ]);
 
-  // Bottle with Big Poe can be emptied by selling to the Poe Collector
-  const bigPoeOwned = isItemOwned("Bottle_with_Big_Poe", items);
-  result = orCombineExpressions(
-    result,
-    new Expression([new Clause([new RequirementItem("Bottle_with_Big_Poe", "Bottle with Big Poe", bigPoeOwned)])]),
-  );
+  // A Bottle with Big Poe only frees up a bottle once the poe is sold to the Poe Collector
+  if (Locations.hasEvent("Sell Big Poe")) {
+    const sellExpr = expandEventSkippingAge("Sell Big Poe", items, visited, depth + 1);
+    if (!sellExpr.isImpossible() && !sellExpr.isEmpty()) {
+      result = orCombineExpressions(result, sellExpr);
+    }
+  } else {
+    const bigPoeOwned = isItemOwned("Bottle_with_Big_Poe", items);
+    result = orCombineExpressions(
+      result,
+      new Expression([new Clause([new RequirementItem("Bottle_with_Big_Poe", "Bottle with Big Poe", bigPoeOwned)])]),
+    );
+  }
 
   // Deliver Ruto's Letter produces a usable bottle
   if (settings?.zora_fountain !== "open") {
@@ -923,6 +952,18 @@ function handleBinaryExpression(node, items) {
   const rightLiteral = node.right.type === "Literal" ? node.right.value : null;
 
   if (isEquality || isInequality) {
+    // age == starting_age: satisfied when ages can be switched freely.
+    // Otherwise, compare the current age context against the known starting age.
+    if (leftName === "age" && rightName === "starting_age") {
+      if (!SettingsHelper.isDoorOfTimeClosed()) { return new Expression(); }
+
+      const startingAge = SettingsHelper.getStartingAge();
+      if (!startingAge || !currentAgeContext) { return new Expression(); }
+
+      const matches = isEquality ? currentAgeContext === startingAge : currentAgeContext !== startingAge;
+      return matches ? new Expression() : impossibleExpr();
+    }
+
     // selected_adult_trade_item == 'Item': the item itself is the requirement.
     // The != form is treated as satisfied (lenient simplification, mirroring LogicHelper._evalBinaryExpression which only special-cases ==).
     if (leftName === "selected_adult_trade_item" && rightLiteral !== null) {
@@ -1236,6 +1277,28 @@ function handleIdentifier(name, items, visited, depth, skipAgeFiltering = false)
 
   // Auto-satisfied identifiers
   if (SKIP_IDENTIFIERS.has(name)) {
+    return new Expression();
+  }
+
+  // Starting age: free when the Door of Time is open. With a closed door, only the actual starting age satisfies it.
+  // With a random starting age and no selection yet, treat it as satisfied.
+  // Availability (LogicHelper) shows everything locked in that state, but tooltips optimistically show the requirements as if either age could be the starting one.
+  if (name === "is_starting_age") {
+    if (!SettingsHelper.isDoorOfTimeClosed()) { return new Expression(); }
+
+    const startingAge = SettingsHelper.getStartingAge();
+    if (!startingAge || !currentAgeContext) { return new Expression(); }
+    return currentAgeContext === startingAge ? new Expression() : impossibleExpr();
+  }
+
+  // Time travel: free when the Door of Time is open. Otherwise, it requires opening the door.
+  // Temple of Time access for the starting age is intentionally omitted as a display simplification.
+  if (name === "Time_Travel") {
+    if (!SettingsHelper.isDoorOfTimeClosed()) { return new Expression(); }
+
+    if ("can_open_door_of_time" in LogicHelper.ruleAliases) {
+      return handleIdentifier("can_open_door_of_time", items, visited, depth, skipAgeFiltering);
+    }
     return new Expression();
   }
 
@@ -2365,7 +2428,7 @@ export function getLocationRequirements(locationName, items) {
       evaluationCache = new Map();
 
       if (ageExprs.length === 0) {
-        return { clauses: [], satisfied: true };
+        return { clauses: [], satisfied: false, impossible: true };
       }
 
       // Short-circuit: only one age produced a valid result
@@ -2391,7 +2454,7 @@ export function getLocationRequirements(locationName, items) {
 
     const result = evaluateForAge(rule, parentRegion, items);
     if (!result) {
-      return { clauses: [], satisfied: true };
+      return { clauses: [], satisfied: false, impossible: true };
     }
 
     return postProcessExpression(result);
