@@ -127,6 +127,37 @@ const warnedUnknownFunctions = new Set();
 // buildRegionCache uses this to detect "pure" exit rules whose extraction can be reused across fixed-point iterations.
 let extractionTouchedDynamicState = false;
 
+// Keys whose cycle guards fired during the current extraction scope (visited keys, plus the pseudo-keys below).
+// A guard hit degrades the result, but only degradation caused by a key still being expanded ABOVE the caching scope is context-dependent.
+// Guards remove their keys from the visited set on exit, so at cache-write time a blocker still present in visited is external and the result must stay out of shared caches.
+// Blockers absent from visited came from an intrinsic self-cycle, making the result deterministic and cacheable.
+let extractionBlockers = new Set();
+
+// Pseudo-blocker for depth-cap truncation: depth depends on the whole call chain, so truncated results are never cacheable.
+const DEPTH_BLOCKER = "\u0000depth-cap";
+
+// Pseudo-blocker prefix for an in-progress baseAgeAccessExpr computation.
+const BASE_AGE_BLOCKER_PREFIX = "\u0000base-age:";
+
+/**
+ * Decide whether any recorded blocker makes a result context-dependent (not cacheable).
+ * @param {Set} blockers - Blocker keys recorded while computing the result.
+ * @param {Set} visited - The visited set as it stands at the cache-write site.
+ * @returns {boolean} True when the result depends on an expansion outside the caching scope.
+ */
+function blockersAreExternal(blockers, visited) {
+  for (const b of blockers) {
+    if (b === DEPTH_BLOCKER) { return true; }
+    if (b.startsWith(BASE_AGE_BLOCKER_PREFIX)) {
+      const age = b.slice(BASE_AGE_BLOCKER_PREFIX.length);
+      if (baseAgeAccessCache.get(age) === BASE_AGE_ACCESS_IN_PROGRESS) { return true; }
+      continue;
+    }
+    if (visited.has(b)) { return true; }
+  }
+  return false;
+}
+
 // Age context for the current extraction pass.
 // null = any age, "adult" = adult only, "child" = child only
 let currentAgeContext = null;
@@ -140,6 +171,11 @@ let evaluationCache = null;
 // Requirement structures keyed by location name. Invalidated when settings or starting age change.
 const structureCache = new Map();
 let lastSettingsKey = null;
+
+// Baseline age-access expressions (see baseAgeAccessExpr), one per age.
+// Cleared together with the region caches. The sentinel marks an in-progress computation.
+const baseAgeAccessCache = new Map();
+const BASE_AGE_ACCESS_IN_PROGRESS = {};
 
 // Region accessibility caches, one per age context. Each maps regionName -> Expression.
 // Built once per settings change via BFS, then reused for all location evaluations.
@@ -602,10 +638,15 @@ function isSettingsIdentifier(name) {
 function expandSources(type, name, sources, items, visited, depth, skipUnreachableRegions) {
   extractionTouchedDynamicState = true;
   const cacheKey = `${type}:${name}`;
-  if (visited.has(cacheKey)) { return impossibleExpr(); }
+  if (visited.has(cacheKey)) {
+    extractionBlockers.add(cacheKey);
+    return impossibleExpr();
+  }
   if (evaluationCache?.has(cacheKey)) { return evaluationCache.get(cacheKey).clone(); }
   if (!sources || sources.length === 0) { return impossibleExpr(); }
 
+  const blockersBefore = extractionBlockers;
+  extractionBlockers = new Set();
   visited.add(cacheKey);
   const sourceExprs = [];
 
@@ -637,7 +678,12 @@ function expandSources(type, name, sources, items, visited, depth, skipUnreachab
   visited.delete(cacheKey);
 
   const result = combineWithOr(sourceExprs);
-  if (evaluationCache) { evaluationCache.set(cacheKey, result); }
+  // Externally-blocked results are context-dependent, so keep them out of the shared cache.
+  // Intrinsic self-cycles are deterministic and safe to cache.
+  const myBlockers = extractionBlockers;
+  extractionBlockers = blockersBefore;
+  for (const b of myBlockers) { extractionBlockers.add(b); }
+  if (evaluationCache && !blockersAreExternal(myBlockers, visited)) { evaluationCache.set(cacheKey, result); }
   return result.clone();
 }
 
@@ -693,6 +739,7 @@ function expandEventSkippingAge(eventName, items, visited, depth) {
   extractionTouchedDynamicState = true;
   const visitKey = `persistent_event:${eventName}`;
   if (visited.has(visitKey)) {
+    extractionBlockers.add(visitKey);
     return impossibleExpr();
   }
 
@@ -700,6 +747,7 @@ function expandEventSkippingAge(eventName, items, visited, depth) {
   const producedFlags = EVENT_TO_FLAG[eventName] || [];
   for (const flag of producedFlags) {
     if (visited.has(flag) || visited.has(`persistent_event:${flag}`)) {
+      extractionBlockers.add(visited.has(flag) ? flag : `persistent_event:${flag}`);
       return impossibleExpr();
     }
   }
@@ -811,10 +859,33 @@ function baseAgeAccessExpr(age, items, visited, depth) {
   const startingAge = SettingsHelper.getStartingAge();
   if (!startingAge || age === startingAge) { return new Expression(); }
 
-  if ("can_open_door_of_time" in LogicHelper.ruleAliases) {
-    return handleIdentifier("can_open_door_of_time", items, visited, depth);
+  if (!("can_open_door_of_time" in LogicHelper.ruleAliases)) { return new Expression(); }
+
+  // The age gate is a standalone question, independent of whatever is being expanded above it, so it is computed once per age with a fresh visited set and memoized.
+  // The in-progress sentinel breaks the intrinsic self-reference without depending on the callers context.
+  const cached = baseAgeAccessCache.get(age);
+  if (cached === BASE_AGE_ACCESS_IN_PROGRESS) {
+    extractionBlockers.add(BASE_AGE_BLOCKER_PREFIX + age);
+    return impossibleExpr();
   }
-  return new Expression();
+  if (cached) { return cached.clone(); }
+
+  const blockersBefore = extractionBlockers;
+  extractionBlockers = new Set();
+  baseAgeAccessCache.set(age, BASE_AGE_ACCESS_IN_PROGRESS);
+  const expr = handleIdentifier("can_open_door_of_time", items, new Set(), depth);
+
+  const myBlockers = extractionBlockers;
+  extractionBlockers = blockersBefore;
+  if (myBlockers.has(DEPTH_BLOCKER)) {
+    // Truncated results must not be memoized, so recompute on the next request.
+    extractionBlockers.add(DEPTH_BLOCKER);
+    baseAgeAccessCache.delete(age);
+  } else {
+    // The self-reference degradation is fully encapsulated by the memo, so it does not taint the caller.
+    baseAgeAccessCache.set(age, expr);
+  }
+  return expr.clone();
 }
 
 /**
@@ -902,9 +973,11 @@ function expandSongNotes(songArg, items) {
  * @returns {Expression} The extracted requirements.
  */
 function extractFromNode(node, items, visited = new Set(), depth = 0, skipAgeFiltering = false) {
-  // Maximum recursion depth to prevent infinite loops
-  // But, needs to be high enough for deeply nested type-checks
-  if (!node || depth > 25) {
+  // Recursion depth cap: a safety valve against pathological expansion blowup.
+  // Real cycles are handled by the visited sets, and legitimate chains can nest deeply, so the cap is generous.
+  // Truncation degrades the result, so it also records the depth pseudo-blocker.
+  if (!node || depth > 80) {
+    if (node) { extractionBlockers.add(DEPTH_BLOCKER); }
     return new Expression();
   }
 
@@ -1224,6 +1297,7 @@ function handleCallExpression(node, items, visited, depth, skipAgeFiltering = fa
       visited.delete(visitKey);
       return expanded;
     }
+    extractionBlockers.add(visitKey);
     return new Expression();
   }
 
@@ -1388,6 +1462,7 @@ function handleIdentifier(name, items, visited, depth, skipAgeFiltering = false)
 
   // Check if this identifier is already being expanded
   if (visited.has(name)) {
+    extractionBlockers.add(name);
     return impossibleExpr();
   }
 
@@ -1417,14 +1492,21 @@ function handleIdentifier(name, items, visited, depth, skipAgeFiltering = false)
     }
 
     const touchedBefore = extractionTouchedDynamicState;
+    const blockersBefore = extractionBlockers;
     extractionTouchedDynamicState = false;
+    extractionBlockers = new Set();
     visited.add(name);
     const expanded = extractFromNode(ruleAliases[name], items, visited, depth + 1, skipAgeFiltering);
     visited.delete(name);
     const touchedByAlias = extractionTouchedDynamicState;
+    const myBlockers = extractionBlockers;
     extractionTouchedDynamicState = touchedBefore || touchedByAlias;
+    extractionBlockers = blockersBefore;
+    for (const b of myBlockers) { extractionBlockers.add(b); }
 
-    if (evaluationCache) {
+    // Externally-blocked results are context-dependent, so keep them out of the shared cache.
+    // Intrinsic self-cycles are deterministic and safe to cache.
+    if (evaluationCache && !blockersAreExternal(myBlockers, visited)) {
       evaluationCache.set(aliasCacheKey, { expr: expanded, touchedDynamicState: touchedByAlias });
     }
     return expanded.clone();
@@ -1567,6 +1649,7 @@ function handleSequenceExpression(node, items, visited, depth, skipAgeFiltering 
 
     // If we're already tracing this item, skip to avoid infinite recursion
     if (visited.has(itemName)) {
+      extractionBlockers.add(itemName);
       return new Expression();
     }
 
@@ -1797,9 +1880,10 @@ function buildRegionCache(items) {
         exitPaths = edge.purePaths;
       } else {
         extractionTouchedDynamicState = false;
+        extractionBlockers = new Set();
         const exitExpr = extractFromNode(rule, items, new Set(), 0);
         exitPaths = exitExpr.isImpossible() ? [] : expressionToDNFPaths(exitExpr);
-        if (!edge.evaluated && !extractionTouchedDynamicState) {
+        if (!edge.evaluated && !extractionTouchedDynamicState && extractionBlockers.size === 0) {
           edge.isPure = true;
           edge.purePaths = exitPaths;
         }
@@ -2539,6 +2623,7 @@ function syncCachesWithSettings() {
     lastSettingsKey = currentSettingsKey;
     regionCacheChild = null;
     regionCacheAdult = null;
+    baseAgeAccessCache.clear();
   }
 }
 
@@ -2642,6 +2727,7 @@ export function clearStructureCache() {
   lastSettingsKey = null;
   regionCacheChild = null;
   regionCacheAdult = null;
+  baseAgeAccessCache.clear();
 }
 
 export default { getLocationRequirements, getRequirementsStructure, updateRequirementsOwnership, clearStructureCache, warmRequirementsCache };
