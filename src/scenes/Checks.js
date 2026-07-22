@@ -113,6 +113,7 @@ const Checks = () => {
   return (
     <div id="checks" className="check-tracker" style={{ backgroundColor: layoutContext.layoutConfig.backgroundColor }}>
       <Buttons efkActive={efkActive} type={type} setType={setType} />
+      <StartingAgePrompt />
       <LocationsList
         actions={actions}
         countLocations={countLocations}
@@ -415,6 +416,18 @@ const Info = ({ locationsCounter }) => {
   );
 };
 
+// Until the player picks a starting age, every check evaluates as inaccessible,
+// so tell them why the regions look empty.
+const StartingAgePrompt = () => {
+  const { startingAge } = useStartingAge();
+
+  if (!SettingsHelper.needsStartingAgeSelection() || startingAge) {
+    return null;
+  }
+
+  return <div className="starting-age-prompt mb-2">Select starting age to see available checks.</div>;
+};
+
 // With Closed Door of Time and a random starting age, nothing is reachable until the
 // player picks starting age.
 const StartingAge = () => {
@@ -425,7 +438,7 @@ const StartingAge = () => {
   }
 
   return (
-    <div className="starting-age">
+    <div className={`starting-age${startingAge ? "" : " starting-age--unselected"}`}>
       <span className="me-2">Starting age</span>
       {["child", "adult"].map(age => (
         <button

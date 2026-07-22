@@ -223,6 +223,15 @@ class LogicHelper {
     // Share renamedAttributes with SettingsHelper to break circular dependency
     SettingsHelper.setRenamedAttributes(this.renamedAttributes);
 
+    // Fenhl's fork splits open_forest into two booleans (open_forest = can
+    // leave the forest, open_deku = Deku Tree open). Stable expects a
+    // single string enum, so translate the bools back into the enum.
+    if (typeof this.settings.open_forest === "boolean") {
+      const openForest = this.settings.open_forest;
+      const openDeku = this.settings.open_deku;
+      _.set(this.settings, "open_forest", openDeku ? "open" : openForest ? "closed_deku" : "closed");
+    }
+
     if (
       this.settings.open_forest === "closed" &&
       (this.renamedAttributes.shuffle_special_interior_entrances ||
@@ -769,11 +778,13 @@ class LogicHelper {
       case "Weird_Egg":
         return this.items[name] > 0 || this._hasLaterChildTradeItem("Weird_Egg");
       case "Zeldas_Letter":
-        return (
-          this.items[name] > 0 ||
-          this.renamedAttributes.skip_child_zelda ||
-          this.isLocationAvailable("HC Zeldas Letter")
-        );
+        if (this.items[name] > 0 || this.renamedAttributes.skip_child_zelda) {
+          return true;
+        }
+        if (SettingsHelper.hasShuffleChildTrade("Zeldas Letter")) {
+          return false;
+        }
+        return this.isLocationAvailable("HC Zeldas Letter");
     }
 
     if (name in MASK_LOCATIONS) {
