@@ -17,6 +17,11 @@ class LogicLoader {
       return await this._fetchLogicFiles(owner, tag);
     } catch (error) {
       // If unable to fetch logic files, fall back to bundled version
+      console.warn(
+        `Failed to fetch logic files for ${owner}/${tag} (version "${version}"): ${error}. ` +
+        `Falling back to bundled ${VersionConfig.getFallbackVersion()} logic files. ` +
+        `Tooltips and logic may be inaccurate.`,
+      );
       return await VersionConfig.getFallbackLogicFiles();
     }
   }

@@ -1162,7 +1162,7 @@ function handleIdentifier(name, items, visited, depth, skipAgeFiltering = false)
       settingValue = renamedAttributes[name];
     }
 
-    if (settingValue) {
+    if (settingValue && settingValue !== "off") {
       return new Expression();
     } else {
       return impossibleExpr();
@@ -1453,7 +1453,7 @@ function handleUnaryExpression(node) {
           settingValue = renamedAttributes[name];
         }
       }
-      if (settingValue) {
+      if (settingValue && settingValue !== "off") {
         return impossibleExpr();
       }
       return new Expression();

@@ -30,7 +30,7 @@ const TIME_TRAVEL_ITEMS = { Ocarina: 1, Song_of_Time: 1 };
 
 describe("Door of Time", () => {
   describe("open", () => {
-    beforeEach(() => initializeLogic({ open_door_of_time: "open", starting_age: "child" }));
+    beforeEach(() => initializeLogic({ open_door_of_time: "open", starting_age: "child", open_forest: "open" }));
 
     test("both ages are reachable with no items", () => {
       updateItems({});
@@ -43,7 +43,7 @@ describe("Door of Time", () => {
   });
 
   describe("closed with a known starting age", () => {
-    beforeEach(() => initializeLogic({ open_door_of_time: "sot", starting_age: "child" }));
+    beforeEach(() => initializeLogic({ open_door_of_time: "sot", starting_age: "child", open_forest: "open" }));
 
     test("the starting age is reachable", () => {
       updateItems({});
@@ -59,7 +59,7 @@ describe("Door of Time", () => {
     });
 
     test("a starting age of adult locks the child side", () => {
-      initializeLogic({ open_door_of_time: "sot", starting_age: "adult" });
+      initializeLogic({ open_door_of_time: "sot", starting_age: "adult", open_forest: "open" });
       updateItems({});
       expect(LogicHelper.isLocationAvailable("KF Kokiri Sword Chest")).toBe(false);
 
@@ -69,7 +69,7 @@ describe("Door of Time", () => {
   });
 
   describe("closed with a random starting age", () => {
-    beforeEach(() => initializeLogic({ open_door_of_time: "sot", starting_age: "random" }));
+    beforeEach(() => initializeLogic({ open_door_of_time: "sot", starting_age: "random", open_forest: "open" }));
 
     test("nothing is reachable until an age is picked", () => {
       updateItems(TIME_TRAVEL_ITEMS);

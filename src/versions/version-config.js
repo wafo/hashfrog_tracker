@@ -8,6 +8,14 @@ const BUNDLED_VERSION_SETTINGS = {
 const DEFAULT_OWNER = "OoTRandomizer";
 const FALLBACK_VERSION = "9.0.0";
 
+// Maps dev-branch version prefixes to the fork repository that hosts the matching logic files.
+const DEV_FORK_BRANCHES = {
+  devrreal_: { owner: "rrealmuto", tag: "Dev-Rob" },
+  devFenhl_: { owner: "fenhl", tag: "dev-fenhl" },
+  devR_: { owner: "Roman971", tag: "Dev-R" },
+  devEnemyShuffle_: { owner: "rrealmuto", tag: "enemy_shuffle" },
+};
+
 /**
  * Checks if a version has bundled logic files.
  * @param {string} version - The version string to check.
@@ -53,6 +61,13 @@ function parseVersion(version) {
   if (version.includes("/")) {
     const [owner, ...tagParts] = version.split("/");
     return { owner, tag: tagParts.join("/") };
+  }
+
+  // Known dev fork versions
+  for (const [prefix, fork] of Object.entries(DEV_FORK_BRANCHES)) {
+    if (version.startsWith(prefix)) {
+      return { owner: fork.owner, tag: fork.tag };
+    }
   }
 
   // Main repo

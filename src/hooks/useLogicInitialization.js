@@ -46,9 +46,12 @@ const useLogicInitialization = (options = {}) => {
         settings = response.settings;
       }
 
+      // Apply defaults and old-name transformations first so LogicHelper sees normalized settings
+      SettingsHelper.setSettings(settings);
+
       // LogicHelper post-processes settings (e.g. mq_dungeons_mode "mq" expands
       // mq_dungeons_specific to all dungeons), so set SettingsHelper from its result.
-      const finalSettings = LogicHelper.initialize(logicHelpersFile, settings);
+      const finalSettings = LogicHelper.initialize(logicHelpersFile, SettingsHelper.settings);
 
       SettingsHelper.setSettings(finalSettings);
       updateItemsFromLogic(finalSettings); // Starting items.
