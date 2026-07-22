@@ -1,5 +1,6 @@
 import GAME_REWARDS from "../data/game-rewards.json";
 import shopRules from "../data/shop-rules.json";
+import SONG_NOTES from "../data/song-notes.json";
 import {
   combineDNFPaths,
   dnfPathSetsEqual, dnfPathsToExpression,
@@ -95,7 +96,10 @@ const SKIP_IDENTIFIERS = new Set([
 ]);
 
 // Item name prefixes to silently skip.
-const SKIP_PREFIXES = new Set(["Bombchu_", "Bombchus_", "Buy_"]);
+const SKIP_PREFIXES = new Set(["Bombchu_", "Buy_"]);
+
+// Bombchu pack items count as the tracked "Bombchus" item.
+const BOMBCHU_PACK_ITEMS = new Set(["Bombchus_5", "Bombchus_10", "Bombchus_20"]);
 
 // Shop items that require an empty bottle to purchase.
 const SHOP_BOTTLE_REQUIRED = new Set(shopRules.bottleRequired || []);
@@ -115,6 +119,9 @@ const STRING_LITERAL_ITEMS = {
   "Goron Tunic": "Goron_Tunic",
   "Zora Tunic": "Zora_Tunic",
 };
+
+// Function names already reported as unhandled, to avoid log spam.
+const warnedUnknownFunctions = new Set();
 
 
 // Age context for the current extraction pass.
@@ -153,7 +160,7 @@ let bfsAtLookupCache = null;
 
 /**
  * Factor common items from compound options within an OR clause.
- * 
+ *
  * Unlike factorCommonFromOrOptions, this only factors from compound items, leaving simple items untouched.
  * @param {Array} items - Array of items in an OR clause.
  * @returns {Array} Simplified array with compounds factored.
@@ -442,7 +449,7 @@ function detectAgeRequirement(node) {
 
 /**
  * Detect if a rule contains here(can_plant_bean).
- * 
+ *
  * This is important because bean planting requires child access, even if the overall location is adult-only.
  * @param {object} node - The AST node to inspect.
  * @returns {boolean} True if the node contains a here(can_plant_bean) call.
@@ -521,6 +528,11 @@ function isItemOwned(itemName, items) {
         const ownedCount = CATEGORY_ITEMS[name].filter(item => (items[item] || 0) > 0).length;
         return ownedCount >= count;
       }
+      // Any N distinct ocarina buttons (Scarecrow's Song with note shuffle)
+      if (name === "Ocarina_Buttons") {
+        const ownedButtons = [...OCARINA_NOTE_IDENTIFIERS].filter(b => (items[b] || 0) > 0).length;
+        return ownedButtons >= count;
+      }
       if (name === "Hearts") {
         const pieces = items.Piece_of_Heart || 0;
         const containers = items.Heart_Container || 0;
@@ -571,7 +583,7 @@ function isSettingsIdentifier(name) {
 
 /**
  * Shared expansion logic for events and drops.
- * 
+ *
  * Each source's rule is extracted, AND-merged with its region access requirements, and the resulting expressions are
  * OR-combined.
  * @param {string} type - Cache key prefix ("event" or "drop").
@@ -647,7 +659,7 @@ function expandEvent(eventName, items, visited, depth) {
 
 /**
  * Expand a drop item into its access requirements.
- * 
+ *
  * Unlike events, drops in dungeon-interior regions (not in the region cache) are still included, as their rule
  * requirements are meaningful for tooltips.
  * @param {string} dropName - The drop name to expand.
@@ -810,6 +822,41 @@ function expandHasBottle(items, visited = new Set(), depth = 0) {
 }
 
 /**
+ * Expand has_all_notes_for_song into individual ocarina button requirements.
+ * @param {object} songArg - The AST node for the song argument.
+ * @param {object} items - Current tracked items.
+ * @returns {Expression} The required ocarina buttons, or a satisfied Expression when notes are not shuffled.
+ */
+function expandSongNotes(songArg, items) {
+  const settings = getSettings();
+  if (!settings.shuffle_individual_ocarina_notes) {
+    return new Expression();
+  }
+  const songName = songArg?.type === "Identifier" ? songArg.name : songArg?.value;
+  if (!songName) {
+    return new Expression();
+  }
+
+  // Scarecrow's Song needs any 2 distinct notes
+  if (songName === "Scarecrow_Song" || songName === "Scarecrow Song") {
+    if (settings.scarecrow_behavior === "free") {
+      return new Expression();
+    }
+    const owned = isItemOwned("Ocarina_Buttons,2", items);
+    return new Expression([new Clause([new RequirementItem("Ocarina_Buttons,2", "Ocarina Buttons x2", owned)])]);
+  }
+
+  const notes = SONG_NOTES[songName] || SONG_NOTES[String(songName).replace(/ /g, "_").replace(/'/g, "")];
+  if (!notes) {
+    return new Expression();
+  }
+  const clauses = notes.map(
+    button => new Clause([new RequirementItem(button, getDisplayName(button), isItemOwned(button, items))]),
+  );
+  return new Expression(clauses);
+}
+
+/**
  * Recursively extract item requirements from an AST node.
  *
  * Dispatches to the appropriate handler based on node type.
@@ -841,7 +888,7 @@ function extractFromNode(node, items, visited = new Set(), depth = 0, skipAgeFil
       return handleLogicalExpression(node, items, visited, depth, skipAgeFiltering);
 
     case "BinaryExpression":
-      return handleBinaryExpression(node);
+      return handleBinaryExpression(node, items);
 
     case "CallExpression":
       return handleCallExpression(node, items, visited, depth, skipAgeFiltering);
@@ -863,17 +910,28 @@ function extractFromNode(node, items, visited = new Set(), depth = 0, skipAgeFil
 /**
  * Handle a binary expression AST node.
  * @param {object} node - The BinaryExpression AST node.
+ * @param {object} items - The current tracked items object.
  * @returns {Expression} Satisfied Expression if condition is true, impossible otherwise.
  */
-function handleBinaryExpression(node) {
+function handleBinaryExpression(node, items) {
   const isEquality = node.operator === "==" || node.operator === "===";
   const isInequality = node.operator === "!=" || node.operator === "!==";
 
+  const leftName = node.left.type === "Identifier" ? node.left.name : null;
+  const rightName = node.right.type === "Identifier" ? node.right.name : null;
+  const leftLiteral = node.left.type === "Literal" ? node.left.value : null;
+  const rightLiteral = node.right.type === "Literal" ? node.right.value : null;
+
   if (isEquality || isInequality) {
-    const leftName = node.left.type === "Identifier" ? node.left.name : null;
-    const rightName = node.right.type === "Identifier" ? node.right.name : null;
-    const leftLiteral = node.left.type === "Literal" ? node.left.value : null;
-    const rightLiteral = node.right.type === "Literal" ? node.right.value : null;
+    // selected_adult_trade_item == 'Item': the item itself is the requirement.
+    // The != form is treated as satisfied (lenient simplification, mirroring LogicHelper._evalBinaryExpression which only special-cases ==).
+    if (leftName === "selected_adult_trade_item" && rightLiteral !== null) {
+      if (isInequality) { return new Expression(); }
+
+      const itemKey = String(rightLiteral).replace(/ /g, "_");
+      const owned = isItemOwned(itemKey, items);
+      return new Expression([new Clause([new RequirementItem(itemKey, getDisplayName(itemKey), owned)])]);
+    }
 
     // Identifier == Identifier (same name comparison)
     if (leftName && rightName) {
@@ -915,7 +973,31 @@ function handleBinaryExpression(node) {
     }
   }
 
+  // setting < number
+  if (node.operator === "<" && leftName && rightLiteral !== null) {
+    const settings = getSettings();
+    const settingValue = settings?.[leftName];
+    if (settingValue !== undefined) {
+      return settingValue < rightLiteral ? new Expression() : impossibleExpr();
+    }
+  }
+
+  // 'Value' in setting_list
+  if (node.operator === "in" && leftLiteral !== null && rightName) {
+    const settings = getSettings();
+    const list = settings?.[rightName];
+    if (Array.isArray(list)) {
+      return list.includes(leftLiteral) ? new Expression() : impossibleExpr();
+    }
+    return impossibleExpr();
+  }
+
   // For other binary expressions or unrecognized patterns, return impossible
+  const knownOperators = new Set(["==", "===", "!=", "!==", "<", "in"]);
+  if (!knownOperators.has(node.operator) && !warnedUnknownFunctions.has(`op:${node.operator}`)) {
+    warnedUnknownFunctions.add(`op:${node.operator}`);
+    console.warn(`expression-converter: unhandled binary operator "${node.operator}" treated as impossible`);
+  }
   return impossibleExpr();
 }
 
@@ -1016,6 +1098,53 @@ function handleCallExpression(node, items, visited, depth, skipAgeFiltering = fa
     return new Expression([new Clause([new RequirementItem(`${categoryName},${requiredCount}`, displayName, owned)])]);
   }
 
+  // Individual ocarina note requirements for songs
+  if (funcName === "has_all_notes_for_song") {
+    return expandSongNotes(node.arguments[0], items);
+  }
+
+  // Dungeon shortcut checks
+  if (funcName === "region_has_shortcuts") {
+    const arg = node.arguments[0];
+    const regionName = arg?.type === "Identifier" ? arg.name : arg?.value;
+    const hintRegion = Locations.regionMap[regionName];
+    if (!hintRegion) {
+      return impossibleExpr();
+    }
+    return SettingsHelper.hasDungeonShortcut(hintRegion) ? new Expression() : impossibleExpr();
+  }
+
+  // Damage survival checks
+  if (funcName === "can_live_dmg") {
+    const hearts = node.arguments[0]?.value ?? 0;
+    const allowReviveArg = node.arguments[1];
+    const allowRevive = allowReviveArg ? allowReviveArg.name !== "False" && allowReviveArg.value !== false : true;
+    const allowNayrusArg = node.arguments[2];
+    const allowNayrus = allowNayrusArg ? allowNayrusArg.name !== "False" && allowNayrusArg.value !== false : true;
+
+    const mult = getSettings().damage_multiplier;
+    const survives =
+      ((mult === "quadruple" || mult === "quad") && hearts < 0.75) ||
+      (mult === "double" && hearts < 1.5) ||
+      (mult === "normal" && hearts < 3) ||
+      (mult === "half" && hearts < 6);
+    if (survives) {
+      return new Expression();
+    }
+
+    const mitigations = [];
+    if (allowRevive) {
+      mitigations.push("Fairy");
+    }
+    if (allowNayrus) {
+      mitigations.push("(Nayrus_Love and Magic_Meter)");
+    }
+    if (mitigations.length === 0) {
+      return impossibleExpr();
+    }
+    return extractFromNode(parseRule(mitigations.join(" or ")), items, visited, depth + 1, skipAgeFiltering);
+  }
+
   const paramAliases = LogicHelper.parameterizedAliases;
   if (funcName in paramAliases) {
     const { patterns, template } = paramAliases[funcName];
@@ -1045,8 +1174,13 @@ function handleCallExpression(node, items, visited, depth, skipAgeFiltering = fa
       visited.delete(visitKey);
       return expanded;
     }
+    return new Expression();
   }
 
+  if (!warnedUnknownFunctions.has(funcName)) {
+    warnedUnknownFunctions.add(funcName);
+    console.warn(`expression-converter: unknown function "${funcName}" treated as satisfied in tooltips`);
+  }
   return new Expression();
 }
 
@@ -1131,6 +1265,12 @@ function handleIdentifier(name, items, visited, depth, skipAgeFiltering = false)
     }
 
     return result;
+  }
+
+  // Bombchu packs all satisfy the same tracked "Bombchus" item
+  if (BOMBCHU_PACK_ITEMS.has(name)) {
+    const owned = isItemOwned("Bombchus", items);
+    return new Expression([new Clause([new RequirementItem("Bombchus", getDisplayName("Bombchus"), owned)])]);
   }
 
   // Skip identifiers with certain prefixes
