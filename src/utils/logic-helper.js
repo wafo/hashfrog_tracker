@@ -290,6 +290,12 @@ class LogicHelper {
   }
 
   static getStartingItems() {
+    // Memoized: called from the tooltip converter for every requirement item.
+    // Treat the returned object as read-only.
+    if (this._startingItemsCache && this._startingItemsCacheSettings === this.settings) {
+      return this._startingItemsCache;
+    }
+
     const items = {};
     const startingLists = [
       this.settings?.starting_inventory || [],
@@ -303,6 +309,9 @@ class LogicHelper {
         }
       }
     }
+
+    this._startingItemsCache = items;
+    this._startingItemsCacheSettings = this.settings;
     return items;
   }
 

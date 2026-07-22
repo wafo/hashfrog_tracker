@@ -7,6 +7,7 @@ import DEFAULT_ITEMS from "../data/default-items.json";
 import DUNGEONS from "../data/dungeons.json";
 import ITEMS_JSON from "../data/items.json";
 import UUID_TO_ITEM from "../data/uuid-to-item.json";
+import { clearStructureCache, warmRequirementsCache } from "../utils/expression-converter";
 import { getEFKSkipRegions, getSelectedEFKDungeons, isEFK, isEFKLabel } from "../utils/efk";
 import Locations from "../utils/locations";
 import LogicHelper from "../utils/logic-helper";
@@ -270,6 +271,12 @@ function reducer(state, action) {
       SettingsHelper.settings["mq_dungeons_specific"] = newDungeonsMQ;
       SettingsHelper.invalidateCachedSets();
 
+      // Settings were mutated in place, so tooltip structures must be recomputed
+      clearStructureCache();
+
+      // Rebuild tooltip caches
+      setTimeout(warmRequirementsCache, 0);
+
       // Modify toggled dungeon to use MQ/non-MQ locations
       const locations = _.cloneDeep(state.locations);
       const locationKey = _.includes(LogicHelper.settings.mq_dungeons_specific, payload) ? "dungeon_mq" : "dungeon";
@@ -311,6 +318,12 @@ function reducer(state, action) {
       SettingsHelper.settings["dungeon_shortcuts"] = newShortcuts;
       SettingsHelper.invalidateCachedSets();
 
+      // Settings were mutated in place, so tooltip structures must be recomputed
+      clearStructureCache();
+
+      // Rebuild tooltip caches
+      setTimeout(warmRequirementsCache, 0);
+
       // Revalidate checks based on items collected
       const validatedLocations = validateLocations(
         state.locations,
@@ -328,6 +341,9 @@ function reducer(state, action) {
       // payload = "child" | "adult", clicking the selected age again clears it
       const selection = state.starting_age_selection === payload ? null : payload;
       SettingsHelper.setStartingAgeSelection(selection);
+
+      // Rebuild tooltip caches
+      setTimeout(warmRequirementsCache, 0);
 
       const locations = validateLocations(
         state.locations,

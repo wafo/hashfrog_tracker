@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { getGeneratorVersionCache, getSettingsStringCache, useItems } from "../context/trackerContext";
+import { warmRequirementsCache } from "../utils/expression-converter";
 import Locations from "../utils/locations";
 import LogicHelper from "../utils/logic-helper";
 import LogicLoader from "../utils/logic-loader";
@@ -56,6 +57,9 @@ const useLogicInitialization = (options = {}) => {
       SettingsHelper.setSettings(finalSettings);
       updateItemsFromLogic(finalSettings); // Starting items.
       setIsInitialized(true);
+
+      // Pre-build tooltip region caches
+      setTimeout(warmRequirementsCache, 0);
     } catch (err) {
       setError(err);
     } finally {

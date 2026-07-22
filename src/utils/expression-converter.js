@@ -123,6 +123,9 @@ const STRING_LITERAL_ITEMS = {
 // Function names already reported as unhandled, to avoid log spam.
 const warnedUnknownFunctions = new Set();
 
+// Set whenever an extraction consults dynamic state (events, drops, region caches).
+// buildRegionCache uses this to detect "pure" exit rules whose extraction can be reused across fixed-point iterations.
+let extractionTouchedDynamicState = false;
 
 // Age context for the current extraction pass.
 // null = any age, "adult" = adult only, "child" = child only
@@ -134,9 +137,9 @@ let cachedSettings = null;
 // Expansion cache for the current evaluation.
 let evaluationCache = null;
 
-// Requirement structures keyed by location name. Invalidated when settings change.
+// Requirement structures keyed by location name. Invalidated when settings or starting age change.
 const structureCache = new Map();
-let lastSettingsJson = null;
+let lastSettingsKey = null;
 
 // Region accessibility caches, one per age context. Each maps regionName -> Expression.
 // Built once per settings change via BFS, then reused for all location evaluations.
@@ -597,6 +600,7 @@ function isSettingsIdentifier(name) {
  * @returns {Expression} The OR combination of all source expressions.
  */
 function expandSources(type, name, sources, items, visited, depth, skipUnreachableRegions) {
+  extractionTouchedDynamicState = true;
   const cacheKey = `${type}:${name}`;
   if (visited.has(cacheKey)) { return impossibleExpr(); }
   if (evaluationCache?.has(cacheKey)) { return evaluationCache.get(cacheKey).clone(); }
@@ -686,6 +690,7 @@ function expandDrop(dropName, items, visited, depth) {
  * @returns {Expression} Combined event + region access requirements.
  */
 function expandEventSkippingAge(eventName, items, visited, depth) {
+  extractionTouchedDynamicState = true;
   const visitKey = `persistent_event:${eventName}`;
   if (visited.has(visitKey)) {
     return impossibleExpr();
@@ -1060,6 +1065,9 @@ function handleCallExpression(node, items, visited, depth, skipAgeFiltering = fa
       // Skip age filtering so the bean requirement appears in any age context.
       const arg = node.arguments[0];
       const isBeanPlanting = arg.type === "Identifier" && arg.name === "can_plant_bean";
+      if (isBeanPlanting) {
+        extractionTouchedDynamicState = true;
+      }
       const beanExpr = extractFromNode(arg, items, visited, depth + 1, isBeanPlanting || skipAgeFiltering);
 
       // In age-specific context, child must reach this region to plant the bean.
@@ -1076,6 +1084,7 @@ function handleCallExpression(node, items, visited, depth, skipAgeFiltering = fa
   }
 
   if (funcName === "at") {
+    extractionTouchedDynamicState = true;
     if (node.arguments.length >= 2) {
       const ruleExpr = extractFromNode(node.arguments[1], items, visited, depth + 1, skipAgeFiltering);
 
@@ -1398,16 +1407,25 @@ function handleIdentifier(name, items, visited, depth, skipAgeFiltering = false)
   if (name in ruleAliases) {
     // Cache key includes skipAgeFiltering to avoid mixing results
     const aliasCacheKey = skipAgeFiltering ? `alias_noage:${name}` : `alias:${name}`;
-    if (evaluationCache?.has(aliasCacheKey)) {
-      return evaluationCache.get(aliasCacheKey).clone();
+    const cached = evaluationCache?.get(aliasCacheKey);
+    if (cached) {
+      // Replay the dynamic-state flag the original expansion produced
+      if (cached.touchedDynamicState) {
+        extractionTouchedDynamicState = true;
+      }
+      return cached.expr.clone();
     }
 
+    const touchedBefore = extractionTouchedDynamicState;
+    extractionTouchedDynamicState = false;
     visited.add(name);
     const expanded = extractFromNode(ruleAliases[name], items, visited, depth + 1, skipAgeFiltering);
     visited.delete(name);
+    const touchedByAlias = extractionTouchedDynamicState;
+    extractionTouchedDynamicState = touchedBefore || touchedByAlias;
 
     if (evaluationCache) {
-      evaluationCache.set(aliasCacheKey, expanded);
+      evaluationCache.set(aliasCacheKey, { expr: expanded, touchedDynamicState: touchedByAlias });
     }
     return expanded.clone();
   }
@@ -1544,6 +1562,9 @@ function handleSequenceExpression(node, items, visited, depth, skipAgeFiltering 
   // Check for vanilla placement
   const vanillaInfo = getVanillaPlacementInfo(itemName, settings);
   if (vanillaInfo.isVanilla && vanillaInfo.vanillaItemName) {
+    // Expands location rules and consults region caches
+    extractionTouchedDynamicState = true;
+
     // If we're already tracing this item, skip to avoid infinite recursion
     if (visited.has(itemName)) {
       return new Expression();
@@ -1722,14 +1743,23 @@ function buildRegionCache(items) {
     dnfCache.set(entry, [[]]);
   }
 
-  // 2. Collect raw edges
+  // 2. Collect raw edges, with per-edge memoization state for the fixed-point loop
   const allEdges = [];
   for (const regionName of Object.keys(Locations.regionMap)) {
     const exits = Locations.getExitsForRegion(regionName);
     if (!exits) { continue; }
     for (const [targetRegion, rule] of Object.entries(exits)) {
       if (EXCLUDED_FROM_PATHFINDING.has(targetRegion)) { continue; }
-      allEdges.push({ source: regionName, target: targetRegion, rule });
+      allEdges.push({
+        source: regionName,
+        target: targetRegion,
+        rule,
+        evaluated: false,
+        isPure: false,
+        purePaths: null,
+        lastSourceVersion: -1,
+        lastGlobalVersion: -1,
+      });
     }
   }
 
@@ -1738,6 +1768,8 @@ function buildRegionCache(items) {
   activeRegionCacheOverride = cache;
 
   let previousCache = new Map(cache);
+  const regionVersion = new Map();
+  let globalVersion = 0;
 
   let changed = true;
   let iterations = 0;
@@ -1747,25 +1779,46 @@ function buildRegionCache(items) {
     evaluationCache = new Map();
     bfsAtLookupCache = previousCache;
 
-    for (const { source, target, rule } of allEdges) {
+    for (const edge of allEdges) {
+      const { source, target, rule } = edge;
       if (!dnfCache.has(source)) { continue; }
 
-      // Evaluate exit rule to CNF Expression
-      const exitExpr = extractFromNode(rule, items, new Set(), 0);
-      if (exitExpr.isImpossible()) { continue; }
+      // Skip edges whose inputs have not changed since they were last processed
+      const sourceVersion = regionVersion.get(source) || 0;
+      if (edge.evaluated && edge.lastSourceVersion === sourceVersion) {
+        if (edge.isPure || edge.lastGlobalVersion === globalVersion) {
+          continue;
+        }
+      }
 
-      // Convert exit CNF to DNF paths and combine with source paths
-      const exitPaths = expressionToDNFPaths(exitExpr);
+      // Evaluate exit rule to DNF paths, reusing the cached result for pure rules
+      let exitPaths;
+      if (edge.isPure) {
+        exitPaths = edge.purePaths;
+      } else {
+        extractionTouchedDynamicState = false;
+        const exitExpr = extractFromNode(rule, items, new Set(), 0);
+        exitPaths = exitExpr.isImpossible() ? [] : expressionToDNFPaths(exitExpr);
+        if (!edge.evaluated && !extractionTouchedDynamicState) {
+          edge.isPure = true;
+          edge.purePaths = exitPaths;
+        }
+      }
+      edge.evaluated = true;
+      edge.lastSourceVersion = sourceVersion;
+      edge.lastGlobalVersion = globalVersion;
+
       if (exitPaths.length === 0) { continue; }
 
       const sourcePaths = dnfCache.get(source);
       const newPaths = combineDNFPaths(sourcePaths, exitPaths);
 
+      let updated = false;
       if (!dnfCache.has(target)) {
         const pruned = pruneDominatedDNFPaths(newPaths);
         dnfCache.set(target, pruned);
         cache.set(target, dnfPathsToExpression(pruned));
-        changed = true;
+        updated = true;
       } else {
         const existing = dnfCache.get(target);
         const all = [...existing, ...newPaths];
@@ -1774,8 +1827,14 @@ function buildRegionCache(items) {
         if (!dnfPathSetsEqual(pruned, existing)) {
           dnfCache.set(target, pruned);
           cache.set(target, dnfPathsToExpression(pruned));
-          changed = true;
+          updated = true;
         }
+      }
+
+      if (updated) {
+        regionVersion.set(target, (regionVersion.get(target) || 0) + 1);
+        globalVersion++;
+        changed = true;
       }
     }
 
@@ -2466,6 +2525,24 @@ export function getLocationRequirements(locationName, items) {
 }
 
 /**
+ * Invalidate the caches when the settings object or the selected starting age changes.
+ */
+function syncCachesWithSettings() {
+  const currentSettingsKey = { settings: LogicHelper.settings, startingAge: SettingsHelper.getStartingAge() || "" };
+
+  if (
+    !lastSettingsKey ||
+    lastSettingsKey.settings !== currentSettingsKey.settings ||
+    lastSettingsKey.startingAge !== currentSettingsKey.startingAge
+  ) {
+    structureCache.clear();
+    lastSettingsKey = currentSettingsKey;
+    regionCacheChild = null;
+    regionCacheAdult = null;
+  }
+}
+
+/**
  * Return the cached requirements structure for a location, recomputing when settings change.
  *
  * Uses starting items to produce a static structure that is then updated with ownership.
@@ -2473,16 +2550,7 @@ export function getLocationRequirements(locationName, items) {
  * @returns {{ clauses: Array, satisfied: boolean }} The cached requirements structure.
  */
 export function getRequirementsStructure(locationName) {
-  // Check if settings have changed and invalidate cache if so
-  const currentSettings = LogicHelper.settings;
-  const currentSettingsJson = JSON.stringify(currentSettings);
-
-  if (currentSettingsJson !== lastSettingsJson) {
-    structureCache.clear();
-    lastSettingsJson = currentSettingsJson;
-    regionCacheChild = null;
-    regionCacheAdult = null;
-  }
+  syncCachesWithSettings();
 
   // Check cache first
   if (structureCache.has(locationName)) {
@@ -2495,6 +2563,24 @@ export function getRequirementsStructure(locationName) {
 
   structureCache.set(locationName, result);
   return result;
+}
+
+/**
+ * Pre-build the per-age region caches so the first tooltip doesn't pay the fixed-point construction on the hover path.
+ */
+export function warmRequirementsCache() {
+  if (!LogicHelper.settings || !Locations.regionMap) { return; }
+
+  syncCachesWithSettings();
+
+  const startingItems = LogicHelper.getStartingItems();
+  cachedSettings = LogicHelper.settings;
+  try {
+    ensureRegionCache("child", startingItems);
+    ensureRegionCache("adult", startingItems);
+  } finally {
+    cachedSettings = null;
+  }
 }
 
 /**
@@ -2553,9 +2639,9 @@ export function updateRequirementsOwnership(requirements, currentItems) {
  */
 export function clearStructureCache() {
   structureCache.clear();
-  lastSettingsJson = null;
+  lastSettingsKey = null;
   regionCacheChild = null;
   regionCacheAdult = null;
 }
 
-export default { getLocationRequirements, getRequirementsStructure, updateRequirementsOwnership, clearStructureCache };
+export default { getLocationRequirements, getRequirementsStructure, updateRequirementsOwnership, clearStructureCache, warmRequirementsCache };
