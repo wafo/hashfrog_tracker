@@ -229,6 +229,16 @@ body {
   padding: 0 2px;
 }
 
+.check-tracker .starting-age--unselected {
+  color: #ffc107;
+}
+
+.check-tracker .starting-age-prompt {
+  font-size: 0.75em;
+  padding: 0 2px;
+  color: #ffc107;
+}
+
 /** *************************************** */
 /** Requirements Tooltip */
 /** *************************************** */

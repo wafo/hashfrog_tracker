@@ -395,14 +395,14 @@ class Locations {
       return false;
     }
 
-    // Song from Impa
-    else if (location.locationName === "Song from Impa") {
-      return !SettingsHelper.getRenamedAttribute("skip_child_zelda");
-    }
-
     // Disabled Locations
     else if (SettingsHelper.isDisabledLocation(location.locationName)) {
       return false;
+    }
+
+    // Song from Impa
+    else if (location.locationName === "Song from Impa") {
+      return !SettingsHelper.getRenamedAttribute("skip_child_zelda");
     }
 
     // Always Placed Items
