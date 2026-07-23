@@ -1889,6 +1889,9 @@ class RegionCache {
 function buildRegionCache(items) {
   const cache = new RegionCache();
 
+  // Memoize Locations.getEvent/getDropLocations for the duration of this build (MQ is fixed here).
+  Locations.beginLookupCache();
+
   // 1. Seed entry points
   for (const entry of ENTRY_POINT_REGIONS) {
     cache.setPaths(entry, [[]]);
@@ -1993,6 +1996,7 @@ function buildRegionCache(items) {
   bfsAtLookupCache = null;
   regionCacheBuildingMode = false;
   activeRegionCacheOverride = null;
+  Locations.endLookupCache();
 
   return cache;
 }

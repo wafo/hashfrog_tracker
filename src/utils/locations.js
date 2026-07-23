@@ -45,6 +45,11 @@ class Locations {
       overworld: new Map(),
     };
 
+    // Per-build memo for getDropLocations/getEvent (see beginLookupCache).
+    this._lookupCacheActive = false;
+    this._dropLookupCache = new Map();
+    this._eventLookupCache = new Map();
+
     this.regionMap = {};
     _.forEach(HINT_REGIONS, (hintRegionData, hintRegionName) => {
       _.forEach(hintRegionData, regionName => {
@@ -178,7 +183,23 @@ class Locations {
     });
   }
 
+  static beginLookupCache() {
+    this._lookupCacheActive = true;
+    this._dropLookupCache.clear();
+    this._eventLookupCache.clear();
+  }
+
+  static endLookupCache() {
+    this._lookupCacheActive = false;
+    this._dropLookupCache.clear();
+    this._eventLookupCache.clear();
+  }
+
   static getDropLocations(dropName) {
+    if (this._lookupCacheActive && this._dropLookupCache.has(dropName)) {
+      return this._dropLookupCache.get(dropName);
+    }
+
     const results = [];
 
     // Check overworld
@@ -199,10 +220,18 @@ class Locations {
       }
     }
 
-    return results.length > 0 ? results : null;
+    const value = results.length > 0 ? results : null;
+    if (this._lookupCacheActive) {
+      this._dropLookupCache.set(dropName, value);
+    }
+    return value;
   }
 
   static getEvent(eventName) {
+    if (this._lookupCacheActive && this._eventLookupCache.has(eventName)) {
+      return this._eventLookupCache.get(eventName);
+    }
+
     const results = [];
 
     // Check overworld
@@ -223,7 +252,11 @@ class Locations {
       }
     }
 
-    return results.length > 0 ? results : null;
+    const value = results.length > 0 ? results : null;
+    if (this._lookupCacheActive) {
+      this._eventLookupCache.set(eventName, value);
+    }
+    return value;
   }
 
   static getExitsForRegion(regionName) {
