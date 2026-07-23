@@ -1804,6 +1804,76 @@ function handleMemberExpression(node) {
 }
 
 /**
+ * Region reachability cache mapping region -> the requirements to reach it.
+ *
+ * Stores DNF paths (the source of truth the BFS updates) and materializes the CNF Expression lazily, memoized per region.
+ */
+class RegionCache {
+  constructor() {
+    this._paths = new Map();
+    this._cnf = new Map();
+  }
+
+  /**
+   * Whether a region is reachable (i.e., has any DNF paths recorded).
+   * @param {string} region - Region name.
+   * @returns {boolean} True if the region is reachable (has paths).
+   */
+  has(region) {
+    return this._paths.has(region);
+  }
+
+  /**
+   * Lazily materialize and memoize the CNF Expression for a region.
+   * @param {string} region - Region name.
+   * @returns {Expression|undefined} The requirements Expression, or undefined if unreachable.
+   */
+  get(region) {
+    if (!this._paths.has(region)) { return undefined; }
+
+    let expr = this._cnf.get(region);
+    if (expr === undefined) {
+      expr = dnfPathsToExpression(this._paths.get(region));
+      this._cnf.set(region, expr);
+    }
+
+    return expr;
+  }
+
+  /**
+   * Return the raw DNF paths for a region (the source of truth the BFS updates), without materializing the CNF Expression.
+   * @param {string} region - Region name.
+   * @returns {Array|undefined} The region's DNF paths, or undefined if unreachable.
+   */
+  getPaths(region) {
+    return this._paths.get(region);
+  }
+
+  /**
+   * Set a region's DNF paths, invalidating its memoized CNF.
+   * @param {string} region - Region name.
+   * @param {Array} paths - The new DNF paths.
+   */
+  setPaths(region, paths) {
+    this._paths.set(region, paths);
+    this._cnf.delete(region);
+  }
+
+  /**
+   * Shallow copy for the fixed-point loop's previous-iteration snapshot.
+   *
+   * Paths and any memoized CNF are copied by reference: both are immutable once produced, so the snapshot stays frozen while the live cache continues to update.
+   * @returns {RegionCache} A snapshot of the current cache state.
+   */
+  snapshot() {
+    const copy = new RegionCache();
+    copy._paths = new Map(this._paths);
+    copy._cnf = new Map(this._cnf);
+    return copy;
+  }
+}
+
+/**
  * Build a region accessibility cache via fixed-point forward propagation.
  * Computes the requirements to reach every region from ENTRY_POINT_REGIONS.
  *
@@ -1817,13 +1887,11 @@ function handleMemberExpression(node) {
  * @returns {Map} A map from region name to the CNF Expression required to reach it.
  */
 function buildRegionCache(items) {
-  const cache = new Map();       // CNF Expression cache (for at() lookups and final output)
-  const dnfCache = new Map();    // DNF paths cache (for accurate BFS updates)
+  const cache = new RegionCache();
 
   // 1. Seed entry points
   for (const entry of ENTRY_POINT_REGIONS) {
-    cache.set(entry, new Expression());
-    dnfCache.set(entry, [[]]);
+    cache.setPaths(entry, [[]]);
   }
 
   // 2. Collect raw edges, with per-edge memoization state for the fixed-point loop
@@ -1850,7 +1918,7 @@ function buildRegionCache(items) {
   regionCacheBuildingMode = true;
   activeRegionCacheOverride = cache;
 
-  let previousCache = new Map(cache);
+  let previousCache = cache.snapshot();
   const regionVersion = new Map();
   let globalVersion = 0;
 
@@ -1864,7 +1932,7 @@ function buildRegionCache(items) {
 
     for (const edge of allEdges) {
       const { source, target, rule } = edge;
-      if (!dnfCache.has(source)) { continue; }
+      if (!cache.has(source)) { continue; }
 
       // Skip edges whose inputs have not changed since they were last processed
       const sourceVersion = regionVersion.get(source) || 0;
@@ -1894,23 +1962,20 @@ function buildRegionCache(items) {
 
       if (exitPaths.length === 0) { continue; }
 
-      const sourcePaths = dnfCache.get(source);
+      const sourcePaths = cache.getPaths(source);
       const newPaths = combineDNFPaths(sourcePaths, exitPaths);
 
       let updated = false;
-      if (!dnfCache.has(target)) {
-        const pruned = pruneDominatedDNFPaths(newPaths);
-        dnfCache.set(target, pruned);
-        cache.set(target, dnfPathsToExpression(pruned));
+      if (!cache.has(target)) {
+        cache.setPaths(target, pruneDominatedDNFPaths(newPaths));
         updated = true;
       } else {
-        const existing = dnfCache.get(target);
+        const existing = cache.getPaths(target);
         const all = [...existing, ...newPaths];
         const pruned = pruneDominatedDNFPaths(all);
 
         if (!dnfPathSetsEqual(pruned, existing)) {
-          dnfCache.set(target, pruned);
-          cache.set(target, dnfPathsToExpression(pruned));
+          cache.setPaths(target, pruned);
           updated = true;
         }
       }
@@ -1922,7 +1987,7 @@ function buildRegionCache(items) {
       }
     }
 
-    previousCache = new Map(cache);
+    previousCache = cache.snapshot();
   }
 
   bfsAtLookupCache = null;
