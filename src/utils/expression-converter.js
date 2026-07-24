@@ -632,7 +632,7 @@ function isSettingsIdentifier(name) {
  * @param {Set} visited - Visited set for cycle detection.
  * @param {number} depth - Current recursion depth.
  * @param {boolean} skipUnreachableRegions - If true, skip sources in regions not found in the region cache.
- *  Events use true (unreachable = skip); drops use false.
+ *  Events use true (unreachable = skip). Drops and boss defeat events use false.
  * @returns {Expression} The OR combination of all source expressions.
  */
 function expandSources(type, name, sources, items, visited, depth, skipUnreachableRegions) {
@@ -691,8 +691,14 @@ function expandSources(type, name, sources, items, visited, depth, skipUnreachab
  * Expand an event into its requisite item requirements.
  * Events can have multiple sources (different regions/rules that trigger them).  Multiple sources are combined with OR.
  *
- * Dungeon clear and boss defeat events are treated as impossible to force simpler OR branches, since computing full
- * dungeon paths exceeds BFS capabilities. Exception: Trial Clear events are needed for Ganon's Tower access.
+ * Dungeon clear events mean completing the whole dungeon, which exceeds BFS capabilities, so they are treated as
+ * impossible to force simpler OR branches.
+ * Exception: Trial Clear events are plain item checks needed for Ganon's Tower access.
+ *
+ * Boss defeat events live in dungeon-interior regions the region cache does not contain, but their rules are plain item
+ * checks and they gate overworld progression.
+ * They are therefore expanded the way drops are: rule requirements only, without the unreachable-region filter.
+ * This understates the dungeon navigation needed to reach the boss, the same trade-off already made for drops.
  * @param {string} eventName - The event name to expand.
  * @param {object} items - Current tracked items.
  * @param {Set} visited - Visited set for cycle detection.
@@ -701,10 +707,13 @@ function expandSources(type, name, sources, items, visited, depth, skipUnreachab
  */
 function expandEvent(eventName, items, visited, depth) {
   const isTrialClear = eventName.endsWith(" Trial Clear");
-  if ((eventName.endsWith(" Clear") && !isTrialClear) || eventName.startsWith("Defeat ")) {
+  if (eventName.endsWith(" Clear") && !isTrialClear) {
     return impossibleExpr();
   }
-  return expandSources("event", eventName, Locations.getEvent(eventName), items, visited, depth, true);
+
+  const skipUnreachableRegions = !eventName.startsWith("Defeat ");
+  const sources = Locations.getEvent(eventName);
+  return expandSources("event", eventName, sources, items, visited, depth, skipUnreachableRegions);
 }
 
 /**
