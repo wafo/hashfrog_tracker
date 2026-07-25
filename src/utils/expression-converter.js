@@ -1064,7 +1064,8 @@ function extractFromNode(node, items, visited = new Set(), depth = 0, skipAgeFil
  * Handle a binary expression AST node.
  * @param {object} node - The BinaryExpression AST node.
  * @param {object} items - The current tracked items object.
- * @returns {Expression} Satisfied Expression if condition is true, impossible otherwise.
+ * @returns {Expression} Satisfied or impossible for comparisons that can be decided from settings alone, or the
+ *  item requirement itself for `selected_adult_trade_item == 'Item'`.
  */
 function handleBinaryExpression(node, items) {
   const isEquality = node.operator === "==" || node.operator === "===";
@@ -2083,7 +2084,7 @@ function populateRegionCache(cache, items) {
 
 /**
  * Get the region cache for the current age context.
- * @returns {Map|null} The active region cache map, or null if none is set.
+ * @returns {RegionCache|null} The active region cache, or null if none is set.
  */
 function getActiveRegionCache() {
   if (activeRegionCacheOverride) { return activeRegionCacheOverride; }
@@ -2592,9 +2593,22 @@ function evaluateForAge(rule, parentRegion, items) {
 }
 
 /**
+ * What a location's tooltip needs, in one of three mutually exclusive shapes: satisfied (nothing left to get), a
+ * non-empty clause list, or impossible.
+ *
+ * `clauses` is CNF: each clause is an OR of items and every clause must hold. `impossible: true` always comes with
+ * `satisfied: false` and an empty `clauses`, and means no age can reach the location under the current settings.
+ * @typedef {object} RequirementsStructure
+ * @property {Array} clauses - CNF clauses, empty when satisfied or impossible.
+ * @property {boolean} satisfied - True when the location needs nothing further.
+ * @property {boolean} [impossible] - True when the location is unreachable at either age.
+ */
+
+/**
  * Post-process an Expression into the output clause format.
  * @param {Expression} regionExpr - The expression to post-process.
- * @returns {{ clauses: Array, satisfied: boolean }} The formatted requirements structure.
+ * @returns {RequirementsStructure} The formatted requirements structure. Never impossible; only the callers that
+ *  find no reachable age produce that.
  */
 function postProcessExpression(regionExpr) {
   // Factor universal items from PoS expressions into compound alternatives
@@ -2670,7 +2684,7 @@ function postProcessExpression(regionExpr) {
  * and post-processes into the output clause format.
  * @param {string} locationName - The location name as used in logic files.
  * @param {object} items - The current tracked items object.
- * @returns {{ clauses: Array, satisfied: boolean }} The requirements structure.
+ * @returns {RequirementsStructure} The requirements structure.
  */
 export function getLocationRequirements(locationName, items) {
   const location = Locations.getLocation(locationName);
@@ -2790,7 +2804,7 @@ function syncCachesWithSettings() {
  *
  * Uses starting items to produce a static structure that is then updated with ownership.
  * @param {string} locationName - The location name as used in logic files.
- * @returns {{ clauses: Array, satisfied: boolean }} The cached requirements structure.
+ * @returns {RequirementsStructure} The cached requirements structure.
  */
 export function getRequirementsStructure(locationName) {
   syncCachesWithSettings();
@@ -2842,9 +2856,10 @@ export function warmRequirementsCache() {
  *
  * Recursively updates simple and compound items, preserving the clause structure.
  * Returns the original object unchanged if already satisfied or empty.
- * @param {{ clauses: Array, satisfied: boolean }} requirements - The requirements structure to update.
+ * @param {RequirementsStructure} requirements - The requirements structure to update.
  * @param {object} currentItems - The current tracked items object.
- * @returns {{ clauses: Array, satisfied: boolean }} A new requirements object with updated ownership.
+ * @returns {RequirementsStructure} A new requirements object with updated ownership, or the input unchanged when
+ *  there is nothing to update.
  */
 export function updateRequirementsOwnership(requirements, currentItems) {
   if (!requirements || requirements.satisfied || requirements.clauses.length === 0) {
@@ -2889,7 +2904,12 @@ export function updateRequirementsOwnership(requirements, currentItems) {
 }
 
 /**
- * Clear the structure cache. Call this when logic files are reloaded.
+ * Discard every cached tooltip structure and region cache.
+ *
+ * Reloading logic files does not need this: that allocates a fresh settings object, and syncCachesWithSettings
+ * detects the change on its own. Nor does mutating settings through SettingsHelper, whose settingsRevision counter
+ * invalidation keys on. It is for tests, and for anything that changes what tooltips depend on without going
+ * through either.
  */
 export function clearStructureCache() {
   structureCache.clear();
