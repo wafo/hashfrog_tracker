@@ -70,6 +70,13 @@ function parseVersion(version) {
     }
   }
 
+  // Upstream tags the first release of a minor line as "vX.Y"
+  // normalizeVersion pads a bare "9.1" out to "9.1.0", and the generator reports that same dotted form, so translate it back.
+  const firstReleaseOfLine = version.match(/^(\d+)\.(\d+)\.0$/);
+  if (firstReleaseOfLine) {
+    return { owner: DEFAULT_OWNER, tag: `v${firstReleaseOfLine[1]}.${firstReleaseOfLine[2]}` };
+  }
+
   // Main repo
   return { owner: DEFAULT_OWNER, tag: version };
 }

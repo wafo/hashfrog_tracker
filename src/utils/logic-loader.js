@@ -72,14 +72,22 @@ class LogicLoader {
 
   static async _loadFileFromUrl(url) {
     const response = await fetch(url);
+    if (!response.ok) { throw new Error(`HTTP ${response.status} fetching ${url}`); }
     return await response.text();
   }
 
+  /**
+   * Strip the Python-style comments and multi-line rule strings that keep the logic files from being valid JSON.
+   * @param {string} fileData - Raw file contents fetched from the randomizer repository.
+   * @returns {string} JSON text ready to be parsed.
+   */
   static _validateLogicFile(fileData) {
-    const matchHashComment = new RegExp(/ +#.*\n/, "g");
+    const matchFullLineComment = new RegExp(/^[ \t]*#[^\n]*\n?/, "gm");
+    const matchTrailingComment = new RegExp(/ +#.*\n/, "g");
     const matchMultilineString = new RegExp(/ *\n +/, "g");
 
-    const removedComments = fileData.replace(matchHashComment, "").trim();
+    const removedFullLineComments = fileData.replace(matchFullLineComment, "");
+    const removedComments = removedFullLineComments.replace(matchTrailingComment, "").trim();
     const removedMultilines = removedComments.replace(matchMultilineString, " ").trim();
 
     return removedMultilines;

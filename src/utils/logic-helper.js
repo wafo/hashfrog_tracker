@@ -16,6 +16,9 @@ import SONG_NOTES from "../data/song-notes.json";
 
 const CHILD_TRADE_SEQUENCE = CHILD_TRADE_ITEMS.map((item) => item.replace(/ /g, "_"));
 
+// Rule functions already reported as unsupported, so each is logged once rather than on every evaluation.
+const warnedUnknownFunctions = new Set();
+
 // Helpers that some fork implement in State.py instead of LogicHelpers.json.
 // When a loaded LogicHelpers file doesn't define them, fall back to the stable definitions so rules referencing them keep working.
 const FALLBACK_RULE_ALIASES = {
@@ -667,7 +670,14 @@ class LogicHelper {
       return this._evalNode(parsedRule, age);
     }
 
-    throw Error(`Unknown CallExpression: ${funcName}`);
+    if (!warnedUnknownFunctions.has(funcName)) {
+      warnedUnknownFunctions.add(funcName);
+      console.warn(
+        `logic-helper: unsupported rule function "${funcName}" treated as false. ` +
+        "Availability for locations gated on it will be understated.",
+      );
+    }
+    return false;
   }
 
   static _canAccessDrop(dropName) {
