@@ -1490,11 +1490,11 @@ function handleIdentifier(name, items, visited, depth, skipAgeFiltering = false)
     else if (name.startsWith("at_")) {
       settingValue = true;
     }
-    else if (name in settings) {
-      settingValue = settings[name];
-    }
     else if (name in renamedAttributes) {
       settingValue = renamedAttributes[name];
+    }
+    else if (name in settings) {
+      settingValue = settings[name];
     }
 
     if (settingValue && settingValue !== "off") {
@@ -1803,10 +1803,10 @@ function handleUnaryExpression(node) {
       } else {
         const settings = getSettings();
         const renamedAttributes = LogicHelper.renamedAttributes;
-        if (name in settings) {
-          settingValue = settings[name];
-        } else if (name in renamedAttributes) {
+        if (name in renamedAttributes) {
           settingValue = renamedAttributes[name];
+        } else if (name in settings) {
+          settingValue = settings[name];
         }
       }
       if (settingValue && settingValue !== "off") {
