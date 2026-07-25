@@ -2692,17 +2692,7 @@ export function getLocationRequirements(locationName, items) {
     return { clauses: [], satisfied: true };
   }
 
-  const { rule: locationRule, parentRegion: locationRegion } = location;
-
-  // Boss defeat locations:
-  // The location rule is a Defeat event reference. Boss fight items are trivially satisfied via shop consumables.
-  // Replace the Defeat rule with true and let the region cache handle navigation from the boss room to root.
-  let rule = locationRule;
-  const parentRegion = locationRegion;
-  const ruleExpr = locationRule.type === "ExpressionStatement" ? locationRule.expression : locationRule;
-  if (ruleExpr.type === "Literal" && typeof ruleExpr.value === "string" && ruleExpr.value.startsWith("Defeat ")) {
-    rule = { type: "Literal", value: true };
-  }
+  const { rule, parentRegion } = location;
 
   const ageRequirement = detectAgeRequirement(rule);
 
