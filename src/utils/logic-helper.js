@@ -16,6 +16,20 @@ import SONG_NOTES from "../data/song-notes.json";
 
 const CHILD_TRADE_SEQUENCE = CHILD_TRADE_ITEMS.map((item) => item.replace(/ /g, "_"));
 
+// Rule functions already reported as unsupported, so each is logged once rather than on every evaluation.
+const warnedUnknownFunctions = new Set();
+
+// Helpers that some fork implement in State.py instead of LogicHelpers.json.
+// When a loaded LogicHelpers file doesn't define them, fall back to the stable definitions so rules referencing them keep working.
+const FALLBACK_RULE_ALIASES = {
+  can_build_rainbow_bridge:
+    "( (bridge == 'open') or (bridge == 'vanilla' and Shadow_Medallion and Spirit_Medallion and Light_Arrows) or (bridge == 'stones' and has_stones(bridge_stones)) or (bridge == 'medallions' and has_medallions(bridge_medallions)) or (bridge == 'dungeons' and has_dungeon_rewards(bridge_rewards)) or (bridge == 'tokens' and (Gold_Skulltula_Token, bridge_tokens)) or (bridge == 'hearts' and has_hearts(bridge_hearts)))",
+  can_trigger_lacs:
+    "( (lacs_condition == 'vanilla' and Shadow_Medallion and Spirit_Medallion) or (lacs_condition == 'stones' and has_stones(lacs_stones)) or (lacs_condition == 'medallions' and has_medallions(lacs_medallions)) or (lacs_condition == 'dungeons' and has_dungeon_rewards(lacs_rewards)) or (lacs_condition == 'tokens' and (Gold_Skulltula_Token, lacs_tokens)) or (lacs_condition == 'hearts' and has_hearts(lacs_hearts)))",
+  can_receive_ganon_bosskey:
+    "( (shuffle_ganon_bosskey == 'stones' and has_stones(ganon_bosskey_stones)) or (shuffle_ganon_bosskey == 'medallions' and has_medallions(ganon_bosskey_medallions)) or (shuffle_ganon_bosskey == 'dungeons' and has_dungeon_rewards(ganon_bosskey_rewards)) or (shuffle_ganon_bosskey == 'tokens' and (Gold_Skulltula_Token, ganon_bosskey_tokens)) or (shuffle_ganon_bosskey == 'hearts' and has_hearts(ganon_bosskey_hearts))) or (shuffle_ganon_bosskey == 'triforce' and (Triforce_Piece, triforce_goal_per_world)) or (shuffle_ganon_bosskey != 'stones' and shuffle_ganon_bosskey != 'medallions' and shuffle_ganon_bosskey != 'dungeons' and shuffle_ganon_bosskey != 'tokens' and shuffle_ganon_bosskey != 'hearts' and shuffle_ganon_bosskey != 'triforce')",
+};
+
 const ADULT_TRADE_ITEMS = ADULT_TRADE_SEQUENCE.map((trade) => trade.item);
 const ADULT_TRADE_LOOKUP = Object.fromEntries(
   ADULT_TRADE_SEQUENCE.filter((trade) => trade.location).map((trade) => [
@@ -101,7 +115,7 @@ class LogicHelper {
 
       if (mult === "ohko") {
         return hasFairy || hasNayrus;
-      } else if (mult === "quad") {
+      } else if (mult === "quadruple" || mult === "quad") {
         return hearts < 0.75 || hasFairy || hasNayrus;
       } else if (mult === "double") {
         return hearts < 1.5 || hasFairy || hasNayrus;
@@ -218,6 +232,12 @@ class LogicHelper {
       }
     });
 
+    _.forEach(FALLBACK_RULE_ALIASES, (rule, alias) => {
+      if (!(alias in this.ruleAliases) && !(alias in this.parameterizedAliases)) {
+        _.set(this.ruleAliases, alias, parseRule(rule));
+      }
+    });
+
     this.renamedAttributes = this._initRenamedAttributes();
 
     // Share renamedAttributes with SettingsHelper to break circular dependency
@@ -235,9 +255,9 @@ class LogicHelper {
     if (
       this.settings.open_forest === "closed" &&
       (this.renamedAttributes.shuffle_special_interior_entrances ||
-        this.settings.shuffle_overworld_entrances ||
-        this.settings.warp_songs ||
-        this.settings.spawn_positions)
+        this._isSettingEnabled(this.settings.shuffle_overworld_entrances) ||
+        this._isSettingEnabled(this.settings.warp_songs) ||
+        this._hasSpawnShuffle())
     ) {
       _.set(this.settings, "open_forest", "closed_deku");
     }
@@ -273,6 +293,12 @@ class LogicHelper {
   }
 
   static getStartingItems() {
+    // Memoized: called from the tooltip converter for every requirement item.
+    // Treat the returned object as read-only.
+    if (this._startingItemsCache && this._startingItemsCacheSettings === this.settings) {
+      return this._startingItemsCache;
+    }
+
     const items = {};
     const startingLists = [
       this.settings?.starting_inventory || [],
@@ -286,6 +312,9 @@ class LogicHelper {
         }
       }
     }
+
+    this._startingItemsCache = items;
+    this._startingItemsCacheSettings = this.settings;
     return items;
   }
 
@@ -419,6 +448,19 @@ class LogicHelper {
     });
   }
 
+  static _isSettingEnabled(value) {
+    return Boolean(value) && value !== "off";
+  }
+
+  static _hasSpawnShuffle() {
+    const spawnPositions = this.settings.spawn_positions;
+    return (
+      (Array.isArray(spawnPositions) ? spawnPositions.length > 0 : this._isSettingEnabled(spawnPositions)) ||
+      this._isSettingEnabled(this.settings.shuffle_child_spawn) ||
+      this._isSettingEnabled(this.settings.shuffle_adult_spawn)
+    );
+  }
+
   static _initRenamedAttributes() {
     // source: World.py __init__()
 
@@ -435,21 +477,25 @@ class LogicHelper {
 
     const entranceShuffle =
       shuffleInteriorEntrances ||
-      this.settings.shuffle_grotto_entrances ||
+      this._isSettingEnabled(this.settings.shuffle_grotto_entrances) ||
       shuffleDungeonEntrances ||
-      this.settings.shuffle_overworld_entrances ||
-      this.settings.shuffle_gerudo_valley_river_exit ||
-      this.settings.owl_drops ||
-      this.settings.warp_songs ||
-      this.settings.spawn_positions ||
+      this._isSettingEnabled(this.settings.shuffle_overworld_entrances) ||
+      this._isSettingEnabled(this.settings.shuffle_gerudo_valley_river_exit) ||
+      this._isSettingEnabled(this.settings.owl_drops) ||
+      this._isSettingEnabled(this.settings.warp_songs) ||
+      this._hasSpawnShuffle() ||
       this.settings.shuffle_bosses !== "off";
 
     const mixedPoolsBosses = false;
 
     const ensureTodAccess =
-      shuffleInteriorEntrances || this.settings.shuffle_overworld_entrances || this.settings.spawn_positions;
+      shuffleInteriorEntrances ||
+      this._isSettingEnabled(this.settings.shuffle_overworld_entrances) ||
+      this._hasSpawnShuffle();
     const disableTradeRevert =
-      shuffleInteriorEntrances || this.settings.shuffle_overworld_entrances || this.settings.adult_trade_shuffle;
+      shuffleInteriorEntrances ||
+      this._isSettingEnabled(this.settings.shuffle_overworld_entrances) ||
+      this.settings.adult_trade_shuffle;
     const skipChildZelda =
       !_.includes(this.settings.shuffle_child_trade, "Zeldas Letter") &&
       _.includes(this.settings.starting_inventory, "zeldas_letter");
@@ -624,7 +670,14 @@ class LogicHelper {
       return this._evalNode(parsedRule, age);
     }
 
-    throw Error(`Unknown CallExpression: ${funcName}`);
+    if (!warnedUnknownFunctions.has(funcName)) {
+      warnedUnknownFunctions.add(funcName);
+      console.warn(
+        `logic-helper: unsupported rule function "${funcName}" treated as false. ` +
+        "Availability for locations gated on it will be understated.",
+      );
+    }
+    return false;
   }
 
   static _canAccessDrop(dropName) {
@@ -728,7 +781,7 @@ class LogicHelper {
   }
 
   static _hasBottle() {
-    return this.items.Bottle > 0 || this.isLocationAvailable("Deliver Rutos Letter");
+    return this.items.Bottle > 0 || this.isLocationAvailable("Deliver Rutos Letter") || this._evalEvent("Sell Big Poe");
   }
 
   static _evalIdentifier(name, age) {
@@ -825,7 +878,7 @@ class LogicHelper {
       return this.renamedAttributes[name];
     }
     if (name in this.settings) {
-      return this.settings[name];
+      return this.settings[name] === "off" ? false : this.settings[name];
     }
     if (name in this.ruleAliases) {
       return this._evalRuleAlias(name, age);
@@ -898,7 +951,7 @@ class LogicHelper {
 
     // case for Bottle_with_Big_Poe sequence expression
     if (itemName === "Bottle_with_Big_Poe") {
-      itemCount = this.big_poe_count_random ? 10 : this.settings.big_poe_count;
+      itemCount = this.settings.big_poe_count_random ? 10 : this.settings.big_poe_count;
     }
 
     // account for removed locked door in Fire Temple when keysanity is off

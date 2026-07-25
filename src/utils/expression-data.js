@@ -1,5 +1,3 @@
-import memoize from "memoizee";
-
 // Maps logic item names to human-readable display names shown in tooltips.
 const DISPLAY_NAMES = {
   Progressive_Hookshot: "Hookshot",
@@ -348,42 +346,37 @@ class Expression {
     // When clause I implies clause J (every way to satisfy I also satisfies J), J is redundant.
     // Handles the classic case ([A] makes [A, B] redundant) and progressive items ([Hookshot x2] implies [Hookshot x1]).
     {
+      // Pre-parse each clause once.
+      const parsedClauses = this.clauses.map(clause =>
+        clause.items.map(item =>
+          item.isCompound
+            ? { isCompound: true, name: item.name }
+            : { isCompound: false, name: item.name, parsed: parseCountedItem(item.name) },
+        ),
+      );
+
+      // Check if A implies B: every item in A maps to an item in B with same base name and <= count
+      const implies = (a, b) =>
+        a.every(cItem => {
+          if (cItem.isCompound) {
+            return b.some(oItem => oItem.name === cItem.name);
+          }
+          const { baseName: cBase, count: cCount } = cItem.parsed;
+          return b.some(oItem => {
+            if (oItem.isCompound) { return false; }
+            const { baseName: oBase, count: oCount } = oItem.parsed;
+            return cBase === oBase && cCount >= oCount;
+          });
+        });
+
       const progressiveAbsorbed = new Set();
       for (let i = 0; i < this.clauses.length; i++) {
         for (let j = i + 1; j < this.clauses.length; j++) {
           if (progressiveAbsorbed.has(i) || progressiveAbsorbed.has(j)) { continue; }
-          const ci = this.clauses[i];
-          const cj = this.clauses[j];
 
-          // Check if I implies J: every item in I maps to an item in J with same base name and <= count
-          const iImpliesJ = ci.items.every(cItem => {
-            if (cItem.isCompound) {
-              return cj.items.some(oItem => oItem.name === cItem.name);
-            }
-            const { baseName: cBase, count: cCount } = parseCountedItem(cItem.name);
-            return cj.items.some(oItem => {
-              if (oItem.isCompound) { return false; }
-              const { baseName: oBase, count: oCount } = parseCountedItem(oItem.name);
-              return cBase === oBase && cCount >= oCount;
-            });
-          });
-
-          // Check if J implies I
-          const jImpliesI = cj.items.every(cItem => {
-            if (cItem.isCompound) {
-              return ci.items.some(oItem => oItem.name === cItem.name);
-            }
-            const { baseName: cBase, count: cCount } = parseCountedItem(cItem.name);
-            return ci.items.some(oItem => {
-              if (oItem.isCompound) { return false; }
-              const { baseName: oBase, count: oCount } = parseCountedItem(oItem.name);
-              return cBase === oBase && cCount >= oCount;
-            });
-          });
-
-          if (iImpliesJ) {
+          if (implies(parsedClauses[i], parsedClauses[j])) {
             progressiveAbsorbed.add(j);
-          } else if (jImpliesI) {
+          } else if (implies(parsedClauses[j], parsedClauses[i])) {
             progressiveAbsorbed.add(i);
           }
         }
@@ -533,18 +526,22 @@ function factorCommonFromOrOptions(items) {
   return { factored, remaining: dedupedRemaining };
 }
 
+const parseCountedItemCache = new Map();
+
 /**
  * Parse a logic item name into its base name and required count.
  * @param {string} itemName - Item name, optionally suffixed with ",N" for a count.
  * @returns {{ baseName: string, count: number }} Parsed base name and count (defaults to 1).
  */
-const parseCountedItem = memoize(function (itemName) {
-  const match = itemName.match(/^(.+),(\d+)$/);
-  if (match) {
-    return { baseName: match[1], count: parseInt(match[2], 10) };
+function parseCountedItem(itemName) {
+  let result = parseCountedItemCache.get(itemName);
+  if (result === undefined) {
+    const match = itemName.match(/^(.+),(\d+)$/);
+    result = match ? { baseName: match[1], count: parseInt(match[2], 10) } : { baseName: itemName, count: 1 };
+    parseCountedItemCache.set(itemName, result);
   }
-  return { baseName: itemName, count: 1 };
-});
+  return result;
+}
 
 /**
  * Return true if requirement set A is a subset of requirement set B.
@@ -574,6 +571,18 @@ function isSubset(reqsA, reqsB) {
  * @returns {Map} Map from item base name to required count.
  */
 function getRequirementSet(item) {
+  // Simple items are immutable, so cache their single-entry requirement map by name.
+  // Compound items may be mutated after construction (name/nestedOr), so never cache them.
+  if (!item.isCompound) {
+    let cached = requirementSetCache.get(item.name);
+    if (!cached) {
+      const { baseName, count } = parseCountedItem(item.name);
+      cached = new Map([[baseName, count]]);
+      requirementSetCache.set(item.name, cached);
+    }
+    return cached;
+  }
+
   const reqs = new Map();
 
   if (item.isCompound) {
@@ -590,13 +599,13 @@ function getRequirementSet(item) {
         reqs.set(baseName, Math.max(existing, count));
       }
     }
-  } else {
-    const { baseName, count } = parseCountedItem(item.name);
-    reqs.set(baseName, count);
   }
 
   return reqs;
 }
+
+// Requirement sets for simple items, keyed by item name (read-only, never mutated).
+const requirementSetCache = new Map();
 
 /**
  * ABSORPTION LAW (OR): A + (A · B) = A
@@ -645,24 +654,29 @@ function simplifyOrBySubset(items) {
   return itemReqs.filter((_, i) => keep[i]).map(ir => ir.item);
 }
 
+const displayNameCache = new Map();
+
 /**
  * Return the human-readable display name for a logic item name.
  * @param {string} itemName - The canonical logic item name.
  * @returns {string} The display name for tooltips.
  */
-const getDisplayName = memoize(function (itemName) {
-  if (itemName in DISPLAY_NAMES) {
-    return DISPLAY_NAMES[itemName];
-  }
-  const name = itemName.replace(/_/g, " ");
+function getDisplayName(itemName) {
+  let result = displayNameCache.get(itemName);
+  if (result === undefined) {
+    if (itemName in DISPLAY_NAMES) {
+      result = DISPLAY_NAMES[itemName];
+    } else {
+      const name = itemName.replace(/_/g, " ");
 
-  // Reorder "Small Key <Dungeon>" to "<Dungeon> Small Key" and "Boss Key <Dungeon>" to "<Dungeon> Boss Key"
-  const keyMatch = name.match(/^(Small Key|Boss Key) (.+)$/);
-  if (keyMatch) {
-    return `${keyMatch[2]} ${keyMatch[1]}`;
+      // Reorder "Small Key <Dungeon>" to "<Dungeon> Small Key" and "Boss Key <Dungeon>" to "<Dungeon> Boss Key"
+      const keyMatch = name.match(/^(Small Key|Boss Key) (.+)$/);
+      result = keyMatch ? `${keyMatch[2]} ${keyMatch[1]}` : name;
+    }
+    displayNameCache.set(itemName, result);
   }
-  return name;
-});
+  return result;
+}
 
 export {
   Clause, combineWithOr, CompoundItem, Expression, getDisplayName, impossibleExpr, orCombineExpressions, parseCountedItem, RequirementItem, simplifyOrBySubset

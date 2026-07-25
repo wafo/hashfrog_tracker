@@ -1,5 +1,6 @@
 import GAME_REWARDS from "../data/game-rewards.json";
 import shopRules from "../data/shop-rules.json";
+import SONG_NOTES from "../data/song-notes.json";
 import {
   combineDNFPaths,
   dnfPathSetsEqual, dnfPathsToExpression,
@@ -42,7 +43,7 @@ const CHILD_ONLY_ITEMS = new Set([
 ]);
 
 // Regions that are always reachable without any items.
-const ENTRY_POINT_REGIONS = new Set(["Root", "Root Exits", "Child Spawn", "Adult Spawn"]);
+const ENTRY_POINT_REGIONS = new Set(["Root"]);
 
 // Farore's Wind Warp is a dynamic save warp.
 // Unlike song warps (which have fixed destinations), this creates spurious paths in our BFS. Exclude it entirely.
@@ -78,7 +79,7 @@ const KEY_SHUFFLE_RULES = [
 
 // Drops that require effort to obtain and should not be auto-satisfied during tooltip evaluation.
 // All other drops are treated as free.
-const NON_FREE_DROPS = new Set(["Blue Fire"]);
+const NON_FREE_DROPS = new Set(["Blue Fire", "Fish"]);
 
 // Logic identifiers for individual ocarina buttons.
 const OCARINA_NOTE_IDENTIFIERS = new Set([
@@ -91,11 +92,14 @@ const SETTINGS_PREFIXES = new Set(["logic_", "at_", "adv_", "glitch_"]);
 
 // Logic identifiers that are always auto-satisfied or otherwise irrelevant to tooltip display.
 const SKIP_IDENTIFIERS = new Set([
-  "True", "is_starting_age", "had_night_start", "Scarecrow_Song", "Bonooru", "Time_Travel",
+  "True", "had_night_start", "Scarecrow_Song", "Bonooru",
 ]);
 
 // Item name prefixes to silently skip.
-const SKIP_PREFIXES = new Set(["Bombchu_", "Bombchus_", "Buy_"]);
+const SKIP_PREFIXES = new Set(["Bombchu_", "Buy_"]);
+
+// Bombchu pack items count as the tracked "Bombchus" item.
+const BOMBCHU_PACK_ITEMS = new Set(["Bombchus_5", "Bombchus_10", "Bombchus_20"]);
 
 // Shop items that require an empty bottle to purchase.
 const SHOP_BOTTLE_REQUIRED = new Set(shopRules.bottleRequired || []);
@@ -116,10 +120,52 @@ const STRING_LITERAL_ITEMS = {
   "Zora Tunic": "Zora_Tunic",
 };
 
+// Function names already reported as unhandled, to avoid log spam.
+const warnedUnknownFunctions = new Set();
+
+// Set whenever an extraction consults dynamic state (events, drops, region caches).
+// buildRegionCache uses this to detect "pure" exit rules whose extraction can be reused across fixed-point iterations.
+let extractionTouchedDynamicState = false;
+
+// Keys whose cycle guards fired during the current extraction scope (visited keys, plus the pseudo-keys below).
+// A guard hit degrades the result, but only degradation caused by a key still being expanded ABOVE the caching scope is context-dependent.
+// Guards remove their keys from the visited set on exit, so at cache-write time a blocker still present in visited is external and the result must stay out of shared caches.
+// Blockers absent from visited came from an intrinsic self-cycle, making the result deterministic and cacheable.
+let extractionBlockers = new Set();
+
+// Pseudo-blocker for depth-cap truncation: depth depends on the whole call chain, so truncated results are never cacheable.
+const DEPTH_BLOCKER = "\u0000depth-cap";
+
+// Pseudo-blocker prefix for an in-progress baseAgeAccessExpr computation.
+const BASE_AGE_BLOCKER_PREFIX = "\u0000base-age:";
+
+/**
+ * Decide whether any recorded blocker makes a result context-dependent (not cacheable).
+ * @param {Set} blockers - Blocker keys recorded while computing the result.
+ * @param {Set} visited - The visited set as it stands at the cache-write site.
+ * @returns {boolean} True when the result depends on an expansion outside the caching scope.
+ */
+function blockersAreExternal(blockers, visited) {
+  for (const b of blockers) {
+    if (b === DEPTH_BLOCKER) { return true; }
+    if (b.startsWith(BASE_AGE_BLOCKER_PREFIX)) {
+      const age = b.slice(BASE_AGE_BLOCKER_PREFIX.length);
+      if (baseAgeAccessCache.get(age) === BASE_AGE_ACCESS_IN_PROGRESS) { return true; }
+      continue;
+    }
+    if (visited.has(b)) { return true; }
+  }
+  return false;
+}
 
 // Age context for the current extraction pass.
 // null = any age, "adult" = adult only, "child" = child only
 let currentAgeContext = null;
+
+// Song whose bare identifier is currently covered by a "Can Play <Song>" requirement, or null.
+// With note shuffle on, can_play(<song>) collapses "<song> and has_all_notes_for_song(<song>)" into one item,
+// so the bare <song> conjunct of that same expansion must not be emitted a second time.
+let songSubsumedByCanPlay = null;
 
 // Settings cache for the current evaluation.
 let cachedSettings = null;
@@ -127,9 +173,18 @@ let cachedSettings = null;
 // Expansion cache for the current evaluation.
 let evaluationCache = null;
 
-// Requirement structures keyed by location name. Invalidated when settings change.
+// Whether pre-warming the region caches is worth its cost, i.e. whether this scene renders tooltips at all.
+// Only affects pre-warming: an ungated tooltip still builds whatever it needs on demand.
+let tooltipWarmingEnabled = false;
+
+// Requirement structures keyed by location name. Invalidated when settings or starting age change.
 const structureCache = new Map();
-let lastSettingsJson = null;
+let lastSettingsKey = null;
+
+// Baseline age-access expressions (see baseAgeAccessExpr), one per age.
+// Cleared together with the region caches. The sentinel marks an in-progress computation.
+const baseAgeAccessCache = new Map();
+const BASE_AGE_ACCESS_IN_PROGRESS = {};
 
 // Region accessibility caches, one per age context. Each maps regionName -> Expression.
 // Built once per settings change via BFS, then reused for all location evaluations.
@@ -153,7 +208,7 @@ let bfsAtLookupCache = null;
 
 /**
  * Factor common items from compound options within an OR clause.
- * 
+ *
  * Unlike factorCommonFromOrOptions, this only factors from compound items, leaving simple items untouched.
  * @param {Array} items - Array of items in an OR clause.
  * @returns {Array} Simplified array with compounds factored.
@@ -442,7 +497,7 @@ function detectAgeRequirement(node) {
 
 /**
  * Detect if a rule contains here(can_plant_bean).
- * 
+ *
  * This is important because bean planting requires child access, even if the overall location is adult-only.
  * @param {object} node - The AST node to inspect.
  * @returns {boolean} True if the node contains a here(can_plant_bean) call.
@@ -510,6 +565,13 @@ function getSettings() {
  * @returns {boolean} True if the ownership requirement is met.
  */
 function isItemOwned(itemName, items) {
+  // "Can Play <Song>" is owned only once the song itself and every note it needs are owned.
+  if (itemName.startsWith(CAN_PLAY_PREFIX)) {
+    const songName = itemName.slice(CAN_PLAY_PREFIX.length);
+    const notes = SONG_NOTES[songName] || [];
+    return isItemOwned(songName, items) && notes.every(button => isItemOwned(button, items));
+  }
+
   if (itemName.includes(",")) {
     const match = itemName.match(/^(.+),\s*(\d+)$/);
     if (match) {
@@ -520,6 +582,11 @@ function isItemOwned(itemName, items) {
       if (name in CATEGORY_ITEMS) {
         const ownedCount = CATEGORY_ITEMS[name].filter(item => (items[item] || 0) > 0).length;
         return ownedCount >= count;
+      }
+      // Any N distinct ocarina buttons (Scarecrow's Song with note shuffle)
+      if (name === "Ocarina_Buttons") {
+        const ownedButtons = [...OCARINA_NOTE_IDENTIFIERS].filter(b => (items[b] || 0) > 0).length;
+        return ownedButtons >= count;
       }
       if (name === "Hearts") {
         const pieces = items.Piece_of_Heart || 0;
@@ -571,7 +638,7 @@ function isSettingsIdentifier(name) {
 
 /**
  * Shared expansion logic for events and drops.
- * 
+ *
  * Each source's rule is extracted, AND-merged with its region access requirements, and the resulting expressions are
  * OR-combined.
  * @param {string} type - Cache key prefix ("event" or "drop").
@@ -581,15 +648,21 @@ function isSettingsIdentifier(name) {
  * @param {Set} visited - Visited set for cycle detection.
  * @param {number} depth - Current recursion depth.
  * @param {boolean} skipUnreachableRegions - If true, skip sources in regions not found in the region cache.
- *  Events use true (unreachable = skip); drops use false.
+ *  Events use true (unreachable = skip). Drops and boss defeat events use false.
  * @returns {Expression} The OR combination of all source expressions.
  */
 function expandSources(type, name, sources, items, visited, depth, skipUnreachableRegions) {
+  extractionTouchedDynamicState = true;
   const cacheKey = `${type}:${name}`;
-  if (visited.has(cacheKey)) { return impossibleExpr(); }
+  if (visited.has(cacheKey)) {
+    extractionBlockers.add(cacheKey);
+    return impossibleExpr();
+  }
   if (evaluationCache?.has(cacheKey)) { return evaluationCache.get(cacheKey).clone(); }
   if (!sources || sources.length === 0) { return impossibleExpr(); }
 
+  const blockersBefore = extractionBlockers;
+  extractionBlockers = new Set();
   visited.add(cacheKey);
   const sourceExprs = [];
 
@@ -621,7 +694,12 @@ function expandSources(type, name, sources, items, visited, depth, skipUnreachab
   visited.delete(cacheKey);
 
   const result = combineWithOr(sourceExprs);
-  if (evaluationCache) { evaluationCache.set(cacheKey, result); }
+  // Externally-blocked results are context-dependent, so keep them out of the shared cache.
+  // Intrinsic self-cycles are deterministic and safe to cache.
+  const myBlockers = extractionBlockers;
+  extractionBlockers = blockersBefore;
+  for (const b of myBlockers) { extractionBlockers.add(b); }
+  if (evaluationCache && !blockersAreExternal(myBlockers, visited)) { evaluationCache.set(cacheKey, result); }
   return result.clone();
 }
 
@@ -629,8 +707,14 @@ function expandSources(type, name, sources, items, visited, depth, skipUnreachab
  * Expand an event into its requisite item requirements.
  * Events can have multiple sources (different regions/rules that trigger them).  Multiple sources are combined with OR.
  *
- * Dungeon clear and boss defeat events are treated as impossible to force simpler OR branches, since computing full
- * dungeon paths exceeds BFS capabilities. Exception: Trial Clear events are needed for Ganon's Tower access.
+ * Dungeon clear events mean completing the whole dungeon, which exceeds BFS capabilities, so they are treated as
+ * impossible to force simpler OR branches.
+ * Exception: Trial Clear events are plain item checks needed for Ganon's Tower access.
+ *
+ * Boss defeat events live in dungeon-interior regions the region cache does not contain, but their rules are plain item
+ * checks and they gate overworld progression.
+ * They are therefore expanded the way drops are: rule requirements only, without the unreachable-region filter.
+ * This understates the dungeon navigation needed to reach the boss, the same trade-off already made for drops.
  * @param {string} eventName - The event name to expand.
  * @param {object} items - Current tracked items.
  * @param {Set} visited - Visited set for cycle detection.
@@ -639,17 +723,25 @@ function expandSources(type, name, sources, items, visited, depth, skipUnreachab
  */
 function expandEvent(eventName, items, visited, depth) {
   const isTrialClear = eventName.endsWith(" Trial Clear");
-  if ((eventName.endsWith(" Clear") && !isTrialClear) || eventName.startsWith("Defeat ")) {
+  if (eventName.endsWith(" Clear") && !isTrialClear) {
     return impossibleExpr();
   }
-  return expandSources("event", eventName, Locations.getEvent(eventName), items, visited, depth, true);
+
+  const skipUnreachableRegions = !eventName.startsWith("Defeat ");
+  const sources = Locations.getEvent(eventName);
+  return expandSources("event", eventName, sources, items, visited, depth, skipUnreachableRegions);
 }
 
 /**
  * Expand a drop item into its access requirements.
- * 
+ *
  * Unlike events, drops in dungeon-interior regions (not in the region cache) are still included, as their rule
  * requirements are meaningful for tooltips.
+ *
+ * While the region cache is being built, drops outside NON_FREE_DROPS resolve to no requirements: working out where a
+ * drop is obtainable needs the very region reachability the build is still computing.
+ * The guard lives here rather than at the call sites so a drop behaves the same whether the rule names it as a string
+ * literal or as a bare identifier.
  * @param {string} dropName - The drop name to expand.
  * @param {object} items - Current tracked items.
  * @param {Set} visited - Visited set for cycle detection.
@@ -657,6 +749,9 @@ function expandEvent(eventName, items, visited, depth) {
  * @returns {Expression} The access requirements for this drop.
  */
 function expandDrop(dropName, items, visited, depth) {
+  if (regionCacheBuildingMode && !NON_FREE_DROPS.has(dropName)) {
+    return new Expression();
+  }
   return expandSources("drop", dropName, Locations.getDropLocations(dropName), items, visited, depth, false);
 }
 
@@ -674,8 +769,10 @@ function expandDrop(dropName, items, visited, depth) {
  * @returns {Expression} Combined event + region access requirements.
  */
 function expandEventSkippingAge(eventName, items, visited, depth) {
+  extractionTouchedDynamicState = true;
   const visitKey = `persistent_event:${eventName}`;
   if (visited.has(visitKey)) {
+    extractionBlockers.add(visitKey);
     return impossibleExpr();
   }
 
@@ -683,6 +780,7 @@ function expandEventSkippingAge(eventName, items, visited, depth) {
   const producedFlags = EVENT_TO_FLAG[eventName] || [];
   for (const flag of producedFlags) {
     if (visited.has(flag) || visited.has(`persistent_event:${flag}`)) {
+      extractionBlockers.add(visited.has(flag) ? flag : `persistent_event:${flag}`);
       return impossibleExpr();
     }
   }
@@ -741,8 +839,10 @@ function expandEventSkippingAge(eventName, items, visited, depth) {
       } else if (ENTRY_POINT_REGIONS.has(parentRegion)) {
         regionExpr = new Expression();
       } else if (!cache) {
-        // This age's cache is being built or not yet built, so treat region as reachable
-        regionExpr = new Expression();
+        // This age's cache is being built or not yet built.
+        // Treat the region as reachable, but still apply the age's baseline access gate, which the missing cache would have carried.
+        regionExpr = baseAgeAccessExpr(age, items, visited, depth + 1);
+        if (regionExpr.isImpossible()) { continue; }
       } else {
         // Region unreachable at this age
         continue;
@@ -779,6 +879,49 @@ function expandEventSkippingAge(eventName, items, visited, depth) {
 }
 
 /**
+ * Baseline requirements for playing as a given age at all, independent of any region.
+ * @param {string} age - The age to compute the access gate for ("child" or "adult").
+ * @param {object} items - Current tracked items.
+ * @param {Set} visited - Visited set for cycle detection.
+ * @param {number} depth - Current recursion depth.
+ * @returns {Expression} The baseline access requirements for the age.
+ */
+function baseAgeAccessExpr(age, items, visited, depth) {
+  if (!SettingsHelper.isDoorOfTimeClosed()) { return new Expression(); }
+
+  const startingAge = SettingsHelper.getStartingAge();
+  if (!startingAge || age === startingAge) { return new Expression(); }
+
+  if (!("can_open_door_of_time" in LogicHelper.ruleAliases)) { return new Expression(); }
+
+  // The age gate is a standalone question, independent of whatever is being expanded above it, so it is computed once per age with a fresh visited set and memoized.
+  // The in-progress sentinel breaks the intrinsic self-reference without depending on the callers context.
+  const cached = baseAgeAccessCache.get(age);
+  if (cached === BASE_AGE_ACCESS_IN_PROGRESS) {
+    extractionBlockers.add(BASE_AGE_BLOCKER_PREFIX + age);
+    return impossibleExpr();
+  }
+  if (cached) { return cached.clone(); }
+
+  const blockersBefore = extractionBlockers;
+  extractionBlockers = new Set();
+  baseAgeAccessCache.set(age, BASE_AGE_ACCESS_IN_PROGRESS);
+  const expr = handleIdentifier("can_open_door_of_time", items, new Set(), depth);
+
+  const myBlockers = extractionBlockers;
+  extractionBlockers = blockersBefore;
+  if (myBlockers.has(DEPTH_BLOCKER)) {
+    // Truncated results must not be memoized, so recompute on the next request.
+    extractionBlockers.add(DEPTH_BLOCKER);
+    baseAgeAccessCache.delete(age);
+  } else {
+    // The self-reference degradation is fully encapsulated by the memo, so it does not taint the caller.
+    baseAgeAccessCache.set(age, expr);
+  }
+  return expr.clone();
+}
+
+/**
  * Expand has_bottle into actual bottle item requirements.
  * @param {object} items - Current tracked items.
  * @param {Set} visited - Visited set for cycle detection.
@@ -792,12 +935,19 @@ function expandHasBottle(items, visited = new Set(), depth = 0) {
     new Clause([new RequirementItem("Bottle", "Bottle", bottleOwned)]),
   ]);
 
-  // Bottle with Big Poe can be emptied by selling to the Poe Collector
-  const bigPoeOwned = isItemOwned("Bottle_with_Big_Poe", items);
-  result = orCombineExpressions(
-    result,
-    new Expression([new Clause([new RequirementItem("Bottle_with_Big_Poe", "Bottle with Big Poe", bigPoeOwned)])]),
-  );
+  // A Bottle with Big Poe only frees up a bottle once the poe is sold to the Poe Collector
+  if (Locations.hasEvent("Sell Big Poe")) {
+    const sellExpr = expandEventSkippingAge("Sell Big Poe", items, visited, depth + 1);
+    if (!sellExpr.isImpossible() && !sellExpr.isEmpty()) {
+      result = orCombineExpressions(result, sellExpr);
+    }
+  } else {
+    const bigPoeOwned = isItemOwned("Bottle_with_Big_Poe", items);
+    result = orCombineExpressions(
+      result,
+      new Expression([new Clause([new RequirementItem("Bottle_with_Big_Poe", "Bottle with Big Poe", bigPoeOwned)])]),
+    );
+  }
 
   // Deliver Ruto's Letter produces a usable bottle
   if (settings?.zora_fountain !== "open") {
@@ -807,6 +957,54 @@ function expandHasBottle(items, visited = new Set(), depth = 0) {
     }
   }
   return result;
+}
+
+// Prefix for the synthetic "player can actually play this song" item (the song plus every note it needs).
+const CAN_PLAY_PREFIX = "Can_Play_";
+
+/**
+ * Normalize a song name from the logic files to the key used in song-notes.json.
+ * @param {string} songName - The song name as it appears in the rule.
+ * @returns {string} The canonical song key.
+ */
+function canonicalSongName(songName) {
+  const name = String(songName);
+  return name in SONG_NOTES ? name : name.replace(/ /g, "_").replace(/'/g, "");
+}
+
+/**
+ * Expand has_all_notes_for_song into a single "Can Play <Song>" requirement.
+ * @param {object} songArg - The AST node for the song argument.
+ * @param {object} items - Current tracked items.
+ * @returns {Expression} The play requirement, or a satisfied Expression when notes are not shuffled.
+ */
+function expandSongNotes(songArg, items) {
+  const settings = getSettings();
+  if (!settings.shuffle_individual_ocarina_notes) {
+    return new Expression();
+  }
+  const songName = songArg?.type === "Identifier" ? songArg.name : songArg?.value;
+  if (!songName) {
+    return new Expression();
+  }
+
+  // Scarecrow's Song needs any 2 distinct notes
+  if (songName === "Scarecrow_Song" || songName === "Scarecrow Song") {
+    if (settings.scarecrow_behavior === "free") {
+      return new Expression();
+    }
+    const owned = isItemOwned("Ocarina_Buttons,2", items);
+    return new Expression([new Clause([new RequirementItem("Ocarina_Buttons,2", "Ocarina Buttons x2", owned)])]);
+  }
+
+  const canonical = canonicalSongName(songName);
+  if (!SONG_NOTES[canonical]) {
+    return new Expression();
+  }
+
+  const itemName = `${CAN_PLAY_PREFIX}${canonical}`;
+  const displayName = `Can Play ${getDisplayName(canonical)}`;
+  return new Expression([new Clause([new RequirementItem(itemName, displayName, isItemOwned(itemName, items))])]);
 }
 
 /**
@@ -821,9 +1019,11 @@ function expandHasBottle(items, visited = new Set(), depth = 0) {
  * @returns {Expression} The extracted requirements.
  */
 function extractFromNode(node, items, visited = new Set(), depth = 0, skipAgeFiltering = false) {
-  // Maximum recursion depth to prevent infinite loops
-  // But, needs to be high enough for deeply nested type-checks
-  if (!node || depth > 25) {
+  // Recursion depth cap: a safety valve against pathological expansion blowup.
+  // Real cycles are handled by the visited sets, and legitimate chains can nest deeply, so the cap is generous.
+  // Truncation degrades the result, so it also records the depth pseudo-blocker.
+  if (!node || depth > 80) {
+    if (node) { extractionBlockers.add(DEPTH_BLOCKER); }
     return new Expression();
   }
 
@@ -841,7 +1041,7 @@ function extractFromNode(node, items, visited = new Set(), depth = 0, skipAgeFil
       return handleLogicalExpression(node, items, visited, depth, skipAgeFiltering);
 
     case "BinaryExpression":
-      return handleBinaryExpression(node);
+      return handleBinaryExpression(node, items);
 
     case "CallExpression":
       return handleCallExpression(node, items, visited, depth, skipAgeFiltering);
@@ -863,17 +1063,41 @@ function extractFromNode(node, items, visited = new Set(), depth = 0, skipAgeFil
 /**
  * Handle a binary expression AST node.
  * @param {object} node - The BinaryExpression AST node.
- * @returns {Expression} Satisfied Expression if condition is true, impossible otherwise.
+ * @param {object} items - The current tracked items object.
+ * @returns {Expression} Satisfied or impossible for comparisons that can be decided from settings alone, or the
+ *  item requirement itself for `selected_adult_trade_item == 'Item'`.
  */
-function handleBinaryExpression(node) {
+function handleBinaryExpression(node, items) {
   const isEquality = node.operator === "==" || node.operator === "===";
   const isInequality = node.operator === "!=" || node.operator === "!==";
 
+  const leftName = node.left.type === "Identifier" ? node.left.name : null;
+  const rightName = node.right.type === "Identifier" ? node.right.name : null;
+  const leftLiteral = node.left.type === "Literal" ? node.left.value : null;
+  const rightLiteral = node.right.type === "Literal" ? node.right.value : null;
+
   if (isEquality || isInequality) {
-    const leftName = node.left.type === "Identifier" ? node.left.name : null;
-    const rightName = node.right.type === "Identifier" ? node.right.name : null;
-    const leftLiteral = node.left.type === "Literal" ? node.left.value : null;
-    const rightLiteral = node.right.type === "Literal" ? node.right.value : null;
+    // age == starting_age: satisfied when ages can be switched freely.
+    // Otherwise, compare the current age context against the known starting age.
+    if (leftName === "age" && rightName === "starting_age") {
+      if (!SettingsHelper.isDoorOfTimeClosed()) { return new Expression(); }
+
+      const startingAge = SettingsHelper.getStartingAge();
+      if (!startingAge || !currentAgeContext) { return new Expression(); }
+
+      const matches = isEquality ? currentAgeContext === startingAge : currentAgeContext !== startingAge;
+      return matches ? new Expression() : impossibleExpr();
+    }
+
+    // selected_adult_trade_item == 'Item': the item itself is the requirement.
+    // The != form is treated as satisfied (lenient simplification, mirroring LogicHelper._evalBinaryExpression which only special-cases ==).
+    if (leftName === "selected_adult_trade_item" && rightLiteral !== null) {
+      if (isInequality) { return new Expression(); }
+
+      const itemKey = String(rightLiteral).replace(/ /g, "_");
+      const owned = isItemOwned(itemKey, items);
+      return new Expression([new Clause([new RequirementItem(itemKey, getDisplayName(itemKey), owned)])]);
+    }
 
     // Identifier == Identifier (same name comparison)
     if (leftName && rightName) {
@@ -915,7 +1139,31 @@ function handleBinaryExpression(node) {
     }
   }
 
+  // setting < number
+  if (node.operator === "<" && leftName && rightLiteral !== null) {
+    const settings = getSettings();
+    const settingValue = settings?.[leftName];
+    if (settingValue !== undefined) {
+      return settingValue < rightLiteral ? new Expression() : impossibleExpr();
+    }
+  }
+
+  // 'Value' in setting_list
+  if (node.operator === "in" && leftLiteral !== null && rightName) {
+    const settings = getSettings();
+    const list = settings?.[rightName];
+    if (Array.isArray(list)) {
+      return list.includes(leftLiteral) ? new Expression() : impossibleExpr();
+    }
+    return impossibleExpr();
+  }
+
   // For other binary expressions or unrecognized patterns, return impossible
+  const knownOperators = new Set(["==", "===", "!=", "!==", "<", "in"]);
+  if (!knownOperators.has(node.operator) && !warnedUnknownFunctions.has(`op:${node.operator}`)) {
+    warnedUnknownFunctions.add(`op:${node.operator}`);
+    console.warn(`expression-converter: unhandled binary operator "${node.operator}" treated as impossible`);
+  }
   return impossibleExpr();
 }
 
@@ -937,6 +1185,9 @@ function handleCallExpression(node, items, visited, depth, skipAgeFiltering = fa
       // Skip age filtering so the bean requirement appears in any age context.
       const arg = node.arguments[0];
       const isBeanPlanting = arg.type === "Identifier" && arg.name === "can_plant_bean";
+      if (isBeanPlanting) {
+        extractionTouchedDynamicState = true;
+      }
       const beanExpr = extractFromNode(arg, items, visited, depth + 1, isBeanPlanting || skipAgeFiltering);
 
       // In age-specific context, child must reach this region to plant the bean.
@@ -953,6 +1204,7 @@ function handleCallExpression(node, items, visited, depth, skipAgeFiltering = fa
   }
 
   if (funcName === "at") {
+    extractionTouchedDynamicState = true;
     if (node.arguments.length >= 2) {
       const ruleExpr = extractFromNode(node.arguments[1], items, visited, depth + 1, skipAgeFiltering);
 
@@ -1016,6 +1268,53 @@ function handleCallExpression(node, items, visited, depth, skipAgeFiltering = fa
     return new Expression([new Clause([new RequirementItem(`${categoryName},${requiredCount}`, displayName, owned)])]);
   }
 
+  // Individual ocarina note requirements for songs
+  if (funcName === "has_all_notes_for_song") {
+    return expandSongNotes(node.arguments[0], items);
+  }
+
+  // Dungeon shortcut checks
+  if (funcName === "region_has_shortcuts") {
+    const arg = node.arguments[0];
+    const regionName = arg?.type === "Identifier" ? arg.name : arg?.value;
+    const hintRegion = Locations.regionMap[regionName];
+    if (!hintRegion) {
+      return impossibleExpr();
+    }
+    return SettingsHelper.hasDungeonShortcut(hintRegion) ? new Expression() : impossibleExpr();
+  }
+
+  // Damage survival checks
+  if (funcName === "can_live_dmg") {
+    const hearts = node.arguments[0]?.value ?? 0;
+    const allowReviveArg = node.arguments[1];
+    const allowRevive = allowReviveArg ? allowReviveArg.name !== "False" && allowReviveArg.value !== false : true;
+    const allowNayrusArg = node.arguments[2];
+    const allowNayrus = allowNayrusArg ? allowNayrusArg.name !== "False" && allowNayrusArg.value !== false : true;
+
+    const mult = getSettings().damage_multiplier;
+    const survives =
+      ((mult === "quadruple" || mult === "quad") && hearts < 0.75) ||
+      (mult === "double" && hearts < 1.5) ||
+      (mult === "normal" && hearts < 3) ||
+      (mult === "half" && hearts < 6);
+    if (survives) {
+      return new Expression();
+    }
+
+    const mitigations = [];
+    if (allowRevive) {
+      mitigations.push("Fairy");
+    }
+    if (allowNayrus) {
+      mitigations.push("(Nayrus_Love and Magic_Meter)");
+    }
+    if (mitigations.length === 0) {
+      return impossibleExpr();
+    }
+    return extractFromNode(parseRule(mitigations.join(" or ")), items, visited, depth + 1, skipAgeFiltering);
+  }
+
   const paramAliases = LogicHelper.parameterizedAliases;
   if (funcName in paramAliases) {
     const { patterns, template } = paramAliases[funcName];
@@ -1037,16 +1336,32 @@ function handleCallExpression(node, items, visited, depth, skipAgeFiltering = fa
     });
 
     // Parse and extract from substituted rule
+    // Aliases gated on has_all_notes_for_song collapse the song and its notes into one item, so the
+    // template's bare song conjunct is suppressed for the duration of this expansion.
+    const collapsesSongNotes =
+      Boolean(getSettings().shuffle_individual_ocarina_notes) && template.includes("has_all_notes_for_song");
+
     const visitKey = `${funcName}(${argValues.join(",")})`;
     if (!visited.has(visitKey)) {
       visited.add(visitKey);
       const parsedRule = parseRule(substituted);
+      const savedSubsumedSong = songSubsumedByCanPlay;
+      if (collapsesSongNotes) {
+        songSubsumedByCanPlay = canonicalSongName(argValues[0]);
+      }
       const expanded = extractFromNode(parsedRule, items, visited, depth + 1, skipAgeFiltering);
+      songSubsumedByCanPlay = savedSubsumedSong;
       visited.delete(visitKey);
       return expanded;
     }
+    extractionBlockers.add(visitKey);
+    return new Expression();
   }
 
+  if (!warnedUnknownFunctions.has(funcName)) {
+    warnedUnknownFunctions.add(funcName);
+    console.warn(`expression-converter: unknown function "${funcName}" treated as satisfied in tooltips`);
+  }
   return new Expression();
 }
 
@@ -1060,6 +1375,11 @@ function handleCallExpression(node, items, visited, depth, skipAgeFiltering = fa
  * @returns {Expression} The requirements associated with this identifier.
  */
 function handleIdentifier(name, items, visited, depth, skipAgeFiltering = false) {
+  // Already covered by the "Can Play <Song>" item produced for this same can_play expansion.
+  if (songSubsumedByCanPlay && name === songSubsumedByCanPlay) {
+    return new Expression();
+  }
+
   // Age requirements
   if (name === "is_adult") {
     if (skipAgeFiltering) {
@@ -1105,6 +1425,28 @@ function handleIdentifier(name, items, visited, depth, skipAgeFiltering = false)
     return new Expression();
   }
 
+  // Starting age: free when the Door of Time is open. With a closed door, only the actual starting age satisfies it.
+  // With a random starting age and no selection yet, treat it as satisfied.
+  // Availability (LogicHelper) shows everything locked in that state, but tooltips optimistically show the requirements as if either age could be the starting one.
+  if (name === "is_starting_age") {
+    if (!SettingsHelper.isDoorOfTimeClosed()) { return new Expression(); }
+
+    const startingAge = SettingsHelper.getStartingAge();
+    if (!startingAge || !currentAgeContext) { return new Expression(); }
+    return currentAgeContext === startingAge ? new Expression() : impossibleExpr();
+  }
+
+  // Time travel: free when the Door of Time is open. Otherwise, it requires opening the door.
+  // Temple of Time access for the starting age is intentionally omitted as a display simplification.
+  if (name === "Time_Travel") {
+    if (!SettingsHelper.isDoorOfTimeClosed()) { return new Expression(); }
+
+    if ("can_open_door_of_time" in LogicHelper.ruleAliases) {
+      return handleIdentifier("can_open_door_of_time", items, visited, depth, skipAgeFiltering);
+    }
+    return new Expression();
+  }
+
   // Ocarina notes
   if (OCARINA_NOTE_IDENTIFIERS.has(name)) {
     const settings = getSettings();
@@ -1133,6 +1475,12 @@ function handleIdentifier(name, items, visited, depth, skipAgeFiltering = false)
     return result;
   }
 
+  // Bombchu packs all satisfy the same tracked "Bombchus" item
+  if (BOMBCHU_PACK_ITEMS.has(name)) {
+    const owned = isItemOwned("Bombchus", items);
+    return new Expression([new Clause([new RequirementItem("Bombchus", getDisplayName("Bombchus"), owned)])]);
+  }
+
   // Skip identifiers with certain prefixes
   for (const prefix of SKIP_PREFIXES) {
     if (name.startsWith(prefix)) {
@@ -1155,14 +1503,14 @@ function handleIdentifier(name, items, visited, depth, skipAgeFiltering = false)
     else if (name.startsWith("at_")) {
       settingValue = true;
     }
-    else if (name in settings) {
-      settingValue = settings[name];
-    }
     else if (name in renamedAttributes) {
       settingValue = renamedAttributes[name];
     }
+    else if (name in settings) {
+      settingValue = settings[name];
+    }
 
-    if (settingValue) {
+    if (settingValue && settingValue !== "off") {
       return new Expression();
     } else {
       return impossibleExpr();
@@ -1176,6 +1524,7 @@ function handleIdentifier(name, items, visited, depth, skipAgeFiltering = false)
 
   // Check if this identifier is already being expanded
   if (visited.has(name)) {
+    extractionBlockers.add(name);
     return impossibleExpr();
   }
 
@@ -1195,16 +1544,32 @@ function handleIdentifier(name, items, visited, depth, skipAgeFiltering = false)
   if (name in ruleAliases) {
     // Cache key includes skipAgeFiltering to avoid mixing results
     const aliasCacheKey = skipAgeFiltering ? `alias_noage:${name}` : `alias:${name}`;
-    if (evaluationCache?.has(aliasCacheKey)) {
-      return evaluationCache.get(aliasCacheKey).clone();
+    const cached = evaluationCache?.get(aliasCacheKey);
+    if (cached) {
+      // Replay the dynamic-state flag the original expansion produced
+      if (cached.touchedDynamicState) {
+        extractionTouchedDynamicState = true;
+      }
+      return cached.expr.clone();
     }
 
+    const touchedBefore = extractionTouchedDynamicState;
+    const blockersBefore = extractionBlockers;
+    extractionTouchedDynamicState = false;
+    extractionBlockers = new Set();
     visited.add(name);
     const expanded = extractFromNode(ruleAliases[name], items, visited, depth + 1, skipAgeFiltering);
     visited.delete(name);
+    const touchedByAlias = extractionTouchedDynamicState;
+    const myBlockers = extractionBlockers;
+    extractionTouchedDynamicState = touchedBefore || touchedByAlias;
+    extractionBlockers = blockersBefore;
+    for (const b of myBlockers) { extractionBlockers.add(b); }
 
-    if (evaluationCache) {
-      evaluationCache.set(aliasCacheKey, expanded);
+    // Externally-blocked results are context-dependent, so keep them out of the shared cache.
+    // Intrinsic self-cycles are deterministic and safe to cache.
+    if (evaluationCache && !blockersAreExternal(myBlockers, visited)) {
+      evaluationCache.set(aliasCacheKey, { expr: expanded, touchedDynamicState: touchedByAlias });
     }
     return expanded.clone();
   }
@@ -1246,9 +1611,6 @@ function handleLiteral(value, items, visited, depth) {
 
   // Expand drops into access requirements.
   if (Locations.hasDrop(value)) {
-    if (regionCacheBuildingMode && !NON_FREE_DROPS.has(value)) {
-      return new Expression(); // Auto-satisfy free drops during cache building
-    }
     return expandDrop(value, items, visited, depth);
   }
 
@@ -1275,6 +1637,11 @@ function handleLiteral(value, items, visited, depth) {
  */
 function handleLogicalExpression(node, items, visited, depth, skipAgeFiltering = false) {
   const leftExpr = extractFromNode(node.left, items, visited, depth + 1, skipAgeFiltering);
+  if (node.operator === "&&" && leftExpr.isImpossible()) {
+    leftExpr.vanillaAutoSatisfied = false;
+    return leftExpr;
+  }
+
   const rightExpr = extractFromNode(node.right, items, visited, depth + 1, skipAgeFiltering);
 
   if (node.operator === "&&") {
@@ -1341,8 +1708,12 @@ function handleSequenceExpression(node, items, visited, depth, skipAgeFiltering 
   // Check for vanilla placement
   const vanillaInfo = getVanillaPlacementInfo(itemName, settings);
   if (vanillaInfo.isVanilla && vanillaInfo.vanillaItemName) {
+    // Expands location rules and consults region caches
+    extractionTouchedDynamicState = true;
+
     // If we're already tracing this item, skip to avoid infinite recursion
     if (visited.has(itemName)) {
+      extractionBlockers.add(itemName);
       return new Expression();
     }
 
@@ -1447,13 +1818,13 @@ function handleUnaryExpression(node) {
       } else {
         const settings = getSettings();
         const renamedAttributes = LogicHelper.renamedAttributes;
-        if (name in settings) {
-          settingValue = settings[name];
-        } else if (name in renamedAttributes) {
+        if (name in renamedAttributes) {
           settingValue = renamedAttributes[name];
+        } else if (name in settings) {
+          settingValue = settings[name];
         }
       }
-      if (settingValue) {
+      if (settingValue && settingValue !== "off") {
         return impossibleExpr();
       }
       return new Expression();
@@ -1497,6 +1868,76 @@ function handleMemberExpression(node) {
 }
 
 /**
+ * Region reachability cache mapping region -> the requirements to reach it.
+ *
+ * Stores DNF paths (the source of truth the BFS updates) and materializes the CNF Expression lazily, memoized per region.
+ */
+class RegionCache {
+  constructor() {
+    this._paths = new Map();
+    this._cnf = new Map();
+  }
+
+  /**
+   * Whether a region is reachable (i.e., has any DNF paths recorded).
+   * @param {string} region - Region name.
+   * @returns {boolean} True if the region is reachable (has paths).
+   */
+  has(region) {
+    return this._paths.has(region);
+  }
+
+  /**
+   * Lazily materialize and memoize the CNF Expression for a region.
+   * @param {string} region - Region name.
+   * @returns {Expression|undefined} The requirements Expression, or undefined if unreachable.
+   */
+  get(region) {
+    if (!this._paths.has(region)) { return undefined; }
+
+    let expr = this._cnf.get(region);
+    if (expr === undefined) {
+      expr = dnfPathsToExpression(this._paths.get(region));
+      this._cnf.set(region, expr);
+    }
+
+    return expr;
+  }
+
+  /**
+   * Return the raw DNF paths for a region (the source of truth the BFS updates), without materializing the CNF Expression.
+   * @param {string} region - Region name.
+   * @returns {Array|undefined} The region's DNF paths, or undefined if unreachable.
+   */
+  getPaths(region) {
+    return this._paths.get(region);
+  }
+
+  /**
+   * Set a region's DNF paths, invalidating its memoized CNF.
+   * @param {string} region - Region name.
+   * @param {Array} paths - The new DNF paths.
+   */
+  setPaths(region, paths) {
+    this._paths.set(region, paths);
+    this._cnf.delete(region);
+  }
+
+  /**
+   * Shallow copy for the fixed-point loop's previous-iteration snapshot.
+   *
+   * Paths and any memoized CNF are copied by reference: both are immutable once produced, so the snapshot stays frozen while the live cache continues to update.
+   * @returns {RegionCache} A snapshot of the current cache state.
+   */
+  snapshot() {
+    const copy = new RegionCache();
+    copy._paths = new Map(this._paths);
+    copy._cnf = new Map(this._cnf);
+    return copy;
+  }
+}
+
+/**
  * Build a region accessibility cache via fixed-point forward propagation.
  * Computes the requirements to reach every region from ENTRY_POINT_REGIONS.
  *
@@ -1507,34 +1948,70 @@ function handleMemberExpression(node) {
  * Without DNF tracking, iterative OR-combining in cycles creates CNF cross-products
  * that mix items from independent routes, producing phantom satisfying assignments.
  * @param {object} items - Current tracked items.
- * @returns {Map} A map from region name to the CNF Expression required to reach it.
+ * @returns {RegionCache} Reachability cache holding the requirements to reach each reachable region.
  */
 function buildRegionCache(items) {
-  const cache = new Map();       // CNF Expression cache (for at() lookups and final output)
-  const dnfCache = new Map();    // DNF paths cache (for accurate BFS updates)
+  const cache = new RegionCache();
 
-  // 1. Seed entry points
-  for (const entry of ENTRY_POINT_REGIONS) {
-    cache.set(entry, new Expression());
-    dnfCache.set(entry, [[]]);
+  // Memoize Locations.getEvent/getDropLocations for the duration of this build (MQ is fixed here).
+  Locations.beginLookupCache();
+
+  // Make the in-progress cache visible to expandEvent/expandDrop/at().
+  regionCacheBuildingMode = true;
+  activeRegionCacheOverride = cache;
+
+  try {
+    populateRegionCache(cache, items);
+  } finally {
+    // A throw mid-build would otherwise leave the module in building mode with a half-built cache wired into
+    // activeRegionCacheOverride, silently corrupting every later at() lookup for the rest of the session.
+    // Locations' lookup memo has the same problem, since a stuck memo survives an MQ toggle.
+    bfsAtLookupCache = null;
+    regionCacheBuildingMode = false;
+    activeRegionCacheOverride = null;
+    Locations.endLookupCache();
   }
 
-  // 2. Collect raw edges
+  return cache;
+}
+
+/**
+ * Run the fixed-point propagation that fills a region cache.
+ *
+ * Assumes the caller has already put the module in region-cache building mode; see buildRegionCache.
+ * @param {RegionCache} cache - The cache to seed and populate, updated in place.
+ * @param {object} items - Current tracked items.
+ */
+function populateRegionCache(cache, items) {
+  // 1. Seed entry points
+  for (const entry of ENTRY_POINT_REGIONS) {
+    cache.setPaths(entry, [[]]);
+  }
+
+  // 2. Collect raw edges, with per-edge memoization state for the fixed-point loop
   const allEdges = [];
   for (const regionName of Object.keys(Locations.regionMap)) {
     const exits = Locations.getExitsForRegion(regionName);
     if (!exits) { continue; }
     for (const [targetRegion, rule] of Object.entries(exits)) {
       if (EXCLUDED_FROM_PATHFINDING.has(targetRegion)) { continue; }
-      allEdges.push({ source: regionName, target: targetRegion, rule });
+      allEdges.push({
+        source: regionName,
+        target: targetRegion,
+        rule,
+        evaluated: false,
+        isPure: false,
+        purePaths: null,
+        lastSourceVersion: -1,
+        lastGlobalVersion: -1,
+      });
     }
   }
 
-  // 3. Fixed-point iteration with in-progress cache visible to expandEvent/expandDrop/at()
-  regionCacheBuildingMode = true;
-  activeRegionCacheOverride = cache;
-
-  let previousCache = new Map(cache);
+  // 3. Fixed-point iteration
+  let previousCache = cache.snapshot();
+  const regionVersion = new Map();
+  let globalVersion = 0;
 
   let changed = true;
   let iterations = 0;
@@ -1544,51 +2021,70 @@ function buildRegionCache(items) {
     evaluationCache = new Map();
     bfsAtLookupCache = previousCache;
 
-    for (const { source, target, rule } of allEdges) {
-      if (!dnfCache.has(source)) { continue; }
+    for (const edge of allEdges) {
+      const { source, target, rule } = edge;
+      if (!cache.has(source)) { continue; }
 
-      // Evaluate exit rule to CNF Expression
-      const exitExpr = extractFromNode(rule, items, new Set(), 0);
-      if (exitExpr.isImpossible()) { continue; }
+      // Skip edges whose inputs have not changed since they were last processed
+      const sourceVersion = regionVersion.get(source) || 0;
+      if (edge.evaluated && edge.lastSourceVersion === sourceVersion) {
+        if (edge.isPure || edge.lastGlobalVersion === globalVersion) {
+          continue;
+        }
+      }
 
-      // Convert exit CNF to DNF paths and combine with source paths
-      const exitPaths = expressionToDNFPaths(exitExpr);
+      // Evaluate exit rule to DNF paths, reusing the cached result for pure rules
+      let exitPaths;
+      if (edge.isPure) {
+        exitPaths = edge.purePaths;
+      } else {
+        extractionTouchedDynamicState = false;
+        extractionBlockers = new Set();
+        const exitExpr = extractFromNode(rule, items, new Set(), 0);
+        exitPaths = exitExpr.isImpossible() ? [] : expressionToDNFPaths(exitExpr);
+        if (!edge.evaluated && !extractionTouchedDynamicState && extractionBlockers.size === 0) {
+          edge.isPure = true;
+          edge.purePaths = exitPaths;
+        }
+      }
+      edge.evaluated = true;
+      edge.lastSourceVersion = sourceVersion;
+      edge.lastGlobalVersion = globalVersion;
+
       if (exitPaths.length === 0) { continue; }
 
-      const sourcePaths = dnfCache.get(source);
+      const sourcePaths = cache.getPaths(source);
       const newPaths = combineDNFPaths(sourcePaths, exitPaths);
 
-      if (!dnfCache.has(target)) {
-        const pruned = pruneDominatedDNFPaths(newPaths);
-        dnfCache.set(target, pruned);
-        cache.set(target, dnfPathsToExpression(pruned));
-        changed = true;
+      let updated = false;
+      if (!cache.has(target)) {
+        cache.setPaths(target, pruneDominatedDNFPaths(newPaths));
+        updated = true;
       } else {
-        const existing = dnfCache.get(target);
+        const existing = cache.getPaths(target);
         const all = [...existing, ...newPaths];
         const pruned = pruneDominatedDNFPaths(all);
 
         if (!dnfPathSetsEqual(pruned, existing)) {
-          dnfCache.set(target, pruned);
-          cache.set(target, dnfPathsToExpression(pruned));
-          changed = true;
+          cache.setPaths(target, pruned);
+          updated = true;
         }
+      }
+
+      if (updated) {
+        regionVersion.set(target, (regionVersion.get(target) || 0) + 1);
+        globalVersion++;
+        changed = true;
       }
     }
 
-    previousCache = new Map(cache);
+    previousCache = cache.snapshot();
   }
-
-  bfsAtLookupCache = null;
-  regionCacheBuildingMode = false;
-  activeRegionCacheOverride = null;
-
-  return cache;
 }
 
 /**
  * Get the region cache for the current age context.
- * @returns {Map|null} The active region cache map, or null if none is set.
+ * @returns {RegionCache|null} The active region cache, or null if none is set.
  */
 function getActiveRegionCache() {
   if (activeRegionCacheOverride) { return activeRegionCacheOverride; }
@@ -2097,9 +2593,22 @@ function evaluateForAge(rule, parentRegion, items) {
 }
 
 /**
+ * What a location's tooltip needs, in one of three mutually exclusive shapes: satisfied (nothing left to get), a
+ * non-empty clause list, or impossible.
+ *
+ * `clauses` is CNF: each clause is an OR of items and every clause must hold. `impossible: true` always comes with
+ * `satisfied: false` and an empty `clauses`, and means no age can reach the location under the current settings.
+ * @typedef {object} RequirementsStructure
+ * @property {Array} clauses - CNF clauses, empty when satisfied or impossible.
+ * @property {boolean} satisfied - True when the location needs nothing further.
+ * @property {boolean} [impossible] - True when the location is unreachable at either age.
+ */
+
+/**
  * Post-process an Expression into the output clause format.
  * @param {Expression} regionExpr - The expression to post-process.
- * @returns {{ clauses: Array, satisfied: boolean }} The formatted requirements structure.
+ * @returns {RequirementsStructure} The formatted requirements structure. Never impossible; only the callers that
+ *  find no reachable age produce that.
  */
 function postProcessExpression(regionExpr) {
   // Factor universal items from PoS expressions into compound alternatives
@@ -2175,7 +2684,7 @@ function postProcessExpression(regionExpr) {
  * and post-processes into the output clause format.
  * @param {string} locationName - The location name as used in logic files.
  * @param {object} items - The current tracked items object.
- * @returns {{ clauses: Array, satisfied: boolean }} The requirements structure.
+ * @returns {RequirementsStructure} The requirements structure.
  */
 export function getLocationRequirements(locationName, items) {
   const location = Locations.getLocation(locationName);
@@ -2183,21 +2692,14 @@ export function getLocationRequirements(locationName, items) {
     return { clauses: [], satisfied: true };
   }
 
-  const { rule: locationRule, parentRegion: locationRegion } = location;
-
-  // Boss defeat locations:
-  // The location rule is a Defeat event reference. Boss fight items are trivially satisfied via shop consumables.
-  // Replace the Defeat rule with true and let the region cache handle navigation from the boss room to root.
-  let rule = locationRule;
-  const parentRegion = locationRegion;
-  const ruleExpr = locationRule.type === "ExpressionStatement" ? locationRule.expression : locationRule;
-  if (ruleExpr.type === "Literal" && typeof ruleExpr.value === "string" && ruleExpr.value.startsWith("Defeat ")) {
-    rule = { type: "Literal", value: true };
-  }
+  const { rule, parentRegion } = location;
 
   const ageRequirement = detectAgeRequirement(rule);
 
   cachedSettings = LogicHelper.settings;
+
+  // MQ selection is fixed for the duration of this call, so drop/event lookups can be memoized across it.
+  Locations.beginLookupCache();
 
   try {
     // Always build both age caches.
@@ -2225,7 +2727,7 @@ export function getLocationRequirements(locationName, items) {
       evaluationCache = new Map();
 
       if (ageExprs.length === 0) {
-        return { clauses: [], satisfied: true };
+        return { clauses: [], satisfied: false, impossible: true };
       }
 
       // Short-circuit: only one age produced a valid result
@@ -2251,7 +2753,7 @@ export function getLocationRequirements(locationName, items) {
 
     const result = evaluateForAge(rule, parentRegion, items);
     if (!result) {
-      return { clauses: [], satisfied: true };
+      return { clauses: [], satisfied: false, impossible: true };
     }
 
     return postProcessExpression(result);
@@ -2259,6 +2761,31 @@ export function getLocationRequirements(locationName, items) {
     currentAgeContext = null;
     cachedSettings = null;
     evaluationCache = null;
+    Locations.endLookupCache();
+  }
+}
+
+/**
+ * Invalidate the caches when the settings change.
+ */
+function syncCachesWithSettings() {
+  const currentSettingsKey = {
+    settings: LogicHelper.settings,
+    revision: SettingsHelper.settingsRevision,
+    startingAge: SettingsHelper.getStartingAge() || "",
+  };
+
+  if (
+    !lastSettingsKey ||
+    lastSettingsKey.settings !== currentSettingsKey.settings ||
+    lastSettingsKey.revision !== currentSettingsKey.revision ||
+    lastSettingsKey.startingAge !== currentSettingsKey.startingAge
+  ) {
+    structureCache.clear();
+    lastSettingsKey = currentSettingsKey;
+    regionCacheChild = null;
+    regionCacheAdult = null;
+    baseAgeAccessCache.clear();
   }
 }
 
@@ -2267,19 +2794,10 @@ export function getLocationRequirements(locationName, items) {
  *
  * Uses starting items to produce a static structure that is then updated with ownership.
  * @param {string} locationName - The location name as used in logic files.
- * @returns {{ clauses: Array, satisfied: boolean }} The cached requirements structure.
+ * @returns {RequirementsStructure} The cached requirements structure.
  */
 export function getRequirementsStructure(locationName) {
-  // Check if settings have changed and invalidate cache if so
-  const currentSettings = LogicHelper.settings;
-  const currentSettingsJson = JSON.stringify(currentSettings);
-
-  if (currentSettingsJson !== lastSettingsJson) {
-    structureCache.clear();
-    lastSettingsJson = currentSettingsJson;
-    regionCacheChild = null;
-    regionCacheAdult = null;
-  }
+  syncCachesWithSettings();
 
   // Check cache first
   if (structureCache.has(locationName)) {
@@ -2295,13 +2813,43 @@ export function getRequirementsStructure(locationName) {
 }
 
 /**
+ * Declare whether the current scene renders tooltips.
+ * @param {boolean} enabled - True for scenes that render requirement tooltips.
+ */
+export function setTooltipWarmingEnabled(enabled) {
+  tooltipWarmingEnabled = Boolean(enabled);
+}
+
+/**
+ * Pre-build the per-age region caches so the first tooltip doesn't pay the fixed-point construction on the hover path.
+ */
+export function warmRequirementsCache() {
+  if (!tooltipWarmingEnabled) { return; }
+  if (!LogicHelper.settings || !Locations.regionMap) { return; }
+
+  syncCachesWithSettings();
+
+  const startingItems = LogicHelper.getStartingItems();
+  cachedSettings = LogicHelper.settings;
+  Locations.beginLookupCache();
+  try {
+    ensureRegionCache("child", startingItems);
+    ensureRegionCache("adult", startingItems);
+  } finally {
+    cachedSettings = null;
+    Locations.endLookupCache();
+  }
+}
+
+/**
  * Update the owned flags in a requirements structure based on current items.
  *
  * Recursively updates simple and compound items, preserving the clause structure.
  * Returns the original object unchanged if already satisfied or empty.
- * @param {{ clauses: Array, satisfied: boolean }} requirements - The requirements structure to update.
+ * @param {RequirementsStructure} requirements - The requirements structure to update.
  * @param {object} currentItems - The current tracked items object.
- * @returns {{ clauses: Array, satisfied: boolean }} A new requirements object with updated ownership.
+ * @returns {RequirementsStructure} A new requirements object with updated ownership, or the input unchanged when
+ *  there is nothing to update.
  */
 export function updateRequirementsOwnership(requirements, currentItems) {
   if (!requirements || requirements.satisfied || requirements.clauses.length === 0) {
@@ -2346,13 +2894,26 @@ export function updateRequirementsOwnership(requirements, currentItems) {
 }
 
 /**
- * Clear the structure cache. Call this when logic files are reloaded.
+ * Discard every cached tooltip structure and region cache.
+ *
+ * Reloading logic files does not need this: that allocates a fresh settings object, and syncCachesWithSettings
+ * detects the change on its own. Nor does mutating settings through SettingsHelper, whose settingsRevision counter
+ * invalidation keys on. It is for tests, and for anything that changes what tooltips depend on without going
+ * through either.
  */
 export function clearStructureCache() {
   structureCache.clear();
-  lastSettingsJson = null;
+  lastSettingsKey = null;
   regionCacheChild = null;
   regionCacheAdult = null;
+  baseAgeAccessCache.clear();
 }
 
-export default { getLocationRequirements, getRequirementsStructure, updateRequirementsOwnership, clearStructureCache };
+export default {
+  clearStructureCache,
+  getLocationRequirements,
+  getRequirementsStructure,
+  setTooltipWarmingEnabled,
+  updateRequirementsOwnership,
+  warmRequirementsCache,
+};

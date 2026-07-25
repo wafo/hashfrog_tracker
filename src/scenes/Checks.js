@@ -161,7 +161,8 @@ const Buttons = ({ efkActive, type, setType }) => {
 // Stable string describing a location's item requirements. Used to compare
 // two checks for requirements equality.
 const requirementsString = locationName => {
-  const { clauses, satisfied } = getRequirementsStructure(locationName);
+  const { clauses, satisfied, impossible } = getRequirementsStructure(locationName);
+  if (impossible) { return "IMPOSSIBLE"; }
   if (satisfied || !clauses || clauses.length === 0) {
     return "NONE";
   }

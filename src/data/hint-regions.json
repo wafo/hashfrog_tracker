@@ -166,7 +166,13 @@
     "Kak Odd Medicine Building",
     "Kak Behind Gate",
     "Kak Redead Grotto",
-    "Kak Open Grotto"
+    "Kak Open Grotto",
+    "Kak Cutscene Entrance",
+    "Kak Backyard Cutscene Entrance",
+    "Kak Behind Gate Cutscene Entrance",
+    "Kak Impas Ledge Cutscene Entrance",
+    "Kak Impas Rooftop Cutscene Entrance",
+    "Burning Kakariko"
   ],
   "Graveyard": [
     "Graveyard",
@@ -376,6 +382,7 @@
     "Shadow Temple Lower Huge Pit",
     "Shadow Temple Across Chasm",
     "Shadow Temple Invisible Maze",
+    "Shadow Temple Chasm Gold Skulltula",
     "Bongo Bongo Boss Room",
     "Bongo Bongo Blue Warp"
   ],

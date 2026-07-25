@@ -13,6 +13,17 @@ const RequirementsTooltip = ({ locationName, items }) => {
     return updateRequirementsOwnership(baseStructure, items);
   }, [baseStructure, items]);
 
+  // Unreachable under the current settings
+  if (baseStructure.impossible) {
+    return (
+      <div className="requirements-tooltip">
+        <ul>
+          <li className="missing">Not reachable</li>
+        </ul>
+      </div>
+    );
+  }
+
   // If all requirements are satisfied, show "Nothing"
   if (satisfied || clauses.length === 0) {
     return (

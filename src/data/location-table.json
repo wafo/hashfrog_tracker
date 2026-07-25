@@ -2288,6 +2288,8 @@
   "Ganons Castle MQ Water Trial Silver Rupee Red Ice":                    ["SilverRupee",  "Silver Rupee (Ganons Castle Water Trial)"],
   "Ganons Castle MQ Water Trial Silver Rupee Above Void":                 ["SilverRupee",  "Silver Rupee (Ganons Castle Water Trial)"],
 
+  "Ganons Castle MQ Shadow Trial Explosives Wonderitem":                  ["Wonderitem",   "Deku Nuts (5)"],
+
   "Ganons Tower Boss Key Chest":                                          ["Chest",        "Boss Key (Ganons Castle)"],
 
   "Ganons Tower Pot 1":                                                   ["Pot",          "Rupees (5)"],
@@ -2326,6 +2328,7 @@
   "Fairy Pot":                                                            ["Drop",         "Fairy"],
   "Free Fairies":                                                         ["Drop",         "Fairy"],
   "Wall Fairy":                                                           ["Drop",         "Fairy"],
+  "Bombable Fairy":                                                       ["Drop",         "Fairy"],
   "Butterfly Fairy":                                                      ["Drop",         "Fairy"],
   "Gossip Stone Fairy":                                                   ["Drop",         "Fairy"],
   "Bean Plant Fairy":                                                     ["Drop",         "Fairy"],

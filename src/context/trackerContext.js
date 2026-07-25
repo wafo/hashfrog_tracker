@@ -7,6 +7,7 @@ import DEFAULT_ITEMS from "../data/default-items.json";
 import DUNGEONS from "../data/dungeons.json";
 import ITEMS_JSON from "../data/items.json";
 import UUID_TO_ITEM from "../data/uuid-to-item.json";
+import { warmRequirementsCache } from "../utils/expression-converter";
 import { getEFKSkipRegions, getSelectedEFKDungeons, isEFK, isEFKLabel } from "../utils/efk";
 import Locations from "../utils/locations";
 import LogicHelper from "../utils/logic-helper";
@@ -203,6 +204,25 @@ function loadSession() {
   }
 }
 
+// Rebuilding both age caches costs a few hundred milliseconds.
+// Configuring MQ dungeons or dungeon shortcuts means one toggle per dungeon, so warming on every
+// action would pay for a full rebuild per click, each one thrown away by the next.
+// A trailing debounce collapses a burst of toggles into a single rebuild once the user stops.
+const TOOLTIP_WARM_DEBOUNCE_MS = 400;
+let tooltipWarmTimer = null;
+
+/** Schedule a tooltip cache rebuild, replacing any rebuild already pending. */
+function scheduleTooltipWarm() {
+  if (tooltipWarmTimer !== null) {
+    clearTimeout(tooltipWarmTimer);
+  }
+
+  tooltipWarmTimer = setTimeout(() => {
+    tooltipWarmTimer = null;
+    warmRequirementsCache();
+  }, TOOLTIP_WARM_DEBOUNCE_MS);
+}
+
 /**
  * Tracker context reducer handling all state mutations.
  * @param {object} state - The current tracker state.
@@ -270,6 +290,9 @@ function reducer(state, action) {
       SettingsHelper.settings["mq_dungeons_specific"] = newDungeonsMQ;
       SettingsHelper.invalidateCachedSets();
 
+      // invalidateCachedSets() bumps SettingsHelper.settingsRevision, which invalidates the tooltip caches
+      scheduleTooltipWarm();
+
       // Modify toggled dungeon to use MQ/non-MQ locations
       const locations = _.cloneDeep(state.locations);
       const locationKey = _.includes(LogicHelper.settings.mq_dungeons_specific, payload) ? "dungeon_mq" : "dungeon";
@@ -311,6 +334,9 @@ function reducer(state, action) {
       SettingsHelper.settings["dungeon_shortcuts"] = newShortcuts;
       SettingsHelper.invalidateCachedSets();
 
+      // invalidateCachedSets() bumps SettingsHelper.settingsRevision, which invalidates the tooltip caches
+      scheduleTooltipWarm();
+
       // Revalidate checks based on items collected
       const validatedLocations = validateLocations(
         state.locations,
@@ -328,6 +354,9 @@ function reducer(state, action) {
       // payload = "child" | "adult", clicking the selected age again clears it
       const selection = state.starting_age_selection === payload ? null : payload;
       SettingsHelper.setStartingAgeSelection(selection);
+
+      // Rebuild tooltip caches
+      scheduleTooltipWarm();
 
       const locations = validateLocations(
         state.locations,
@@ -587,6 +616,9 @@ function reducer(state, action) {
 
       const starting_age_selection = snapshot.starting_age_selection || null;
       SettingsHelper.setStartingAgeSelection(starting_age_selection);
+
+      // Rebuild the tooltip caches the restored settings invalidated
+      scheduleTooltipWarm();
 
       const locations = _.cloneDeep(state.locations);
 

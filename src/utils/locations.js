@@ -45,6 +45,12 @@ class Locations {
       overworld: new Map(),
     };
 
+    // Memo for getDropLocations/getEvent (see beginLookupCache).
+    this._lookupCacheActive = false;
+    this._lookupCacheDepth = 0;
+    this._dropLookupCache = new Map();
+    this._eventLookupCache = new Map();
+
     this.regionMap = {};
     _.forEach(HINT_REGIONS, (hintRegionData, hintRegionName) => {
       _.forEach(hintRegionData, regionName => {
@@ -178,7 +184,37 @@ class Locations {
     });
   }
 
+  /**
+   * Start memoizing getDropLocations/getEvent.
+   *
+   * Both walk every hint region on every call, and both are hot during tooltip evaluation.
+   * The memo is keyed by name alone, so it is only valid while the MQ selection is fixed.
+   * Calls nest and only the outermost pair opens and clears it.
+   */
+  static beginLookupCache() {
+    this._lookupCacheDepth += 1;
+    if (this._lookupCacheDepth === 1) {
+      this._lookupCacheActive = true;
+      this._dropLookupCache.clear();
+      this._eventLookupCache.clear();
+    }
+  }
+
+  /** Close the innermost memo scope opened by beginLookupCache, releasing it once the outermost scope ends. */
+  static endLookupCache() {
+    this._lookupCacheDepth = Math.max(0, this._lookupCacheDepth - 1);
+    if (this._lookupCacheDepth === 0) {
+      this._lookupCacheActive = false;
+      this._dropLookupCache.clear();
+      this._eventLookupCache.clear();
+    }
+  }
+
   static getDropLocations(dropName) {
+    if (this._lookupCacheActive && this._dropLookupCache.has(dropName)) {
+      return this._dropLookupCache.get(dropName);
+    }
+
     const results = [];
 
     // Check overworld
@@ -199,10 +235,18 @@ class Locations {
       }
     }
 
-    return results.length > 0 ? results : null;
+    const value = results.length > 0 ? results : null;
+    if (this._lookupCacheActive) {
+      this._dropLookupCache.set(dropName, value);
+    }
+    return value;
   }
 
   static getEvent(eventName) {
+    if (this._lookupCacheActive && this._eventLookupCache.has(eventName)) {
+      return this._eventLookupCache.get(eventName);
+    }
+
     const results = [];
 
     // Check overworld
@@ -223,7 +267,11 @@ class Locations {
       }
     }
 
-    return results.length > 0 ? results : null;
+    const value = results.length > 0 ? results : null;
+    if (this._lookupCacheActive) {
+      this._eventLookupCache.set(eventName, value);
+    }
+    return value;
   }
 
   static getExitsForRegion(regionName) {
