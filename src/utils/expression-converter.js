@@ -737,6 +737,11 @@ function expandEvent(eventName, items, visited, depth) {
  *
  * Unlike events, drops in dungeon-interior regions (not in the region cache) are still included, as their rule
  * requirements are meaningful for tooltips.
+ *
+ * While the region cache is being built, drops outside NON_FREE_DROPS resolve to no requirements: working out where a
+ * drop is obtainable needs the very region reachability the build is still computing.
+ * The guard lives here rather than at the call sites so a drop behaves the same whether the rule names it as a string
+ * literal or as a bare identifier.
  * @param {string} dropName - The drop name to expand.
  * @param {object} items - Current tracked items.
  * @param {Set} visited - Visited set for cycle detection.
@@ -744,6 +749,9 @@ function expandEvent(eventName, items, visited, depth) {
  * @returns {Expression} The access requirements for this drop.
  */
 function expandDrop(dropName, items, visited, depth) {
+  if (regionCacheBuildingMode && !NON_FREE_DROPS.has(dropName)) {
+    return new Expression();
+  }
   return expandSources("drop", dropName, Locations.getDropLocations(dropName), items, visited, depth, false);
 }
 
@@ -1602,9 +1610,6 @@ function handleLiteral(value, items, visited, depth) {
 
   // Expand drops into access requirements.
   if (Locations.hasDrop(value)) {
-    if (regionCacheBuildingMode && !NON_FREE_DROPS.has(value)) {
-      return new Expression(); // Auto-satisfy free drops during cache building
-    }
     return expandDrop(value, items, visited, depth);
   }
 
