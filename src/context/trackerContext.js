@@ -204,6 +204,25 @@ function loadSession() {
   }
 }
 
+// Rebuilding both age caches costs a few hundred milliseconds.
+// Configuring MQ dungeons or dungeon shortcuts means one toggle per dungeon, so warming on every
+// action would pay for a full rebuild per click, each one thrown away by the next.
+// A trailing debounce collapses a burst of toggles into a single rebuild once the user stops.
+const TOOLTIP_WARM_DEBOUNCE_MS = 400;
+let tooltipWarmTimer = null;
+
+/** Schedule a tooltip cache rebuild, replacing any rebuild already pending. */
+function scheduleTooltipWarm() {
+  if (tooltipWarmTimer !== null) {
+    clearTimeout(tooltipWarmTimer);
+  }
+
+  tooltipWarmTimer = setTimeout(() => {
+    tooltipWarmTimer = null;
+    warmRequirementsCache();
+  }, TOOLTIP_WARM_DEBOUNCE_MS);
+}
+
 /**
  * Tracker context reducer handling all state mutations.
  * @param {object} state - The current tracker state.
@@ -272,7 +291,7 @@ function reducer(state, action) {
       SettingsHelper.invalidateCachedSets();
 
       // invalidateCachedSets() bumps SettingsHelper.settingsRevision, which invalidates the tooltip caches
-      setTimeout(warmRequirementsCache, 0);
+      scheduleTooltipWarm();
 
       // Modify toggled dungeon to use MQ/non-MQ locations
       const locations = _.cloneDeep(state.locations);
@@ -316,7 +335,7 @@ function reducer(state, action) {
       SettingsHelper.invalidateCachedSets();
 
       // invalidateCachedSets() bumps SettingsHelper.settingsRevision, which invalidates the tooltip caches
-      setTimeout(warmRequirementsCache, 0);
+      scheduleTooltipWarm();
 
       // Revalidate checks based on items collected
       const validatedLocations = validateLocations(
@@ -337,7 +356,7 @@ function reducer(state, action) {
       SettingsHelper.setStartingAgeSelection(selection);
 
       // Rebuild tooltip caches
-      setTimeout(warmRequirementsCache, 0);
+      scheduleTooltipWarm();
 
       const locations = validateLocations(
         state.locations,
@@ -599,7 +618,7 @@ function reducer(state, action) {
       SettingsHelper.setStartingAgeSelection(starting_age_selection);
 
       // Rebuild the tooltip caches the restored settings invalidated
-      setTimeout(warmRequirementsCache, 0);
+      scheduleTooltipWarm();
 
       const locations = _.cloneDeep(state.locations);
 
