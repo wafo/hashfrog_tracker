@@ -7,7 +7,7 @@ import Checks from "./Checks";
 import Layout from "./Layout";
 
 const TrackerChecks = () => {
-  const { isLoading } = useLogicInitialization();
+  const { isLoading } = useLogicInitialization({ warmTooltips: true });
   const { state } = useTracker();
 
   // In checks mode the location structure is built by Checks.js after logic

@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { getGeneratorVersionCache, getSettingsStringCache, useItems } from "../context/trackerContext";
-import { warmRequirementsCache } from "../utils/expression-converter";
+import { setTooltipWarmingEnabled, warmRequirementsCache } from "../utils/expression-converter";
 import Locations from "../utils/locations";
 import LogicHelper from "../utils/logic-helper";
 import LogicLoader from "../utils/logic-loader";
 import SettingsHelper from "../utils/settings-helper";
 
 const useLogicInitialization = (options = {}) => {
-  const { skip = false } = options;
+  const { skip = false, warmTooltips = false } = options;
   const [isLoading, setIsLoading] = useState(!skip);
   const [error, setError] = useState(null);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -58,14 +58,15 @@ const useLogicInitialization = (options = {}) => {
       updateItemsFromLogic(finalSettings); // Starting items.
       setIsInitialized(true);
 
-      // Pre-build tooltip region caches
+      // Pre-build tooltip region caches, but only for scenes that show tooltips.
+      setTooltipWarmingEnabled(warmTooltips);
       setTimeout(warmRequirementsCache, 0);
     } catch (err) {
       setError(err);
     } finally {
       setIsLoading(false);
     }
-  }, [skip, updateItemsFromLogic]);
+  }, [skip, warmTooltips, updateItemsFromLogic]);
 
   useEffect(() => {
     initializeLogic();

@@ -173,6 +173,10 @@ let cachedSettings = null;
 // Expansion cache for the current evaluation.
 let evaluationCache = null;
 
+// Whether pre-warming the region caches is worth its cost, i.e. whether this scene renders tooltips at all.
+// Only affects pre-warming: an ungated tooltip still builds whatever it needs on demand.
+let tooltipWarmingEnabled = false;
+
 // Requirement structures keyed by location name. Invalidated when settings or starting age change.
 const structureCache = new Map();
 let lastSettingsKey = null;
@@ -2800,9 +2804,18 @@ export function getRequirementsStructure(locationName) {
 }
 
 /**
+ * Declare whether the current scene renders tooltips.
+ * @param {boolean} enabled - True for scenes that render requirement tooltips.
+ */
+export function setTooltipWarmingEnabled(enabled) {
+  tooltipWarmingEnabled = Boolean(enabled);
+}
+
+/**
  * Pre-build the per-age region caches so the first tooltip doesn't pay the fixed-point construction on the hover path.
  */
 export function warmRequirementsCache() {
+  if (!tooltipWarmingEnabled) { return; }
   if (!LogicHelper.settings || !Locations.regionMap) { return; }
 
   syncCachesWithSettings();
@@ -2881,4 +2894,11 @@ export function clearStructureCache() {
   baseAgeAccessCache.clear();
 }
 
-export default { getLocationRequirements, getRequirementsStructure, updateRequirementsOwnership, clearStructureCache, warmRequirementsCache };
+export default {
+  clearStructureCache,
+  getLocationRequirements,
+  getRequirementsStructure,
+  setTooltipWarmingEnabled,
+  updateRequirementsOwnership,
+  warmRequirementsCache,
+};
