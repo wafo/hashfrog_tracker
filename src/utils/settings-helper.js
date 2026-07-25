@@ -6,6 +6,9 @@ class SettingsHelper {
 
   static startingAgeSelection = null;
 
+  // Bumped whenever the settings object or the starting age selection changes
+  static settingsRevision = 0;
+
   static _mqDungeonsSet = null;
   static _dungeonShortcutsSet = null;
   static _allowedTricksSet = null;
@@ -25,6 +28,7 @@ class SettingsHelper {
     this.settings = null;
     this.renamedAttributes = null;
     this.startingAgeSelection = null;
+    this.settingsRevision++;
 
     this._mqDungeonsSet = null;
     this._dungeonShortcutsSet = null;
@@ -36,6 +40,8 @@ class SettingsHelper {
   }
 
   static _updateCachedSets() {
+    this.settingsRevision++;
+
     const mqDungeons = this.settings?.mq_dungeons_specific || this.defaults.mq_dungeons_specific || [];
     this._mqDungeonsSet = new Set(mqDungeons);
 
@@ -96,6 +102,7 @@ class SettingsHelper {
 
   static setStartingAgeSelection(age) {
     this.startingAgeSelection = age;
+    this.settingsRevision++;
   }
 
   static hasAdultTradeStart(itemName) {

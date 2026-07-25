@@ -2687,14 +2687,19 @@ export function getLocationRequirements(locationName, items) {
 }
 
 /**
- * Invalidate the caches when the settings object or the selected starting age changes.
+ * Invalidate the caches when the settings change.
  */
 function syncCachesWithSettings() {
-  const currentSettingsKey = { settings: LogicHelper.settings, startingAge: SettingsHelper.getStartingAge() || "" };
+  const currentSettingsKey = {
+    settings: LogicHelper.settings,
+    revision: SettingsHelper.settingsRevision,
+    startingAge: SettingsHelper.getStartingAge() || "",
+  };
 
   if (
     !lastSettingsKey ||
     lastSettingsKey.settings !== currentSettingsKey.settings ||
+    lastSettingsKey.revision !== currentSettingsKey.revision ||
     lastSettingsKey.startingAge !== currentSettingsKey.startingAge
   ) {
     structureCache.clear();
