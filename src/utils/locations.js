@@ -45,8 +45,9 @@ class Locations {
       overworld: new Map(),
     };
 
-    // Per-build memo for getDropLocations/getEvent (see beginLookupCache).
+    // Memo for getDropLocations/getEvent (see beginLookupCache).
     this._lookupCacheActive = false;
+    this._lookupCacheDepth = 0;
     this._dropLookupCache = new Map();
     this._eventLookupCache = new Map();
 
@@ -183,16 +184,30 @@ class Locations {
     });
   }
 
+  /**
+   * Start memoizing getDropLocations/getEvent.
+   *
+   * Both walk every hint region on every call, and both are hot during tooltip evaluation.
+   * The memo is keyed by name alone, so it is only valid while the MQ selection is fixed.
+   * Calls nest and only the outermost pair opens and clears it.
+   */
   static beginLookupCache() {
-    this._lookupCacheActive = true;
-    this._dropLookupCache.clear();
-    this._eventLookupCache.clear();
+    this._lookupCacheDepth += 1;
+    if (this._lookupCacheDepth === 1) {
+      this._lookupCacheActive = true;
+      this._dropLookupCache.clear();
+      this._eventLookupCache.clear();
+    }
   }
 
+  /** Close the innermost memo scope opened by beginLookupCache, releasing it once the outermost scope ends. */
   static endLookupCache() {
-    this._lookupCacheActive = false;
-    this._dropLookupCache.clear();
-    this._eventLookupCache.clear();
+    this._lookupCacheDepth = Math.max(0, this._lookupCacheDepth - 1);
+    if (this._lookupCacheDepth === 0) {
+      this._lookupCacheActive = false;
+      this._dropLookupCache.clear();
+      this._eventLookupCache.clear();
+    }
   }
 
   static getDropLocations(dropName) {

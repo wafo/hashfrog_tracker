@@ -1938,7 +1938,7 @@ class RegionCache {
  * Without DNF tracking, iterative OR-combining in cycles creates CNF cross-products
  * that mix items from independent routes, producing phantom satisfying assignments.
  * @param {object} items - Current tracked items.
- * @returns {Map} A map from region name to the CNF Expression required to reach it.
+ * @returns {RegionCache} Reachability cache holding the requirements to reach each reachable region.
  */
 function buildRegionCache(items) {
   const cache = new RegionCache();
@@ -1946,6 +1946,33 @@ function buildRegionCache(items) {
   // Memoize Locations.getEvent/getDropLocations for the duration of this build (MQ is fixed here).
   Locations.beginLookupCache();
 
+  // Make the in-progress cache visible to expandEvent/expandDrop/at().
+  regionCacheBuildingMode = true;
+  activeRegionCacheOverride = cache;
+
+  try {
+    populateRegionCache(cache, items);
+  } finally {
+    // A throw mid-build would otherwise leave the module in building mode with a half-built cache wired into
+    // activeRegionCacheOverride, silently corrupting every later at() lookup for the rest of the session.
+    // Locations' lookup memo has the same problem, since a stuck memo survives an MQ toggle.
+    bfsAtLookupCache = null;
+    regionCacheBuildingMode = false;
+    activeRegionCacheOverride = null;
+    Locations.endLookupCache();
+  }
+
+  return cache;
+}
+
+/**
+ * Run the fixed-point propagation that fills a region cache.
+ *
+ * Assumes the caller has already put the module in region-cache building mode; see buildRegionCache.
+ * @param {RegionCache} cache - The cache to seed and populate, updated in place.
+ * @param {object} items - Current tracked items.
+ */
+function populateRegionCache(cache, items) {
   // 1. Seed entry points
   for (const entry of ENTRY_POINT_REGIONS) {
     cache.setPaths(entry, [[]]);
@@ -1971,10 +1998,7 @@ function buildRegionCache(items) {
     }
   }
 
-  // 3. Fixed-point iteration with in-progress cache visible to expandEvent/expandDrop/at()
-  regionCacheBuildingMode = true;
-  activeRegionCacheOverride = cache;
-
+  // 3. Fixed-point iteration
   let previousCache = cache.snapshot();
   const regionVersion = new Map();
   let globalVersion = 0;
@@ -2046,13 +2070,6 @@ function buildRegionCache(items) {
 
     previousCache = cache.snapshot();
   }
-
-  bfsAtLookupCache = null;
-  regionCacheBuildingMode = false;
-  activeRegionCacheOverride = null;
-  Locations.endLookupCache();
-
-  return cache;
 }
 
 /**
@@ -2668,6 +2685,9 @@ export function getLocationRequirements(locationName, items) {
 
   cachedSettings = LogicHelper.settings;
 
+  // MQ selection is fixed for the duration of this call, so drop/event lookups can be memoized across it.
+  Locations.beginLookupCache();
+
   try {
     // Always build both age caches.
     // Age-specific locations still need both caches for dual-age evaluation.
@@ -2728,6 +2748,7 @@ export function getLocationRequirements(locationName, items) {
     currentAgeContext = null;
     cachedSettings = null;
     evaluationCache = null;
+    Locations.endLookupCache();
   }
 }
 
@@ -2788,11 +2809,13 @@ export function warmRequirementsCache() {
 
   const startingItems = LogicHelper.getStartingItems();
   cachedSettings = LogicHelper.settings;
+  Locations.beginLookupCache();
   try {
     ensureRegionCache("child", startingItems);
     ensureRegionCache("adult", startingItems);
   } finally {
     cachedSettings = null;
+    Locations.endLookupCache();
   }
 }
 
