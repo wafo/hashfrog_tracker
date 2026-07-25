@@ -1627,6 +1627,11 @@ function handleLiteral(value, items, visited, depth) {
  */
 function handleLogicalExpression(node, items, visited, depth, skipAgeFiltering = false) {
   const leftExpr = extractFromNode(node.left, items, visited, depth + 1, skipAgeFiltering);
+  if (node.operator === "&&" && leftExpr.isImpossible()) {
+    leftExpr.vanillaAutoSatisfied = false;
+    return leftExpr;
+  }
+
   const rightExpr = extractFromNode(node.right, items, visited, depth + 1, skipAgeFiltering);
 
   if (node.operator === "&&") {
