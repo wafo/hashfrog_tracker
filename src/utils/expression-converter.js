@@ -162,6 +162,11 @@ function blockersAreExternal(blockers, visited) {
 // null = any age, "adult" = adult only, "child" = child only
 let currentAgeContext = null;
 
+// Song whose bare identifier is currently covered by a "Can Play <Song>" requirement, or null.
+// With note shuffle on, can_play(<song>) collapses "<song> and has_all_notes_for_song(<song>)" into one item,
+// so the bare <song> conjunct of that same expansion must not be emitted a second time.
+let songSubsumedByCanPlay = null;
+
 // Settings cache for the current evaluation.
 let cachedSettings = null;
 
@@ -556,6 +561,13 @@ function getSettings() {
  * @returns {boolean} True if the ownership requirement is met.
  */
 function isItemOwned(itemName, items) {
+  // "Can Play <Song>" is owned only once the song itself and every note it needs are owned.
+  if (itemName.startsWith(CAN_PLAY_PREFIX)) {
+    const songName = itemName.slice(CAN_PLAY_PREFIX.length);
+    const notes = SONG_NOTES[songName] || [];
+    return isItemOwned(songName, items) && notes.every(button => isItemOwned(button, items));
+  }
+
   if (itemName.includes(",")) {
     const match = itemName.match(/^(.+),\s*(\d+)$/);
     if (match) {
@@ -935,11 +947,24 @@ function expandHasBottle(items, visited = new Set(), depth = 0) {
   return result;
 }
 
+// Prefix for the synthetic "player can actually play this song" item (the song plus every note it needs).
+const CAN_PLAY_PREFIX = "Can_Play_";
+
 /**
- * Expand has_all_notes_for_song into individual ocarina button requirements.
+ * Normalize a song name from the logic files to the key used in song-notes.json.
+ * @param {string} songName - The song name as it appears in the rule.
+ * @returns {string} The canonical song key.
+ */
+function canonicalSongName(songName) {
+  const name = String(songName);
+  return name in SONG_NOTES ? name : name.replace(/ /g, "_").replace(/'/g, "");
+}
+
+/**
+ * Expand has_all_notes_for_song into a single "Can Play <Song>" requirement.
  * @param {object} songArg - The AST node for the song argument.
  * @param {object} items - Current tracked items.
- * @returns {Expression} The required ocarina buttons, or a satisfied Expression when notes are not shuffled.
+ * @returns {Expression} The play requirement, or a satisfied Expression when notes are not shuffled.
  */
 function expandSongNotes(songArg, items) {
   const settings = getSettings();
@@ -960,14 +985,14 @@ function expandSongNotes(songArg, items) {
     return new Expression([new Clause([new RequirementItem("Ocarina_Buttons,2", "Ocarina Buttons x2", owned)])]);
   }
 
-  const notes = SONG_NOTES[songName] || SONG_NOTES[String(songName).replace(/ /g, "_").replace(/'/g, "")];
-  if (!notes) {
+  const canonical = canonicalSongName(songName);
+  if (!SONG_NOTES[canonical]) {
     return new Expression();
   }
-  const clauses = notes.map(
-    button => new Clause([new RequirementItem(button, getDisplayName(button), isItemOwned(button, items))]),
-  );
-  return new Expression(clauses);
+
+  const itemName = `${CAN_PLAY_PREFIX}${canonical}`;
+  const displayName = `Can Play ${getDisplayName(canonical)}`;
+  return new Expression([new Clause([new RequirementItem(itemName, displayName, isItemOwned(itemName, items))])]);
 }
 
 /**
@@ -1298,11 +1323,21 @@ function handleCallExpression(node, items, visited, depth, skipAgeFiltering = fa
     });
 
     // Parse and extract from substituted rule
+    // Aliases gated on has_all_notes_for_song collapse the song and its notes into one item, so the
+    // template's bare song conjunct is suppressed for the duration of this expansion.
+    const collapsesSongNotes =
+      Boolean(getSettings().shuffle_individual_ocarina_notes) && template.includes("has_all_notes_for_song");
+
     const visitKey = `${funcName}(${argValues.join(",")})`;
     if (!visited.has(visitKey)) {
       visited.add(visitKey);
       const parsedRule = parseRule(substituted);
+      const savedSubsumedSong = songSubsumedByCanPlay;
+      if (collapsesSongNotes) {
+        songSubsumedByCanPlay = canonicalSongName(argValues[0]);
+      }
       const expanded = extractFromNode(parsedRule, items, visited, depth + 1, skipAgeFiltering);
+      songSubsumedByCanPlay = savedSubsumedSong;
       visited.delete(visitKey);
       return expanded;
     }
@@ -1327,6 +1362,11 @@ function handleCallExpression(node, items, visited, depth, skipAgeFiltering = fa
  * @returns {Expression} The requirements associated with this identifier.
  */
 function handleIdentifier(name, items, visited, depth, skipAgeFiltering = false) {
+  // Already covered by the "Can Play <Song>" item produced for this same can_play expansion.
+  if (songSubsumedByCanPlay && name === songSubsumedByCanPlay) {
+    return new Expression();
+  }
+
   // Age requirements
   if (name === "is_adult") {
     if (skipAgeFiltering) {
