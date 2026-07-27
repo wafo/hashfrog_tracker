@@ -66,6 +66,9 @@ const STARTING_ITEM_SETTINGS = {
 };
 
 class LogicHelper {
+  // The region whose rule is being evaluated, so here() knows what it refers to.
+  static _currentRegion = null;
+
   static BUILTIN_FUNCTIONS = {
     // source: State.py
 
@@ -203,7 +206,14 @@ class LogicHelper {
     },
 
     here: function (node, age) {
-      return this._evalNode(node.arguments[0], age);
+      const expression = node.arguments[0];
+      const regionName = this._currentRegion;
+      if (!regionName) { return this._evalNode(expression, age); }
+
+      return (
+        (this._isRegionAccessible(regionName, "child") && this._evalNode(expression, "child")) ||
+        (this._isRegionAccessible(regionName, "adult") && this._evalNode(expression, "adult"))
+      );
     },
 
     at_day: function (_node, _age) {
@@ -421,7 +431,10 @@ class LogicHelper {
     if (_.isUndefined(age)) {
       return this.isLocationAvailable(locationName, "child") || this.isLocationAvailable(locationName, "adult");
     } else {
-      return this._isRegionAccessible(parentRegion, age) && this._evalNode(locationRule, age);
+      return (
+        this._isRegionAccessible(parentRegion, age) &&
+        this._withRegion(parentRegion, () => this._evalNode(locationRule, age))
+      );
     }
   }
 
@@ -546,7 +559,7 @@ class LogicHelper {
           return;
         }
         if (!this.regions[age].has(exitName)) {
-          if (this._evalNode(exitRule, age)) {
+          if (this._withRegion(rootRegion, () => this._evalNode(exitRule, age))) {
             this.regions[age].add(exitName);
             this._recalculateAccessibleRegions(exitName, age, regionsToCheck, skipRegions);
           } else {
@@ -557,6 +570,22 @@ class LogicHelper {
     }
 
     return regionsToCheck;
+  }
+
+  /**
+   * Evaluate with a region in scope, so here() knows which region its rule belongs to.
+   * @param {string} regionName - The region the rule belongs to.
+   * @param {function(): boolean} evaluate - Thunk performing the evaluation.
+   * @returns {boolean} Whatever the thunk returns.
+   */
+  static _withRegion(regionName, evaluate) {
+    const previousRegion = this._currentRegion;
+    this._currentRegion = regionName;
+    try {
+      return evaluate();
+    } finally {
+      this._currentRegion = previousRegion;
+    }
   }
 
   static _isRegionAccessible(regionName, age) {
@@ -730,8 +759,10 @@ class LogicHelper {
       const parentRegion = locationData.parentRegion;
       const rule = locationData.rule;
 
-      const asChild = this._isRegionAccessible(parentRegion, "child") && this._evalNode(rule, "child");
-      const asAdult = this._isRegionAccessible(parentRegion, "adult") && this._evalNode(rule, "adult");
+      const asChild =
+        this._isRegionAccessible(parentRegion, "child") && this._withRegion(parentRegion, () => this._evalNode(rule, "child"));
+      const asAdult =
+        this._isRegionAccessible(parentRegion, "adult") && this._withRegion(parentRegion, () => this._evalNode(rule, "adult"));
 
       return asChild || asAdult;
     });
@@ -1041,8 +1072,10 @@ class LogicHelper {
       const parentRegion = event.parentRegion;
       const rule = event.rule;
 
-      const asChild = this._isRegionAccessible(parentRegion, "child") && this._evalNode(rule, "child");
-      const asAdult = this._isRegionAccessible(parentRegion, "adult") && this._evalNode(rule, "adult");
+      const asChild =
+        this._isRegionAccessible(parentRegion, "child") && this._withRegion(parentRegion, () => this._evalNode(rule, "child"));
+      const asAdult =
+        this._isRegionAccessible(parentRegion, "adult") && this._withRegion(parentRegion, () => this._evalNode(rule, "adult"));
 
       return asChild || asAdult;
     });
