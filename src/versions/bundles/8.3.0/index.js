@@ -1,4 +1,5 @@
 import LogicHelpers from "./LogicHelpers.json";
+import LocationTable from "./location-table.json";
 import SettingsDefaults from "./settings-defaults.json";
 import Bosses from "./Bosses.json";
 import Overworld from "./Overworld.json";
@@ -29,6 +30,7 @@ import GerudoTrainingGroundMQ from "./Gerudo Training Ground MQ.json";
 
 export default {
   logicHelpersFile: LogicHelpers,
+  locationTable: LocationTable,
   settingsDefaults: SettingsDefaults,
   settingsTransformations: [],
   bossesFile: Bosses,

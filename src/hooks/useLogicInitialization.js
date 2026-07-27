@@ -26,12 +26,12 @@ const useLogicInitialization = (options = {}) => {
 
       // Load logic files for the specific generator version
       const bundle = await LogicLoader.loadLogicFiles(generatorVersion, settingsString);
-      const { logicHelpersFile, dungeonFiles, dungeonMQFiles, bossesFile, overworldFile } = bundle;
+      const { logicHelpersFile, locationTable, dungeonFiles, dungeonMQFiles, bossesFile, overworldFile } = bundle;
 
       // Initialize SettingsHelper with version-specific defaults
       SettingsHelper.initialize(bundle);
 
-      Locations.initialize(dungeonFiles, dungeonMQFiles, bossesFile, overworldFile);
+      Locations.initialize(dungeonFiles, dungeonMQFiles, bossesFile, overworldFile, locationTable);
 
       let settings;
       if (!settingsString) {

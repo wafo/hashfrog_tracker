@@ -5,7 +5,6 @@ import CHILD_TRADE_ITEMS from "../data/child-trade-items.json";
 import DUNGEONS from "../data/dungeons.json";
 import HINT_REGIONS_SHORT_NAMES from "../data/hint-regions-short-names.json";
 import HINT_REGIONS from "../data/hint-regions.json";
-import LOCATION_TABLE from "../data/location-table.json";
 
 const ADULT_TRADE_ITEMS = ADULT_TRADE_SEQUENCE.map((trade) => trade.displayName);
 
@@ -25,7 +24,16 @@ import { parseRule } from "./rule-parser";
 import SettingsHelper from "./settings-helper";
 
 class Locations {
-  static initialize(dungeonFiles, dungeonMQFiles, bossesFile, overworldFile) {
+  /**
+   * Load a version's logic files into the lookup tables the rest of the tracker reads.
+   * @param {object} dungeonFiles - Vanilla dungeon logic files, keyed by dungeon name.
+   * @param {object} dungeonMQFiles - Master Quest dungeon logic files, keyed by dungeon name.
+   * @param {Array} bossesFile - Boss room logic file.
+   * @param {Array} overworldFile - Overworld logic file.
+   * @param {object} locationTable - The version's own location table, from LocationList.py.
+   */
+  static initialize(dungeonFiles, dungeonMQFiles, bossesFile, overworldFile, locationTable) {
+    this.locationTable = locationTable ?? {};
     this.locations = {
       dungeon: new Map(),
       dungeon_mq: new Map(),
@@ -168,7 +176,7 @@ class Locations {
         const missingLocations = [];
         _.forEach(region.locations, (rule, locationName) => {
           try {
-            const [type, vanillaItem] = LOCATION_TABLE[locationName];
+            const [type, vanillaItem] = this.locationTable[locationName];
 
             if (_.startsWith(type, "Hint")) {
               // Ignore hint locations
