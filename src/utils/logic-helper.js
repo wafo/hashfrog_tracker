@@ -1,6 +1,7 @@
 import _ from "lodash";
 import memoize from "memoizee";
 
+import { boulderNameArgument, boulderRule, boulderTypeNames, possibleBoulderTypes } from "./boulders";
 import Locations from "./locations";
 import { parseRule } from "./rule-parser";
 import SettingsHelper from "./settings-helper";
@@ -64,6 +65,14 @@ const STARTING_ITEM_SETTINGS = {
 class LogicHelper {
   static BUILTIN_FUNCTIONS = {
     // source: State.py
+
+    can_pass_boulder: function (node, age) {
+      return this._evalBoulder(node, age, null);
+    },
+
+    can_pass_boulder_types: function (node, age) {
+      return this._evalBoulder(node, age, boulderTypeNames(node.arguments[1]));
+    },
 
     has_hearts: function (node, _age) {
       const countArg = node.arguments[0];
@@ -207,8 +216,11 @@ class LogicHelper {
     },
   };
 
-  static initialize(logicHelpersFile, settings) {
+  static initialize(logicHelpersFile, settings, boulderTable) {
     this.settings = settings;
+
+    // Empty for every branch that does not implement boulder shuffle
+    this.boulderTable = boulderTable ?? {};
 
     this.ruleAliases = {};
     this.parameterizedAliases = {};
@@ -561,6 +573,16 @@ class LogicHelper {
     const leftValue = leftNode.type === "Identifier" ? leftNode.name : leftNode.value;
     const rightValue = rightNode.type === "Identifier" ? rightNode.name : rightNode.value;
 
+    // boulder_type('X') == BOULDER_TYPE_Y, or `in [BOULDER_TYPE_Y, ...]` for the multi-type form
+    if (leftNode.type === "CallExpression" && leftNode.callee?.name === "boulder_type") {
+      const possible = possibleBoulderTypes(this.boulderTable, this.settings, boulderNameArgument(leftNode));
+      const compared = boulderTypeNames(rightNode);
+      const overlaps = possible.some(type => compared.includes(type));
+
+      if (node.operator === "in" || node.operator === "==") { return overlaps; }
+      if (node.operator === "!=") { return !(possible.length > 0 && possible.every(type => compared.includes(type))); }
+    }
+
     switch (node.operator) {
       case "==":
         if (leftNode.type === "Identifier" && rightNode.type === "Identifier") {
@@ -678,6 +700,23 @@ class LogicHelper {
       );
     }
     return false;
+  }
+
+  /**
+   * Evaluate whether the current items can get past a boulder.
+   * @param {object} node - The CallExpression AST node for the boulder helper.
+   * @param {string} age - The age context to evaluate under.
+   * @param {Array<string>|null} allowedTypes - Restrict to these types, or null for any.
+   * @returns {boolean} True if the boulder can be passed.
+   */
+  static _evalBoulder(node, age, allowedTypes) {
+    let types = possibleBoulderTypes(this.boulderTable, this.settings, boulderNameArgument(node));
+    if (allowedTypes) { types = types.filter(type => allowedTypes.includes(type)); }
+
+    const rule = boulderRule(types);
+    if (!rule) { return false; }
+
+    return this._evalNode(parseRule(rule), age);
   }
 
   static _canAccessDrop(dropName) {

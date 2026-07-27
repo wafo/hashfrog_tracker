@@ -1,6 +1,7 @@
 import DUNGEONS from "../data/dungeons.json";
 import VersionConfig from "../versions/version-config";
 
+import { parseBoulderTable } from "./boulder-table-parser.mjs";
 import { parseLocationTable } from "./location-table-parser.mjs";
 
 class LogicLoader {
@@ -30,9 +31,10 @@ class LogicLoader {
 
   static async _fetchLogicFiles(owner, tag) {
     // Load all logic files in parallel
-    const [logicHelpersFile, locationTable, bossesFile, overworldFile, ...dungeonResults] = await Promise.all([
+    const [logicHelpersFile, locationTable, boulderTable, bossesFile, overworldFile, ...dungeonResults] = await Promise.all([
       this._loadLogicFile(this._logicHelpersFileUrl(owner, tag)),
       this._loadLocationTable(this._locationListFileUrl(owner, tag)),
+      this._loadBoulderTable(this._bouldersFileUrl(owner, tag)),
       this._loadLogicFile(this._logicFileUrl(owner, tag, "Bosses.json")),
       this._loadLogicFile(this._logicFileUrl(owner, tag, "Overworld.json")),
       ...DUNGEONS.flatMap(dungeonName => [
@@ -62,6 +64,7 @@ class LogicLoader {
     return {
       logicHelpersFile,
       locationTable,
+      boulderTable,
       dungeonFiles,
       dungeonMQFiles,
       bossesFile,
@@ -81,6 +84,19 @@ class LogicLoader {
    */
   static async _loadLocationTable(fileUrl) {
     return parseLocationTable(await this._loadFileFromUrl(fileUrl));
+  }
+
+  /**
+   * Fetch and parse the boulder table, if this branch implements boulder shuffle.
+   * @param {string} fileUrl - URL of the branch's Boulders.py.
+   * @returns {Promise<object>} Map of boulder name to type, empty when the branch has no such file.
+   */
+  static async _loadBoulderTable(fileUrl) {
+    const response = await fetch(fileUrl);
+
+    // Only the boulder-shuffle forks ship Boulders.py, so a miss here is the normal case
+    if (!response.ok) { return {}; }
+    return parseBoulderTable(await response.text());
   }
 
   static async _loadFileFromUrl(url) {
@@ -116,6 +132,10 @@ class LogicLoader {
 
   static _locationListFileUrl(owner, tag) {
     return `https://raw.githubusercontent.com/${owner}/OoT-Randomizer/${tag}/LocationList.py`;
+  }
+
+  static _bouldersFileUrl(owner, tag) {
+    return `https://raw.githubusercontent.com/${owner}/OoT-Randomizer/${tag}/Boulders.py`;
   }
 }
 

@@ -15,11 +15,12 @@ import SettingsHelper from "./settings-helper";
  * @param {object} settingsOverrides - Settings to override bundle defaults.
  */
 function initializeLogic(settingsOverrides = {}) {
-  const { logicHelpersFile, locationTable, dungeonFiles, dungeonMQFiles, bossesFile, overworldFile } = BUNDLE;
+  const { logicHelpersFile, locationTable, boulderTable, dungeonFiles, dungeonMQFiles, bossesFile, overworldFile } =
+    BUNDLE;
   SettingsHelper.initialize(BUNDLE);
   Locations.initialize(dungeonFiles, dungeonMQFiles, bossesFile, overworldFile, locationTable);
   SettingsHelper.setSettings(settingsOverrides);
-  LogicHelper.initialize(logicHelpersFile, SettingsHelper.settings);
+  LogicHelper.initialize(logicHelpersFile, SettingsHelper.settings, boulderTable);
   clearStructureCache();
 }
 
