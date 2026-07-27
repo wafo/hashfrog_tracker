@@ -20,6 +20,9 @@ const CHILD_TRADE_SEQUENCE = CHILD_TRADE_ITEMS.map((item) => item.replace(/ /g, 
 // Rule functions already reported as unsupported, so each is logged once rather than on every evaluation.
 const warnedUnknownFunctions = new Set();
 
+// Same, for identifiers that resolve to nothing the tracker knows about.
+const warnedUnknownIdentifiers = new Set();
+
 // Helpers that some fork implement in State.py instead of LogicHelpers.json.
 // When a loaded LogicHelpers file doesn't define them, fall back to the stable definitions so rules referencing them keep working.
 const FALLBACK_RULE_ALIASES = {
@@ -827,6 +830,8 @@ class LogicHelper {
     switch (name) {
       case "True":
         return true;
+      case "False":
+        return false;
 
       case "has_bottle":
         return this._hasBottle();
@@ -941,7 +946,14 @@ class LogicHelper {
       return SettingsHelper.isAdvancedAllowedTrick(name);
     }
 
-    throw Error(`Unknown Identifier: ${name}`);
+    if (!warnedUnknownIdentifiers.has(name)) {
+      warnedUnknownIdentifiers.add(name);
+      console.warn(
+        `logic-helper: unknown identifier "${name}" treated as false. ` +
+        "Availability for locations gated on it will be understated.",
+      );
+    }
+    return false;
   }
 
   static _evalLiteral(value) {
