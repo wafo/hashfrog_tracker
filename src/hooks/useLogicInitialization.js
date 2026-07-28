@@ -26,12 +26,13 @@ const useLogicInitialization = (options = {}) => {
 
       // Load logic files for the specific generator version
       const bundle = await LogicLoader.loadLogicFiles(generatorVersion, settingsString);
-      const { logicHelpersFile, dungeonFiles, dungeonMQFiles, bossesFile, overworldFile } = bundle;
+      const { logicHelpersFile, locationTable, boulderTable, dungeonFiles, dungeonMQFiles, bossesFile, overworldFile } =
+        bundle;
 
       // Initialize SettingsHelper with version-specific defaults
       SettingsHelper.initialize(bundle);
 
-      Locations.initialize(dungeonFiles, dungeonMQFiles, bossesFile, overworldFile);
+      Locations.initialize(dungeonFiles, dungeonMQFiles, bossesFile, overworldFile, locationTable);
 
       let settings;
       if (!settingsString) {
@@ -52,7 +53,7 @@ const useLogicInitialization = (options = {}) => {
 
       // LogicHelper post-processes settings (e.g. mq_dungeons_mode "mq" expands
       // mq_dungeons_specific to all dungeons), so set SettingsHelper from its result.
-      const finalSettings = LogicHelper.initialize(logicHelpersFile, SettingsHelper.settings);
+      const finalSettings = LogicHelper.initialize(logicHelpersFile, SettingsHelper.settings, boulderTable);
 
       SettingsHelper.setSettings(finalSettings);
       updateItemsFromLogic(finalSettings); // Starting items.

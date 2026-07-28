@@ -5,15 +5,35 @@ import CHILD_TRADE_ITEMS from "../data/child-trade-items.json";
 import DUNGEONS from "../data/dungeons.json";
 import HINT_REGIONS_SHORT_NAMES from "../data/hint-regions-short-names.json";
 import HINT_REGIONS from "../data/hint-regions.json";
-import LOCATION_TABLE from "../data/location-table.json";
 
 const ADULT_TRADE_ITEMS = ADULT_TRADE_SEQUENCE.map((trade) => trade.displayName);
+
+const HINT_REGION_NAMES = new Set(HINT_REGIONS.hintRegions);
+
+// Hint area identifiers as they appear in the `hint` field of the randomizer's logic files.
+const HINT_AREAS = _.reduce(
+  HINT_REGIONS.hintRegions,
+  (accumulator, hintRegionName) => {
+    accumulator[hintRegionName.toUpperCase().replace(/[^A-Z0-9]+/g, "_")] = hintRegionName;
+    return accumulator;
+  },
+  { CASTLE_GROUNDS: "Hyrule Castle" },
+);
 
 import { parseRule } from "./rule-parser";
 import SettingsHelper from "./settings-helper";
 
 class Locations {
-  static initialize(dungeonFiles, dungeonMQFiles, bossesFile, overworldFile) {
+  /**
+   * Load a version's logic files into the lookup tables the rest of the tracker reads.
+   * @param {object} dungeonFiles - Vanilla dungeon logic files, keyed by dungeon name.
+   * @param {object} dungeonMQFiles - Master Quest dungeon logic files, keyed by dungeon name.
+   * @param {Array} bossesFile - Boss room logic file.
+   * @param {Array} overworldFile - Overworld logic file.
+   * @param {object} locationTable - The version's own location table, from LocationList.py.
+   */
+  static initialize(dungeonFiles, dungeonMQFiles, bossesFile, overworldFile, locationTable) {
+    this.locationTable = locationTable ?? {};
     this.locations = {
       dungeon: new Map(),
       dungeon_mq: new Map(),
@@ -51,12 +71,13 @@ class Locations {
     this._dropLookupCache = new Map();
     this._eventLookupCache = new Map();
 
-    this.regionMap = {};
-    _.forEach(HINT_REGIONS, (hintRegionData, hintRegionName) => {
-      _.forEach(hintRegionData, regionName => {
-        this.regionMap[regionName] = hintRegionName;
-      });
-    });
+    this.regionMap = { ...HINT_REGIONS.overrides };
+    this._buildRegionMap([
+      ..._.flatten(_.values(dungeonFiles)),
+      ..._.flatten(_.values(dungeonMQFiles)),
+      ...(bossesFile ?? []),
+      ...(overworldFile ?? []),
+    ]);
 
     _.forEach(dungeonFiles, file => {
       this._parseLogicFile(file, true, false);
@@ -70,10 +91,78 @@ class Locations {
     this._parseLogicFile(bossesFile, true, false);
 
     this._parseLogicFile(overworldFile, false, false);
+  }
 
-    // TODO: Include this in the normal flow to always have a regions object up to date ?
-    // Not really optimized, so leaving it out for now.
-    // updateHintRegionsJSON(_.set(dungeonFiles, "Overworld", overworldFile));
+  /**
+   * Assign a hint region to every region in the loaded logic files.
+   *
+   * A hardcoded list of regions goes stale the moment a fork splits or renames one, and that is not
+   * just cosmetic: the fork's checks end up grouped under an unnamed region, and buildRegionCache
+   * walks `regionMap` to collect exits, so an unlisted region's edges drop out of the region graph
+   * entirely and everything past them looks unreachable.
+   *
+   * The logic files already carry the answer. A region names its own area through `dungeon` or
+   * `hint`; regions with neither (interiors, grottos, boss rooms) inherit from the closest region
+   * that leads into them, which is how the randomizer resolves hint areas as well. The handful of
+   * regions this cannot place are listed as overrides in hint-regions.json.
+   * @param {Array} regions - Every region entry across the loaded logic files.
+   */
+  static _buildRegionMap(regions) {
+    const exits = new Map();
+    const unmapped = new Set();
+
+    for (const region of regions) {
+      const regionName = region.region_name;
+
+      // Region names repeat across MQ/non-MQ variants; merge their exits into one graph
+      const regionExits = exits.get(regionName) ?? new Set();
+      _.forEach(_.keys(region.exits), exitName => regionExits.add(exitName));
+      exits.set(regionName, regionExits);
+
+      if (regionName in this.regionMap) { continue; }
+
+      if (region.dungeon && HINT_REGION_NAMES.has(region.dungeon)) {
+        this.regionMap[regionName] = region.dungeon;
+      } else if (HINT_AREAS[region.hint]) {
+        this.regionMap[regionName] = HINT_AREAS[region.hint];
+      } else {
+        unmapped.add(regionName);
+      }
+    }
+
+    // Walk outward from the named regions a level at a time, so each remaining region inherits from
+    // the nearest region that reaches it. Root goes in a second pass: it is a pseudo-region wired to
+    // every spawn and warp, so propagating it first would swallow whatever those lead into.
+    const [namedRegions, rootRegions] = _.partition(
+      _.keys(this.regionMap),
+      regionName => this.regionMap[regionName] !== "Root",
+    );
+
+    for (const seedRegions of [namedRegions, rootRegions]) {
+      let frontier = seedRegions;
+
+      while (frontier.length && unmapped.size) {
+        const inherited = new Map();
+
+        for (const regionName of frontier) {
+          for (const exitName of exits.get(regionName) ?? []) {
+            if (!unmapped.has(exitName) || inherited.has(exitName)) { continue; }
+            inherited.set(exitName, this.regionMap[regionName]);
+          }
+        }
+
+        if (!inherited.size) { break; }
+        for (const [regionName, hintRegionName] of inherited) {
+          this.regionMap[regionName] = hintRegionName;
+          unmapped.delete(regionName);
+        }
+        frontier = [...inherited.keys()];
+      }
+    }
+
+    if (unmapped.size) {
+      console.warn(`${unmapped.size} regions could not be matched to a hint region: ${[...unmapped].join(", ")}`);
+    }
   }
 
   static _parseLogicFile(logicFile, isDungeon, isMQ) {
@@ -87,7 +176,7 @@ class Locations {
         const missingLocations = [];
         _.forEach(region.locations, (rule, locationName) => {
           try {
-            const [type, vanillaItem] = LOCATION_TABLE[locationName];
+            const [type, vanillaItem] = this.locationTable[locationName];
 
             if (_.startsWith(type, "Hint")) {
               // Ignore hint locations

@@ -1,6 +1,7 @@
 import _ from "lodash";
 import memoize from "memoizee";
 
+import { boulderNameArgument, boulderRule, boulderTypeNames, possibleBoulderTypes } from "./boulders";
 import Locations from "./locations";
 import { parseRule } from "./rule-parser";
 import SettingsHelper from "./settings-helper";
@@ -18,6 +19,9 @@ const CHILD_TRADE_SEQUENCE = CHILD_TRADE_ITEMS.map((item) => item.replace(/ /g, 
 
 // Rule functions already reported as unsupported, so each is logged once rather than on every evaluation.
 const warnedUnknownFunctions = new Set();
+
+// Same, for identifiers that resolve to nothing the tracker knows about.
+const warnedUnknownIdentifiers = new Set();
 
 // Helpers that some fork implement in State.py instead of LogicHelpers.json.
 // When a loaded LogicHelpers file doesn't define them, fall back to the stable definitions so rules referencing them keep working.
@@ -62,8 +66,19 @@ const STARTING_ITEM_SETTINGS = {
 };
 
 class LogicHelper {
+  // The region whose rule is being evaluated, so here() knows what it refers to.
+  static _currentRegion = null;
+
   static BUILTIN_FUNCTIONS = {
     // source: State.py
+
+    can_pass_boulder: function (node, age) {
+      return this._evalBoulder(node, age, null);
+    },
+
+    can_pass_boulder_types: function (node, age) {
+      return this._evalBoulder(node, age, boulderTypeNames(node.arguments[1]));
+    },
 
     has_hearts: function (node, _age) {
       const countArg = node.arguments[0];
@@ -191,7 +206,14 @@ class LogicHelper {
     },
 
     here: function (node, age) {
-      return this._evalNode(node.arguments[0], age);
+      const expression = node.arguments[0];
+      const regionName = this._currentRegion;
+      if (!regionName) { return this._evalNode(expression, age); }
+
+      return (
+        (this._isRegionAccessible(regionName, "child") && this._evalNode(expression, "child")) ||
+        (this._isRegionAccessible(regionName, "adult") && this._evalNode(expression, "adult"))
+      );
     },
 
     at_day: function (_node, _age) {
@@ -207,8 +229,11 @@ class LogicHelper {
     },
   };
 
-  static initialize(logicHelpersFile, settings) {
+  static initialize(logicHelpersFile, settings, boulderTable) {
     this.settings = settings;
+
+    // Empty for every branch that does not implement boulder shuffle
+    this.boulderTable = boulderTable ?? {};
 
     this.ruleAliases = {};
     this.parameterizedAliases = {};
@@ -406,7 +431,10 @@ class LogicHelper {
     if (_.isUndefined(age)) {
       return this.isLocationAvailable(locationName, "child") || this.isLocationAvailable(locationName, "adult");
     } else {
-      return this._isRegionAccessible(parentRegion, age) && this._evalNode(locationRule, age);
+      return (
+        this._isRegionAccessible(parentRegion, age) &&
+        this._withRegion(parentRegion, () => this._evalNode(locationRule, age))
+      );
     }
   }
 
@@ -531,7 +559,7 @@ class LogicHelper {
           return;
         }
         if (!this.regions[age].has(exitName)) {
-          if (this._evalNode(exitRule, age)) {
+          if (this._withRegion(rootRegion, () => this._evalNode(exitRule, age))) {
             this.regions[age].add(exitName);
             this._recalculateAccessibleRegions(exitName, age, regionsToCheck, skipRegions);
           } else {
@@ -542,6 +570,22 @@ class LogicHelper {
     }
 
     return regionsToCheck;
+  }
+
+  /**
+   * Evaluate with a region in scope, so here() knows which region its rule belongs to.
+   * @param {string} regionName - The region the rule belongs to.
+   * @param {function(): boolean} evaluate - Thunk performing the evaluation.
+   * @returns {boolean} Whatever the thunk returns.
+   */
+  static _withRegion(regionName, evaluate) {
+    const previousRegion = this._currentRegion;
+    this._currentRegion = regionName;
+    try {
+      return evaluate();
+    } finally {
+      this._currentRegion = previousRegion;
+    }
   }
 
   static _isRegionAccessible(regionName, age) {
@@ -560,6 +604,16 @@ class LogicHelper {
     const rightNode = node.right;
     const leftValue = leftNode.type === "Identifier" ? leftNode.name : leftNode.value;
     const rightValue = rightNode.type === "Identifier" ? rightNode.name : rightNode.value;
+
+    // boulder_type('X') == BOULDER_TYPE_Y, or `in [BOULDER_TYPE_Y, ...]` for the multi-type form
+    if (leftNode.type === "CallExpression" && leftNode.callee?.name === "boulder_type") {
+      const possible = possibleBoulderTypes(this.boulderTable, this.settings, boulderNameArgument(leftNode));
+      const compared = boulderTypeNames(rightNode);
+      const overlaps = possible.some(type => compared.includes(type));
+
+      if (node.operator === "in" || node.operator === "==") { return overlaps; }
+      if (node.operator === "!=") { return !(possible.length > 0 && possible.every(type => compared.includes(type))); }
+    }
 
     switch (node.operator) {
       case "==":
@@ -680,6 +734,23 @@ class LogicHelper {
     return false;
   }
 
+  /**
+   * Evaluate whether the current items can get past a boulder.
+   * @param {object} node - The CallExpression AST node for the boulder helper.
+   * @param {string} age - The age context to evaluate under.
+   * @param {Array<string>|null} allowedTypes - Restrict to these types, or null for any.
+   * @returns {boolean} True if the boulder can be passed.
+   */
+  static _evalBoulder(node, age, allowedTypes) {
+    let types = possibleBoulderTypes(this.boulderTable, this.settings, boulderNameArgument(node));
+    if (allowedTypes) { types = types.filter(type => allowedTypes.includes(type)); }
+
+    const rule = boulderRule(types);
+    if (!rule) { return false; }
+
+    return this._evalNode(parseRule(rule), age);
+  }
+
   static _canAccessDrop(dropName) {
     const dropLocations = Locations.getDropLocations(dropName);
     if (!dropLocations) { return false; }
@@ -688,8 +759,10 @@ class LogicHelper {
       const parentRegion = locationData.parentRegion;
       const rule = locationData.rule;
 
-      const asChild = this._isRegionAccessible(parentRegion, "child") && this._evalNode(rule, "child");
-      const asAdult = this._isRegionAccessible(parentRegion, "adult") && this._evalNode(rule, "adult");
+      const asChild =
+        this._isRegionAccessible(parentRegion, "child") && this._withRegion(parentRegion, () => this._evalNode(rule, "child"));
+      const asAdult =
+        this._isRegionAccessible(parentRegion, "adult") && this._withRegion(parentRegion, () => this._evalNode(rule, "adult"));
 
       return asChild || asAdult;
     });
@@ -788,6 +861,8 @@ class LogicHelper {
     switch (name) {
       case "True":
         return true;
+      case "False":
+        return false;
 
       case "has_bottle":
         return this._hasBottle();
@@ -902,7 +977,14 @@ class LogicHelper {
       return SettingsHelper.isAdvancedAllowedTrick(name);
     }
 
-    throw Error(`Unknown Identifier: ${name}`);
+    if (!warnedUnknownIdentifiers.has(name)) {
+      warnedUnknownIdentifiers.add(name);
+      console.warn(
+        `logic-helper: unknown identifier "${name}" treated as false. ` +
+        "Availability for locations gated on it will be understated.",
+      );
+    }
+    return false;
   }
 
   static _evalLiteral(value) {
@@ -990,8 +1072,10 @@ class LogicHelper {
       const parentRegion = event.parentRegion;
       const rule = event.rule;
 
-      const asChild = this._isRegionAccessible(parentRegion, "child") && this._evalNode(rule, "child");
-      const asAdult = this._isRegionAccessible(parentRegion, "adult") && this._evalNode(rule, "adult");
+      const asChild =
+        this._isRegionAccessible(parentRegion, "child") && this._withRegion(parentRegion, () => this._evalNode(rule, "child"));
+      const asAdult =
+        this._isRegionAccessible(parentRegion, "adult") && this._withRegion(parentRegion, () => this._evalNode(rule, "adult"));
 
       return asChild || asAdult;
     });

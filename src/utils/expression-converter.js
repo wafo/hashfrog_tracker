@@ -17,6 +17,7 @@ import {
   impossibleExpr, orCombineExpressions,
   simplifyOrBySubset,
 } from "./expression-data";
+import { boulderNameArgument, boulderRule, boulderTypeNames, possibleBoulderTypes } from "./boulders";
 import Locations from "./locations";
 import LogicHelper from "./logic-helper";
 import { parseRule } from "./rule-parser";
@@ -1076,6 +1077,23 @@ function handleBinaryExpression(node, items) {
   const leftLiteral = node.left.type === "Literal" ? node.left.value : null;
   const rightLiteral = node.right.type === "Literal" ? node.right.value : null;
 
+  // boulder_type('X') == BOULDER_TYPE_Y, or `in [BOULDER_TYPE_Y, ...]` for the multi-type form.
+  // Under boulder shuffle, several types stay possible, so each branch of a rule that switches on the type is admitted
+  // and the surrounding `or` collapses to the union of their requirements.
+  if (node.left.type === "CallExpression" && node.left.callee?.name === "boulder_type") {
+    const possible = possibleBoulderTypes(LogicHelper.boulderTable, getSettings(), boulderNameArgument(node.left));
+    const compared = boulderTypeNames(node.right);
+    const overlaps = possible.some(type => compared.includes(type));
+
+    if (node.operator === "in" || isEquality) {
+      return overlaps ? new Expression() : impossibleExpr();
+    }
+    if (isInequality) {
+      const alwaysMatches = possible.length > 0 && possible.every(type => compared.includes(type));
+      return alwaysMatches ? impossibleExpr() : new Expression();
+    }
+  }
+
   if (isEquality || isInequality) {
     // age == starting_age: satisfied when ages can be switched freely.
     // Otherwise, compare the current age context against the known starting age.
@@ -1282,6 +1300,21 @@ function handleCallExpression(node, items, visited, depth, skipAgeFiltering = fa
       return impossibleExpr();
     }
     return SettingsHelper.hasDungeonShortcut(hintRegion) ? new Expression() : impossibleExpr();
+  }
+
+  // Boulder shuffle checks
+  if (funcName === "can_pass_boulder" || funcName === "can_pass_boulder_types") {
+    let types = possibleBoulderTypes(LogicHelper.boulderTable, getSettings(), boulderNameArgument(node));
+
+    if (funcName === "can_pass_boulder_types") {
+      const allowed = boulderTypeNames(node.arguments[1]);
+      types = types.filter(type => allowed.includes(type));
+    }
+
+    const combinedRule = boulderRule(types);
+    if (!combinedRule) { return impossibleExpr(); }
+
+    return extractFromNode(parseRule(combinedRule), items, visited, depth + 1, skipAgeFiltering);
   }
 
   // Damage survival checks
