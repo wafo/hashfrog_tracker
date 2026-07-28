@@ -1,9 +1,9 @@
-const BUNDLED_VERSIONS = new Set(["9.0.0", "8.3.0", "devTFBlitz_"]);
+import { isEFK } from "../utils/efk";
 
-// Versions that are only bundled when the settings string exactly matches.
-const BUNDLED_VERSION_SETTINGS = {
-  "devTFBlitz_": "BSAZASAALTDDSLFQNACAAASWCHGADSFCAAABAAAA2NCA2VCAGXM29TASECCAWAACWAAFAXC2JTFF2WJVCQL6KTH5CQDAABSAGADWBRAJEWHBLZLAF2BQULFPBAASNBAUFZALAAESR4S25AQMAENSW26AFBJ9A3BEAWJSNEDC",
-};
+const BUNDLED_VERSIONS = new Set(["9.0.0", "8.3.0"]);
+
+// EFK is handled separately from BUNDLED_VERSIONS and relies instead on isEFK().
+const EFK_BUNDLE = "EFK";
 
 const DEFAULT_OWNER = "OoTRandomizer";
 const FALLBACK_VERSION = "9.0.0";
@@ -19,23 +19,17 @@ const DEV_FORK_BRANCHES = {
 /**
  * Checks if a version has bundled logic files.
  * @param {string} version - The version string to check.
- * @param {string} [settingsString] - The settings string, required for versions in BUNDLED_VERSION_SETTINGS.
+ * @param {string} [settingsString] - The settings string, used to detect the EFK bundle.
  * @returns {boolean} True if the version is bundled.
  */
 function isBundled(version, settingsString) {
-  if (!BUNDLED_VERSIONS.has(version)) {
-    return false;
-  }
-  if (version in BUNDLED_VERSION_SETTINGS) {
-    return settingsString === BUNDLED_VERSION_SETTINGS[version];
-  }
-  return true;
+  return isEFK(settingsString) || BUNDLED_VERSIONS.has(version);
 }
 
 /**
  * Dynamically imports bundled logic files for a version.
  * @param {string} version - The version string.
- * @param {string} [settingsString] - The settings string, required for versions in BUNDLED_VERSION_SETTINGS.
+ * @param {string} [settingsString] - The settings string, used to detect the EFK bundle.
  * @returns {Promise<object|null>} The bundle or null if not bundled.
  */
 async function getBundledLogicFiles(version, settingsString) {
@@ -43,7 +37,8 @@ async function getBundledLogicFiles(version, settingsString) {
     return null;
   }
 
-  const bundle = await import(`./bundles/${version}/index.js`);
+  const bundleName = isEFK(settingsString) ? EFK_BUNDLE : version;
+  const bundle = await import(`./bundles/${bundleName}/index.js`);
   return bundle.default;
 }
 

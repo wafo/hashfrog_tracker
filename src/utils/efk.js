@@ -8,7 +8,7 @@ const EFK_SETTINGS_STRING = SETTING_STRINGS_JSON.presets.find(p => p.value === "
 
 const EFK_LABEL_NAME = "efk_dungeon";
 
-// Maps full dungeon hint-region names to the lobby region name used in the devTFBlitz_ Overworld graph.
+// Maps full dungeon hint-region names to the lobby region name used in the EFK bundle's Overworld graph.
 // These are the unconditional (True) exits added from Kakariko Village in the EFK version.
 const EFK_DUNGEON_LOBBY_REGIONS = {
   "Deku Tree": "Deku Tree Lobby",
@@ -31,6 +31,9 @@ const SHORT_TO_FULL_HINT_REGION_NAMES = _.invert(HINT_REGIONS_SHORT_NAMES);
  * @returns {boolean} True if the EFK preset is active.
  */
 function isEFK(settingsString) {
+  if (!settingsString) {
+    return false;
+  }
   return settingsString === EFK_SETTINGS_STRING;
 }
 
