@@ -3064,5 +3064,28 @@
       "boss_tw_25x25.png"
     ],
     "receiver": false
+  },
+  {
+    "id": "3408c14106b24e4c913cdbb48f838068",
+    "type": "simple",
+    "name": "numbers",
+    "displayName": "Numbers",
+    "size": [
+      20,
+      20
+    ],
+    "icons": [
+      "count_0.png",
+      "count_1.png",
+      "count_2.png",
+      "count_3.png",
+      "count_4.png",
+      "count_5.png",
+      "count_6.png",
+      "count_7.png",
+      "count_8.png",
+      "count_9.png"
+    ],
+    "receiver": false
   }
 ]
