@@ -81,7 +81,15 @@ const TrackerLauncher = () => {
     setGeneratorVersionCache(debouncedVersion);
   }, [debouncedVersion, setGeneratorVersionCache]);
 
+  const missingSettingsString = checks && !settingsString.trim();
+  const [launchAttempted, setLaunchAttempted] = useState(false);
+
   const launchTracker = useCallback(() => {
+    if (missingSettingsString) {
+      setLaunchAttempted(true);
+      return;
+    }
+
     let url = `${baseURL}/tracker`;
     if (checks) { url = `${baseURL}/tracker/checks`; }
 
@@ -98,7 +106,7 @@ const TrackerLauncher = () => {
       "HashFrog Tracker",
       `toolbar=0,location=0,status=0,menubar=0,scrollbars=0,resizable=0,width=${width},height=${height}`
     );
-  }, [checks, layout, settingsString, generatorVersion, layoutSize]);
+  }, [missingSettingsString, checks, layout, settingsString, generatorVersion, layoutSize]);
 
   // Track whether a saved session exists so the Resume button reacts when one
   // is created in a popup window; refresh on focus when returning to the launcher.
@@ -298,6 +306,11 @@ const TrackerLauncher = () => {
                       }
                     />
                   </InputGroup>
+                  {launchAttempted && missingSettingsString && (
+                    <div className="text-danger small mt-1">
+                      Enter a settings string or pick a preset to launch with check tracking.
+                    </div>
+                  )}
                 </div>
               </div>
 

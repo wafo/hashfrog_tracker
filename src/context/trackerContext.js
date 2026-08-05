@@ -603,55 +603,58 @@ function reducer(state, action) {
       const draggedIcons = snapshot.draggedIcons || {};
       const starting_item_claims = snapshot.starting_item_claims || {};
       const unchanged_starting_inventory = snapshot.unchanged_starting_inventory || [];
-
-      if (snapshot.mq_dungeons_specific) {
-        _.set(LogicHelper.settings, "mq_dungeons_specific", snapshot.mq_dungeons_specific);
-        SettingsHelper.settings["mq_dungeons_specific"] = snapshot.mq_dungeons_specific;
-      }
-      if (snapshot.dungeon_shortcuts) {
-        _.set(LogicHelper.settings, "dungeon_shortcuts", snapshot.dungeon_shortcuts);
-        SettingsHelper.settings["dungeon_shortcuts"] = snapshot.dungeon_shortcuts;
-      }
-      SettingsHelper.invalidateCachedSets();
-
       const starting_age_selection = snapshot.starting_age_selection || null;
-      SettingsHelper.setStartingAgeSelection(starting_age_selection);
-
-      // Rebuild the tooltip caches the restored settings invalidated
-      scheduleTooltipWarm();
-
-      const locations = _.cloneDeep(state.locations);
-
-      // Rebuild each dungeon's location list to match the restored MQ setting.
-      _.forEach(_.keys(locations), regionName => {
-        if (!_.includes(DUNGEONS, regionName)) { return; }
-        const locationKey = SettingsHelper.isMQDungeon(regionName) ? "dungeon_mq" : "dungeon";
-        _.set(locations, regionName, {});
-        _.forEach(Locations.locations[locationKey][regionName], (locationData, locationName) => {
-          if (Locations.isProgressLocation(locationData)) {
-            _.set(locations, [regionName, locationName], { isAvailable: false, isChecked: false });
-          }
-        });
-      });
-
-      _.forEach(snapshot.checkedLocations || {}, (locationNames, regionName) => {
-        if (!locations[regionName]) { return; }
-        locationNames.forEach(locationName => {
-          if (locations[regionName][locationName]) {
-            _.set(locations, [regionName, locationName, "isChecked"], true);
-          }
-        });
-      });
-
-      const settingsString = snapshot.settings_string || state.settings_string;
-      const skipRegions = isEFK(settingsString) ? getEFKSkipRegions(settingsString, labelSelections) : new Set();
-
       const parsedItems = parseItems(items_list, counters, unchanged_starting_inventory);
-      const validatedLocations = validateLocations(locations, parsedItems, skipRegions);
+
+      let restoredLocations = state.locations;
+
+      // The following is only restored with check tracking on.
+      if (!_.isEmpty(state.locations)) {
+        if (snapshot.mq_dungeons_specific) {
+          _.set(LogicHelper.settings, "mq_dungeons_specific", snapshot.mq_dungeons_specific);
+          SettingsHelper.settings["mq_dungeons_specific"] = snapshot.mq_dungeons_specific;
+        }
+        if (snapshot.dungeon_shortcuts) {
+          _.set(LogicHelper.settings, "dungeon_shortcuts", snapshot.dungeon_shortcuts);
+          SettingsHelper.settings["dungeon_shortcuts"] = snapshot.dungeon_shortcuts;
+        }
+        SettingsHelper.invalidateCachedSets();
+        SettingsHelper.setStartingAgeSelection(starting_age_selection);
+
+        const locations = _.cloneDeep(state.locations);
+
+        // Rebuild each dungeon's location list to match the restored MQ setting.
+        _.forEach(_.keys(locations), regionName => {
+          if (!_.includes(DUNGEONS, regionName)) { return; }
+          const locationKey = SettingsHelper.isMQDungeon(regionName) ? "dungeon_mq" : "dungeon";
+          _.set(locations, regionName, {});
+          _.forEach(Locations.locations[locationKey][regionName], (locationData, locationName) => {
+            if (Locations.isProgressLocation(locationData)) {
+              _.set(locations, [regionName, locationName], { isAvailable: false, isChecked: false });
+            }
+          });
+        });
+
+        _.forEach(snapshot.checkedLocations || {}, (locationNames, regionName) => {
+          if (!locations[regionName]) { return; }
+          locationNames.forEach(locationName => {
+            if (locations[regionName][locationName]) {
+              _.set(locations, [regionName, locationName, "isChecked"], true);
+            }
+          });
+        });
+
+        const settingsString = snapshot.settings_string || state.settings_string;
+        const skipRegions = isEFK(settingsString) ? getEFKSkipRegions(settingsString, labelSelections) : new Set();
+        restoredLocations = validateLocations(locations, parsedItems, skipRegions);
+
+        // Rebuild the tooltip caches the restored settings invalidated
+        scheduleTooltipWarm();
+      }
 
       return {
         ...state,
-        locations: validatedLocations,
+        locations: restoredLocations,
         items: parsedItems,
         items_list,
         counters,
