@@ -27,6 +27,13 @@
       "description": "The official settings for Mentor Tournament 2026."
     },
     {
+      "label": "League S10",
+      "value": "league_s10",
+      "generatorVersion": "Dev v9.1.28",
+      "settingsString": "BSAXDNCAX2TB2TCHGAB3L62ANAEACAAAJAAAG4AAWEASK7CAAEAEKEEAJBAAFALFAAAC2ANSG6BAKS6WH3LANAFJKGXVFAAACAJYS3FAGAADWHPJND2RASSBUDWWGARS6ACALJSNEDC",
+      "description": "The official settings for League Season 10."
+    },
+    {
       "label": "League S9",
       "value": "league_s9",
       "generatorVersion": "9.0.0",

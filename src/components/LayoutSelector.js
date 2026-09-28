@@ -9,6 +9,7 @@ import { readFileAsText } from "../utils/utils";
 // Layouts
 import hashfrogJSON from "../layouts/hashfrog.json";
 import hashfrogMentorJSON from "../layouts/HashFrogMentor.json";
+import leagueS10JSON from "../layouts/LeagueS10.json"
 import hashfrogSawsJSON from "../layouts/HashFrogSAWS.json";
 import linsoJSON from "../layouts/linso.json";
 import escapefromkakJSON from "../layouts/escapefromkak.json";
@@ -70,6 +71,9 @@ const LayoutSelector = () => {
         case "hashfrogMentor":
           selectedLayout = hashfrogMentorJSON;
           break;
+        case "leagueS10":
+          selectedLayout = leagueS10JSON;
+          break;
         default:
           selectedLayout = hashfrogJSON;
           break;
@@ -128,6 +132,12 @@ const LayoutSelector = () => {
         <li>
           <button type="button" className="btn btn-link btm-sm p-0" onClick={() => applyPreset("hashfrogMentor")}>
             HashFrog Mentor
+          </button>
+        </li>
+        <li className="list-divider">|</li>
+        <li>
+          <button type="button" className="btn btn-link btm-sm p-0" onClick={() => applyPreset("leagueS10")}>
+            League S10
           </button>
         </li>
         <li className="list-divider">|</li>

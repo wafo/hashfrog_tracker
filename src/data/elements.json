@@ -2117,6 +2117,19 @@
     ]
   },
   {
+    "id": "0c3a16921f994cde8089ab570e4a0882",
+    "type": "simple",
+    "name": "gs_token",
+    "displayName": "Gold Skulltula Token",
+    "size": [
+      25,
+      25
+    ],
+    "icons": [
+      "gs_32x32.png"
+    ]
+  },
+  {
     "id": "7ac5c97bf662472599f66f70d4b83b16",
     "type": "simple",
     "name": "gs_10",
