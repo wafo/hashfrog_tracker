@@ -81,8 +81,8 @@
   "10498d96274048598706264078789899": { "item": "Magic_Meter", "value": 1 },
   "29cddaecf35a49dfb6f80682f69b5df9": { "item": "Magic_Meter", "value": 2 },
 
-  "7d8f399f6ef848e0bfba61d7ba31d1ff": { "item": "Ocarina" },
-  "6240defb8f6044d984476dc0b0467f74": { "item": "Ocarina" },
+  "7d8f399f6ef848e0bfba61d7ba31d1ff": { "item": "Ocarina", "value": 1 },
+  "6240defb8f6044d984476dc0b0467f74": { "item": "Ocarina", "value": 2 },
 
   "28bfbeeeaaf54dc99e66244bd8ba4aa3": { "item": "Bottle_with_Big_Poe" },
 
