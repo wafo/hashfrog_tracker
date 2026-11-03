@@ -15,7 +15,8 @@
     "dev": "concurrently --kill-others-on-fail --names web,worker \"react-scripts start\" \"npm run worker\"",
     "worker": "wrangler dev --port 8787",
     "preview": "npm run build && wrangler dev --port 8787",
-    "preworker": "node -e \"require('fs').mkdirSync('build', { recursive: true })\""
+    "preworker": "node -e \"require('fs').mkdirSync('build', { recursive: true })\"",
+    "deploy:staging": "npm run build && wrangler deploy --env staging"
   },
   "dependencies": {
     "acorn": "^8.18.0",

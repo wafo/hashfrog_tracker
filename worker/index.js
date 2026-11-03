@@ -3,7 +3,8 @@ import { DEV_FORK_BRANCHES } from "../src/versions/dev-branches.js";
 const GENERATOR_URL = "https://ootrandomizer.com/settings/get";
 
 // Bump the namespace to throw away every cached decode at once (see ADR 0001).
-const CACHE_NAMESPACE = "v1";
+// Staging sets its own through the environment, since it shares the zone's cache with production.
+const DEFAULT_CACHE_NAMESPACE = "v1";
 const CACHE_TTL_SECONDS = 7 * 24 * 60 * 60;
 
 // Shorter than the client's own 10-second limit, so the client sees our timeout rather than its generic one.
@@ -29,12 +30,14 @@ const errorResponse = (status, error, message) =>
 
 /**
  * Builds the cache key for a decode. The Cache API keys on URLs, so the key is a synthetic one.
+ * @param {object} env - The Worker bindings.
  * @param {string} version - The generator version.
  * @param {string} settingsString - The settings string.
  * @returns {string} The cache key URL.
  */
-const cacheKey = (version, settingsString) =>
-  `https://settings-cache.hashfrog.internal/${CACHE_NAMESPACE}?` + new URLSearchParams({ version, settingsString });
+const cacheKey = (env, version, settingsString) =>
+  `https://settings-cache.hashfrog.internal/${env?.CACHE_NAMESPACE || DEFAULT_CACHE_NAMESPACE}?` +
+  new URLSearchParams({ version, settingsString });
 
 /**
  * Builds the response the client sees for a set of decoded settings.
@@ -178,7 +181,7 @@ const decodeSettings = async (request, env, ctx) => {
   if (!GENERATOR_VERSION.test(version) || !SETTINGS_STRING.test(settingsString)) {
     return errorResponse(400, "invalid_request", "Expected a generator version and an uppercase settings string.");
   }
-  const key = cacheKey(version, settingsString);
+  const key = cacheKey(env, version, settingsString);
 
   const cached = await caches.default.match(key);
   if (cached) {

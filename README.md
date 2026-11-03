@@ -41,3 +41,21 @@ Configure the Cloudflare Workers Build with:
 - Deploy command: `npx wrangler deploy`
 
 The Worker name in `wrangler.jsonc` must match the Worker created in Cloudflare.
+
+### Staging
+
+Staging is a separate Worker, `hashfrog-tracker-staging`, served at
+[https://staging.hashfrog-tracker.com](https://staging.hashfrog-tracker.com). Use it to
+test a branch on real Cloudflare infrastructure (including the settings cache) before it
+reaches production. Deploys are manual; whatever you deploy replaces what is there.
+
+1. Check out the branch you want to test.
+2. Run `npx wrangler login` once, with an account that has access to the project's
+   Cloudflare account (ask the maintainer to invite you under Manage Account → Members
+   with a Workers role).
+3. Run `npm run deploy:staging`. It builds the app and deploys it to staging.
+4. Mention in the pull request that staging runs your branch.
+
+Follow staging's logs with `npx wrangler tail --env staging`. Staging keeps its own
+settings cache and rate limit, so testing there never affects production.
+

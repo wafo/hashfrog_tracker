@@ -104,6 +104,16 @@ describe("GET /api/settings/string", () => {
     assert.equal(generator.calls.length, 1);
   });
 
+  it("keeps each deployment's cache entries apart", async () => {
+    await call(settingsRequest());
+    env.CACHE_NAMESPACE = "staging-v1";
+
+    const response = await call(settingsRequest());
+
+    assert.equal(response.headers.get("X-Cache"), "MISS");
+    assert.equal(generator.calls.length, 2);
+  });
+
   it("caches each generator version separately", async () => {
     await call(settingsRequest({ version: "9.1.0" }));
     const response = await call(settingsRequest({ version: "8.3.0" }));

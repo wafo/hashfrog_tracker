@@ -20,5 +20,24 @@
   ],
   "observability": {
     "enabled": true
+  },
+  "env": {
+    // A separate Worker for testing branches before they reach production: `npm run deploy:staging`.
+    "staging": {
+      "name": "hashfrog-tracker-staging",
+      "workers_dev": false,
+      "routes": [{ "pattern": "staging.hashfrog-tracker.com", "custom_domain": true }],
+      "vars": {
+        // Staging shares the zone's cache with production, so its decodes live under their own namespace.
+        "CACHE_NAMESPACE": "staging-v1"
+      },
+      "ratelimits": [
+        {
+          "name": "SETTINGS_RATE_LIMITER",
+          "namespace_id": "1002",
+          "simple": { "limit": 20, "period": 60 }
+        }
+      ]
+    }
   }
 }
