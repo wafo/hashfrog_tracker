@@ -9,8 +9,13 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "lint": "eslint src/",
-    "eject": "react-scripts eject"
+    "lint": "eslint --ext .js,.mjs src/ worker/",
+    "eject": "react-scripts eject",
+    "test:worker": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test \"worker/**/*.test.mjs\"",
+    "dev": "concurrently --kill-others-on-fail --names web,worker \"react-scripts start\" \"npm run worker\"",
+    "worker": "wrangler dev --port 8787",
+    "preview": "npm run build && wrangler dev --port 8787",
+    "preworker": "node -e \"require('fs').mkdirSync('build', { recursive: true })\""
   },
   "dependencies": {
     "acorn": "^8.18.0",
@@ -31,11 +36,13 @@
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.4",
+    "concurrently": "10.0.6",
     "eslint": "^8.57.1",
     "eslint-plugin-jsdoc": "^64.1.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^4.6.2",
-    "prettier": "^3.9.6"
+    "prettier": "^3.9.6",
+    "wrangler": "4.156.2"
   },
   "browserslist": {
     "production": [
@@ -48,5 +55,6 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "proxy": "http://localhost:8787"
 }

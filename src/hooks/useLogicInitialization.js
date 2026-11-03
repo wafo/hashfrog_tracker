@@ -51,8 +51,17 @@ const validateDecodedSettings = settings => {
   return settings;
 };
 
+// What to tell the player for each error status of the settings endpoint.
+// Only a 400 means the settings string itself is at fault; everything else is worth retrying as-is.
+const STATUS_MESSAGES = {
+  400: `The generator could not decode this settings string. ${CHECK_STRING_HINT}`,
+  429: "Too many new settings strings were decoded from your connection. Wait a minute and try again.",
+  502: "The settings service is having trouble right now. Try again in a moment.",
+  504: "The settings service did not respond in time. Try again in a moment.",
+};
+
 /**
- * Decode a settings string through the companion API, failing loudly on anything unusable.
+ * Decode a settings string through the tracker's settings endpoint, failing loudly on anything unusable.
  *
  * Every failure throws instead of returning undefined.
  * This prevents a session from running on silently applied default settings.
@@ -62,9 +71,9 @@ const validateDecodedSettings = settings => {
  * @returns {Promise<object>} The decoded settings.
  * @throws {Error} When the service is unreachable, errors, or returns a malformed body.
  */
-const fetchDecodedSettings = async (generatorVersion, settingsString, signal) => {
+export const fetchDecodedSettings = async (generatorVersion, settingsString, signal) => {
   const url =
-    `${process.env.REACT_APP_API_URL}/settings/string?` +
+    "/api/settings/string?" +
     new URLSearchParams({
       version: generatorVersion,
       settingsString: settingsString,
@@ -81,7 +90,10 @@ const fetchDecodedSettings = async (generatorVersion, settingsString, signal) =>
   }
 
   if (!response.ok) {
-    throw new Error(`Could not decode the settings string (the service responded with status ${response.status}). ${CHECK_STRING_HINT}`);
+    throw new Error(
+      STATUS_MESSAGES[response.status] ??
+        `The settings service could not decode the settings string (status ${response.status}). Try again in a moment.`,
+    );
   }
 
   let body;

@@ -38,5 +38,8 @@ jobs:
       - name: Run tests
         run: npm test
 
+      - name: Run Worker tests
+        run: npm run test:worker
+
       - name: Build UI
         run: npm run build

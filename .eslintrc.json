@@ -23,6 +23,12 @@
     "react-hooks",
     "jsdoc"
   ],
+  "overrides": [
+    {
+      "files": ["worker/**"],
+      "env": { "es2022": true }
+    }
+  ],
   "settings": {
     "react": {
       "version": "detect"
