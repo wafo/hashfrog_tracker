@@ -1,4 +1,3 @@
-// The generator's dev branches, keyed by the version prefix each one reports.
 // Kept free of imports so the Worker can share it with the frontend.
 
 export const DEFAULT_OWNER = "OoTRandomizer";

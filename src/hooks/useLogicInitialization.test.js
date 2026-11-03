@@ -30,7 +30,9 @@ describe("fetchDecodedSettings", () => {
   it("blames the settings string when the generator rejects it", async () => {
     respondWith(new Response(JSON.stringify({ error: "invalid_settings_string" }), { status: 400 }));
 
-    await expect(decode()).rejects.toThrow(CHECK_STRING_HINT);
+    const error = await decode().catch(err => err);
+    expect(error.message).toMatch(/settings string for this generator version/);
+    expect(error.message).toMatch(CHECK_STRING_HINT);
   });
 
   it("asks the player to wait when they hit the rate limit", async () => {
@@ -41,11 +43,11 @@ describe("fetchDecodedSettings", () => {
     expect(error.message).not.toMatch(CHECK_STRING_HINT);
   });
 
-  it("blames the settings service, not the settings string, when the generator is down", async () => {
+  it("blames the generator, not the settings string, when the generator is down", async () => {
     respondWith(new Response(JSON.stringify({ error: "upstream_error" }), { status: 502 }));
 
     const error = await decode().catch(err => err);
-    expect(error.message).toMatch(/settings service is having trouble/);
+    expect(error.message).toMatch(/generator is having trouble/);
     expect(error.message).not.toMatch(CHECK_STRING_HINT);
   });
 
@@ -53,7 +55,7 @@ describe("fetchDecodedSettings", () => {
     respondWith(new Response(JSON.stringify({ error: "upstream_timeout" }), { status: 504 }));
 
     const error = await decode().catch(err => err);
-    expect(error.message).toMatch(/did not respond in time/);
+    expect(error.message).toMatch(/generator did not respond in time/);
     expect(error.message).not.toMatch(CHECK_STRING_HINT);
   });
 

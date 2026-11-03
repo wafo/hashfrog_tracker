@@ -1,4 +1,5 @@
-import { loadSession } from "./trackerContext";
+import SettingStrings from "../data/setting-strings.json";
+import { getGeneratorVersionCache, loadSession } from "./trackerContext";
 
 const SESSION_KEY = "tracker_session";
 
@@ -106,5 +107,21 @@ describe("loadSession", () => {
       "Hyrule Field": ["HF Ocarina of Time Item"],
     });
     expect(warnSpy).toHaveBeenCalled();
+  });
+});
+
+describe("getGeneratorVersionCache", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("defaults a fresh browser to the generator's current active version", () => {
+    expect(getGeneratorVersionCache()).toBe(SettingStrings.currentActiveVersion);
+  });
+
+  it("keeps a version the player already chose", () => {
+    localStorage.setItem("generator_version", "8.3.0");
+
+    expect(getGeneratorVersionCache()).toBe("8.3.0");
   });
 });

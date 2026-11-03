@@ -14,8 +14,8 @@ const SETTINGS_STRING = /^[A-Z0-9]{1,1024}$/;
 // A release ("9.1.0"), or a known dev branch prefix with the build it reports, if any ("dev_9.1.28", "devrreal_9.0.2-17").
 const escapeRegExp = text => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const DEV_PREFIXES = Object.keys(DEV_FORK_BRANCHES).map(escapeRegExp).join("|");
-const BUILD = String.raw`\d+(?:\.\d+)*(?:-[A-Za-z0-9.]+)?`;
-const GENERATOR_VERSION = new RegExp(`^(?:${BUILD}|(?:${DEV_PREFIXES})(?:${BUILD})?)$`);
+const BUILD_PATTERN = String.raw`\d+(?:\.\d+)*(?:-[A-Za-z0-9.]+)?`;
+const GENERATOR_VERSION = new RegExp(`^(?:${BUILD_PATTERN}|(?:${DEV_PREFIXES})(?:${BUILD_PATTERN})?)$`);
 
 /**
  * Builds a JSON error response.
@@ -76,8 +76,15 @@ const log = (event, fields) => {
 };
 
 /**
- * Asks the generator to decode a settings string.
- * Every failure is logged in full here and turned into an error response that never carries the generator's own text.
+ * Reads the tail of a failed generator response, where a Python traceback names the actual error.
+ * @param {Response} response - The generator's response.
+ * @returns {Promise<string>} Up to the last 500 characters of the body.
+ */
+const failureDetail = async response => (await response.text().catch(() => "")).slice(-500);
+
+/**
+ * Asks the generator to decode a settings string, and logs the outcome as one cache-miss line.
+ * Failures become error responses that never carry the generator's own text; that text goes to the log instead.
  * @param {string} version - The generator version.
  * @param {string} settingsString - The settings string.
  * @param {number} timeoutMs - How long to wait for the generator.
@@ -88,11 +95,14 @@ const askGenerator = async (version, settingsString, timeoutMs) => {
   upstream.searchParams.set("version", version);
   upstream.searchParams.set("settingsString", settingsString);
 
-  const settingsStringId = await fingerprint(settingsString);
-  const fail = (status, error, message, detail) => {
-    log("generator_error", { status, error, version, settingsString: settingsStringId, ...detail });
+  const logMiss = async fields =>
+    log("cache_miss", { version, settingsString: await fingerprint(settingsString), ...fields });
+  const fail = async (status, error, message, detail) => {
+    await logMiss({ status, error, ...detail });
     return { error: errorResponse(status, error, message) };
   };
+  const timedOut = () => fail(504, "upstream_timeout", "The generator did not respond in time.", { timeoutMs });
+  const unreadable = cause => fail(502, "upstream_error", "The generator returned an unreadable answer.", { cause });
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -102,37 +112,37 @@ const askGenerator = async (version, settingsString, timeoutMs) => {
       response = await fetch(upstream, { signal: controller.signal });
     } catch (err) {
       if (controller.signal.aborted) {
-        return fail(504, "upstream_timeout", "The settings service did not answer in time.", { timeoutMs });
+        return timedOut();
       }
-      return fail(502, "upstream_error", "Could not reach the settings service.", { cause: String(err) });
+      return fail(502, "upstream_error", "Could not reach the generator.", { cause: String(err) });
     }
 
     if (response.status >= 400 && response.status < 500) {
-      const detail = (await response.text().catch(() => "")).slice(-500);
-      return fail(400, "invalid_settings_string", "The generator could not decode this settings string for this version.", {
-        upstreamStatus: response.status,
-        detail,
-      });
+      return fail(
+        400,
+        "invalid_settings_string",
+        "The generator could not decode this settings string for this generator version.",
+        { upstreamStatus: response.status, detail: await failureDetail(response) },
+      );
     }
     if (!response.ok) {
-      const detail = (await response.text().catch(() => "")).slice(-500);
-      return fail(502, "upstream_error", "The settings service is having trouble.", { upstreamStatus: response.status, detail });
+      return fail(502, "upstream_error", "The generator is having trouble.", {
+        upstreamStatus: response.status,
+        detail: await failureDetail(response),
+      });
     }
 
     let settings;
     try {
       settings = await response.json();
     } catch (err) {
-      if (controller.signal.aborted) {
-        return fail(504, "upstream_timeout", "The settings service did not answer in time.", { timeoutMs });
-      }
-      return fail(502, "upstream_error", "The settings service returned an unreadable answer.", { cause: String(err) });
+      return controller.signal.aborted ? timedOut() : unreadable(String(err));
     }
     if (!settings || typeof settings !== "object" || Array.isArray(settings)) {
-      return fail(502, "upstream_error", "The settings service returned an unreadable answer.", { cause: "not an object" });
+      return unreadable("not an object");
     }
 
-    log("cache_miss", { version, settingsString: settingsStringId });
+    await logMiss({ status: 200 });
     return { settings };
   } finally {
     clearTimeout(timer);

@@ -24,6 +24,10 @@ _Avoid_: Seed string, settings code
 The full set of named settings that a settings string stands for, as the generator reports them.
 _Avoid_: Parsed settings, settings JSON
 
+**Settings service**:
+The tracker's own endpoint that turns a settings string into decoded settings by asking the generator and remembering its answers.
+_Avoid_: Backend, API, settings API
+
 **Preset**:
 A named, curated pairing of a generator version and a settings string (e.g. "Mentor 2026") offered on the launcher.
 _Avoid_: Template, profile

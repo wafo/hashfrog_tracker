@@ -172,6 +172,7 @@ describe("GET /api/settings/string", () => {
 
       assert.equal(response.status, 400);
       assert.equal(JSON.parse(text).error, "invalid_settings_string");
+      assert.match(JSON.parse(text).message, /generator version/);
       assert.doesNotMatch(text, /Traceback|OoTRandomizer\.py/);
     });
 
@@ -299,22 +300,25 @@ describe("routing", () => {
 });
 
 describe("logging", () => {
-  it("logs a cache miss with the generator version, but not the full settings string", async () => {
+  it("logs a cache miss with its status and the generator version, but not the full settings string", async () => {
     await call(settingsRequest());
 
     assert.equal(logs.length, 1);
     assert.equal(logs[0].event, "cache_miss");
+    assert.equal(logs[0].status, 200);
     assert.equal(logs[0].version, "9.1.0");
     assert.doesNotMatch(JSON.stringify(logs), new RegExp(SETTINGS_STRING));
   });
 
-  it("logs a generator failure with its status and the generator's own explanation", async () => {
+  it("logs a failed cache miss once, with its status and the generator's own explanation", async () => {
     globalThis.fetch = fakeGenerator(() => new Response("Traceback: bad string", { status: 400 })).fetchImpl;
 
     await call(settingsRequest());
 
     assert.equal(logs.length, 1);
-    assert.equal(logs[0].event, "generator_error");
+    assert.equal(logs[0].event, "cache_miss");
+    assert.equal(logs[0].status, 400);
+    assert.equal(logs[0].error, "invalid_settings_string");
     assert.equal(logs[0].upstreamStatus, 400);
     assert.match(logs[0].detail, /Traceback/);
     assert.doesNotMatch(JSON.stringify(logs), new RegExp(SETTINGS_STRING));

@@ -27,6 +27,11 @@ const LIST_SETTINGS = [
 
 const CHECK_STRING_HINT = "Check the settings string and generator version, then try again.";
 
+/** A failure to decode the settings string, whose message already tells the player what to do. */
+export class SettingsDecodeError extends Error {
+  name = "SettingsDecodeError";
+}
+
 /**
  * Check that a decoded-settings response looks like settings before it reaches the logic.
  * Unknown keys remain allowed on purpose: forks add settings this tracker has never seen.
@@ -36,16 +41,16 @@ const CHECK_STRING_HINT = "Check the settings string and generator version, then
  */
 const validateDecodedSettings = settings => {
   if (typeof settings !== "object" || settings === null || Array.isArray(settings)) {
-    throw new Error(`The settings service returned an unexpected response. ${CHECK_STRING_HINT}`);
+    throw new SettingsDecodeError(`The settings service returned an unexpected response. ${CHECK_STRING_HINT}`);
   }
 
   const badLists = LIST_SETTINGS.filter(key => key in settings && !Array.isArray(settings[key]));
   if (badLists.length) {
-    throw new Error(`The decoded settings look corrupted (${badLists.join(", ")} should be lists). ${CHECK_STRING_HINT}`);
+    throw new SettingsDecodeError(`The decoded settings look corrupted (${badLists.join(", ")} should be lists). ${CHECK_STRING_HINT}`);
   }
 
   if ("bridge" in settings && typeof settings.bridge !== "string") {
-    throw new Error(`The decoded settings look corrupted (bridge should be text). ${CHECK_STRING_HINT}`);
+    throw new SettingsDecodeError(`The decoded settings look corrupted (bridge should be text). ${CHECK_STRING_HINT}`);
   }
 
   return settings;
@@ -54,10 +59,10 @@ const validateDecodedSettings = settings => {
 // What to tell the player for each error status of the settings endpoint.
 // Only a 400 means the settings string itself is at fault; everything else is worth retrying as-is.
 const STATUS_MESSAGES = {
-  400: `The generator could not decode this settings string. ${CHECK_STRING_HINT}`,
+  400: `The generator could not decode this settings string for this generator version. ${CHECK_STRING_HINT}`,
   429: "Too many new settings strings were decoded from your connection. Wait a minute and try again.",
-  502: "The settings service is having trouble right now. Try again in a moment.",
-  504: "The settings service did not respond in time. Try again in a moment.",
+  502: "The generator is having trouble right now. Try again in a moment.",
+  504: "The generator did not respond in time. Try again in a moment.",
 };
 
 /**
@@ -84,13 +89,13 @@ export const fetchDecodedSettings = async (generatorVersion, settingsString, sig
     response = await fetch(url, { signal });
   } catch (err) {
     if (err?.name === "AbortError") {
-      throw new Error("The settings service did not respond in time. Check your connection and try again.");
+      throw new SettingsDecodeError("The settings service did not respond in time. Check your connection and try again.");
     }
-    throw new Error("Could not reach the settings service. Check your connection and try again.");
+    throw new SettingsDecodeError("Could not reach the settings service. Check your connection and try again.");
   }
 
   if (!response.ok) {
-    throw new Error(
+    throw new SettingsDecodeError(
       STATUS_MESSAGES[response.status] ??
         `The settings service could not decode the settings string (status ${response.status}). Try again in a moment.`,
     );
@@ -101,9 +106,9 @@ export const fetchDecodedSettings = async (generatorVersion, settingsString, sig
     body = await response.json();
   } catch (err) {
     if (err?.name === "AbortError") {
-      throw new Error("The settings service did not respond in time. Check your connection and try again.");
+      throw new SettingsDecodeError("The settings service did not respond in time. Check your connection and try again.");
     }
-    throw new Error("The settings service returned an unreadable response. Try again in a moment.");
+    throw new SettingsDecodeError("The settings service returned an unreadable response. Try again in a moment.");
   }
 
   return validateDecodedSettings(body?.settings);
