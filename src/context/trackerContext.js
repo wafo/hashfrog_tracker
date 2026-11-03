@@ -5,6 +5,7 @@ import COMBO_ITEMS from "../data/combo-items.json";
 import COUNTER_TO_ITEM from "../data/counter-to-item.json";
 import DEFAULT_ITEMS from "../data/default-items.json";
 import DUNGEONS from "../data/dungeons.json";
+import SETTING_STRINGS from "../data/setting-strings.json";
 import ITEMS_JSON from "../data/items.json";
 import UUID_TO_ITEM from "../data/uuid-to-item.json";
 import { warmRequirementsCache } from "../utils/expression-converter";
@@ -119,14 +120,10 @@ function setSettingsStringCache(string) {
 
 /**
  * Retrieves the cached generator version from localStorage, in the form the generator reports.
- * @returns {string} The normalized cached version, or the default from env.
+ * @returns {string} The normalized cached version, or else the default from env, or else the generator's current active version.
  */
 function getGeneratorVersionCache() {
-  let version = localStorage.getItem("generator_version");
-  if (!version) {
-    // Coming from .env and using it as default
-    version = GENERATOR_VERSION;
-  }
+  const version = localStorage.getItem("generator_version") || GENERATOR_VERSION || SETTING_STRINGS.currentActiveVersion;
   return VersionConfig.normalizeVersion(version);
 }
 
